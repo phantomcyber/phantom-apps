@@ -22,6 +22,7 @@ from ipwhois import IPDefinedError
 from bs4 import UnicodeDammit
 import tldextract
 import ipaddress
+import sys
 
 TLD_LIST_CACHE_FILE_NAME = "public_suffix_list.dat"
 ISO_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -39,6 +40,7 @@ class WhoisConnector(BaseConnector):
     # actions supported by this script
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
     ACTION_ID_WHOIS_IP = "whois_ip"
+    ACTION_ID_WHOIS_TEST_CONNECTIVITY = "test_connectivity"
 
     def __init__(self):
 
@@ -48,9 +50,64 @@ class WhoisConnector(BaseConnector):
         self._state_file_path = None
         self._cache_file_path = None
         self._state = {}
+        self._python_version = None
+        self._update_days = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the WHOIS. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def initialize(self):
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._state = self.load_state()
+        config = self.get_config()
+        self._update_days = int(config['update_days'])
+        if self._update_days <= 0:
+            return self.set_status(phantom.APP_ERROR, "Please provide a valid non-zero positive integer value in update_days.")
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -78,6 +135,38 @@ class WhoisConnector(BaseConnector):
 
         return False
 
+    def _handle_test_connectivity(self, param):
+
+        ip = '1.1.1.1'
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        action_result.set_param({phantom.APP_JSON_IP: ip})
+
+        self.debug_print("Validating/Querying IP '{0}'".format(ip))
+
+        self.save_progress("Querying...")
+
+        try:
+            obj_whois = IPWhois(ip)
+            whois_response = obj_whois.lookup_whois(asn_methods=['whois', 'dns', 'http'])
+        except IPDefinedError as e_defined:
+            self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(error_message)))
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, error_message)
+
+        if not whois_response:
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
+
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _whois_ip(self, param):
 
         ip = param[phantom.APP_JSON_IP]
@@ -101,8 +190,9 @@ class WhoisConnector(BaseConnector):
             self.debug_print("Got IPDefinedError exception str: {0}".format(str(e_defined)))
             return action_result.set_status(phantom.APP_SUCCESS, str(e_defined))
         except Exception as e:
-            self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(e)))
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Got exception: type: {0}, str: {1}".format(type(e).__name__, str(error_message)))
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, error_message)
 
         if not whois_response:
             return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY_RETURNED_NO_DATA)
@@ -136,7 +226,7 @@ class WhoisConnector(BaseConnector):
                 summary_net = {x: net[x] for x in wanted_keys}
                 summary[WHOIS_JSON_NETS].append(summary_net)
                 message += '\nRange: {0}'.format(summary_net['range'])
-                message += '\nAddress: {0}'.format(summary_net['address'])
+                message += '\nAddress: {0}'.format(self._handle_py_ver_compat_for_input_str(summary_net['address']))
 
         action_result.set_status(phantom.APP_SUCCESS, message)
 
@@ -174,15 +264,16 @@ class WhoisConnector(BaseConnector):
         try:
             last_time = datetime.datetime.strptime(last_time, ISO_TIME_FORMAT)
         except Exception as e:
-            self.debug_print("Exception while strptime", e)
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("Exception while strptime", error_message)
             return True
 
         current_time = datetime.datetime.utcnow()
 
         time_diff = current_time - last_time
 
-        app_config = self.get_app_config()
-        cache_exp_days = int(app_config[WHOIS_JSON_CACHE_EXP_DAYS])
+        config = self.get_config()
+        cache_exp_days = int(config[WHOIS_JSON_CACHE_EXP_DAYS])
 
         if (time_diff.days >= cache_exp_days):
             self.debug_print("Diff days {0} >= cache exp days {1}".format(time_diff.days, cache_exp_days))
@@ -202,7 +293,8 @@ class WhoisConnector(BaseConnector):
             else:
                 extract = tldextract.TLDExtract(cache_file=self._cache_file_path, suffix_list_urls=None)
         except Exception as e:
-            self.debug_print("tldextract result failed", e)
+            error_message = self._get_error_message_from_exception(e)
+            self.debug_print("tldextract result failed", error_message)
             # The caller of this function has a try..except for this one
             raise
 
@@ -214,12 +306,12 @@ class WhoisConnector(BaseConnector):
 
         domain = ""
         if result.suffix and result.domain:
-            domain = "{0}.{1}".format(result.domain, result.suffix)  # pylint: disable=E1101
+            domain = "{0}.{1}".format(self._handle_py_ver_compat_for_input_str(result.domain),
+                                        self._handle_py_ver_compat_for_input_str(result.suffix))  # pylint: disable=E1101
         elif result.suffix:
-            domain = "{0}".format(result.suffix)  # pylint: disable=E1101
+            domain = "{0}".format(self._handle_py_ver_compat_for_input_str(result.suffix))  # pylint: disable=E1101
         elif result.domain:
-            domain = "{0}".format(result.domain)  # pylint: disable=E1101
-
+            domain = "{0}".format(self._handle_py_ver_compat_for_input_str(result.domain))  # pylint: disable=E1101
         return domain
 
     def _fetch_whois_info(self, action_result, domain, server):
@@ -236,7 +328,8 @@ class WhoisConnector(BaseConnector):
             else:
                 whois_response = pythonwhois.get_whois(domain)
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, e)
+            error_message = self._get_error_message_from_exception(e)
+            action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_QUERY, error_message)
             return None
 
         if not whois_response:
@@ -248,13 +341,11 @@ class WhoisConnector(BaseConnector):
     def _whois_domain(self, param):
 
         config = self.get_config()
-
         server = config.get(phantom.APP_JSON_SERVER, None)
 
         domain = param[phantom.APP_JSON_DOMAIN]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
         action_result.set_param({phantom.APP_JSON_DOMAIN: domain})
 
         # This sleep is required between two calls, else the server might
@@ -268,7 +359,8 @@ class WhoisConnector(BaseConnector):
         try:
             domain = self._get_domain(domain)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_INPUT, e)
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_INPUT, error_message)
 
         self.debug_print("Validating/Querying Domain {0}".format(repr(domain)))
 
@@ -306,7 +398,8 @@ class WhoisConnector(BaseConnector):
             whois_response = json.loads(whois_response)
             action_result.add_data(whois_response)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_REPLY, e)
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, WHOIS_ERR_PARSE_REPLY, error_message)
 
         # Even if the query was successfull the data might not be available
         if (self._response_no_data(whois_response, domain)):
@@ -340,6 +433,8 @@ class WhoisConnector(BaseConnector):
             result = self._whois_domain(param)
         elif (action == self.ACTION_ID_WHOIS_IP):
             result = self._whois_ip(param)
+        elif (action == self.ACTION_ID_WHOIS_TEST_CONNECTIVITY):
+            result = self._handle_test_connectivity(param)
         else:
             result = self.unknown_action()
 
@@ -348,7 +443,6 @@ class WhoisConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
     # import simplejson as json
     import pudb
 

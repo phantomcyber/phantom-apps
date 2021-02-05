@@ -1,5 +1,5 @@
 # File: jira_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -8,6 +8,7 @@
 # Phantom imports
 import phantom.app as phantom
 from phantom.vault import Vault
+import phantom.rules as phantom_rules
 
 # THIS Connector imports
 from jira_consts import *
@@ -830,7 +831,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_DELETED)
 
-    def _create_ticket(self, param):
+    def _create_ticket(self, param):  # noqa: C901
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
@@ -1254,9 +1255,8 @@ class JiraConnector(phantom.BaseConnector):
 
         # Check for file in vault
         try:
-            vault_meta = Vault.get_file_info(vault_id=vault_id)  # Vault IDs are unique
-
-            if (not vault_meta):
+            _, _, vault_meta = phantom_rules.vault_info(vault_id=vault_id)  # Vault IDs are unique
+            if not vault_meta:
                 self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
                 return JIRA_ERR_FILE_NOT_IN_VAULT
 
@@ -1282,7 +1282,7 @@ class JiraConnector(phantom.BaseConnector):
             file_meta = vault_meta[0]
 
         try:
-            path = Vault.get_file_path(vault_id)
+            path = list(vault_meta)[0].get('path')
             filename = file_meta["name"]
 
             try:
@@ -1657,10 +1657,10 @@ class JiraConnector(phantom.BaseConnector):
 
             filename = self._handle_py_ver_compat_for_input_str(attachment.filename)
 
-            vault_ret = Vault.add_attachment(tmp.name, container_id, filename)
+            success, message, vault_id = phantom_rules.vault_add(file_location=tmp.name, container=container_id, file_name=filename)
 
-            if not vault_ret.get('succeeded'):
-                self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
+            if not success:
+                self.debug_print("Error saving file to vault: ", message)
                 return phantom.APP_ERROR
 
             artifact_json = {}
@@ -1687,7 +1687,7 @@ class JiraConnector(phantom.BaseConnector):
                 artifact_cef['author'] = attachment.author.displayName
                 artifact_cef['is_on_prem'] = False
 
-            artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
+            artifact_cef['vault_id'] = vault_id
 
             artifact_json['cef'] = artifact_cef
 
@@ -1958,12 +1958,11 @@ class JiraConnector(phantom.BaseConnector):
                 attachment_content = attachment.get()
                 f.write(attachment_content)
 
-            vault_ret = Vault.add_attachment(file_location=full_path, container_id=container_id)
+            success, message, vault_id = phantom_rules.vault_add(file_location=full_path, container=container_id)
+            action_result.add_data({"vault_id": vault_id})
 
-            action_result.add_data(vault_ret)
-
-            if not vault_ret.get('succeeded'):
-                err_msg = vault_ret.get('message', "Could not save file to vault")
+            if not success:
+                err_msg = message
                 return action_result.set_status(phantom.APP_ERROR, "Error saving file to vault: {}".format(
                     self._handle_py_ver_compat_for_input_str(err_msg if err_msg else "Could not save file to vault")))
 

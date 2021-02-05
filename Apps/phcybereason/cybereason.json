@@ -1,0 +1,1621 @@
+{
+    "appid": "d8bb9ae7-4c54-4fc8-80da-b66b80d30699",
+    "name": "Cybereason",
+    "description": "This app integrates with the Cybereason platform to perform investigative, contain, and corrective actions on Malop and Malware events",
+    "type": "endpoint",
+    "product_vendor": "Cybereason",
+    "logo": "logo_cybereason.svg",
+    "logo_dark": "logo_cybereason_dark.svg",
+    "product_name": "Cybereason",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Cybereason",
+    "license": "Copyright (c) Cybereason, 2018-2021",
+    "app_version": "2.0.0",
+    "utctime_updated": "2020-03-05T07:04:29.824069Z",
+    "package_name": "phantom_cybereason",
+    "main_module": "cybereason_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "The URL of the Cybereason server to connect to. This should be of the form 'https://<server name or ip>:<port>'",
+            "data_type": "string",
+            "required": true,
+            "default": "https://integration.cybereason.net:8443",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "If checked, will verify the SSL certificate of the Cybereason server",
+            "data_type": "boolean",
+            "default": false,
+            "order": 1
+        },
+        "username": {
+            "description": "A valid username for connecting to the Cybereason server",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "A valid password for connecting to the Cybereason server",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "malop_historical_days": {
+            "description": "The number of days for which we want to get Malops (This parameter will be used for the first-time poll only, and will be ignored in subsequent polls)",
+            "data_type": "numeric",
+            "required": true,
+            "default": 30,
+            "order": 4
+        },
+        "malware_historical_days": {
+            "description": "The number of days for which we want to get Malware (This parameter will be used for the first-time poll only, and will be ignored in subsequent polls)",
+            "data_type": "numeric",
+            "required": true,
+            "default": 60,
+            "order": 5
+        },
+        "override_malop_severity_map": {
+            "description": "A JSON string that the user can add to override the default severity mapping for different malop types",
+            "data_type": "string",
+            "order": 6
+        },
+        "malware_severity": {
+            "description": "The severity to apply for all malware events",
+            "data_type": "string",
+            "default": "High",
+            "order": 7
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "Test the connectivity with the Cybereason server configured by the user.",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of containers to ingest",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "container_id": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "start_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "end_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete registry key",
+            "description": "Deletes the specified registry key for a given malop id and machine name",
+            "verbose": "A malop can contain processes that write to Windows registry keys. This action will fire a remediation action on the Cybereason console that will delete the registry key using the Cybereason sensor installed on the machine.",
+            "type": "correct",
+            "identifier": "delete_registry_key",
+            "read_only": false,
+            "parameters": {
+                "malop_id": {
+                    "description": "The ID of the malop for deleting the registry key",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                },
+                "machine_name": {
+                    "description": "The name of the machine on which we want to delete the registry key",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason machine name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.machine_name",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine name"
+                    ],
+                    "column_name": "Machine Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.remediation_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason remediation id"
+                    ],
+                    "column_name": "Remediation ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.initiating_user",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "column_name": "Initiating User",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get sensor status",
+            "description": "Get the connectivity status for all machine sensors in a Malop",
+            "verbose": "Each machine covered by Cybereason will have a sensor installed on it. This action will extract the sensor status for all machines in a Malop.",
+            "type": "investigate",
+            "identifier": "get_sensor_status",
+            "read_only": true,
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we will get sensor status information",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.machine_name",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine name"
+                    ],
+                    "column_name": "Machine Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.machine_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "column_name": "Machine ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason sensor status"
+                    ],
+                    "column_name": "Machine Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "Online",
+                        "Offline"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add malop comment",
+            "description": "Add a comment to the provided Malop ID",
+            "type": "generic",
+            "identifier": "add_malop_comment",
+            "read_only": false,
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to add a comment",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "The comment that we want to add to the malop",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update malop status",
+            "description": "Update status for the provided Malop ID such as Under Investigation, To review, etc",
+            "type": "generic",
+            "identifier": "update_malop_status",
+            "read_only": false,
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to update the status",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                },
+                "status": {
+                    "description": "The status that will be assigned to the malop",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop status"
+                    ],
+                    "value_list": [
+                        "Unread",
+                        "To Review",
+                        "Not Relevant",
+                        "Remediated",
+                        "Reopend",
+                        "Under Investigation"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop status"
+                    ],
+                    "column_name": "Malop Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "isolate machine",
+            "description": "Blocks all communication to and from the machine. Communication with the Cybereason platform is not affected",
+            "type": "contain",
+            "identifier": "isolate_machine",
+            "read_only": false,
+            "undo": "unisolate machine",
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to isolate the machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unisolate machine",
+            "description": "Unblocks all communication to and from the machine",
+            "type": "correct",
+            "identifier": "unisolate_machine",
+            "read_only": false,
+            "undo": "isolate machine",
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to unisolate the machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "kill process",
+            "description": "Kills the active process on the machine",
+            "type": "contain",
+            "identifier": "kill_process",
+            "read_only": false,
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to kill the active process",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                },
+                "remediation_user": {
+                    "description": "The user-id who is killing the process",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "order": 1
+                },
+                "machine_id": {
+                    "description": "Machine ID associated with that malop ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "order": 2
+                },
+                "process_id": {
+                    "description": "Cybereason Process ID of the process to kill",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason process id"
+                    ],
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.remediation_user",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "column_name": "Remediation User",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.machine_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "column_name": "Machine ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.process_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason process id"
+                    ],
+                    "column_name": "Process ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.remediation_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason remediation id"
+                    ],
+                    "column_name": "Remediation ID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.remediation_status",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason remediation status"
+                    ],
+                    "column_name": "Remediation Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get remediation status",
+            "description": "Gets the remediation status for a previously executed remediation action like Kill Process",
+            "type": "investigate",
+            "identifier": "get_remediation_status",
+            "read_only": true,
+            "parameters": {
+                "malop_id": {
+                    "description": "The malop ID for which we want to get the remediation status",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                },
+                "remediation_user": {
+                    "description": "The user id that has requested the remediation action",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "order": 1
+                },
+                "remediation_id": {
+                    "description": "An ID that specifies a previously executed remediation action like Kill Process",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason remediation id"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.remediation_user",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "column_name": "Remediation User",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.remediation_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason remediation id"
+                    ],
+                    "column_name": "Remediation ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.remediation_status",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason remediation status"
+                    ],
+                    "column_name": "Remediation Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.remediation_message",
+                    "data_type": "string",
+                    "column_name": "Remediation Message",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 5,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set reputation",
+            "description": "Blacklists / Whitelists / Removes a file hash reputation so that future malop detections can quickly identify the hash",
+            "type": "generic",
+            "identifier": "set_reputation",
+            "read_only": false,
+            "parameters": {
+                "reputation_item_hash": {
+                    "description": "The item (hash, IP) for which we want to set the reputation",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash"
+                    ],
+                    "order": 0
+                },
+                "custom_reputation": {
+                    "description": "The custom reputation that we want to set for the reputation item",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "whitelist",
+                        "blacklist",
+                        "remove"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.reputation_item_hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ],
+                    "column_name": "Reputation Item Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.custom_reputation",
+                    "data_type": "string",
+                    "column_name": "Custom Reputation",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query processes",
+            "description": "Queries a given malop to retrieve all processes",
+            "type": "investigate",
+            "identifier": "query_processes",
+            "read_only": true,
+            "parameters": {
+                "malop_id": {
+                    "description": "The ID of the malop for which we want to get process details",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.malop_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason malop id"
+                    ],
+                    "column_name": "Malop ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.process_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason process id"
+                    ],
+                    "column_name": "Process ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.process_name",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason process name"
+                    ],
+                    "column_name": "Process Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.owner_machine_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "column_name": "Owner Machine ID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.owner_machine_name",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine name"
+                    ],
+                    "column_name": "Owner Machine Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query machine",
+            "description": "Queries a given machine name to retrieve all that machine's information",
+            "type": "investigate",
+            "identifier": "query_machine",
+            "read_only": true,
+            "parameters": {
+                "name": {
+                    "description": "The name of the machine",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.machine_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "column_name": "Machine ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.machine_name",
+                    "data_type": "string",
+                    "column_name": "Machine Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.os_version",
+                    "data_type": "string",
+                    "column_name": "OS Version",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.platform_architecture",
+                    "data_type": "string",
+                    "column_name": "Platform Architecture",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.is_connected_to_cybereason",
+                    "data_type": "string",
+                    "column_name": "Is Connected To Cybereason",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query users",
+            "description": "Queries a given user to retrieve all user-related details",
+            "type": "investigate",
+            "identifier": "query_users",
+            "read_only": true,
+            "parameters": {
+                "user": {
+                    "description": "The name of the user",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason user"
+                    ],
+                    "column_name": "User",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.element_name",
+                    "data_type": "string",
+                    "column_name": "Element Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.last_machine_logged_into",
+                    "data_type": "string",
+                    "column_name": "Last Machine Logged Into",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.organization",
+                    "data_type": "string",
+                    "column_name": "Organization",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.local_system",
+                    "data_type": "string",
+                    "column_name": "Local System",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query files",
+            "description": "Queries a given filename to retrieve all file details",
+            "type": "investigate",
+            "identifier": "query_files",
+            "read_only": true,
+            "parameters": {
+                "file_name": {
+                    "description": "The name of the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.element_name",
+                    "data_type": "string",
+                    "column_name": "Element Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.suspicion_count",
+                    "data_type": "string",
+                    "column_name": "Suspicion Count",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.signed",
+                    "data_type": "string",
+                    "column_name": "Signed",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.SHA1_signature",
+                    "data_type": "string",
+                    "column_name": "SHA1 Signature",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "Path",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.product_name",
+                    "data_type": "string",
+                    "column_name": "Product Name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.company_name",
+                    "data_type": "string",
+                    "column_name": "Company Name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 9,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query domain",
+            "description": "Queries a given domain name to retrieve all details of that domain",
+            "type": "investigate",
+            "identifier": "query_domain",
+            "read_only": true,
+            "parameters": {
+                "domain_name": {
+                    "description": "The name of the domain",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domain_name",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.element_name",
+                    "data_type": "string",
+                    "column_name": "Element Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.malicious_classification_type",
+                    "data_type": "string",
+                    "column_name": "Malicious Classification Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.is_internal_domain",
+                    "data_type": "string",
+                    "column_name": "Is Internal Domain",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.was_ever_resolved",
+                    "data_type": "string",
+                    "column_name": "Was Ever Resolved",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.was_ever_resolved_as_second_level_domain",
+                    "data_type": "string",
+                    "column_name": "Was Ever Resolved As Second Level Domain",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query connections",
+            "description": "Queries a given name to retrieve all details of that connection",
+            "type": "investigate",
+            "identifier": "query_connections",
+            "read_only": true,
+            "parameters": {
+                "connection_name": {
+                    "description": "The name of the connection",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.connection_name",
+                    "data_type": "string",
+                    "column_name": "Connection Name",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.element_name",
+                    "data_type": "string",
+                    "column_name": "Element Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.direction",
+                    "data_type": "string",
+                    "column_name": "Direction",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.server_address",
+                    "data_type": "string",
+                    "column_name": "Server Address",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.server_port",
+                    "data_type": "string",
+                    "column_name": "Server Port",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.port_type",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "column_name": "Port Type",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.received_bytes",
+                    "data_type": "string",
+                    "column_name": "Received Bytes",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.transmitted_bytes",
+                    "data_type": "string",
+                    "column_name": "Transmitted Bytes",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.remote_address",
+                    "data_type": "string",
+                    "column_name": "Remote Address",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.owner_machine",
+                    "data_type": "string",
+                    "column_name": "Owner Machine",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.owner_process",
+                    "data_type": "string",
+                    "column_name": "Owner Process",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.dns_query",
+                    "data_type": "string",
+                    "column_name": "DNS Query",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 12,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

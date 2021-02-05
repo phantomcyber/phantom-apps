@@ -10,15 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "python_version": "3",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "latest_tested_versions": [
         "Build (Windows): 7.3.314.4269 | Console: 1.3.3.0150"
     ],
-    "app_version": "2.0.0",
-    "utctime_updated": "2020-04-17T09:06:28.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-01-18T06:20:26.000000Z",
     "package_name": "phantom_taniumrest",
     "main_module": "taniumrest_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -55,9 +55,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -65,10 +65,10 @@
         },
         {
             "action": "list processes",
-            "identifier": "list_processes",
             "description": "List the running processes of the devices registered on the Tanium server",
             "verbose": "This action requires specifying a sensor to be used to list processes. A standard Tanium sensor, 'Process Details' is used by default but a different sensor can be specified instead. Note that the 'Process Details' sensor may not be available on all Tanium deployments. Note that at this time this action only supports limiting the query to specified computer groups, but a generic Run Query action can be constructed to query an in individual computer's processes. As pagination is not implemented, the result(s) of the action will be the result(s) that are fetched in a single API call.",
             "type": "investigate",
+            "identifier": "list_processes",
             "read_only": true,
             "parameters": {
                 "sensor": {
@@ -92,16 +92,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
@@ -146,6 +136,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ]
                 },
                 {
@@ -223,6 +216,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         58456
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ]
                 },
                 {
@@ -272,6 +268,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         58456
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ]
                 },
                 {
@@ -345,6 +344,23 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num results: 864"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.num_results",
                     "data_type": "numeric",
                     "example_values": [
@@ -356,13 +372,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         10
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Num results: 864"
                     ]
                 },
                 {
@@ -390,10 +399,10 @@
         },
         {
             "action": "parse question",
-            "identifier": "parse_question",
             "description": "Parses the supplied text into a valid Tanium query string",
             "verbose": "<p>When asked a non-saved question in the <b>query_text</b> parameter, it will parse the given query and give a list of suggestions that are related to it.</p><p>For example, on the Tanium platform, if one were to just ask the question, 'all IP addresses,' Tanium will give the suggestions:<br><ul><li>Get Static IP Addresses from all machines</li><li>Get IP Routes from all machines</li><li>Get IP Address from all machines</li><li>Get IP Connections from all machines</li><li>Get IP Route Details from all machines</li><li>Get Network IP Gateway from all machines</li></ul><br>Tanium sorts this list, from most-related to least-related.</p>",
             "type": "investigate",
+            "identifier": "parse_question",
             "read_only": true,
             "parameters": {
                 "query_text": {
@@ -409,14 +418,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.query_text",
                     "data_type": "string",
                     "example_values": [
@@ -431,6 +432,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group",
+                    "data_type": "string",
+                    "example_values": [
+                        "{ group id object }"
+                    ],
+                    "contains": [
+                        "taniumrest group definition"
                     ]
                 },
                 {
@@ -481,10 +492,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.number_of_parsed_questions",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        7
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -492,6 +504,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num parsed questions: 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.number_of_parsed_questions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
                     ]
                 },
                 {
@@ -516,10 +535,10 @@
         },
         {
             "action": "list questions",
-            "identifier": "list_questions",
             "description": "Retrieves either a history of the most recent questions or a list of saved questions",
             "verbose": "If the <b>list_saved_questions</b> parameter is true, this action will return a list of saved questions. If the flag is not set, this action will return the history of recently asked questions. As pagination is not implemented, the result(s) of the action will be the result(s) that are fetched in a single API call.",
             "type": "investigate",
+            "identifier": "list_questions",
             "read_only": true,
             "parameters": {
                 "list_saved_questions": {
@@ -530,14 +549,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.list_saved_questions",
                     "data_type": "boolean",
@@ -789,10 +800,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_saved_questions",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        32
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -800,6 +812,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num saved questions: 32"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_saved_questions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
                     ]
                 },
                 {
@@ -824,9 +843,9 @@
         },
         {
             "action": "terminate process",
-            "identifier": "terminate_process",
             "description": "Kill a running process of the devices registered on the Tanium server",
             "type": "generic",
+            "identifier": "terminate_process",
             "read_only": false,
             "parameters": {
                 "action_name": {
@@ -876,16 +895,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.action_group",
                     "data_type": "string",
@@ -1330,8 +1339,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
@@ -1339,6 +1354,10 @@
                     "example_values": [
                         "Successfully executed the action"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1362,10 +1381,10 @@
         },
         {
             "action": "execute action",
-            "identifier": "execute_action",
             "description": "Execute an action on the Tanium server",
-            "verbose": "<li>See top-level app documentation for example parameters.</li><li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>reissue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in the <b>reissue_seconds</b> parameter.</li>",
+            "verbose": "<li>See top-level app documentation for example parameters.</li><li>If a parameterized package is used for executing an action all the parameters must be provided with correct and unique keys. If any key is repeated then the value of that key will be overwritten.</li><li>If the <b>issue_seconds</b> parameter is provided, then the action will respawn after a time interval provided in the <b>issue_seconds</b> parameter.</li>",
             "type": "generic",
+            "identifier": "execute_action",
             "read_only": false,
             "parameters": {
                 "action_name": {
@@ -1395,7 +1414,11 @@
                 "group_name": {
                     "description": "The Tanium Computer Group name on which the action will be executed. If left blank, will execute on all registered IP addresses/hostnames in your Tanium instance",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "contains": [
+                        "taniumrest group definition"
+                    ],
+                    "primary": true
                 },
                 "distribute_seconds": {
                     "description": "The number of seconds over which to deploy the action",
@@ -1416,16 +1439,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.action_group",
                     "data_type": "string",
@@ -1457,6 +1470,9 @@
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
+                    "contains": [
+                        "taniumrest group definition"
+                    ],
                     "example_values": [
                         "tanium-01"
                     ]
@@ -1554,6 +1570,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         482
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ],
                     "column_name": "Action ID",
                     "column_order": 1
@@ -1894,8 +1913,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
@@ -1903,6 +1928,10 @@
                     "example_values": [
                         "Successfully executed the action"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1926,11 +1955,14 @@
         },
         {
             "action": "run query",
-            "identifier": "run_query",
             "description": "Run a search query on the devices registered on the Tanium server",
             "verbose": "See top-level app documentation for example parameters. For manual questions only, the action waits for <b>timeout_seconds</b> provided by the user in intervals of 5 seconds to fetch the results. The action is a success as soon as the results are retrieved or else it will timeout and fail. As pagination is not implemented, the result(s) of the action will be the result(s) that are fetched in a single API call.",
             "type": "investigate",
+            "identifier": "run_query",
             "read_only": true,
+            "lock": {
+                "enabled": false
+            },
             "parameters": {
                 "query_text": {
                     "description": "Query to run (in Tanium Question Syntax)",
@@ -1950,6 +1982,7 @@
                 "is_saved_question": {
                     "description": "Check this box if the query text parameter refers to a 'Saved Question' on your Tanium",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 2
                 },
                 "timeout_seconds": {
@@ -1958,17 +1991,26 @@
                     "required": true,
                     "default": 600,
                     "order": 3
+                },
+                "wait_for_results_processing": {
+                    "description": "Flag to wait for endpoint to return full results",
+                    "verbose": "If an endpoint takes longer than usual to evaluate a sensor, it might initially supply the answer[current results unavailable] to the answer message that it passes along the linear chain and ultimately to the Tanium Server. However, the sensor process continues on the endpoint after supplying that initial answer and, upon completing the process, the endpoint sends its updated answer. Reference Link: ~https://docs.tanium.com/interact/interact/results.html",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 4
+                },
+                "return_when_n_results_available": {
+                    "description": "Return results as soon as 'n' answers are available",
+                    "data_type": "numeric",
+                    "order": 5
+                },
+                "wait_for_n_results_available": {
+                    "description": "Wait until 'n' results are present, even if hit the percent complete threshold",
+                    "data_type": "numeric",
+                    "order": 6
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
@@ -1999,6 +2041,28 @@
                     "data_type": "numeric",
                     "example_values": [
                         600
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.wait_for_results_processing",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.return_when_n_results_available",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.wait_for_n_results_available",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
                     ]
                 },
                 {
@@ -2101,6 +2165,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         58377
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ]
                 },
                 {
@@ -2150,6 +2217,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         58377
+                    ],
+                    "contains": [
+                        "taniumrest question id"
                     ]
                 },
                 {
@@ -2223,6 +2293,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of rows: 3"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.number_of_rows",
                     "data_type": "numeric",
                     "example_values": [
@@ -2237,10 +2322,314 @@
                     ]
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "view": "taniumrest_view.display_invoke"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get question results",
+            "description": "Return the results for an already asked question",
+            "type": "investigate",
+            "identifier": "get_question_results",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "question_id": {
+                    "description": "The ID of the question",
+                    "data_type": "numeric",
+                    "contains": [
+                        "taniumrest question id"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.question_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        11111111
+                    ],
+                    "contains": [
+                        "taniumrest question id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.max_available_age",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.now",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019/07/24 07:53:06 GMT-0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.age",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.archived_question_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.cache_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2668614289"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.columns.*.hash",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3112892791
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.columns.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "DNS Server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.columns.*.type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.error_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.estimated_total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.expiration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.expire_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.filtered_row_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.filtered_row_count_machines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        58377
+                    ],
+                    "contains": [
+                        "taniumrest question id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.issue_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.item_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.mr_passed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.mr_tested",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.no_results_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.passed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.question_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        58377
+                    ],
+                    "contains": [
+                        "taniumrest question id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.report_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.row_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.row_count_machines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.rows.*.cid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.rows.*.data.*.*.text",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.16.5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.rows.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1306085003
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.saved_question_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.seconds_since_issued",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.select_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.result_sets.*.tested",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Number of rows: 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.number_of_rows",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.timeout_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
                     ]
                 },
                 {

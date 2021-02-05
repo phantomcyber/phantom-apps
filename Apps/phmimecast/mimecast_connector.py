@@ -1,5 +1,5 @@
 # File: mimecast_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -11,7 +11,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from mimecast_consts import *
+from mimecast_consts import *
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -21,6 +21,8 @@ import hmac
 import datetime
 import dateutil.parser
 import hashlib
+import sys
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -45,7 +47,15 @@ class MimecastConnector(BaseConnector):
     def _login(self, action_result):
         uri = '/api/login/login'
         auth_type = 'Basic-AD' if self._auth_type == 'Domain' else 'Basic-Cloud'
-        headers = {'Authorization': auth_type + ' ' + base64.b64encode(('{0}:{1}').format(self._username, self._password)),
+        try:
+            encoded_auth_token = base64.b64encode(('{0}:{1}').format(self._username, self._password))
+        except:
+            # In Python v3, strings are not binary,
+            # so we need to explicitly convert them to 'bytes' (which are binary)
+            # We need to convert 'bytes' back to string,
+            # as the contents of headers are of the 'string' form
+            encoded_auth_token = base64.b64encode(bytes(('{0}:{1}').format(self._username, self._password), 'utf-8')).decode('utf-8')
+        headers = {'Authorization': auth_type + ' ' + encoded_auth_token,
            'x-mc-app-id': self._app_id,
            'x-mc-date': datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S') + ' UTC',
            'x-mc-req-id': str(uuid.uuid4()),
@@ -72,9 +82,19 @@ class MimecastConnector(BaseConnector):
             self.save_progress("Skipped login")
         request_id = str(uuid.uuid4())
         hdr_date = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S') + ' UTC'
-        hmac_sha1 = hmac.new(self._secret_key.decode('base64'), (':').join([hdr_date, request_id, uri, self._app_key]), digestmod=hashlib.sha1).digest()
+        # The 'hmac' library on Python v3 expects the parameters in bytes (or binary format),
+        # while the 'hmac' library on Python v2 expects the parameters in string
+        # (which are stored in binary and Unicode form on Python v2 and Python v3 respectively).
+        # UnicodeDammit.unicode_markup.encode() works for both the versions, as it converts the
+        # provided input to string on Python v2 and bytes on Python v3.
+        encoded_secret_key = UnicodeDammit(self._secret_key).unicode_markup.encode("utf-8")
+        encoded_msg = UnicodeDammit(':'.join([hdr_date, request_id, uri, self._app_key])).unicode_markup.encode("utf-8")
+        hmac_sha1 = hmac.new(base64.b64decode(encoded_secret_key), encoded_msg, digestmod=hashlib.sha1).digest()
         sig = base64.encodestring(hmac_sha1).rstrip()
-        headers = {'Authorization': 'MC ' + self._access_key + ':' + sig,
+        # For Python v3 'bytes' need to be converted back to 'string'
+        # as the contents of headers are of the 'string' form
+        decoded_sig = UnicodeDammit(sig).unicode_markup
+        headers = {'Authorization': 'MC ' + self._access_key + ':' + decoded_sig,
            'x-mc-app-id': self._app_id,
            'x-mc-date': hdr_date,
            'x-mc-req-id': request_id,
@@ -86,7 +106,8 @@ class MimecastConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, u"Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR,
+        "Empty response and no information in the header. Please check the asset configuration and|or action parameters."), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -95,17 +116,22 @@ class MimecastConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = u'\n'.join(split_lines)
+            error_text = '\n'.join(split_lines)
         except:
-            error_text = u"Cannot parse error details"
+            error_text = "Cannot parse error details"
 
-        message = u"Status Code: {0}. Data from server:\n{1}\n".format(status_code,
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 error_text)
 
-        message = message.replace(u'{', u'{{').replace(u'}', u'}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -115,18 +141,14 @@ class MimecastConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if not resp_json['fail']:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # You should process the error returned in the json
-        message = u"Error from server. Message from server: {0} ".format(resp_json['fail'][0]['errors'][0]['message'])
-
-        if "AccessKey Has Expired" in resp_json['fail'][0]['errors'][0]['message']:
-            message += "Resetting AccessKey and SecretKey... Please try again."
-            self._login(action_result)
+        message = "Error from server. Message from server: {0} ".format(resp_json['fail'][0]['errors'][0]['message'])
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -156,10 +178,158 @@ class MimecastConnector(BaseConnector):
             return self._process_empty_reponse(r, action_result)
 
         # everything else is actually an error at this point
-        message = u"Can't process response from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :return: integer value of the parameter or None in case of failure
+        """
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
+                    return None
+                parameter = int(parameter)
+
+            except:
+                action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
+                return None
+
+            if parameter < 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {} parameter".format(key))
+                return None
+            if not allow_zero and parameter == 0:
+                action_result.set_status(phantom.APP_ERROR, "Please provide non-zero positive integer in {}".format(key))
+                return None
+
+        return parameter
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param python_version: Python major version
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = MIMECAST_ERROR_CODE_MESSAGE
+                    error_msg = e.args[0]
+            else:
+                error_code = MIMECAST_ERROR_CODE_MESSAGE
+                error_msg = MIMECAST_ERROR_MESSAGE
+        except:
+            error_code = MIMECAST_ERROR_CODE_MESSAGE
+            error_msg = MIMECAST_ERROR_MESSAGE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = MIMECAST_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
+        except:
+            error_msg = MIMECAST_ERROR_MESSAGE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _paginator(self, endpoint, action_result, limit=None, headers=None, data=None, method="get", **kwargs):
+
+        page_size = DEFAULT_MAX_RESULTS
+        # If page_size param is present, then validate if pageSize is a positive integer greater than zero
+        data_object = {}
+
+        if limit is not None:
+            page_size = min(page_size, limit)
+
+        data_object['pageSize'] = page_size
+        data['meta']['pagination'].update(data_object)
+
+        response = {}
+        count = 0
+
+        while True:
+
+            ret_val, interim_response = self._make_rest_call_helper(endpoint, action_result, headers=headers, method=method, data=data, **kwargs)
+
+            if phantom.is_fail(ret_val):
+                return ret_val, interim_response
+
+            if response:
+                response['meta'].update(interim_response['meta'])
+                response['fail'].extend(interim_response['fail'])
+                for key, val in list(interim_response['data'][0].items()):
+                    if isinstance(val, list):
+                        response['data'][0][key].extend(val)
+                    else:
+                        response['data'][0][key] = val
+            else:
+                response = interim_response
+            count += interim_response['meta']['pagination']['pageSize']
+            if limit:
+                if count == limit:
+                    break
+                if count + page_size > limit:
+                    data['meta']['pagination']['pageSize'] = limit - count
+
+            nextToken = interim_response['meta']['pagination'].get('next')
+
+            if nextToken:
+                data['meta']['pagination']['pageToken'] = nextToken
+            else:
+                break
+
+        return ret_val, response
+
+    def _make_rest_call_helper(self, endpoint, action_result, headers=None, params=None, data=None, method="get", **kwargs):
+
+        ret_val, response = self._make_rest_call(endpoint, action_result, headers, params, data, method, **kwargs)
+
+        if not phantom.is_fail(ret_val):
+            ret_val, response
+
+        # If token is expired, generate a new token
+        msg = action_result.get_message()
+
+        if "AccessKey Has Expired" in msg:
+            # Resetting the access_key and secret_key to None
+            # will generate new access_key and secret_key.
+            self._access_key = None
+            self._secret_key = None
+            headers = self._get_request_headers(endpoint, action_result)
+
+            if headers is None:
+                return action_result.get_status(), None
+
+            ret_val, response = self._make_rest_call(endpoint, action_result, headers, params, data, method, **kwargs)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        return ret_val, response
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", **kwargs):
 
@@ -171,7 +341,7 @@ class MimecastConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
         url = self._base_url + endpoint
@@ -184,14 +354,16 @@ class MimecastConnector(BaseConnector):
                             verify=config.get('verify_server_cert', False),
                             params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to the Mimecast server. Details: {0}"
+                        .format(self._get_error_message_from_exception(e))), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         uri = '/api/ttp/url/get-all-managed-urls'
+        self._access_key = None
+        self._secret_key = None
         headers = self._get_request_headers(uri, action_result)
         if headers is None:
             self.save_progress("Test Connectivity Failed")
@@ -233,7 +405,7 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -261,7 +433,7 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -311,7 +483,7 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -350,7 +522,7 @@ class MimecastConnector(BaseConnector):
         if data_object:
             data['data'][0].update(data_object)
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -389,7 +561,7 @@ class MimecastConnector(BaseConnector):
         if data_object:
             data['data'][0].update(data_object)
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -427,7 +599,7 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -447,9 +619,17 @@ class MimecastConnector(BaseConnector):
         uri = '/api/ttp/url/get-all-managed-urls'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
 
-        data = {'data': []}
+        data = {
+            'meta': {
+                'pagination': {
+                    'pageSize': DEFAULT_MAX_RESULTS
+                }
+            },
+            'data': [
+            ]
+        }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._paginator(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -473,7 +653,7 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageToken': param.get('page_token')
+                    'pageToken': None
                 }
             },
             'data': [
@@ -482,14 +662,6 @@ class MimecastConnector(BaseConnector):
 
         # Build request body params one by one. These params are optional
         data_object = {}
-
-        if param.get('page_size') is not None:
-            page_size = param.get('page_size')
-            # Validate pageSize is a positive integer greater than zero
-            if type(page_size) != int or int(page_size) <= 0:
-                return action_result.set_status(phantom.APP_ERROR, "Page size value must be an integer greater than 0")
-            data_object['pageSize'] = page_size
-            data['meta']['pagination'].update(data_object)
 
         if param.get('query') is not None:
             data_object['query'] = param.get('query')
@@ -500,7 +672,13 @@ class MimecastConnector(BaseConnector):
         if data_object:
             data['data'].append(data_object)
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        limit = param.get('page_size')
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
+
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -525,7 +703,7 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageToken': param.get('page_token')
+                    'pageToken': None
                 }
             },
             'data': [
@@ -535,17 +713,13 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        # If pageSize param is present, then validate if pageSize is a positive integer greater than zero
-        data_object = {}
-        if param.get('page_size') is not None:
-            page_size = param.get('page_size')
-            # Validate pageSize is a positive integer greater than zero
-            if type(page_size) != int or int(page_size) <= 0:
-                return action_result.set_status(phantom.APP_ERROR, "Page size value must be an integer greater than 0")
-            data_object['pageSize'] = page_size
-            data['meta']['pagination'].update(data_object)
+        limit = param.get('page_size')
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -567,7 +741,10 @@ class MimecastConnector(BaseConnector):
         uri = '/api/directory/get-group-members'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
         member = param.get('member')
-        search_type = param['type']
+        type_list = ['email', 'domain']
+        search_type = self._handle_py_ver_compat_for_input_str(param['type'])
+        if search_type and search_type not in type_list:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'type' parameter")
         if search_type == 'email':
             search_type = 'emailAddress'
 
@@ -577,8 +754,8 @@ class MimecastConnector(BaseConnector):
             data = {
                 'meta': {
                     'pagination': {
-                        'pageToken': param.get('page_token'),
-                        'pageSize': 100
+                        'pageToken': None,
+                        'pageSize': DEFAULT_MAX_RESULTS
                     }
                 },
                 'data': [
@@ -588,7 +765,7 @@ class MimecastConnector(BaseConnector):
                 ]
             }
 
-            ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+            ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -640,14 +817,16 @@ class MimecastConnector(BaseConnector):
                 start = dateutil.parser.parse(start)
                 start = start.strftime('%Y-%m-%dT%H:%M:%S+%f')[:-2]
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, u"Start timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(str(e))), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Start timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(
+                    self._get_error_message_from_exception(e))), None)
         if param.get('end') is not None:
             end = param.get('end')
             try:
                 end = dateutil.parser.parse(end)
                 end = end.strftime('%Y-%m-%dT%H:%M:%S+%f')[:-2]
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, u"End timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(str(e))), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "End timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(
+                    self._get_error_message_from_exception(e))), None)
 
         # Add timestamps to payload
         data_object = {}
@@ -661,7 +840,7 @@ class MimecastConnector(BaseConnector):
         if data_object:
             data['data'][0].update(data_object)
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -685,12 +864,12 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": self._handle_py_ver_compat_for_input_str(param.get("id"))
                 }
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -718,7 +897,7 @@ class MimecastConnector(BaseConnector):
             ]
         }
 
-        ret_val, response = self._make_rest_call(uri, action_result, headers=headers, method="post", data=data)
+        ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -790,20 +969,25 @@ class MimecastConnector(BaseConnector):
         return ret_val
 
     def initialize(self):
+        # Load the state in initialize, use it to store data
+        # that needs to be accessed across actions
         self._state = self.load_state()
+
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         config = self.get_config()
         self._base_url = config['base_url'].rstrip('/')
-        self._username = config['username']
+        self._username = self._handle_py_ver_compat_for_input_str(config['username'])
         self._password = config['password']
         self._app_id = config['app_id']
         self._app_key = config['app_key']
         self._auth_type = config['auth_type']
         self._access_key = self._state.get('access_key')
         self._secret_key = self._state.get('secret_key')
-        return phantom.APP_SUCCESS
-
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
 
         return phantom.APP_SUCCESS
 
@@ -843,7 +1027,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             login_url = BaseConnector._get_phantom_base_url() + 'login'
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
@@ -857,11 +1041,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -877,6 +1061,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
