@@ -193,12 +193,6 @@ class CiscoumbrellaConnector(BaseConnector):
         # Connectivity
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
-        # Progress
-        self.save_progress(CISCOUMB_USING_BASE_URL, base_url=self._base_url)
-
-        # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
-
         endpoint = '/domains'
 
         page_index = param.get(CISCOUMB_JSON_PAGE_INDEX, CISCOUMB_DEFAULT_PAGE_INDEX)
@@ -229,12 +223,6 @@ class CiscoumbrellaConnector(BaseConnector):
         # Connectivity
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
-        # Progress
-        self.save_progress(CISCOUMB_USING_BASE_URL, base_url=self._base_url)
-
-        # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
-
         endpoint = '/domains'
 
         domain = param[CISCOUMB_JSON_DOMAIN]
@@ -254,12 +242,6 @@ class CiscoumbrellaConnector(BaseConnector):
     def _block_domain(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Progress
-        self.save_progress(CISCOUMB_USING_BASE_URL, base_url=self._base_url)
-
-        # Connectivity
-        self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, self._host)
 
         # Progress
         self.save_progress(CISCOUMB_USING_BASE_URL, base_url=self._base_url)
