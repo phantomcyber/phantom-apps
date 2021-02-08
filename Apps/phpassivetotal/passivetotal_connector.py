@@ -511,7 +511,6 @@ class PassivetotalConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid SHA1 Hash')
 
         extra_data = action_result.add_data({})
-        summary = action_result.update_summary({})
 
         self.save_progress('Querying Certificate by Hash')
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/', {'query': query}, action_result)
@@ -540,7 +539,6 @@ class PassivetotalConnector(BaseConnector):
         }
 
         extra_data = action_result.add_data({})
-        summary = action_result.update_summary({})
 
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/search', params, action_result)
 
