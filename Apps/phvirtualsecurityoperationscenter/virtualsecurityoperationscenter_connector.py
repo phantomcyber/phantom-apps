@@ -326,11 +326,7 @@ class VirtualSecurityOperationsCenterConnector(BaseConnector):
                 ticket_artifact["cef"][target] = ticket[source]
 
         artifacts.append(ticket_artifact)
-        if (
-            extract_worklog
-            and ticket.get("worklog")
-            and len(ticket["worklog"].get("entries", [])) > 0
-        ):
+        if extract_worklog and ticket.get("worklog") and len(ticket["worklog"].get("entries", [])) > 0:
             for entry in ticket["worklog"]["entries"]:
                 entry_artifact = {
                     "container_id": container_id,
@@ -431,7 +427,7 @@ class VirtualSecurityOperationsCenterConnector(BaseConnector):
                 action_result, last_run, max_tickets
             )
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "Error while fetching tickets")
+            action_result.set_status(phantom.APP_ERROR, "Error while fetching tickets: {}".format(str(e)))
 
         self.debug_print(f"Total tickets fetched: {len(tickets)}")
         self.save_progress(f"Total tickets fetched: {len(tickets)}")
@@ -491,7 +487,6 @@ class VirtualSecurityOperationsCenterConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ticket_id = param["id"]
         worklog_text = param["text"]
-        worklog_type = param.get("type", VSOC_WORKLOG_ENTRY_DEFAULT_TYPE)
         ret_val, ticket = self._retrieve_ticket(action_result, ticket_id)
         self.debug_print("Fetched_Ticket")
         self.debug_print(ticket)
@@ -545,7 +540,8 @@ class VirtualSecurityOperationsCenterConnector(BaseConnector):
 
 
 def main():
-    import pudb, argparse
+    import pudb
+    import argparse
 
     pudb.set_trace()
     argparser = argparse.ArgumentParser()
@@ -564,8 +560,7 @@ def main():
     if username and password:
         try:
             login_url = (
-                VirtualSecurityOperationsCenterConnector._get_phantom_base_url()
-                + "/login"
+                VirtualSecurityOperationsCenterConnector._get_phantom_base_url() + "/login"
             )
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
