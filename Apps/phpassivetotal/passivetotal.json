@@ -2253,15 +2253,6 @@
           "data_type": "string"
         },
         {
-          "data_path": "action_result.summary.organization",
-          "data_type": "string",
-          "column_name": "Organization",
-          "column_order": 0,
-          "example_values": [
-            "Abc, Inc."
-          ]
-        },
-        {
           "data_path": "action_result.message",
           "data_type": "string",
           "example_values": [
@@ -2322,7 +2313,7 @@
         "page": {
           "description": "Page number for paging through results, defaults to 0",
           "data_type": "string",
-          "order": 2,
+          "order": 3,
           "primary": false,
           "required": false
         }
@@ -2420,7 +2411,7 @@
     },
     {
       "action": "get host pairs",
-      "description": "Retrieves the host attribute pairs related to the query.",
+      "description": "Retrieves the host attribute pairs related to the query",
       "type": "investigate",
       "identifier": "get_host_pairs",
       "read_only": true,
@@ -2435,7 +2426,7 @@
         "direction": {
           "description": "Directionality of the search",
           "data_type": "string",
-          "order": 0,
+          "order": 1,
           "primary": true,
           "required": true,
           "default": "children",
@@ -2447,21 +2438,21 @@
         "from": {
           "description": "Start datetime (YYYY-mm-dd)",
           "data_type": "string",
-          "order": 1,
+          "order": 2,
           "primary": false,
           "required": false
         },
         "to": {
           "description": "End datetime (YYYY-mm-dd)",
           "data_type": "string",
-          "order": 2,
+          "order": 3,
           "primary": false,
           "required": false
         },
         "page": {
           "description": "Page number for paging through results, defaults to 0",
           "data_type": "string",
-          "order": 2,
+          "order": 4,
           "primary": false,
           "required": false
         }
