@@ -118,7 +118,7 @@ class GCloudStorageConnector(BaseConnector):
 
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API HTTP Error: {}. {} '.format(error_code, error_reason)), None)
         except errors.Error as e:
-            error_reason = e._get_reason()
+            error_reason = self._get_error_message_from_exception(e)
 
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error. {}'.format(error_reason)), None)
 
@@ -178,7 +178,7 @@ class GCloudStorageConnector(BaseConnector):
         # Optional values should use the .get() function
         prefix = param.get('prefix', '')
         max_objects = param.get('max_objects', 1000)
-        ret_val, max_objects = self._validate_integer(self, max_objects, MAX_OBJECTS_KEY)
+        ret_val, max_objects = self._validate_integer(action_result, max_objects, MAX_OBJECTS_KEY)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -233,7 +233,7 @@ class GCloudStorageConnector(BaseConnector):
                 action_result.set_summary({"created_vault_id": response["vault_id"]})
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                ret_val = action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault', err)
+                ret_val = action_result.set_status(phantom.APP_ERROR, 'Could not add file to vault. {}'.format(err))
 
         if phantom.is_fail(ret_val):
             return ret_val
