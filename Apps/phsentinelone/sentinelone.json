@@ -215,10 +215,11 @@
             "description": "Quarantine an endpoint",
             "type": "contain",
             "identifier": "quarantine_device",
+            "undo": "unquarantine device",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to Quarantine",
+                    "description": "The hostname of an endpoint to quarantine",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -285,6 +286,7 @@
             "description": "Unquarantine an endpoint",
             "type": "correct",
             "identifier": "unquarantine_device",
+            "undo": "quarantine device",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -353,7 +355,7 @@
         {
             "action": "mitigate threat",
             "description": "Mitigate an identified threat",
-            "verbose": "Mitigate threat such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
+            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
             "type": "correct",
             "identifier": "mitigate_threat",
             "read_only": false,
@@ -574,19 +576,31 @@
                     "data_path": "action_result.data.*.data.*.infected",
                     "data_type": "boolean",
                     "column_name": "Infected",
-                    "column_order": 5
+                    "column_order": 5,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.isActive",
                     "data_type": "boolean",
                     "column_name": "Is Active",
-                    "column_order": 6
+                    "column_order": 6,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.isUpToDate",
                     "data_type": "boolean",
                     "column_name": "Is Up To Date",
-                    "column_order": 7
+                    "column_order": 7,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.updatedAt",
@@ -598,7 +612,11 @@
                     "data_path": "action_result.data.*.data.*.threatRebootRequired",
                     "data_type": "boolean",
                     "column_name": "Threat Reboot Required",
-                    "column_order": 9
+                    "column_order": 9,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.networkStatus",
@@ -769,19 +787,31 @@
                     "data_path": "action_result.data.*.data.*.threatInfo.pendingActions",
                     "data_type": "boolean",
                     "column_name": "Pending Actions",
-                    "column_order": 14
+                    "column_order": 14,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.threatInfo.rebootRequired",
                     "data_type": "boolean",
                     "column_name": "Reboot Required",
-                    "column_order": 15
+                    "column_order": 15,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.threatInfo.failedActions",
                     "data_type": "boolean",
                     "column_name": "Failed Actions",
-                    "column_order": 16
+                    "column_order": 16,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.agentDetectionInfo.agentMitigationMode",
@@ -793,13 +823,21 @@
                     "data_path": "action_result.data.*.data.*.threatInfo.mitigatedPreemptively",
                     "data_type": "boolean",
                     "column_name": "Mitigated Preemptively",
-                    "column_order": 18
+                    "column_order": 18,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.threatInfo.externalTicketExists",
                     "data_type": "boolean",
                     "column_name": "External Ticket",
-                    "column_order": 19
+                    "column_order": 19,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.threatInfo.sha1",
@@ -817,7 +855,11 @@
                     "data_path": "action_result.data.*.data.*.threatInfo.automaticallyResolved",
                     "data_type": "boolean",
                     "column_name": "Automatically Resolved",
-                    "column_order": 22
+                    "column_order": 22,
+                    "example_values":[
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.threatInfo.detectionType",
