@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: ds_pagination_grouping_iterator.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -45,7 +44,7 @@ class DSPaginationGroupingIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self._page is None:
             self._page = next(self._provider)
 
