@@ -14,6 +14,7 @@ import json
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime
+from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -90,6 +91,7 @@ class SentineloneConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = unquote(message)
         message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
