@@ -188,6 +188,23 @@ class SsmachineConnector(BaseConnector):
 
         if hasattr(Vault, "create_attachment"):
             vault_ret = Vault.create_attachment(image, self.get_container_id(), file_name=file_name)
+
+            if vault_ret.get('succeeded'):
+                action_result.set_status(phantom.APP_SUCCESS, "Downloaded screenshot")
+                _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_ret[phantom.APP_JSON_HASH])
+                if (not vault_meta_info):
+                    self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_ret[phantom.APP_JSON_HASH]))
+                    return action_result.set_status(phantom.APP_ERROR, "Could not find specified vault ID in vault")
+
+                vault_path = vault_meta_info[0]['path']
+                summary = {
+                        phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
+                        phantom.APP_JSON_NAME: file_name,
+                        'vault_file_path': vault_path,
+                        phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE)}
+                if permalink:
+                    summary['permalink'] = permalink
+                action_result.update_summary(summary)
         else:
             if hasattr(Vault, 'get_vault_tmp_dir'):
                 temp_dir = Vault.get_vault_tmp_dir()
@@ -200,24 +217,24 @@ class SsmachineConnector(BaseConnector):
             with open(file_path, 'wb') as f:
                 f.write(image)
 
-            vault_ret = Vault.add_attachment(file_path, self.get_container_id(), file_name=file_name)
+            success, _, vault_id = ph_rules.vault_add(container=self.get_container_id(), file_location=file_path, file_name=file_name)
 
-        if vault_ret.get('succeeded'):
-            action_result.set_status(phantom.APP_SUCCESS, "Downloaded screenshot")
-            _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_ret[phantom.APP_JSON_HASH])
-            if (not vault_meta_info):
-                self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_ret[phantom.APP_JSON_HASH]))
-                return action_result.set_status(phantom.APP_ERROR, "Could not find specified vault ID in vault")
+            if success:
+                action_result.set_status(phantom.APP_SUCCESS, "Downloaded screenshot")
+                _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
+                if (not vault_meta_info):
+                    self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
+                    return action_result.set_status(phantom.APP_ERROR, "Could not find specified vault ID in vault")
 
-            vault_path = vault_meta_info[0]['path']
-            summary = {
-                    phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
-                    phantom.APP_JSON_NAME: file_name,
-                    'vault_file_path': vault_path,
-                    phantom.APP_JSON_SIZE: vault_ret.get(phantom.APP_JSON_SIZE)}
-            if permalink:
-                summary['permalink'] = permalink
-            action_result.update_summary(summary)
+                vault_path = vault_meta_info[0]['path']
+                summary = {
+                        phantom.APP_JSON_VAULT_ID: vault_id,
+                        phantom.APP_JSON_NAME: file_name,
+                        'vault_file_path': vault_path}
+
+                if permalink:
+                    summary['permalink'] = permalink
+                action_result.update_summary(summary)
 
         return action_result.get_status()
 

@@ -1,16 +1,15 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: ds_abstract_service.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
 from abc import ABCMeta
-from httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment
+from ..httplib2 import Http, ProxyInfo, socks, proxy_info_from_environment
 
 from dsapi.config.ds_proxy_config import DSProxyConfig
 
 
-class DSAbstractService(object):
+class DSAbstractService(object, metaclass=ABCMeta):
     """
     Abstract Service that provides http methods to implementing services.
 
@@ -18,8 +17,6 @@ class DSAbstractService(object):
     For more control, pass a DSProxyConfig object as the keyword argument 'proxy' to
     this class. The keyword argument will take precedence.
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self, proxy=None):
         if proxy is None:

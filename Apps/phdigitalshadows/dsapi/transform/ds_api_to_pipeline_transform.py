@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: ds_api_to_pipeline_transform.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -20,9 +19,9 @@ class DSAPIToPipelineTransform(object):
         date_from = json['from']
         date_until = json['until']
         for stage in json['stages']:
-            stage[unicode('date_range')] = unicode(pipeline_range)
-            stage[unicode('from')] = unicode(date_from)
-            stage[unicode('until')] = unicode(date_until)
+            stage[str('date_range')] = str(pipeline_range)
+            stage[str('from')] = str(date_from)
+            stage[str('until')] = str(date_until)
 
             stage_type = stage['type']
             if stage_type == 'INCIDENTS':
