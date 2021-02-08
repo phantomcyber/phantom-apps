@@ -1,0 +1,330 @@
+{
+    "appid": "2256eb6e-4b18-4534-ba0a-598dd272fb13",
+    "name": "Virtual Security Operations Center",
+    "description": "This app integrates with the ticketing capability of IBM Virtual Security Operations Center",
+    "type": "ticketing",
+    "product_vendor": "IBM",
+    "logo": "virtualsecurityoperationscenter.svg",
+    "logo_dark": "virtualsecurityoperationscenter_dark.svg",
+    "product_name": "Virtual Security Operations Center (vSOC)",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "contributors": "Daniel Federschmidt",
+    "app_version": "1.0.24",
+    "utctime_updated": "2020-08-25T11:20:05.384921Z",
+    "package_name": "phantom_virtualsecurityoperationscenter",
+    "main_module": "virtualsecurityoperationscenter_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "server": {
+            "description": "XPSWS Server",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "services.mss.iss.net",
+            "order": 0
+        },
+        "username": {
+            "description": "XPSWS Username (or MSSToken)",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        },
+        "password": {
+            "description": "XPSWS Password (or Token)",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "customer_id": {
+            "description": "XPSWS Customer ID",
+            "data_type": "string",
+            "required": false,
+            "default": "",
+            "order": 3
+        },
+        "worklog_artifacts": {
+            "description": "Extract worklog entries as artifacts?",
+            "data_type": "boolean",
+            "required": true,
+            "default": true,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Ingest tickets from vSOC",
+            "verbose": "Basic configuration parameters for this action are available in the asset configuration.<br><br>If the <b>project_key</b> parameter is set, polling will only ingest tickets (issues) from the specified project.<br><br>If the <b>query</b> parameter is set, polling will filter tickets based on the JQL query specified in the parameter.<br><br>If the <b>first_run_max_tickets</b> parameter is set, the first poll will only ingest up to the specified amount of tickets. If the field is left empty, the first poll will ingest all the available tickets.<br><br>If the <b>max_tickets</b> parameter is set, each poll will ingest only up to the specified amount of newly updated tickets. If the field is left empty, all tickets available at the time of the poll will be ingested.<br><br>During each polling interval, the app will query the JIRA server for tickets that have been updated since the previous poll. The app will check if each ticket has already been ingested, if it has not, it will create a new container for the ticket. An artifact will be created in the container that will have a selection of the ticket's fields listed as CEF fields. All the data of tickets will be added to the container's data field. Each attachment and comment on the ticket will be ingested as artifacts. All attachments will also be added to the vault. If a ticket has been previously ingested, the app will update the ticket container's data field. The app will also add a new artifact with updated fields and it will add new artifacts for new comments and attachments. If a comment on a ticket is edited, a new artifact will be added to the container.<br><br>For a poll now, the app will ingest as many tickets as specified by the <b>container_count</b>.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 0
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 1
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter ignored in this app",
+                    "order": 2
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of tickets to be ingested during poll now",
+                    "required": false,
+                    "default": 1,
+                    "order": 3
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ticket",
+            "identifier": "get_ticket",
+            "description": "Get ticket information",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Ticket (Issue) Key",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["vsoc ticket id"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": ["vsoc ticket id"],
+                    "column_name": "ticket id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.0.issueType",
+                    "data_type": "string",
+                    "column_name": "ticket type",
+                    "contains": ["vsoc ticket type"],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.status",
+                    "data_type": "string",
+                    "column_name": "ticket status",
+                    "contains": ["vsoc ticket status"],
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update ticket",
+            "identifier": "update_ticket",
+            "description": "Updates an existing ticket",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Issue ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["vsoc ticket id"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "update_fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": ["vsoc ticket id"],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.update_fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create worklog entry",
+            "identifier": "create_worklog_entry",
+            "description": "Creates a new worklog entry",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Issue ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": ["vsoc ticket id"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "text": {
+                    "description": "Text of Worklog Entry",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "type": {
+                    "description": "Type of Worklog Entry",
+                    "data_type": "string",
+                    "value_list": ["CUSTOMER", "MSS"],
+                    "default": "CUSTOMER",
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": ["vsoc ticket id"],
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
