@@ -12,7 +12,7 @@
     "product_vendor": "Slack Technologies",
     "product_name": "Slack",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud API, October 16, 2020"
@@ -99,12 +99,6 @@
                     ]
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Create Channel",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -115,14 +109,62 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.warning",
+                    "data_path": "action_result.parameter.channel_type",
                     "data_type": "string",
                     "example_values": [
-                        "missing_charset"
+                        "public"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ok",
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.created",
+                    "data_type": "numeric",
+                    "column_name": "Created",
+                    "column_order": 2,
+                    "example_values": [
+                        1595502058
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 1,
+                    "example_values": [
+                        "UEVKZ9ZLL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "C017K3XMNTF"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_archived",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_channel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_ext_shared",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -138,63 +180,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.channel.name_normalized",
-                    "data_type": "string",
-                    "example_values": [
-                        "name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_channel",
+                    "data_path": "action_result.data.*.channel.is_group",
                     "data_type": "boolean",
                     "example_values": [
                         true,
                         false
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.creator",
-                    "data_type": "string",
-                    "column_name": "Creator",
-                    "column_order": 1,
-                    "example_values": [
-                        "UEVKZ9ZLL"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_member",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_archived",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.last_set",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.value",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.creator",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.parent_conversation",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.channel.is_im",
@@ -205,37 +196,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.channel.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "C017K3XMNTF"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_org_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.last_read",
-                    "data_type": "string",
-                    "example_values": [
-                        "0000000000.000000"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_ext_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_pending_ext_shared",
+                    "data_path": "action_result.data.*.channel.is_member",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -251,7 +212,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.channel.is_group",
+                    "data_path": "action_result.data.*.channel.is_org_shared",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -259,11 +220,68 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.channel.shared_team_ids",
+                    "data_path": "action_result.data.*.channel.is_pending_ext_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_private",
+                    "data_type": "boolean",
+                    "column_name": "Private",
+                    "column_order": 3,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.last_read",
                     "data_type": "string",
                     "example_values": [
-                        "TEW1DJ485"
+                        "0000000000.000000"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.name",
+                    "data_type": "string",
+                    "column_name": "Channel Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.name_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.parent_conversation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.priority",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.purpose.creator",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.channel.purpose.last_set",
@@ -277,44 +295,26 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.channel.purpose.creator",
+                    "data_path": "action_result.data.*.channel.shared_team_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.topic.creator",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.channel.is_private",
-                    "data_type": "boolean",
-                    "column_name": "Private",
-                    "column_order": 3,
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.name",
-                    "data_type": "string",
-                    "column_name": "Channel Name",
-                    "column_order": 0,
-                    "example_values": [
-                        "name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.created",
+                    "data_path": "action_result.data.*.channel.topic.last_set",
                     "data_type": "numeric",
-                    "column_name": "Created",
-                    "column_order": 2,
                     "example_values": [
-                        1595502058
+                        0
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.topic.value",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.channel.unlinked",
@@ -324,10 +324,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.channel.priority",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.ok",
+                    "data_type": "boolean",
                     "example_values": [
-                        0
+                        true,
+                        false
                     ]
                 },
                 {
@@ -338,10 +339,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.warning",
                     "data_type": "string",
                     "example_values": [
-                        "Channel created successfully"
+                        "missing_charset"
                     ]
                 },
                 {
@@ -349,17 +350,10 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.channel_type",
+                    "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "public"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "name"
+                        "Channel created successfully"
                     ]
                 },
                 {
@@ -377,6 +371,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Create Channel",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -393,12 +393,6 @@
                     "default": 100,
                     "order": 0
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "List Channels",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -544,6 +538,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "List Channels",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -559,12 +559,6 @@
                     "default": 100,
                     "order": 0
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "List Users",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -831,6 +825,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "List Users",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -851,12 +851,6 @@
                         "slack user"
                     ]
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Get User",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -1086,6 +1080,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Get User",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1109,12 +1109,6 @@
                     "order": 1
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Invite Users To Channel",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1122,6 +1116,232 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.channel_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLBC12T3R"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.users",
+                    "data_type": "string",
+                    "example_values": [
+                        "U6YJX1H24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.created",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1562715284
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 1,
+                    "example_values": [
+                        "U6ZA4J17F"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLBC12T3R"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_archived",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_channel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_ext_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_general",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_group",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_im",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_member",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_mpim",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_org_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_pending_ext_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_private",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.is_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.last_read",
+                    "data_type": "string",
+                    "example_values": [
+                        "1562715284.000200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.name",
+                    "data_type": "string",
+                    "column_name": "Channel Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "channel1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.name_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "channel1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.parent_conversation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.purpose.creator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.purpose.last_set",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.purpose.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.shared_team_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "T6YGC45LY"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.topic.creator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.topic.last_set",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channel.topic.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.channel.unlinked",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ok",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response_metadata.warnings",
+                    "data_type": "string",
+                    "example_values": [
+                        "missing_charset"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.warning",
+                    "data_type": "string",
+                    "example_values": [
+                        "missing_charset"
                     ]
                 },
                 {
@@ -1148,234 +1368,14 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.users",
-                    "data_type": "string",
-                    "example_values": [
-                        "U6YJX1H24"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.channel_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "CLBC12T3R"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.warning",
-                    "data_type": "string",
-                    "example_values": [
-                        "missing_charset"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_general",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.name_normalized",
-                    "data_type": "string",
-                    "example_values": [
-                        "splunk"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_channel",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.creator",
-                    "data_type": "string",
-                    "column_name": "Creator",
-                    "column_order": 1,
-                    "example_values": [
-                        "U6ZA4J17F"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_member",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_archived",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.last_set",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.value",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.topic.creator",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.parent_conversation",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_im",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "CLBC12T3R"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_org_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.last_read",
-                    "data_type": "string",
-                    "example_values": [
-                        "1562715284.000200"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_ext_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_pending_ext_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_mpim",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_group",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.shared_team_ids",
-                    "data_type": "string",
-                    "example_values": [
-                        "T6YGC45LY"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.purpose.last_set",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.purpose.value",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.purpose.creator",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_private",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.name",
-                    "data_type": "string",
-                    "column_name": "Channel Name",
-                    "column_order": 0,
-                    "example_values": [
-                        "splunk"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.is_shared",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.created",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1562715284
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.channel.unlinked",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.response_metadata.warnings",
-                    "data_type": "string",
-                    "example_values": [
-                        "missing_charset"
-                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Invite Users To Channel",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1406,7 +1406,6 @@
                 "parent_message_ts": {
                     "description": "Parent message timestamp to reply in thread",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 2,
                     "contains": [
@@ -1416,15 +1415,8 @@
                 "reply_broadcast": {
                     "description": "Used in conjunction with 'parent_message_ts' and indicates whether reply should be made visible to everyone in the channel or conversation",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 3
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Send Message",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -1448,6 +1440,12 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
                     "data_path": "action_result.parameter.parent_message_ts",
                     "data_type": "string",
                     "contains": [
@@ -1455,14 +1453,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.reply_broadcast",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channel",
@@ -1534,6 +1530,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Send Message",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1572,12 +1574,6 @@
                     ]
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Add Reaction",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1599,8 +1595,7 @@
                         "slack user"
                     ],
                     "example_values": [
-                        "C1A1A1AAA",
-                        "U1A1A1AAA"
+                        "C1A1A1AAA"
                     ]
                 },
                 {
@@ -1609,7 +1604,6 @@
                     "example_values": [
                         "thumbsup"
                     ]
-
                 },
                 {
                     "data_path": "action_result.parameter.message_ts",
@@ -1657,6 +1651,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Add Reaction",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1681,7 +1681,6 @@
                 "parent_message_ts": {
                     "description": "Parent message ts to reply in thread",
                     "data_type": "string",
-                    "required": false,
                     "order": 1,
                     "contains": [
                         "slack message ts"
@@ -1692,7 +1691,6 @@
                     "description": "Vault ID of file to upload",
                     "data_type": "string",
                     "primary": true,
-                    "required": false,
                     "order": 2,
                     "contains": [
                         "vault id",
@@ -1702,7 +1700,6 @@
                 "content": {
                     "description": "Contents of the file",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "caption": {
@@ -1721,12 +1718,6 @@
                     "order": 6
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Upload File",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1741,6 +1732,12 @@
                 {
                     "data_path": "action_result.parameter.caption",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content",
+                    "data_type": "string",
+                    "column_name": "File Content",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.destination",
@@ -1763,6 +1760,12 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": 5
+                },
+                {
                     "data_path": "action_result.parameter.filetype",
                     "data_type": "string",
                     "column_name": "File Type",
@@ -1777,18 +1780,6 @@
                     "example_values": [
                         "1612429747.000100"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.content",
-                    "data_type": "string",
-                    "column_name": "File Content",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.parameter.filename",
-                    "data_type": "string",
-                    "column_name": "File Name",
-                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.caption.channel",
@@ -2106,6 +2097,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Upload File",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -2146,12 +2143,6 @@
                     "data_type": "string",
                     "order": 3
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Question",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -2453,6 +2444,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Question",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -2473,12 +2470,6 @@
                         "slack question id"
                     ]
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Response",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -2677,6 +2668,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Response",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -2719,12 +2716,6 @@
             "identifier": "stop_bot",
             "read_only": true,
             "parameters": {},
-            "render": {
-                "width": 12,
-                "title": "Stop SlackBot",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -2768,6 +2759,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Stop SlackBot",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         }
     ]

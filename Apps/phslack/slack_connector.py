@@ -396,12 +396,15 @@ class SlackConnector(phantom.BaseConnector):
 
         return self._process_response(response, action_result)
 
-    def _validate_integers(self, action_result, parameter, key):
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
         """Validate the provided input parameter value is a non-zero positive integer and returns the integer value of the parameter itself.
 
         Parameters:
             :param action_result: object of ActionResult class
             :param parameter: input parameter
+            :param key: input parameter message key
+            :allow_zero: whether zero should be considered as valid value or not
+            :return: integer value of the parameter or None in case of failure
 
         Returns:
             :return: integer value of the parameter
@@ -416,7 +419,10 @@ class SlackConnector(phantom.BaseConnector):
             action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_INT.format(key=key))
             return None
 
-        if parameter <= 0:
+        if parameter < 0:
+            action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NEGATIVE_INT.format(key=key))
+            return None
+        if not allow_zero and parameter == 0:
             action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NEGATIVE_AND_ZERO_INT.format(key=key))
             return None
 
@@ -690,7 +696,6 @@ class SlackConnector(phantom.BaseConnector):
 
     def _send_message(self, param):
 
-        self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         message = self._handle_py_ver_compat_for_input_str(param['message'])
@@ -724,7 +729,6 @@ class SlackConnector(phantom.BaseConnector):
 
     def _add_reaction(self, param):
 
-        self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         emoji = self._handle_py_ver_compat_for_input_str(param['emoji'])
@@ -742,7 +746,6 @@ class SlackConnector(phantom.BaseConnector):
 
     def _upload_file(self, param):
 
-        self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         caption = param.get('caption', '')

@@ -54,6 +54,7 @@ SLACK_ERR_MESSAGE_UNKNOWN = "Unknown error occurred. Please check the asset conf
 SLACK_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the Slack server. Please check the asset configuration and|or the action parameters"
 SLACK_ERR_INVALID_INT = "Please provide a valid integer value in the {key} parameter"
 SLACK_ERR_NEGATIVE_AND_ZERO_INT = "Please provide a valid non-zero positive integer value in the {key} parameter"
+SLACK_ERR_NEGATIVE_INT = "Please provide a valid non-negative integer value in the {key} parameter"
 SLACK_ERR_UNABLE_TO_FETCH_FILE = "Unable to fetch the file {key}"
 SLACK_ERR_PAYLOAD_NOT_FOUND = "Found no payload field in rest post body"
 SLACK_ERR_CALLBACK_ID_NOT_FOUND = "Found no callback_id field in payload"
