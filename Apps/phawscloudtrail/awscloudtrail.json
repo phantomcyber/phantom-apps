@@ -8,14 +8,18 @@
     "logo_dark": "logo_awscloudtrail_dark.svg",
     "product_name": "CloudTrail",
     "product_version_regex": ".*",
+    "python_version": "3",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.6",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-10-11T00:18:46.000000Z",
     "package_name": "phantom_awscloudtrail",
-    "main_module": "awscloudtrail_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "main_module": "awscloudtrail_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
+    "latest_tested_versions": [
+        "Cloud tested on 10-02-2021"
+    ],
     "configuration": {
         "Access Key": {
             "description": "AWS Access Key",
@@ -76,12 +80,8 @@
                 "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
             },
             {
-                "module": "futures",
-                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
-            },
-            {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
@@ -110,7 +110,6 @@
                 "include_shadow_trails": {
                     "description": "Inform command to include shadow trails",
                     "data_type": "boolean",
-                    "required": false,
                     "default": true,
                     "order": 0
                 }
@@ -275,7 +274,6 @@
                 "attribute_key": {
                     "description": "Select an Attribute to query on (or blank)",
                     "data_type": "string",
-                    "required": false,
                     "value_list": [
                         "EventId",
                         "EventName",
@@ -291,25 +289,21 @@
                 "attribute_value": {
                     "description": "Select the Value by which to search. Note that true/false values must be lower-case",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "start_date": {
                     "description": "Start date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
                     "data_type": "string",
-                    "required": false,
                     "order": 2
                 },
                 "end_date": {
                     "description": "End date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "max_results": {
                     "description": "Max results to return",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 50,
                     "order": 4
                 }
@@ -587,7 +581,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.iPAddress",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.92.126"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"
