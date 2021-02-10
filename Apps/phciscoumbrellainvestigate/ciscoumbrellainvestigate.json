@@ -812,7 +812,7 @@
                     "data_path": "action_result.data.*.registrantEmail",
                     "data_type": "string",
                     "column_name": "Registrant Email",
-                    "column_order": 9,
+                    "column_order": 8,
                     "contains": [
                         "email"
                     ],
@@ -835,7 +835,7 @@
                     "data_path": "action_result.data.*.registrantName",
                     "data_type": "string",
                     "column_name": "Registrant Name",
-                    "column_order": 10,
+                    "column_order": 9,
                     "example_values": [
                         "Domain Administrator"
                     ]
