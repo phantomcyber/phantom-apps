@@ -1415,6 +1415,7 @@
                 "reply_broadcast": {
                     "description": "Used in conjunction with 'parent_message_ts' and indicates whether reply should be made visible to everyone in the channel or conversation",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 3
                 }
             },

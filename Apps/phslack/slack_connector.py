@@ -491,7 +491,10 @@ class SlackConnector(phantom.BaseConnector):
         endpoint = "{}{}".format(SLACK_BASE_URL, SLACK_CHANNEL_CREATE_ENDPOINT)
 
         # private channel
-        if param['channel_type'] == "private":
+        channel_type = param.get("channel_type", "public")
+        if channel_type not in ["public", "private"]:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_CHANNEL_TYPE)
+        if channel_type == "private":
             params.update({"is_private": True})
 
         ret_val, resp_json = self._make_rest_call(
@@ -713,10 +716,10 @@ class SlackConnector(phantom.BaseConnector):
 
         if 'parent_message_ts' in param:
             # Support for replying in thread
-            params['thread_ts'] = param['parent_message_ts']
+            params['thread_ts'] = param.get('parent_message_ts')
 
             if 'reply_broadcast' in param:
-                params['reply_broadcast'] = param['reply_broadcast']
+                params['reply_broadcast'] = param.get('reply_broadcast', False)
 
         ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_SEND_MESSAGE, params)
 
@@ -759,17 +762,17 @@ class SlackConnector(phantom.BaseConnector):
         params = {'channels': param['destination'], 'initial_comment': caption}
 
         if 'filetype' in param:
-            params['filetype'] = param['filetype']
+            params['filetype'] = param.get('filetype')
 
         if 'filename' in param:
-            params['filename'] = param['filename']
+            params['filename'] = param.get('filename')
 
         if 'parent_message_ts' in param:
             # Support for replying in thread
-            params['thread_ts'] = param['parent_message_ts']
+            params['thread_ts'] = param.get('parent_message_ts')
 
         if 'file' in param:
-            vault_id = param['file']
+            vault_id = param.get('file')
 
             # check the vault for a file with the supplied ID
             try:
@@ -796,7 +799,7 @@ class SlackConnector(phantom.BaseConnector):
             params['filename'] = file_name
             kwargs['files'] = {'file': upfile}
         elif 'content' in param:
-            params['content'] = self._handle_py_ver_compat_for_input_str(param['content'])
+            params['content'] = self._handle_py_ver_compat_for_input_str(param.get('content'))
         else:
             return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_FILE_OR_CONTENT_NOT_PROVIDED)
 
