@@ -339,6 +339,13 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Channel created successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -428,19 +435,35 @@
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_archived",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_channel",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_general",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_member",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.members",
@@ -485,7 +508,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -497,15 +524,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Num public channels: 100"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -556,7 +592,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.deleted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.id",
@@ -570,27 +610,51 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_admin",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_primary_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_ultra_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.name",
@@ -604,7 +668,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.always_active",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.api_app_id",
@@ -731,7 +799,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.num_users",
@@ -739,15 +811,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Num users: 28"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -796,7 +877,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.color",
@@ -804,7 +889,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.user.deleted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.id",
@@ -818,27 +907,51 @@
                 },
                 {
                     "data_path": "action_result.data.*.user.is_admin",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_primary_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_ultra_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.name",
@@ -953,15 +1066,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "User data successfully retrieved"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1282,16 +1404,17 @@
                     "order": 1
                 },
                 "parent_message_ts": {
-                    "description": "Parent message ts to reply in thread",
+                    "description": "Parent message timestamp to reply in thread",
                     "data_type": "string",
                     "required": false,
+                    "primary": true,
                     "order": 2,
                     "contains": [
-                        "slack thread ts"
+                        "slack message ts"
                     ]
                 },
                 "reply_broadcast": {
-                    "description": "If posting in a thread, also broadcast to channel",
+                    "description": "Used in conjunction with 'parent_message_ts' and indicates whether reply should be made visible to everyone in the channel or conversation",
                     "data_type": "boolean",
                     "required": false,
                     "order": 3
@@ -1325,10 +1448,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.parent_message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.message",
                     "data_type": "string",
                     "column_name": "Message",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.reply_broadcast",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.channel",
@@ -1349,8 +1483,10 @@
                     "data_path": "action_result.data.*.message.ts",
                     "data_type": "string",
                     "contains": [
-                        "slack thread ts"
-                    ]
+                        "slack message ts"
+                    ],
+                    "column_name": "Message Timestamp",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.message.type",
@@ -1362,7 +1498,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ts",
@@ -1374,15 +1514,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Message sent successfully"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1396,7 +1545,7 @@
             "read_only": false,
             "parameters": {
                 "destination": {
-                    "description": "Channel (e.g. #channel or C1A1A1AAA) or user (e.g. @user or U1A1A1AAA) to send message to",
+                    "description": "Channel ID (C1A1A1AAA) or user ID (e.g. U1A1A1AAA) to send message to",
                     "data_type": "string",
                     "primary": true,
                     "required": true,
@@ -1413,14 +1562,21 @@
                     "order": 1
                 },
                 "message_ts": {
-                    "description": "Message to which reaction is added",
+                    "description": "Timestamp of the message to add reaction to",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
                     "order": 2,
                     "contains": [
-                        "slack thread ts"
+                        "slack message ts"
                     ]
                 }
+            },
+            "render": {
+                "width": 12,
+                "title": "Add Reaction",
+                "type": "table",
+                "height": 5
             },
             "output": [
                 {
@@ -1441,22 +1597,64 @@
                     "contains": [
                         "slack destination",
                         "slack user"
+                    ],
+                    "example_values": [
+                        "C1A1A1AAA",
+                        "U1A1A1AAA"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.emoji",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "thumbsup"
+                    ]
+
                 },
                 {
                     "data_path": "action_result.parameter.message_ts",
                     "data_type": "string",
                     "contains": [
-                        "slack thread ts"
+                        "slack message ts"
+                    ],
+                    "example_values": [
+                        "1612429747.000100"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Reaction added successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1464,7 +1662,7 @@
         {
             "action": "upload file",
             "description": "Upload file to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user or U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack.",
             "type": "generic",
             "identifier": "upload_file",
             "read_only": false,
@@ -1486,8 +1684,9 @@
                     "required": false,
                     "order": 1,
                     "contains": [
-                        "slack thread ts"
-                    ]
+                        "slack message ts"
+                    ],
+                    "primary": true
                 },
                 "file": {
                     "description": "Vault ID of file to upload",
@@ -1512,9 +1711,14 @@
                     "order": 4
                 },
                 "filetype": {
-                    "description": "Filetype of the file (https://api.slack.com/types/file#file_types)",
+                    "description": "A file type identifier (https://api.slack.com/types/file#file_types)",
                     "data_type": "string",
                     "order": 5
+                },
+                "filename": {
+                    "description": "Name of the file",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "render": {
@@ -1559,6 +1763,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filetype",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.parent_message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ],
+                    "example_values": [
+                        "1612429747.000100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
+                    "data_type": "string",
+                    "column_name": "File Content",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": 5
+                },
+                {
                     "data_path": "action_result.data.*.caption.channel",
                     "data_type": "string"
                 },
@@ -1576,7 +1808,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.caption.is_intro",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.caption.timestamp",
@@ -1608,11 +1844,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.display_as_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.editable",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.external_type",
@@ -1632,11 +1876,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.is_external",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.is_public",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.mimetype",
@@ -1681,7 +1933,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.public_url_shared",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.size",
@@ -1714,7 +1970,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sender",
@@ -1826,15 +2086,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "File uploaded successfully"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1958,7 +2227,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_app_unfurl",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.message.attachments.*.actions.*.id",
@@ -2026,11 +2299,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.message_ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.attachments.*.actions.*.id",
@@ -2086,7 +2366,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.original_message.ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.type",
@@ -2142,19 +2425,32 @@
                 },
                 {
                     "data_path": "action_result.summary.response_received",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Response received: True, Question id: c2bc5f7cfbb34e13a7ada4aa6e6bb7b5, Response: yes"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -2236,11 +2532,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_app_unfurl",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.message_ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.attachments.*.actions.*.id",
@@ -2298,7 +2601,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.original_message.ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.type",
@@ -2343,19 +2649,32 @@
                 },
                 {
                     "data_path": "action_result.summary.response_received",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Response received: True, Response: yes"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -2429,15 +2748,24 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "SlackBot isn't running, not going to stop it. Ingestion has been disabled."
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
