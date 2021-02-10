@@ -4,8 +4,8 @@
     "description": "This app allows management of a domain list on the Cisco Umbrella Security platform",
     "type": "endpoint",
     "main_module": "ciscoumbrella_connector.py",
-    "app_version": "1.0.0",
-    "utctime_updated": "2021-02-01T22:47:58.000000Z",
+    "app_version": "1.0.1",
+    "utctime_updated": "2021-02-10T08:25:01.000000Z",
     "product_vendor": "Cisco",
     "product_name": "Cisco Umbrella",
     "product_version_regex": ".*",
@@ -112,7 +112,6 @@
                     "example_values": [
                         "Total domains: 21"
                     ]
-
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -174,7 +173,6 @@
                         true,
                         false
                     ]
-
                 },
                 {
                     "data_path": "action_result.parameter.domain",
@@ -187,7 +185,6 @@
                     "example_values": [
                         "test.com"
                     ]
-
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -205,7 +202,6 @@
                     "example_values": [
                         "REST API returned success with id: a4070f26,4cfc,4a5f,9a17-532c093ca151"
                     ]
-
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -265,7 +261,6 @@
                     "example_values": [
                         "test.com"
                     ]
-
                 },
                 {
                     "data_path": "action_result.data",
@@ -281,7 +276,6 @@
                     "example_values": [
                         "Domain successfully unblocked"
                     ]
-
                 },
                 {
                     "data_path": "summary.total_objects",
