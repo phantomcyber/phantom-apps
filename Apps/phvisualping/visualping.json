@@ -1,0 +1,578 @@
+{
+    "appid": "394f9efc-5ac5-4ab4-8e0e-fdc59a2a5e0a",
+    "name": "visualping",
+    "description": "The visualping app is a convenient tool to monitor websites changes",
+    "type": "siem",
+    "product_vendor": "visualping",
+    "logo": "logo_visualping.svg",
+    "logo_dark": "logo_visualping_dark.svg",
+    "product_name": "visualping",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "contributors": "Matt Sayar",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-12-22T17:55:40.648399Z",
+    "package_name": "phantom_visualping",
+    "main_module": "visualping_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "username": {
+            "description": "User name to authenticate using HTTP Basic Authentication",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "password": {
+            "description": "Password to authenticate using HTTP Basic Authentication",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "base_url": {
+            "description": "The base URL for visualping",
+            "data_type": "string",
+            "required": true,
+            "default": "https://visualping.io",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list jobs",
+            "description": "List visualping jobs",
+            "verbose": "List all your VisualPing jobs, sorted by the job status.",
+            "type": "investigate",
+            "identifier": "list_jobs",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "bd84977cdd2b45c"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
+                    "example_values": [
+                        "https://example.com/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "WEB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.runs",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.jobid",
+                    "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 2,
+                    "example_values": [
+                        "3003726"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-21 15:27:48"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.favicon",
+                    "data_type": "string",
+                    "example_values": [
+                        "metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.trigger",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.interval",
+                    "data_type": "string",
+                    "column_name": "Interval",
+                    "column_order": 3,
+                    "example_values": [
+                        "1440"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.last_run",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-23 16:30:19"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobs.active.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Entry-Specific-Rule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example message"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "bd84977cdd2b45c"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://example.com/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "WEB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.runs",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.jobid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3003726"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-21 15:27:48"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.favicon",
+                    "data_type": "string",
+                    "example_values": [
+                        "metadata/_vol_9/_data_924/924307/401942541602d03c6b7e3794d9cbb2f0.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.trigger",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.interval",
+                    "data_type": "string",
+                    "example_values": [
+                        "1440"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.last_run",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-23 16:30:19"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.active_jobs.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Entry-Specific-Rule"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "show result",
+            "description": "Show the last result of a specific job",
+            "verbose": "Show the details of the last run of a specific visualping job, including a percent difference.",
+            "type": "investigate",
+            "identifier": "show_result",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "ID of the job",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "visualping job id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
+                    "example_values": [
+                        "https://example.com/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.jobid",
+                    "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 2,
+                    "example_values": [
+                        "2969557"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interval",
+                    "data_type": "string",
+                    "column_name": "Interval",
+                    "column_order": 3,
+                    "example_values": [
+                        "1440"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastcheck",
+                    "data_type": "string",
+                    "column_name": "Last Check",
+                    "column_order": 4,
+                    "example_values": [
+                        "2020-12-23 01:28:27"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.PercentDifference",
+                    "data_type": "string",
+                    "column_name": "Percent Difference",
+                    "column_order": 5,
+                    "example_values": [
+                        "0.03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example message"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://example.com/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.lastCheck",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-12-23 01:28:27"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.percentDifference",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.03"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get images",
+            "description": "Get the images from the last run of a specific job",
+            "verbose": "Get the images from the last run of a specific job, including the previous image and the difference.",
+            "type": "investigate",
+            "identifier": "get_images",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "ID of the job",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "visualping job id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.job_id",
+                    "data_type": "string",
+                    "column_name": "Job ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3941f47390034e8"
+                    ],
+                    "contains": [
+                        "visualping job id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-01 02:33:29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.image_diff",
+                    "data_type": "string",
+                    "column_name": "Image Diff",
+                    "column_order": 1,
+                    "example_values": [
+                        "https://example.com/2969557_1609464809592_diff.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.image_previous",
+                    "data_type": "string",
+                    "column_name": "Image Previous",
+                    "column_order": 2,
+                    "example_values": [
+                        "https://example.com/2969557_1609374975789.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example message"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-01-01 02:33:29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.image_diff",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://example.com/2969557_1609464809592_diff.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.image_previous",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://example.com/2969557_1609374975789.png"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
