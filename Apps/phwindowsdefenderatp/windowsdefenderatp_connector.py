@@ -1366,7 +1366,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET]
-        self._non_interactive = config['non_interactive']
+        self._non_interactive = config.get('non_interactive', True)
 
         return phantom.APP_SUCCESS
 
