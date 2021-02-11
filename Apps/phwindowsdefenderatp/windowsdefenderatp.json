@@ -43,6 +43,12 @@
             "data_type": "password",
             "required": true,
             "order": 3
+        },
+        "non_interactive":{
+            "description": "Non Interactive Auth",
+            "data_type": "boolean",
+            "default": true,
+            "order": 4
         }
     },
     "actions": [
