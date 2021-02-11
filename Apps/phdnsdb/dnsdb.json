@@ -3,7 +3,7 @@
     "name": "DNSDB",
     "description": "This app supports investigative DNS lookup actions on DNSDB",
     "publisher": "Farisght Security",
-    "package_name": "farsight_dnsdb",
+    "package_name": "phantom_dnsdb",
     "type": "investigative",
     "license": "Copyright (c) Farsight Security 2021",
     "main_module": "dnsdb_connector.pyc",
@@ -13,7 +13,7 @@
     "product_name": "DNSDB",
     "python_version": "3",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "logo": "farsight-logo.png",
     "configuration": {
         "api_key": {
@@ -60,6 +60,15 @@
                 {
                     "data_path": "action_result.data.*.results_max",
                     "data_type": "string"
+                },
+                {   "data_path": "action_result.summary", 
+                    "data_type": "string"
+                },
+                {   "data_path": "action_result.status", 
+                    "data_type": "string"
+                },
+                {   "data_path": "action_result.message", 
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)",
@@ -72,7 +81,7 @@
             }
         },
         {
-            "action": "rdata lookup - name",
+            "action": "rdata name lookup",
             "identifier": "lookup_rdata_name",
             "type": "investigate",
             "read_only": true,
@@ -92,31 +101,31 @@
                 "time_first_after": {
                     "required": false,
                     "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 3,
+                    "order": 1,
                     "data_type": "string"
                 },
                 "time_first_before": {
                     "required": false,
                     "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 4,
+                    "order": 2,
                     "data_type": "string"
                 },
                 "time_last_after": {
                     "required": false,
                     "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 5,
+                    "order": 3,
                     "data_type": "string"
                 },
                 "time_last_before": {
                     "required": false,
                     "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 6,
+                    "order": 4,
                     "data_type": "string"
                 },
                 "limit": {
                     "required": false,
                     "description": "Max records to return",
-                    "order": 4,
+                    "order": 5,
                     "data_type": "numeric",
                     "default": 200
                 }
@@ -218,7 +227,7 @@
             ]
         },
         {
-            "action": "rdata lookup - ip",
+            "action": "rdata ip lookup",
             "identifier": "lookup_rdata_ip",
             "type": "investigate",
             "read_only": true,
@@ -245,31 +254,31 @@
                 "time_first_after": {
                     "required": false,
                     "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 3,
+                    "order": 2,
                     "data_type": "string"
                 },
                 "time_first_before": {
                     "required": false,
                     "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 4,
+                    "order": 3,
                     "data_type": "string"
                 },
                 "time_last_after": {
                     "required": false,
                     "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 5,
+                    "order": 4,
                     "data_type": "string"
                 },
                 "time_last_before": {
                     "required": false,
                     "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 6,
+                    "order": 5,
                     "data_type": "string"
                 },
                 "limit": {
                     "required": false,
                     "description": "Max records to return",
-                    "order": 4,
+                    "order": 6,
                     "data_type": "numeric",
                     "default": 200
                 }
@@ -377,12 +386,11 @@
             ]
         },
         {
-            "action": "rdata lookup - raw",
+            "action": "rdata raw lookup",
             "identifier": "lookup_rdata_raw",
             "type": "investigate",
             "read_only": true,
             "description": "Lookup raw RDATA",
-            "verbose": "",
             "parameters": {
                 "raw_rdata": {
                     "required": true,
@@ -441,31 +449,31 @@
                 "time_first_after": {
                     "required": false,
                     "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 3,
+                    "order": 2,
                     "data_type": "string"
                 },
                 "time_first_before": {
                     "required": false,
                     "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 4,
+                    "order": 3,
                     "data_type": "string"
                 },
                 "time_last_after": {
                     "required": false,
                     "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 5,
+                    "order": 4,
                     "data_type": "string"
                 },
                 "time_last_before": {
                     "required": false,
                     "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 6,
+                    "order": 5,
                     "data_type": "string"
                 },
                 "limit": {
                     "required": false,
                     "description": "Max records to return",
-                    "order": 4,
+                    "order": 6,
                     "data_type": "numeric",
                     "default": 200
                 }
@@ -625,37 +633,37 @@
                 "time_first_after": {
                     "required": false,
                     "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 3,
+                    "order": 2,
                     "data_type": "string"
                 },
                 "time_first_before": {
                     "required": false,
                     "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 4,
+                    "order": 3,
                     "data_type": "string"
                 },
                 "time_last_after": {
                     "required": false,
                     "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 5,
+                    "order": 4,
                     "data_type": "string"
                 },
                 "time_last_before": {
                     "required": false,
                     "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
-                    "order": 6,
+                    "order": 5,
                     "data_type": "string"
                 },
                 "bailiwick": {
                     "required": false,
                     "description": "Bailiwick",
                     "data_type": "string",
-                    "order": 4
+                    "order": 6
                 },
                 "limit": {
                     "required": false,
                     "description": "Max records to return",
-                    "order": 5,
+                    "order": 7,
                     "data_type": "numeric",
                     "default": 200
                 }
@@ -770,7 +778,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.domain",
+                    "data_path": "action_result.parameter.owner_name",
                     "data_type": "string",
                     "contains": [
                         "domain"
@@ -824,7 +832,6 @@
             "type": "investigate",
             "read_only": true,
             "description": "Perform a Flex search",
-            "verbose": "TODO",
             "parameters": {
                 "query": {
                     "required": true,
