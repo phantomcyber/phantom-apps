@@ -19,7 +19,8 @@
         "api_key": {
             "data_type": "password",
             "description": "API Key",
-            "required": true
+            "required": true,
+            "order": 0
         }
     },
     "actions": [
