@@ -87,6 +87,9 @@
                 {
                   "data_path": "action_result.data.*.code",
                   "data_type": "string",
+                  "contains": [
+                      "greynoise code"
+                  ],
                   "example_values": [
                       "0x00",
                       "0x01"
@@ -95,6 +98,9 @@
                 {
                     "data_path": "action_result.data.*.code_meaning",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise code meaning"
+                    ],
                     "example_values": [
                         "The IP has never been observed scanning the Internet",
                         "The IP has been observed by the GreyNoise sensor network"
@@ -103,6 +109,9 @@
                 {
                     "data_path": "action_result.data.*.noise",
                     "data_type": "boolean",
+                    "contains": [
+                        "greynoise noise"
+                    ],
                     "example_values": [
                         true,
                         false
@@ -179,6 +188,9 @@
                 {
                   "data_path": "action_result.data.*.seen",
                   "data_type": "boolean",
+                  "contains": [
+                      "greynoise seen"
+                  ],
                   "example_values": [
                       true,
                       false
@@ -187,6 +199,9 @@
                 {
                     "data_path": "action_result.data.*.classification",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise classification"
+                    ],
                     "example_values": [
                         "benign",
                         "malicious"
@@ -195,6 +210,9 @@
                 {
                     "data_path": "action_result.data.*.first_seen",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise date"
+                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -202,6 +220,9 @@
                 {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise date"
+                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -209,6 +230,9 @@
                 {
                     "data_path": "action_result.data.*.actor",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise actor"
+                    ],
                     "example_values": [
                         "Shodan.io"
                     ]
@@ -216,6 +240,9 @@
                 {
                     "data_path": "action_result.data.*.tags.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise tags"
+                    ],
                     "example_values": [
                         "Mirai",
                         "Telnet Worm"
@@ -224,6 +251,9 @@
                 {
                     "data_path": "action_result.data.*.metadata.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise metadata key value pairs"
+                    ],
                     "example_values": [
                         "{\n\"country\":\"United States\"\n\"country_code\":\"US\"\n\"city\":\"Seattle\"\n\"organization\":\"Org. Name\"\n\"rdns\":\"crawl-66-249-79-17.testbot.com\"\n\"asn\":\"AS521\"\n\"tor\":false\n\"category\":\"education\"\n\"os\":\"Windows 7/8\"\n}"
                     ]
@@ -231,6 +261,9 @@
                 {
                     "data_path": "action_result.data.*.raw_data.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise raw data key value pairs"
+                    ],
                     "example_values": [
                         "{\n\"scan\":[\n0:{\n\"port\":80\n\"protocol\":\"TCP\"\n}\n]\n\"web\":{\n\"paths\":[\n0:\"/robots.txt\"\n]\n\"useragents\":[\n0:\"test/5.0 (compatible; testbot/2.1; +http://www.test.com/bot.html)\"\n]\n}\n\"ja3\":[\n0:{\n\"fingerprint\":\"c3a6cf0bf2e690ac8e1ecf6081f17a50\"\n\"port\":443\n}\n]\n}"
                     ]
@@ -294,6 +327,10 @@
                 "size": {
                     "description": "The number of results to return (warning: returning over 1000 results may degrade widget performance)",
                     "data_type": "numeric",
+                    "contains": [
+                        "greynoise size"
+                    ],
+                    "primary": true,
                     "required": true,
                     "default": 100,
                     "order": 1
@@ -314,6 +351,9 @@
                 {
                     "data_path": "action_result.parameter.size",
                     "data_type": "numeric",
+                    "contains": [
+                        "greynoise size"
+                    ],
                     "example_values": [
                         1000
                     ]
@@ -331,6 +371,9 @@
                 {
                     "data_path": "action_result.data.*.seen",
                     "data_type": "boolean",
+                    "contains": [
+                        "greynoise seen"
+                    ],
                     "example_values": [
                         true,
                         false
@@ -339,6 +382,9 @@
                 {
                     "data_path": "action_result.data.*.classification",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise classification"
+                    ],
                     "example_values": [
                         "benign",
                         "malicious"
@@ -347,6 +393,9 @@
                 {
                     "data_path": "action_result.data.*.first_seen",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise date"
+                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -354,6 +403,9 @@
                 {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise date"
+                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -361,6 +413,9 @@
                 {
                     "data_path": "action_result.data.*.actor",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise actor"
+                    ],
                     "example_values": [
                         "Shodan.io"
                     ]
@@ -368,6 +423,9 @@
                 {
                     "data_path": "action_result.data.*.tags.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise tags"
+                    ],
                     "example_values": [
                         "Mirai",
                         "Telnet Worm"
@@ -376,6 +434,9 @@
                 {
                     "data_path": "action_result.data.*.metadata.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise metadata key value pairs"
+                    ],
                     "example_values": [
                         "{\n\"country\":\"United States\"\n\"country_code\":\"US\"\n\"city\":\"Seattle\"\n\"organization\":\"Org. Name\"\n\"rdns\":\"crawl-66-249-79-17.testbot.com\"\n\"asn\":\"AS521\"\n\"tor\":false\n\"category\":\"education\"\n\"os\":\"Windows 7/8\"\n}"
                     ]
@@ -383,6 +444,9 @@
                 {
                     "data_path": "action_result.data.*.raw_data.*",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise raw data key value pairs"
+                    ],
                     "example_values": [
                         "{\n\"scan\":[\n0:{\n\"port\":80\n\"protocol\":\"TCP\"\n}\n]\n\"web\":{\n\"paths\":[\n0:\"/robots.txt\"\n]\n\"useragents\":[\n0:\"test/5.0 (compatible; testbot/2.1; +http://www.test.com/bot.html)\"\n]\n}\n\"ja3\":[\n0:{\n\"fingerprint\":\"c3a6cf0bf2e690ac8e1ecf6081f17a50\"\n\"port\":443\n}\n]\n}"
                     ]
@@ -390,6 +454,9 @@
                 {
                     "data_path": "action_result.complete",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise status"
+                    ],
                     "example_values": [
                         "true",
                         "false"
@@ -467,6 +534,9 @@
                 {
                     "data_path": "action_result.data.*.code",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise code"
+                    ],
                     "example_values": [
                         "0x00",
                         "0x01"
@@ -475,6 +545,9 @@
                 {
                     "data_path": "action_result.data.*.code_meaning",
                     "data_type": "string",
+                    "contains": [
+                        "greynoise code meaning"
+                    ],
                     "example_values": [
                         "The IP has never been observed scanning the Internet",
                         "The IP has been observed by the GreyNoise sensor network"
@@ -483,6 +556,9 @@
                 {
                     "data_path": "action_result.data.*.noise",
                     "data_type": "boolean",
+                    "contains": [
+                        "greynoise noise"
+                    ],
                     "example_values": [
                         true,
                         false

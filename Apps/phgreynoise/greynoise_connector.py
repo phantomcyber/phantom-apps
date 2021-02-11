@@ -186,7 +186,7 @@ class GreyNoiseConnector(BaseConnector):
             else:
                 result_data["code_meaning"] = "This code is unmapped"
         except KeyError:
-            self.debug_print("Error occurred while processing API response")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -212,7 +212,7 @@ class GreyNoiseConnector(BaseConnector):
         try:
             result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
         except KeyError:
-            self.debug_print("Error occurred while processing API response")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -288,7 +288,10 @@ class GreyNoiseConnector(BaseConnector):
                 remaining_results_flag = True
 
         if phantom.is_fail(ret_val):
-            return ret_val
+            if is_poll:
+                return ret_val, None
+            else:
+                return ret_val
 
         result_data = {}
         action_result.add_data(result_data)
@@ -296,7 +299,11 @@ class GreyNoiseConnector(BaseConnector):
             for entry in full_response["data"]:
                 entry["visualization"] = VISUALIZATION_URL.format(ip=entry["ip"])
         except KeyError:
-            self.debug_print("Error occurred while processing API response")
+            error_msg = "Error occurred while processing API response"
+            if is_poll:
+                return action_result.set_status(phantom.APP_ERROR, error_msg), None
+            else:
+                return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         result_data.update(full_response)
 
@@ -352,72 +359,60 @@ class GreyNoiseConnector(BaseConnector):
 
     def _process_query(self, data):
         # spawn container for every item returned
-        if data and "count" in data:
-            if data["count"] > 0:
-                try:
-                    for entry in data["data"]:
-                        ip = entry["ip"]
-                        self.save_progress("Processing IP address {}".format(ip))
-                        container = {
-                            "custom_fields": {},
-                            "data": {},
-                            "name": "",
-                            "description": "Container added by GreyNoise",
-                            "label": self.get_config().get("ingest", {}).get("container_label"),
-                            "sensitivity": "amber",
-                            "source_data_identifier": "",
-                            "tags": entry["tags"],
-                        }
+        if data["count"] > 0:
+            try:
+                for entry in data["data"]:
+                    ip = entry["ip"]
+                    self.save_progress("Processing IP address {}".format(ip))
+                    container = {
+                        "custom_fields": {},
+                        "data": {},
+                        "name": "",
+                        "description": "Container added by GreyNoise",
+                        "label": self.get_config().get("ingest", {}).get("container_label"),
+                        "sensitivity": "amber",
+                        "source_data_identifier": "",
+                        "tags": entry["tags"],
+                    }
+                    if entry["classification"] == "malicious":
+                        container["severity"] = "high"
+                    else:
+                        container["severity"] = "low"
+                    artifact_cef = {
+                        'ip': entry['ip'],
+                        'classification': entry['classification'],
+                        'first_seen': entry['first_seen'],
+                        'last_seen': entry['last_seen'],
+                        'actor': entry['actor'],
+                        'organization': entry['metadata']['organization'],
+                        'asn': entry['metadata']['asn']
+                    }
+                    if entry['metadata']['country']:
+                        artifact_cef['country'] = entry['metadata']['country']
+                    if entry['metadata']['city']:
+                        artifact_cef['city'] = entry['metadata']['city']
+                    container["artifacts"] = [{
+                        "cef": artifact_cef,
+                        "description": "Artifact added by GreyNoise",
+                        "label": container["label"],
+                        "name": "GreyNoise Query Language Entry",
+                        "source_data_identifier": container["source_data_identifier"],
+                        "severity": container["severity"]
+                    }]
+                    container["name"] = "GreyNoise Query Language Entry"
 
-                        if entry["classification"] == "malicious":
-                            container["severity"] = "high"
-                        else:
-                            container["severity"] = "low"
-
-                        artifact_cef = {
-                            'ip': entry['ip'],
-                            'classification': entry['classification'],
-                            'first_seen': entry['first_seen'],
-                            'last_seen': entry['last_seen'],
-                            'actor': entry['actor'],
-                            'organization': entry['metadata']['organization'],
-                            'asn': entry['metadata']['asn']
-                        }
-                        if entry['metadata']['country']:
-                            artifact_cef['country'] = entry['metadata']['country']
-                        if entry['metadata']['city']:
-                            artifact_cef['city'] = entry['metadata']['city']
-
-                        container["artifacts"] = [{
-                            "cef": artifact_cef,
-                            "description": "Artifact added by GreyNoise",
-                            "label": container["label"],
-                            "name": "GreyNoise Query Language Entry",
-                            "source_data_identifier": container["source_data_identifier"],
-                            "severity": container["severity"]
-                        }]
-
-                        container["name"] = "GreyNoise Query Language Entry"
-
-                        try:
-                            ret_val, _, container_id = self.save_container(container)
-                            self.save_progress("Created %s" % container_id)
-                        except:
-                            self.save_progress("Error occurred while saving the container")
-                            return phantom.APP_ERROR
-                        else:
-                            if phantom.is_fail(ret_val):
-                                self.save_progress("Error occurred while saving the container")
-                                return phantom.APP_ERROR
-                except Exception as e:
-                    err = self._get_error_message_from_exception(e)
-                    err_msg = "Error occurred while processing query data. {}".format(err)
-                    self.debug_print(err_msg)
-                    return phantom.APP_ERROR
-                return phantom.APP_SUCCESS
-            else:
-                self.save_progress("No results matching your GNQL query were found")
-                return phantom.APP_SUCCESS
+                    ret_val, container_creation_msg, container_id = self.save_container(container)
+                    if phantom.is_fail(ret_val):
+                        self.save_progress("Error occurred while saving the container")
+                        self.debug_print(container_creation_msg)
+                        continue
+                    self.save_progress("Created %s" % container_id)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                err_msg = "Error occurred while processing query data. {}".format(err)
+                self.debug_print(err_msg)
+                return phantom.APP_ERROR
+            return phantom.APP_SUCCESS
         else:
             self.save_progress("No results matching your GNQL query were found")
             return phantom.APP_SUCCESS
