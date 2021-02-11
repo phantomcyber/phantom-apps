@@ -57,7 +57,7 @@ class CiscoUmbrellaInvestigateConnector(BaseConnector):
         # self.debug_print('REST url: {0}'.format(r.url))
         try:
             if (r.text.lower() == 'no data'):
-                return (action_result.set_status(phantom.APP_ERROR, "OpenDNS returned no data"), resp_json, status_code)
+                return (action_result.set_status(phantom.APP_ERROR, "API returned no data"), resp_json, status_code)
 
             resp_json = r.json()
             status_code = r.status_code
