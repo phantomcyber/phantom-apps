@@ -1,413 +1,1064 @@
 {
-  "appid": "adf140f0-60e3-45ff-8d69-258b3c0a63b1",
-  "name": "DNSDB",
-  "description": "This app supports investigative DNS lookup actions on DNSDB",
-  "publisher": "Splunk",
-  "package_name": "phantom_dnsdb",
-  "type": "investigative",
-  "license": "Copyright (c) 2016-2020 Splunk Inc.",
-  "main_module": "dnsdb_connector.pyc",
-  "app_version": "1.0.13",
-  "utctime_updated": "2018-12-07T01:51:25.000000Z",
-  "product_vendor": "Farsight Security",
-  "product_name": "DNSDB",
-  "product_version_regex": ".*",
-  "min_phantom_version": "4.8.24304",
-  "logo": "farsight-logo.png",
-  "configuration": {
-    "api_key": {
-      "data_type": "password",
-      "description": "API Key",
-      "required": true
-    }
-  },
-  "actions": [
-    {
-      "action": "test connectivity",
-      "description": "Validate the asset configuration for connectivity",
-      "type": "test",
-      "identifier": "test_asset_connectivity",
-      "read_only": true,
-      "parameters": {},
-      "output": [],
-      "versions": "EQ(*)"
+    "appid": "adf140f0-60e3-45ff-8d69-258b3c0a63b1",
+    "name": "DNSDB",
+    "description": "This app supports investigative DNS lookup actions on DNSDB",
+    "publisher": "Farisght Security",
+    "package_name": "farsight_dnsdb",
+    "type": "investigative",
+    "license": "Copyright (c) Farsight Security 2021",
+    "main_module": "dnsdb_connector.pyc",
+    "app_version": "2.0.0",
+    "utctime_updated": "2018-12-07T01:51:25.000000Z",
+    "product_vendor": "Farsight Security",
+    "product_name": "DNSDB",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.8.24304",
+    "logo": "farsight-logo.png",
+    "configuration": {
+        "api_key": {
+            "data_type": "password",
+            "description": "API Key",
+            "required": true
+        }
     },
-    {
-      "action": "lookup ip",
-      "identifier": "lookup_ip",
-      "type": "investigate",
-      "read_only": true,
-      "description": "Reverse DNS lookup",
-      "verbose": "If <b>limit</b> parameter is not specified, the action will use 200.",
-      "parameters": {
-        "ip": {
-          "required": true,
-          "description": "IP to resolve",
-          "order": 0,
-          "data_type": "string",
-          "contains": [
-            "ip",
-            "ipv6"
-          ],
-          "primary": true
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
-        "network_prefix": {
-          "required": false,
-          "description": "Network prefix",
-          "order": 1,
-          "data_type": "numeric"
+        {
+            "action": "check rate limit",
+            "description": "Get current rate limit data",
+            "type": "generic",
+            "identifier": "check_rate_limit",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.reset",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remaining",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.limit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.offset_max",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.results_max",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Rate Limit",
+                "type": "custom",
+                "view": "dnsdb_view.show_rate_limits",
+                "height": 5
+            }
         },
-        "record_seen_after": {
-          "required": false,
-          "description": "Record seen after (YYYY-MM-DDThh:mm:ssZ or epoch)",
-          "order": 2,
-          "data_type": "string"
+        {
+            "action": "rdata lookup - name",
+            "identifier": "lookup_rdata_name",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Name RDATA Lookup",
+            "verbose": "If <b>limit</b> parameter is not specified, the action will use 200.",
+            "parameters": {
+                "name": {
+                    "required": true,
+                    "description": "Name to lookup",
+                    "order": 0,
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true
+                },
+                "time_first_after": {
+                    "required": false,
+                    "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 3,
+                    "data_type": "string"
+                },
+                "time_first_before": {
+                    "required": false,
+                    "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 4,
+                    "data_type": "string"
+                },
+                "time_last_after": {
+                    "required": false,
+                    "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 5,
+                    "data_type": "string"
+                },
+                "time_last_before": {
+                    "required": false,
+                    "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 6,
+                    "data_type": "string"
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Max records to return",
+                    "order": 4,
+                    "data_type": "numeric",
+                    "default": 200
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Name RDATA Lookup",
+                "type": "custom",
+                "view": "dnsdb_view.display_lookup_info",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrname",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
         },
-        "record_seen_before": {
-          "required": false,
-          "description": "Record seen before (YYYY-MM-DDThh:mm:ssZ or epoch)",
-          "order": 3,
-          "data_type": "string"
+        {
+            "action": "rdata lookup - ip",
+            "identifier": "lookup_rdata_ip",
+            "type": "investigate",
+            "read_only": true,
+            "description": "IP RDATA Lookup",
+            "verbose": "If <b>limit</b> parameter is not specified, the action will use 200.",
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "description": "IP to resolve",
+                    "order": 0,
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true
+                },
+                "network_prefix": {
+                    "required": false,
+                    "description": "Network prefix",
+                    "order": 1,
+                    "data_type": "numeric"
+                },
+                "time_first_after": {
+                    "required": false,
+                    "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 3,
+                    "data_type": "string"
+                },
+                "time_first_before": {
+                    "required": false,
+                    "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 4,
+                    "data_type": "string"
+                },
+                "time_last_after": {
+                    "required": false,
+                    "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 5,
+                    "data_type": "string"
+                },
+                "time_last_before": {
+                    "required": false,
+                    "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 6,
+                    "data_type": "string"
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Max records to return",
+                    "order": 4,
+                    "data_type": "numeric",
+                    "default": 200
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "RDATA IP Lookup",
+                "type": "custom",
+                "view": "dnsdb_view.display_lookup_info",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrname",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.network_prefix",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
         },
-        "limit": {
-          "required": false,
-          "description": "Max records to return",
-          "order": 4,
-          "data_type": "numeric",
-          "default": 200
+        {
+            "action": "rdata lookup - raw",
+            "identifier": "lookup_rdata_raw",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Lookup raw RDATA",
+            "verbose": "",
+            "parameters": {
+                "raw_rdata": {
+                    "required": true,
+                    "description": "An even number of hexadecimal digits specifying a raw octet string",
+                    "order": 0,
+                    "data_type": "string",
+                    "contains": [
+                        "rdata"
+                    ],
+                    "primary": true
+                },
+                "type": {
+                    "value_list": [
+                        "ANY",
+                        "A",
+                        "A6",
+                        "AAAA",
+                        "AFSDB",
+                        "CNAME",
+                        "DNAME",
+                        "HINFO",
+                        "ISDN",
+                        "KX",
+                        "NAPTR",
+                        "NXT",
+                        "MB",
+                        "MD",
+                        "MF",
+                        "MG",
+                        "MINFO",
+                        "MR",
+                        "MX",
+                        "NS",
+                        "PTR",
+                        "PX",
+                        "RP",
+                        "RT",
+                        "SIG",
+                        "SOA",
+                        "SRV",
+                        "TXT",
+                        "ANY-DNSSEC",
+                        "DLV",
+                        "DNSKEY",
+                        "DS",
+                        "NSEC",
+                        "NSEC3",
+                        "NSEC3PARAM",
+                        "RRSIG"
+                    ],
+                    "required": false,
+                    "description": "DNS record type",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "time_first_after": {
+                    "required": false,
+                    "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 3,
+                    "data_type": "string"
+                },
+                "time_first_before": {
+                    "required": false,
+                    "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 4,
+                    "data_type": "string"
+                },
+                "time_last_after": {
+                    "required": false,
+                    "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 5,
+                    "data_type": "string"
+                },
+                "time_last_before": {
+                    "required": false,
+                    "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 6,
+                    "data_type": "string"
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Max records to return",
+                    "order": 4,
+                    "data_type": "numeric",
+                    "default": 200
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "RDATA lookup (Raw)",
+                "type": "custom",
+                "view": "dnsdb_view.display_lookup_info",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrname",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.raw_rdata",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "rrset lookup",
+            "identifier": "lookup_rrset",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Perform a DNSDB RRSET lookup",
+            "verbose": "If <b>limit</b> parameter is not specified, the action will use 200.<br><br> Supported DNS record <b>types</b>:<br><ul><li>ANY</li><li>A</li><li>A6</li><li>AAAA</li><li>AFSDB</li><li>CNAME</li><li>DNAME</li><li>HINFO</li><li>ISDN</li><li>KX</li><li>NAPTR</li><li>NXT</li><li>MB</li><li>MD</li><li>MF</li><li>MG</li><li>MINFO</li><li>MR</li><li>MX</li><li>NS</li><li>PTR</li><li>PX</li><li>RP</li><li>RT</li><li>SIG</li><li>SOA</li><li>SRV</li><li>TXT</li><li>ANY-DNSSEC</li><li>DLV</li><li>DNSKEY</li><li>DS</li><li>NSEC</li><li>NSEC3</li><li>NSEC3PARAM</li><li>RRSIG</li></ul> 'ANY' returns records from types: A, A6, AAAA, AFSDB, CNAME, DNAME, HINFO, ISDN, KX, NAPTR, NXT, MB, MD, MF, MG, MINFO, MR, MX, NS, PTR, PX, RP, RT, SIG, SOA, SRV, TXT. <br> 'ANY-DNSSEC' returns records from types: DLV, DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG. <br><br>For types ANY and ANY-DNSSEC, low limit can leave out retrieval of some record types.",
+            "parameters": {
+                "owner_name": {
+                    "required": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "description": "Domain to resolve",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true
+                },
+                "type": {
+                    "value_list": [
+                        "ANY",
+                        "A",
+                        "A6",
+                        "AAAA",
+                        "AFSDB",
+                        "CNAME",
+                        "DNAME",
+                        "HINFO",
+                        "ISDN",
+                        "KX",
+                        "NAPTR",
+                        "NXT",
+                        "MB",
+                        "MD",
+                        "MF",
+                        "MG",
+                        "MINFO",
+                        "MR",
+                        "MX",
+                        "NS",
+                        "PTR",
+                        "PX",
+                        "RP",
+                        "RT",
+                        "SIG",
+                        "SOA",
+                        "SRV",
+                        "TXT",
+                        "ANY-DNSSEC",
+                        "DLV",
+                        "DNSKEY",
+                        "DS",
+                        "NSEC",
+                        "NSEC3",
+                        "NSEC3PARAM",
+                        "RRSIG"
+                    ],
+                    "required": false,
+                    "description": "DNS record type",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "time_first_after": {
+                    "required": false,
+                    "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 3,
+                    "data_type": "string"
+                },
+                "time_first_before": {
+                    "required": false,
+                    "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 4,
+                    "data_type": "string"
+                },
+                "time_last_after": {
+                    "required": false,
+                    "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 5,
+                    "data_type": "string"
+                },
+                "time_last_before": {
+                    "required": false,
+                    "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 6,
+                    "data_type": "string"
+                },
+                "bailiwick": {
+                    "required": false,
+                    "description": "Bailiwick",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Max records to return",
+                    "order": 5,
+                    "data_type": "numeric",
+                    "default": 200
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "RRSET Lookup",
+                "type": "custom",
+                "view": "dnsdb_view.display_lookup_info",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_origin",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_mail_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_serial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_refresh",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_retry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_expire",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_minimum",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_preference",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_mail_exchange",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrname",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bailiwick",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.bailiwick",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_items",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
+        },
+        {
+            "action": "flex search",
+            "identifier": "flex_search",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Perform a Flex search",
+            "verbose": "TODO",
+            "parameters": {
+                "query": {
+                    "required": true,
+                    "description": "Flex search query",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true
+                },
+                "type": {
+                    "value_list": [
+                        "RDATA",
+                        "RRNAMES"
+                    ],
+                    "required": true,
+                    "description": "DNS record type",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "search_type": {
+                    "value_list": [
+                        "regex",
+                        "glob"
+                    ],
+                    "required": true,
+                    "description": "Search syntax type",
+                    "order": 2,
+                    "data_type": "string"
+                },
+                "time_first_after": {
+                    "required": false,
+                    "description": "Record first seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 3,
+                    "data_type": "string"
+                },
+                "time_first_before": {
+                    "required": false,
+                    "description": "Record first seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 4,
+                    "data_type": "string"
+                },
+                "time_last_after": {
+                    "required": false,
+                    "description": "Record last seen after (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 5,
+                    "data_type": "string"
+                },
+                "time_last_before": {
+                    "required": false,
+                    "description": "Record last seen before (epoch, relative seconds e.g. -31536000, or UTC timestamp e.g. 2021-01-05T12:06:02Z)",
+                    "order": 6,
+                    "data_type": "string"
+                },
+                "exclude": {
+                    "required": false,
+                    "description": "Exclusion pattern (regex)",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "limit": {
+                    "required": false,
+                    "description": "Max records to return",
+                    "order": 8,
+                    "data_type": "numeric",
+                    "default": 10000
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "DNSDB Flex Search",
+                "type": "custom",
+                "view": "dnsdb_view.display_lookup_info",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_origin",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_mail_addr",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_serial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_refresh",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_retry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_expire",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_minimum",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_preference",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rdata.*.rdata_mail_exchange",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrname",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rrtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bailiwick",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_last",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.zone_time_first",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.search_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_first_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_after",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.time_last_before",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.exclude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_items",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ]
         }
-      },
-      "versions": "EQ(*)",
-      "render": {
-        "width": 12,
-        "title": "IP Lookup",
-        "type": "custom",
-        "view": "dnsdb_view.display_lookup_info",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.count",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.rdata",
-          "data_type": "string",
-          "contains": [
-            "ip",
-            "ipv6"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rrname",
-          "data_type": "string",
-          "contains": [
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rrtype",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.time_last",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.time_first",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.zone_time_last",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.zone_time_first",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.ip",
-          "data_type": "string",
-          "contains": [
-            "ip",
-            "ipv6"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.network_prefix",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.parameter.record_seen_after",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.record_seen_before",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.limit",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.summary.total_domains",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ]
+    ],
+    "pip_dependencies": {
+        "pypi": [
+            {"module": "dnsdb2"}
+        ]
     },
-    {
-      "action": "lookup domain",
-      "identifier": "lookup_domain",
-      "type": "investigate",
-      "read_only": true,
-      "description": "Query DNS about a domain",
-      "verbose": "If <b>limit</b> parameter is not specified, the action will use 200.<br><br> Supported DNS record <b>types</b>:<br><ul><li>ANY</li><li>A</li><li>A6</li><li>AAAA</li><li>AFSDB</li><li>CNAME</li><li>DNAME</li><li>HINFO</li><li>ISDN</li><li>KX</li><li>NAPTR</li><li>NXT</li><li>MB</li><li>MD</li><li>MF</li><li>MG</li><li>MINFO</li><li>MR</li><li>MX</li><li>NS</li><li>PTR</li><li>PX</li><li>RP</li><li>RT</li><li>SIG</li><li>SOA</li><li>SRV</li><li>TXT</li><li>ANY-DNSSEC</li><li>DLV</li><li>DNSKEY</li><li>DS</li><li>NSEC</li><li>NSEC3</li><li>NSEC3PARAM</li><li>RRSIG</li></ul> 'ANY' returns records from types: A, A6, AAAA, AFSDB, CNAME, DNAME, HINFO, ISDN, KX, NAPTR, NXT, MB, MD, MF, MG, MINFO, MR, MX, NS, PTR, PX, RP, RT, SIG, SOA, SRV, TXT. <br> 'ANY-DNSSEC' returns records from types: DLV, DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG. <br><br>For types ANY and ANY-DNSSEC, low limit can leave out retrieval of some record types.",
-      "parameters": {
-        "domain": {
-          "required": true,
-          "contains": [
-            "domain"
-          ],
-          "description": "Domain to resolve",
-          "data_type": "string",
-          "order": 0,
-          "primary": true
-        },
-        "type": {
-          "value_list": [
-            "ANY",
-            "A",
-            "A6",
-            "AAAA",
-            "AFSDB",
-            "CNAME",
-            "DNAME",
-            "HINFO",
-            "ISDN",
-            "KX",
-            "NAPTR",
-            "NXT",
-            "MB",
-            "MD",
-            "MF",
-            "MG",
-            "MINFO",
-            "MR",
-            "MX",
-            "NS",
-            "PTR",
-            "PX",
-            "RP",
-            "RT",
-            "SIG",
-            "SOA",
-            "SRV",
-            "TXT",
-            "ANY-DNSSEC",
-            "DLV",
-            "DNSKEY",
-            "DS",
-            "NSEC",
-            "NSEC3",
-            "NSEC3PARAM",
-            "RRSIG"
-          ],
-          "required": false,
-          "description": "DNS record type",
-          "data_type": "string",
-          "order": 1
-        },
-        "record_seen_after": {
-          "required": false,
-          "description": "Record seen after (YYYY-MM-DDThh:mm:ssZ or epoch)",
-          "order": 2,
-          "data_type": "string"
-        },
-        "record_seen_before": {
-          "required": false,
-          "description": "Record seen before (YYYY-MM-DDThh:mm:ssZ or epoch)",
-          "order": 3,
-          "data_type": "string"
-        },
-        "zone": {
-          "required": false,
-          "description": "DNS record zone",
-          "data_type": "string",
-          "order": 4
-        },
-        "limit": {
-          "required": false,
-          "description": "Max records to return",
-          "order": 5,
-          "data_type": "numeric",
-          "default": 200
-        }
-      },
-      "versions": "EQ(*)",
-      "render": {
-        "width": 12,
-        "title": "Domain Lookup",
-        "type": "custom",
-        "view": "dnsdb_view.display_lookup_info",
-        "height": 5
-      },
-      "output": [
-        {
-          "data_path": "action_result.data.*.count",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.rdata",
-          "data_type": "string",
-          "contains": [
-            "ip",
-            "ipv6",
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_origin",
-          "data_type": "string",
-          "contains": [
-            "host name"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_mail_addr",
-          "data_type": "string",
-          "contains": [
-            "email"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_serial",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_refresh",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_retry",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_expire",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_minimum",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_preference",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.rdata.*.rdata_mail_exchange",
-          "data_type": "string",
-          "contains": [
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rrname",
-          "data_type": "string",
-          "contains": [
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.rrtype",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.data.*.bailiwick",
-          "data_type": "string",
-          "contains": [
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.data.*.time_last",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.time_first",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.zone_time_last",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.data.*.zone_time_first",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.domain",
-          "data_type": "string",
-          "contains": [
-            "domain"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.zone",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.record_seen_after",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.record_seen_before",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.limit",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.summary.total_items",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
-        }
-      ]
-    }
-  ]
+    "directory": "dnsdb_adf140f0-60e3-45ff-8d69-258b3c0a63b1",
+    "version": 1,
+    "appname": "-",
+    "executable": "spawn3",
+    "disabled": false
 }

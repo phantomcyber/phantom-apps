@@ -3,6 +3,9 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
+from __future__ import print_function, unicode_literals
+
+import dnsdb2
 # Phantom imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -11,11 +14,10 @@ from phantom.action_result import ActionResult
 # Local imports
 from dnsdb_consts import *
 
-import requests
 import json
 import re
-from bs4 import BeautifulSoup
 import socket
+import time
 
 
 class DnsdbConnector(BaseConnector):
@@ -24,6 +26,7 @@ class DnsdbConnector(BaseConnector):
 
         # Call the BaseConnector's init first
         super(DnsdbConnector, self).__init__()
+        self._client = None
         self._api_key = None
         return
 
@@ -37,148 +40,55 @@ class DnsdbConnector(BaseConnector):
             return False
         if param[-1] == '.':
             param = param[:-1]
-        allowed = re.compile("(?!-)[A-Z\\d\-\_]{1,63}(?<!-')$", re.IGNORECASE)
-        l = param.split('.')
+        allowed = re.compile(r"(?!-)[A-Z\\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
+        parts = param.split('.')
 
         # Wildcard serch '*' is allowed in the first and
         # last subdomain only
-        for idx, x in enumerate(l):
-            if idx == 0 or idx == (len(l) - 1):
+        for idx, x in enumerate(parts):
+            if idx == 0 or idx == (len(parts) - 1):
                 if not (x == '*' or allowed.match(x)):
                     return False
             elif not allowed.match(x):
-                    return False
+                return False
         return True
 
     def initialize(self):
-
         config = self.get_config()
         self._api_key = config[DNSDB_JSON_API_KEY]
+        self._client = dnsdb2.Client(config[DNSDB_JSON_API_KEY])
         self.set_validator('domain', self._validate_domain)
         return phantom.APP_SUCCESS
 
-    def _make_rest_call(self, endpoint, action_result, params=None, method="get"):
-        """ Function that makes the REST call to the device,
-            generic function that can be called from various action handlers
-        """
-
-        rest_res = None
-
-        error_resp_dict = {
-            DNSDB_REST_RESP_RESOURCE_INCORRECT: DNSDB_REST_RESP_RESOURCE_INCORRECT_MSG,
-            DNSDB_REST_RESP_ACCESS_DENIED: DNSDB_REST_RESP_ACCESS_DENIED_MSG,
-            DNSDB_REST_RESP_LIC_EXCEED: DNSDB_REST_RESP_LIC_EXCEED_MSG,
-            DNSDB_REST_RESP_OVERLOADED: DNSDB_REST_RESP_OVERLOADED_MSG
-        }
-
-        """Get or post or put, whatever the caller asked us to use,
-        if not specified the default will be 'get' """
-
-        try:
-            request_func = getattr(requests, method)
-        except:
-            """handle the error in case the caller specified
-            a non-existent method"""
-            self.debug_print(DNSDB_ERR_API_UNSUPPORTED_METHOD.format(method=method))
-
-            # set the action_result status to error, the handler function
-            # will most probably return as is
-            return (action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_API_UNSUPPORTED_METHOD),
-                    rest_res)
-
-        # Headers to be supplied
-        headers = {
-            'X-API-Key': self._api_key,
-            'Accept': 'application/json'
-        }
-
-        # Make the call
-        try:
-            r = request_func(
-                DNSDB_BASE_URL + endpoint,
-                headers=headers, params=params)
-        except Exception as e:
-            self.debug_print(DNSDB_ERR_SERVER_CONNECTION)
-            # set the action_result status to error, the handler function
-            # will most probably return as is
-            return (action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_SERVER_CONNECTION, e),
-                    rest_res)
-
-        if r.status_code in error_resp_dict.keys():
-            self.debug_print(DNSDB_ERR_FROM_SERVER.format(status=r.status_code, detail=error_resp_dict[r.status_code]))
-            # set the action_result status to error, the handler function
-            # will most probably return as is
-            return (action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_FROM_SERVER, status=r.status_code,
-                                             detail=error_resp_dict[r.status_code]),
-                    rest_res)
-
-        # Return code 404 is not considered as failed action.
-        # The requested resource is unavailable
-        if r.status_code == DNSDB_REST_RESP_RESOURCE_NOT_FOUND:
-            return (phantom.APP_SUCCESS, {DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MSG: True})
-
-        # Try parsing the json, even in the case of an HTTP error
-        # the data might contain a json of details 'message'
-        content_type = r.headers['content-type']
-        if content_type.find('json') != -1:
-            try:
-                # The reponse returned can have multiple json seperated
-                # by newline character
-                resp_arr = ((r.text).encode('utf-8')).splitlines()
-                rest_res = []
-                for res in resp_arr:
-                    res = res.rstrip()
-                    if res:
-                        rest_res.append(json.loads(res))
-            except Exception as e:
-                # r.text is guaranteed to be not None,
-                # it will be empty, but not None
-                msg_string = DNSDB_ERR_JSON_PARSE.format(
-                    raw_text=r.text)
-                self.debug_print(msg_string)
-                # set the action_result status to error, the handler function
-                # will most probably return as is
-                return (action_result.set_status(phantom.APP_ERROR,
-                                                 msg_string, e), rest_res)
-
-        else:
-            rest_res = r.text
-
-        if r.status_code == DNSDB_REST_RESP_SUCCESS:
-            return (phantom.APP_SUCCESS, {DNSDB_JSON_RESPONSE: rest_res})
-
-        # see if an error message is present
-        message = self._normalize_reply(rest_res) if rest_res else DNSDB_REST_RESP_OTHER_ERROR_MSG
-
-        # All other response codes from Rest call are failures
-        self.debug_print(DNSDB_ERR_FROM_SERVER.format(status=r.status_code, detail=message))
-        # set the action_result status to error, the handler function
-        # will most probably return as is
-        return (action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_FROM_SERVER, status=r.status_code,
-                                         detail=message),
-                rest_res)
-
     def _test_connectivity(self, param):
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(DNSDB_TEST_CONNECTIVITY_MSG)
 
-        ret_val, json_resp = self._make_rest_call(
-            (DNSDB_ENDPOINT_DOMAIN).format(
-                domain=DNSDB_TEST_CONN_DOMAIN),
-            action_result)
+        try:
+            rate = self._client.rate_limit()[DNSDB_JSON_RATE]
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
 
-        # Forcefully set the status of the BaseConnector to failure, since
-        # action_result is not added to the BaseConnector.
-        if (phantom.is_fail(ret_val)):
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
+
+        except:
             self.save_progress(action_result.get_message())
             self.set_status(
                 phantom.APP_ERROR, DNSDB_TEST_CONN_FAIL)
             return action_result.get_status()
-
         self.set_status_save_progress(
-            phantom.APP_SUCCESS, DNSDB_TEST_CONN_SUCC)
-        return action_result.get_status()
+            phantom.APP_SUCCESS, DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate['limit'], rate['remaining'], rate['reset']))
+
+        action_result.add_data(rate)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _is_ipv6(self, address):
 
@@ -190,47 +100,69 @@ class DnsdbConnector(BaseConnector):
 
         return True
 
-    def _lookup_domain(self, param):
+    def _lookup_rrset(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Getting mandatory input parameters
-        domain = param[DNSDB_JSON_DOMAIN]
+        owner_name = param[DNSDB_JSON_OWNER_NAME]
         # Getting optional input parameters
-        record_type = param.get(DNSDB_JSON_TYPE, 'ANY')
-        zone = param.get(DNSDB_JSON_ZONE)
+        record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
+        bailiwick = param.get(DNSDB_JSON_BAILIWICK)
+        limit = param.get(DNSDB_JSON_LIMIT, 200)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except ValueError:
+                pass
+            except TypeError:
+                pass
 
         summary_data = action_result.update_summary({})
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val, url_params = self._get_url_params(param, action_result)
+        ret_val = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Endpoint as per parameter given
-        if zone:
-            endpoint = (DNSDB_ENDPOINT_DOMAIN_TYPE_ZONE).format(domain=domain, type=record_type, zone=zone)
-        else:
-            endpoint = (DNSDB_ENDPOINT_DOMAIN_TYPE).format(domain=domain, type=record_type)
-
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=url_params)
-
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+        try:
+            responses = list(self._client.lookup_rrset(owner_name,
+                                                    bailiwick=bailiwick,
+                                                    rrtype=record_type,
+                                                    limit=limit,
+                                                    time_first_before=timestamps[0],
+                                                    time_first_after=timestamps[1],
+                                                    time_last_before=timestamps[2],
+                                                    time_last_after=timestamps[3],
+                                                    ignore_limited=True))
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
 
         # No data is considered as app success
-        if (response.get(DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MSG)):
+        if len(responses) == 0:
             return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
 
-        json_resp = response.get(DNSDB_JSON_RESPONSE)
-
-        for resp in json_resp:
-
+        for resp in responses:
             rdata = resp.get('rdata', [])
 
             for i, curr_rdata in enumerate(rdata):
@@ -270,11 +202,11 @@ class DnsdbConnector(BaseConnector):
             # Adding Each data of list to action_result
             action_result.add_data(resp)
 
-        summary_data['total_items'] = len(json_resp)
+        summary_data['total_items'] = len(responses)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _lookup_ip(self, param):
+    def _lookup_rdata_ip(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -282,6 +214,19 @@ class DnsdbConnector(BaseConnector):
         ip = param[DNSDB_JSON_IP]
         # Getting optional input parameter
         network_prefix = param.get(DNSDB_JSON_NETWORK_PREFIX)
+        limit = param.get(DNSDB_JSON_LIMIT, 200)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except ValueError:
+                pass
+            except TypeError:
+                pass
 
         summary_data = action_result.update_summary({})
 
@@ -302,34 +247,48 @@ class DnsdbConnector(BaseConnector):
 
         # Endpoint as per parameter given
         if network_prefix:
-            endpoint = (DNSDB_ENDPOINT_IP_PREFIX).format(ip=ip, prefix=network_prefix)
-        else:
-            endpoint = (DNSDB_ENDPOINT_IP).format(ip=ip)
+            ip = "%s,%s" % (ip, network_prefix)
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val, url_params = self._get_url_params(param, action_result)
+        ret_val = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=url_params)
+        try:
+            responses = list(self._client.lookup_rdata_ip(ip,
+                                                        limit=limit,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        ignore_limited=True))
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # No data is considered as app success
-        if (response.get(DNSDB_REST_RESP_RESOURCE_NOT_FOUND_MSG)):
+        if len(responses) == 0:
             return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
 
-        json_resp = response.get(DNSDB_JSON_RESPONSE)
         # To display count of domains in summary data
         count_domain = set()
 
-        for resp in json_resp:
+        for resp in responses:
 
             if ('rrname' in resp):
                 resp['rrname'] = resp['rrname'].rstrip('.')
@@ -343,91 +302,341 @@ class DnsdbConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_url_params(self, param, action_result):
-        """ Function to get input parameters and return error in case of
+    def _lookup_rdata_name(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Getting mandatory input parameter
+        name = param[DNSDB_JSON_NAME]
+        # Getting optional input parameter
+        limit = param.get(DNSDB_JSON_LIMIT, 200)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except ValueError:
+                pass
+            except TypeError:
+                pass
+
+        summary_data = action_result.update_summary({})
+
+        # Constructing request parameters based on input
+        # Validating the input parameters provided
+        # Would be used during REST call
+        ret_val = self._validate_params(param, action_result)
+
+        # Something went wrong while validing input parameters
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            responses = list(self._client.lookup_rdata_name(name,
+                                                        limit=limit,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        ignore_limited=True))
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
+
+        # Something went wrong with the request
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # No data is considered as app success
+        if len(responses) == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
+
+        # To display count of domains in summary data
+        count_domain = set()
+
+        for resp in responses:
+
+            if ('rrname' in resp):
+                resp['rrname'] = resp['rrname'].rstrip('.')
+                count_domain.add(resp['rrname'])
+
+            # Response from the API is list of rdata.
+            # Adding Each data of list to action_result
+            action_result.add_data(resp)
+
+        summary_data['total_domains'] = len(count_domain)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _lookup_rdata_raw(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Getting mandatory input parameter
+        raw_rdata = param[DNSDB_JSON_RAW_RDATA]
+        # Getting optional input parameter
+        record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
+        limit = param.get(DNSDB_JSON_LIMIT, 200)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except ValueError:
+                pass
+            except TypeError:
+                pass
+
+        summary_data = action_result.update_summary({})
+
+        # Constructing request parameters based on input
+        # Validating the input parameters provided
+        # Would be used during REST call
+        ret_val = self._validate_params(param, action_result)
+
+        # Something went wrong while validing input parameters
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            responses = list(self._client.lookup_rdata_raw(raw_rdata,
+                                                        rrtype=record_type,
+                                                        limit=limit,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        ignore_limited=True))
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
+
+        # Something went wrong with the request
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # No data is considered as app success
+        if len(responses) == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
+
+        # To display count of domains in summary data
+        count_domain = set()
+
+        for resp in responses:
+
+            if (DNSDB_JSON_RRNAME in resp):
+                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
+                count_domain.add(resp[DNSDB_JSON_RRNAME])
+
+            # Response from the API is list of rdata.
+            # Adding Each data of list to action_result
+            action_result.add_data(resp)
+
+        summary_data['total_domains'] = len(count_domain)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _flex_search(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Getting mandatory input parameter
+        query = param[DNSDB_JSON_QUERY]
+        rrtype = param[DNSDB_JSON_TYPE]
+        search_type = param[DNSDB_JSON_SEARCH_TYPE]
+        # Getting optional input parameter
+        limit = param.get(DNSDB_JSON_LIMIT, 10000)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except ValueError:
+                pass
+            except TypeError:
+                pass
+
+        exclude = param.get(DNSDB_JSON_EXCLUDE)
+
+        summary_data = action_result.update_summary({})
+
+        # Constructing request parameters based on input
+        # Validating the input parameters provided
+        # Would be used during REST call
+        ret_val = self._validate_params(param, action_result)
+
+        # Something went wrong while validing input parameters
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        try:
+            if rrtype == "RDATA" and search_type == "regex":
+                responses = list(self._client.flex_rdata_regex(query,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        exclude=exclude,
+                                                        limit=limit,
+                                                        ignore_limited=True))
+            elif rrtype == "RDATA" and search_type == "glob":
+                responses = list(self._client.flex_rdata_glob(query,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        exclude=exclude,
+                                                        limit=limit,
+                                                        ignore_limited=True))
+            elif rrtype == "RRNAMES" and search_type == "regex":
+                responses = list(self._client.flex_rrnames_regex(query,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        exclude=exclude,
+                                                        limit=limit,
+                                                        ignore_limited=True))
+            elif rrtype == "RRNAMES" and search_type == "glob":
+                responses = list(self._client.flex_rrnames_glob(query,
+                                                        time_first_before=timestamps[0],
+                                                        time_first_after=timestamps[1],
+                                                        time_last_before=timestamps[2],
+                                                        time_last_after=timestamps[3],
+                                                        exclude=exclude,
+                                                        limit=limit,
+                                                        ignore_limited=True))
+        except dnsdb2.exceptions.AccessDenied:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
+            return action_result.get_status()
+        except dnsdb2.exceptions.QuotaExceeded:
+            self.save_progress(action_result.get_message())
+            self.set_status(
+                phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+            return action_result.get_status()
+
+        # No data is considered as app success
+        if len(responses) == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
+
+        # To display count of domains in summary data
+        count_domain = set()
+
+        for resp in responses:
+            if (DNSDB_JSON_RRNAME in resp):
+                resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
+                count_domain.add(resp[DNSDB_JSON_RRNAME])
+
+            # Response from the API is list of rdata.
+            # Adding Each data of list to action_result
+            action_result.add_data(resp)
+
+        summary_data['total_items'] = len(responses)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _validate_params(self, param, action_result):
+        """ Function to validate input parameters and return error in case of
             validation fails
         """
 
-        url_params = {}
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 200)
-        record_seen_before = param.get(DNSDB_JSON_RECORD_SEEN_BEFORE)
-        record_seen_after = param.get(DNSDB_JSON_RECORD_SEEN_AFTER)
+        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
+        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
+        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
+        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
 
-        if record_seen_before:
-            # Validating the input for time format(YYYY-MM-DDThh:mm:ssZ or epoch)
-            if not self._is_valid_time(record_seen_before):
-                return (action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=record_seen_before)),
-                        None)
+        if time_first_before:
+            # Validating the input for time format(epoch or relative seconds)
+            if not self._is_valid_time(time_first_before):
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_first_before))
 
-        if record_seen_after:
-            # Validating the input for time format(YYYY-MM-DDThh:mm:ssZ or epoch)
-            if not self._is_valid_time(record_seen_after):
-                return (action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=record_seen_after)),
-                        None)
+        if time_first_after:
+            # Validating the input for time format(epoch or relative seconds)
+            if not self._is_valid_time(time_first_after):
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_first_after))
+
+        if time_last_before:
+            # Validating the input for time format(epoch or relative seconds)
+            if not self._is_valid_time(time_last_before):
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_last_before))
+
+        if time_last_after:
+            # Validating the input for time format(epoch or relative seconds)
+            if not self._is_valid_time(time_last_after):
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_last_after))
 
         if limit:
             limit_valid = int(limit) > 0
             if not limit_valid:
-                return (action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_LIMIT).format(limit=limit)),
-                        None)
+                return action_result.set_status(phantom.APP_ERROR,
+                                                 (DNSDB_ERR_INVALID_LIMIT).format(limit=limit))
 
-            url_params[DNSDB_JSON_LIMIT] = limit
+        return phantom.APP_SUCCESS
 
-        if record_seen_before and record_seen_after:
-            url_params['time_first_after'] = record_seen_after
-            url_params['time_last_before'] = record_seen_before
-        else:
-            if record_seen_before:
-                url_params['time_first_before'] = record_seen_before
-            elif record_seen_after:
-                url_params['time_last_after'] = record_seen_after
-
-        return (phantom.APP_SUCCESS, url_params)
-
-    def _is_valid_time(self, time):
+    def _is_valid_time(self, time_value):
         """ Function that validates given time,
-            time can be epoch time or UTC ISO format.
-            e.g.1380139330 or 2016-07-12T00:00:00Z
+            time can be epoch time, relative seconds, or timestamp
+            e.g.1380139330, -31536000, or 2021-01-05T12:06:02Z
         """
-
-        if len(time) == 10:
-            # regular expression to validate epoch time
-            reg_exp = re.compile("[0-9]{10}")
-
-        elif len(time) == 20:
-            # regular expression to validate UTC ISO time format
-            # e.g. 2016-07-12T00:00:00Z
-            reg_exp = re.compile('\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[1-2]\d|3'
-                                 '[0-1])T(?:[0-1]\d|2[0-3]):[0-5]\d:[0-5]\dZ')
-
+        date_format = DNSDB_TIME_FORMAT
+        try:
+            time.strptime(time_value, date_format)
+        except ValueError:
+            pass
         else:
+            return True
+
+        try:
+            int(time_value)
+        except ValueError:
             return False
 
-        if not reg_exp.match(time):
+        if not (len(time_value) == 10 or int(time_value) < 0):
             return False
 
         return True
-
-    def _normalize_reply(self, reply):
-
-        try:
-            soup = BeautifulSoup(reply, 'html.parser')
-            return soup.text
-        except Exception as e:
-            self.debug_print('Handled exception', e)
-            return 'Unparsable Reply. Please see the log files for the response text.'
 
     def handle_action(self, param):
 
         # Supported actions by app
         supported_actions = {
             'test_asset_connectivity': self._test_connectivity,
-            'lookup_ip': self._lookup_ip,
-            'lookup_domain': self._lookup_domain
+            'check_rate_limit': self._test_connectivity,
+            'lookup_rdata_ip': self._lookup_rdata_ip,
+            'lookup_rdata_name': self._lookup_rdata_name,
+            'lookup_rdata_raw': self._lookup_rdata_raw,
+            'lookup_rrset': self._lookup_rrset,
+            'flex_search': self._flex_search
         }
 
         action = self.get_action_identifier()
@@ -448,7 +657,7 @@ if __name__ == '__main__':
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = DnsdbConnector()
         connector.print_progress_message = True
         connector._handle_action(json.dumps(in_json), None)
