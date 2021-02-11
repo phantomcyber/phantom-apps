@@ -90,7 +90,7 @@ class AwsCloudtrailConnector(BaseConnector):
                 for i in resp_json.get(set_name):
                     updated_list.append(i)
         except Exception as e:
-            exception_message = e.args[0].encode('utf-8').strip()
+            exception_message = e.args[0].strip()
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR, "boto3 call to CloudTrail failed.", exception_message),
                 None)
