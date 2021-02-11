@@ -269,16 +269,11 @@ class TestConnector(BaseConnector):
                 # the call to the 3rd party device or service failed, action result should contain all the error details
                 return action_result.get_status()
 
-            try:
-                reply = response["reply"]
-
-                if reply["total_count"] == 0:
-                    break
-
-                polled_count += reply["result_count"]
-                incidents += reply["incidents"]
-            except Exception:
-                self.debug_print(ERR_PARSING_RESPONSE)
+            reply = response["reply"]
+            if reply["total_count"] == 0:
+                break
+            polled_count += reply["result_count"]
+            incidents += reply["incidents"]
             self._state.update({"last_incident": incidents[-1]["creation_time"] + 1})
             self.save_state(self._state)
 
