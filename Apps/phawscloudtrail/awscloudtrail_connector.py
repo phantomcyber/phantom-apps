@@ -37,29 +37,29 @@ class AwsCloudtrailConnector(BaseConnector):
 
     def _create_client(self, action_result):
 
-            boto_config = None
-            if self._proxy:
-                boto_config = Config(proxies=self._proxy)
+        boto_config = None
+        if self._proxy:
+            boto_config = Config(proxies=self._proxy)
 
-            try:
-                if self._access_key and self._secret_key:
-                    self.debug_print("Creating boto3 client with API keys")
-                    self._client = client(
-                        'cloudtrail',
-                        region_name=self._region,
-                        aws_access_key_id=self._access_key,
-                        aws_secret_access_key=self._secret_key,
-                        config=boto_config)
-                else:
-                    self.debug_print("Creating boto3 client without API keys")
-                    self._client = client(
-                        'cloudtrail',
-                        region_name=self._region,
-                        config=boto_config)
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+        try:
+            if self._access_key and self._secret_key:
+                self.debug_print("Creating boto3 client with API keys")
+                self._client = client(
+                    'cloudtrail',
+                    region_name=self._region,
+                    aws_access_key_id=self._access_key,
+                    aws_secret_access_key=self._secret_key,
+                    config=boto_config)
+            else:
+                self.debug_print("Creating boto3 client without API keys")
+                self._client = client(
+                    'cloudtrail',
+                    region_name=self._region,
+                    config=boto_config)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
 
-            return phantom.APP_SUCCESS
+        return phantom.APP_SUCCESS
 
     def _extract_cloudtrail_event_object(self, ct_string):
         try:
@@ -91,7 +91,9 @@ class AwsCloudtrailConnector(BaseConnector):
                     updated_list.append(i)
         except Exception as e:
             exception_message = e.args[0].encode('utf-8').strip()
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "boto3 call to CloudTrail failed.", exception_message), None)
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, "boto3 call to CloudTrail failed.", exception_message),
+                None)
 
         if can_paginate:
             next_token = None
@@ -99,9 +101,9 @@ class AwsCloudtrailConnector(BaseConnector):
                 next_token = resp_json.get('NextToken')
 
             res_dict = {
-                    "response_list": self._sanitize_data(updated_list),
-                    "next_token": next_token
-                }
+                "response_list": self._sanitize_data(updated_list),
+                "next_token": next_token
+            }
             return phantom.APP_SUCCESS, res_dict
         else:
             return phantom.APP_SUCCESS, self._sanitize_data(updated_list)
@@ -112,7 +114,9 @@ class AwsCloudtrailConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))),
+                None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -120,7 +124,7 @@ class AwsCloudtrailConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -307,7 +311,7 @@ class AwsCloudtrailConnector(BaseConnector):
                     new_dict.update(page)
                 return new_dict
             except Exception as e:
-                return { 'error': e }
+                return {'error': e}
 
         return cur_obj
 
@@ -362,9 +366,9 @@ if __name__ == '__main__':
     password = args.password
 
     if (username is not None and password is None):
-
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if (username and password):
