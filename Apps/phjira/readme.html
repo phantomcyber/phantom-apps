@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2016-2020 Splunk Inc.
+  Copyright (c) 2016-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -162,7 +162,7 @@ One helpful debugging tool: simplify your action, instead of filling out all the
 					For the first time we try to add an attachment to the Jira ticket with the same name as the filename, if it may get successful, then it will add an attachment with the same name
 				</li>
 				<li>
-					But if it fails, then, we will check whether there are Unicode characters or not in the filename, if it has, there are highly possible chances that Jira SDK might get throws an exception due to this Unicode characters.
+					But if it fails, then, we will check whether there are Unicode characters or not in the filename, if it has, there are highly possible chances that Jira SDK might get throws an exception due to these Unicode characters.
 				</li>
 				<li>
 					And in such a case, we removed those non-ASCII Unicode characters from the filename and add prefix FILENAME_ASCII to the filename. And, we again try to add an attachment with a newly created name to the Jira ticket.

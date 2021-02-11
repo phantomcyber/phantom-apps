@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: view_results.html
-  Copyright (c) 2014-2020 Splunk Inc.
+  Copyright (c) 2014-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -82,14 +82,16 @@
 
 <div class="cuckoo-report" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
   {% for result in results %}
+    {% if not result.data %}
+      <h3 class="wf-h4-style">No data found</h3>
+      
+  {% else %}
+
   <ul class="nav nav-tabs" role="tablist">
     <li {% if forloop.first  %} class="active" {% endif %}>
       <a data-toggle="tab" href="#report{{ forloop.counter0 }}">Report {{ result.data.report.info.id }}</a>
     </li>
   </ul>
-  {% if not result.data %}
-    <h3 class="wf-h4-style">No data found</h3>
-  {% else %}
 
   <div class="tab-content" style="z-index: 1;">
     <div id="report{{ forloop.counter0 }}" class="tab-pane fade {% if forloop.first %} active in {% endif %}" role="tabpanel">
@@ -110,7 +112,7 @@
             {% with item=result.data.report.info %}
             <div class="panel">
               <div class="panel-title">
-                <h3>{{ info.category|title }} Analysis</h3>
+                <h3>{{ result.data.report.info.category|title }} Analysis</h3>
               </div>
               <div class="panel-body">
                 <div class="sandbox-info"><b>Started ON:</b> &nbsp;{{ item.started|human_datetime }}</div>
@@ -348,10 +350,10 @@
             {% with item=result.data.report.debug %}
             <div style="overflow:auto; width: 100%; height: 100%;">
               {% if item.errors %}
-                <pre>{{ item.errors }}</pre>
+                <pre style="color: rgb(129, 129, 129)">{{ item.errors }}</pre>
               {% endif %}
               {% if item.log %}
-                <pre>{{ item.log }}</pre>
+                <pre style="color: rgb(129, 129, 129)">{{ item.log }}</pre>
               {% endif %}
             </div>
             {% endwith %}
@@ -380,7 +382,7 @@
                 <h3>Yara</h3>
               </div>
               <div class="panel-body">
-                <pre>{{ item.phantom_info.yara }}</pre>
+                <pre style="color: rgb(129, 129, 129)">{{ item.phantom_info.yara }}</pre>
               </div>
             </div>
             {% endif %}
@@ -393,7 +395,7 @@
             {% with item=result.data.report.strings %}
             <div style="overflow:auto; width: 100%; height: 100%;">
               <h3>Strings</h3>
-              <pre>{{ item }}</pre>
+                <pre style="color: rgb(129, 129, 129)">{{ item }}</pre></div>
             </div>
             {% endwith %}
           </div>
@@ -402,7 +404,7 @@
           {% for key, value in result.data.report.items %}
           {% if key not in result.formatted_sections %}
           <div id="{{ key }}{{ forloop.parentloop.counter0 }}" class="tab-pane fade" role="tabpanel">
-            <pre>{{ value }}</pre>
+            <pre style="color: rgb(129, 129, 129)">{{ value }}</pre>
           </div> <!-- End {{ key }} -->
           {% endif %}
           {% endfor %}

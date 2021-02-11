@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: ds_base_service.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -22,7 +21,10 @@ class DSBaseService(DSAbstractService):
 
     def __init__(self, ds_api_key, ds_api_secret_key, proxy=None):
         super(DSBaseService, self).__init__(proxy=proxy)
-        self._hash = base64.b64encode('{}:{}'.format(ds_api_key, ds_api_secret_key))
+        data_string = str(ds_api_key) + ":" + str(ds_api_secret_key)
+        data_bytes = data_string.encode("ascii")
+        data_bytes = base64.b64encode(data_bytes)
+        self._hash = data_bytes.decode("ascii")
         self._url_base = '{}{}'.format(ds_api_host, ds_api_base)
 
     def _headers(self, with_content_type=True):
