@@ -9,12 +9,12 @@
     "product_name": "Active Directory LDAP",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) Splunk, 2021",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "2.0.0",
     "utctime_updated": "2019-10-27T05:06:05.140684Z",
     "package_name": "phantom_adldap",
     "main_module": "adldap_connector.py",
-    "min_phantom_version": "4.9.38671",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.2",
     "python_version": "3",
     "latest_tested_versions": [
@@ -91,7 +91,6 @@
             "action": "add group members",
             "identifier": "add_group_members",
             "description": "Adds one more more AD objects to one or more groups",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "versions": "EQ(*)",
@@ -227,7 +226,6 @@
             "action": "remove group members",
             "identifier": "remove_group_members",
             "description": "Removes one more more AD objects to one or more groups",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "versions": "EQ(*)",
@@ -265,7 +263,7 @@
                     "data_path": "action_result.data.*.member",
                     "data_type": "string",
                     "column_name": "member",
-                    "column_order": 1,
+                    "column_order": 0,
                     "example_values": [
                         "cn=svc-splunk,ou=splunk,dc=splunk,dc=lab"
                     ]
@@ -274,7 +272,7 @@
                     "data_path": "action_result.data.*.function",
                     "data_type": "string",
                     "column_name": "function",
-                    "column_order": 2,
+                    "column_order": 1,
                     "example_values": [
                         "removed"
                     ]
@@ -283,7 +281,7 @@
                     "data_path": "action_result.data.*.group",
                     "data_type": "string",
                     "column_name": "group",
-                    "column_order": 3,
+                    "column_order": 2,
                     "example_values": [
                         "cn=domain guests,cn=users,dc=splunk,dc=lab"
                     ]
@@ -364,7 +362,6 @@
             "action": "unlock account",
             "identifier": "unlock_account",
             "description": "Unlocks a locked Active Directory account",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "versions": "EQ(*)",
@@ -480,7 +477,6 @@
             "action": "disable account",
             "identifier": "disable_account",
             "description": "Disables an Active Directory account",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "undo": "enable account",
@@ -589,7 +585,6 @@
             "action": "enable account",
             "identifier": "enable_account",
             "description": "Enables a disabled Active Directory account",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "undo": "disable account",
@@ -698,7 +693,6 @@
             "action": "reset password",
             "identifier": "reset_password",
             "description": "Reset a user's password",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "versions": "EQ(*)",
@@ -828,13 +822,12 @@
             "action": "move object",
             "identifier": "move_object",
             "description": "Moves an entry in active directory",
-            "verbose": "",
             "type": "custom",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
                 "object": {
-                    "description": "specify the distinguished name to move",
+                    "description": "Specify the distinguished name to move",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -843,7 +836,7 @@
                     "order": 0
                 },
                 "destination_ou": {
-                    "description": "the OU the specified object will move to",
+                    "description": "The OU the specified object will move to",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1049,7 +1042,7 @@
             "action": "get attribute",
             "identifier": "get_attributes",
             "description": "Get attributes of various principals",
-            "verbose": "This action takes any number of principals (samaccountname, distinguishedname, or userprincipalname) and returns requested attributes. Separate with semi-colon (';')",
+            "verbose": "This action takes any number of principals (samaccountname, distinguishedname, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -1157,7 +1150,6 @@
             "action": "set attribute",
             "identifier": "set_attribute",
             "description": "Add, delete, or replace an attribute of a user",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
