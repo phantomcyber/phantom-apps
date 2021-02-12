@@ -273,7 +273,7 @@ class AdLdapConnector(BaseConnector):
         user = param['user'].lower()
         ar_data = {}            # data for action_result
 
-        if param.get("use_samaccountname", False):
+        if param["use_samaccountname"]:
             user_dn = self._sam_to_dn([user])   # _sam_to_dn requires a list.
             if len(user_dn) == 0 or user_dn[user] is False:
                 return RetVal(action_result.set_status(
@@ -323,7 +323,7 @@ class AdLdapConnector(BaseConnector):
         ar_data = {}
 
         # let the analyst use samaccountname if they wish
-        if param.get("use_samaccountname", False):
+        if param["use_samaccountname"]:
             user_info = self._sam_to_dn([user])
             ar_data["samaccountname"] = user
             if user_info[user] is False:
@@ -468,10 +468,10 @@ class AdLdapConnector(BaseConnector):
 
         if (action == 'ADD' or action == 'REPLACE') and value is None:
             return RetVal(action_result.set_status(
-                phantom.APP_ERROR, u"Value parameter must be filled when using {} action".format(action)), None)
+                phantom.APP_ERROR, "Value parameter must be filled when using {} action".format(action)), None)
 
         ar_data = {}
-        if param.get("use_samaccountname", False):
+        if param["use_samaccountname"]:
             user_dn = self._sam_to_dn([user])   # _sam_to_dn requires a list.
             if len(user_dn) == 0 or user_dn[user] is False:
                 return RetVal(action_result.set_status(
@@ -600,6 +600,10 @@ class AdLdapConnector(BaseConnector):
 
         user = param['user'].lower()
         pwd = param['password']
+        confirm_pwd = param['confirm_password']
+        if pwd != confirm_pwd:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Passwords do not match."), None)
+
         ar_data = {}
 
         if not self._ldap_bind():
@@ -609,7 +613,7 @@ class AdLdapConnector(BaseConnector):
                 self._ldap_bind.result
             ))
 
-        if param.get("use_samaccountname", False):
+        if param["use_samaccountname"]:
             user_dn = self._sam_to_dn([user])   # _sam_to_dn requires a list.
             if len(user_dn) == 0 or user_dn[user] is False:
                 return RetVal(action_result.set_status(
@@ -743,7 +747,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            login_url = AdLdapConnector._get_phantom_base_url() + '/login'
+            login_url = AdLdapConnector._get_phantom_base_url() + 'login'
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)

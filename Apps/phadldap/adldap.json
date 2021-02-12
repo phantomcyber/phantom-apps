@@ -37,14 +37,12 @@
             "description": "The Active Directory Server hostname, IP, or VIP for binding",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "order": 0
         },
         "username": {
             "description": "The username with which to bind to LDAP",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "order": 1
         },
         "password": {
@@ -71,7 +69,6 @@
             "description": "The port to bind for SSL (default 636)",
             "data_type": "numeric",
             "required": true,
-            "value_list": [],
             "default": "636",
             "order": 5
         }
@@ -96,28 +93,26 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Specify members AND groups as samaccountnames instead of distinguished names (note: member AND groups will use samaccountname if selected).",
+                    "description": "Specify members AND groups as sAMAccountName(s) instead of distinguishedName(s) (note: member AND groups will use sAMAccountName if selected)",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
                 "members": {
-                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false then these must be distinguished names.",
+                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false, then these must be distinguishedName(s)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": "",
                     "order": 1
                 },
                 "groups": {
-                    "description": "Semi-colon (';') separated list of groups to which the members will be added. If 'use samaccountname' is false, then these must be distinguished names.",
+                    "description": "Semi-colon (';') separated list of groups to which the members will be added. If 'use samaccountname' is false, then these must be distinguishedName(s)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
+                    "primary": false,
                     "default": "",
                     "order": 2
                 }
@@ -231,29 +226,26 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Specify members AND groups as samaccountnames instead of distinguished names",
+                    "description": "Specify members AND groups as sAMAccountName(s) instead of distinguishedName(s)",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
                 "members": {
-                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false then these must be distinguished names.",
+                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false, then these must be distinguishedName(s)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": "",
                     "order": 1
                 },
                 "groups": {
-                    "description": "Semi-colon (';') separated list of groups from which the members will be removed. If 'use samaccountname' is false, then these must be distinguished names.",
+                    "description": "Semi-colon (';') separated list of groups from which the members will be removed. If 'use samaccountname' is false, then these must be distinguishedName(s)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": "",
                     "order": 2
                 }
@@ -367,11 +359,10 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Use samaccountname for user instead of distinguished name.",
+                    "description": "Use sAMAccountName for user instead of distinguishedName(s)",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
@@ -483,11 +474,10 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Specify samaccountname instead of distinguishedname",
+                    "description": "Specify sAMAccountName instead of distinguishedName",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
@@ -591,11 +581,10 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Specify samaccountname instead of distinguishedname",
+                    "description": "Specify sAMAccountName instead of distinguishedName",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
@@ -698,11 +687,10 @@
             "versions": "EQ(*)",
             "parameters": {
                 "use_samaccountname": {
-                    "description": "Specify samaccountname instead of distinguishedname",
+                    "description": "Specify sAMAccountName instead of distinguishedName",
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
@@ -721,10 +709,17 @@
                     "description": "New password",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": false,
                     "order": 2
+                },
+                "confirm_password": {
+                    "description": "Re-type the password",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 3
                 }
             },
             "output": [
@@ -762,6 +757,13 @@
                 },
                 {
                     "data_path": "action_result.parameter.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thisisanewpw!123"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.confirm_password",
                     "data_type": "string",
                     "example_values": [
                         "Thisisanewpw!123"
@@ -827,11 +829,10 @@
             "versions": "EQ(*)",
             "parameters": {
                 "object": {
-                    "description": "Specify the distinguished name to move",
+                    "description": "Specify the distinguishedName to move",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": false,
                     "order": 0
                 },
@@ -839,8 +840,7 @@
                     "description": "The OU the specified object will move to",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
+                    "primary": false,
                     "default": false,
                     "order": 1
                 }
@@ -931,25 +931,23 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "value_list": [],
                     "default": "",
                     "order": 0
                 },
                 "search_base": {
-                    "description": "The search base to use. If not specified, the 'defaultNamingContext' will be used.",
+                    "description": "The search base to use. If not specified, the 'defaultNamingContext' will be used",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": "",
                     "order": 1
                 },
                 "attributes": {
-                    "description": "Semi-colon separated list of attributes to collect (e.g. samaccountname;mail).",
+                    "description": "Semi-colon separated list of attributes to collect (e.g. sAMAccountName;mail)",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "default": "samaccountname",
+                    "default": "sAMAccountName",
                     "order": 2
                 }
             },
@@ -962,7 +960,7 @@
                     "data_path": "action_result.parameter.filter",
                     "data_type": "string",
                     "example_values": [
-                        "(samaccountname=*)"
+                        "(sAMAccountName=*)"
                     ]
                 },
                 {
@@ -976,7 +974,7 @@
                     "data_path": "action_result.parameter.attributes",
                     "data_type": "string",
                     "example_values": [
-                        "samaccountname"
+                        "sAMAccountName"
                     ]
                 },
                 {
@@ -1042,25 +1040,24 @@
             "action": "get attribute",
             "identifier": "get_attributes",
             "description": "Get attributes of various principals",
-            "verbose": "This action takes any number of principals (samaccountname, distinguishedname, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
+            "verbose": "This action takes any number of principals (sAMAccountName, distinguishedName, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "principals": {
-                    "description": "The semi-colon separated principals. These can be samaccountname, userprincipalname, or distinguishedname.",
+                    "description": "The semi-colon separated principals. These can be sAMAccountName, userprincipalname, or distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "value_list": [],
                     "default": "",
                     "order": 0
                 },
                 "attributes": {
-                    "description": "Semi-colon separated list of attributes to collect.",
+                    "description": "Semi-colon separated list of attributes to collect",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "default": "samaccountname",
+                    "default": "sAMAccountName",
                     "order": 1
                 }
             },
@@ -1158,7 +1155,6 @@
                     "data_type": "boolean",
                     "required": false,
                     "primary": false,
-                    "value_list": [],
                     "default": false,
                     "order": 0
                 },
@@ -1170,7 +1166,6 @@
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
                     "default": "",
                     "order": 1
                 },
@@ -1190,7 +1185,7 @@
                     "order": 3
                 },
                 "action": {
-                    "description": "Semi-colon separated list of attributes to collect.",
+                    "description": "Semi-colon separated list of attributes to collect",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
