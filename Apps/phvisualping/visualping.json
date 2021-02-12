@@ -10,7 +10,11 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "contributors": "Matt Sayar",
+    "contributors": [
+      {
+        "name": "Matt Sayar"
+      }
+    ],
     "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-12-22T17:55:40.648399Z",
