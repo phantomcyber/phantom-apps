@@ -287,7 +287,7 @@
                     "order": 0
                 },
                 "attribute_value": {
-                    "description": "Select the Value by which to search. Note that true/false values must be lower-case",
+                    "description": "Specify the Value by which to search. Note that true/false values must be lower-case",
                     "data_type": "string",
                     "order": 1
                 },
@@ -319,15 +319,28 @@
                 },
                 {
                     "data_path": "action_result.parameter.attribute_key",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "EventName",
+                        "Username"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.attribute_value",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "DescribeTable",
+                        "false",
+                        "true"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.end_date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-02-10",
+                        "1980-08-12"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_results",
@@ -338,7 +351,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.start_date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-02-10",
+                        "1980-08-12"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.AccessKeyId",
