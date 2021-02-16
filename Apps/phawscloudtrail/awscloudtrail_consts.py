@@ -32,4 +32,4 @@ AWSCLOUDTRAIL_DICT_MAP = {
             'describe_trails': 'trailList',
             'lookup_events': 'Events'
         }
-AWSCLOUDTRAIL_INVALID_LIMIT = 'Please provide non-zero positive integer in limit'
+AWSCLOUDTRAIL_INVALID_LIMIT = 'Please provide a non-zero positive integer in the max_results'
