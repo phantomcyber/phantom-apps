@@ -1,0 +1,22 @@
+<!-- File: readme.html
+  Copyright (c) 2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<p>This app implements actions that manage a Cisco Umbrella domain list. Cisco Umbrella allows third-party implementations like Phantom Enterprise to create and manage a list of domains (i.e. add, delete) via what it calls 'custom integrations'. The Phantom Cisco Umbrella App requires such an integration to be pre-configured on Cisco Umbrella. The steps to do this are outlined below:</p>
+<ul>
+<li>Login to your Cisco dashboard and go to Policies &gt; Policy Components &gt; Integrations and click the &quot;Add&quot; button.</li>
+<li>Set the name of the custom integration to be &quot;Phantom Orchestration Feed&quot;</li>
+<li>Expand your new custom integration, check &quot;Enable&quot;, copy the integration URL and then click Save.</li>
+<li>The integration URL will be of the form: <b>https://s-platform.api.opendns.com/1.0/events?customerKey=bac2bfa7-d134-4b85-a5ed-b1ffec027a91</b> One of the parameters to this URL is the customer key (GUID format). This value will be required while configuring the Cisco Umbrella asset on Phantom. The Cisco Umbrella App on Phantom will use this customer key while adding, listing, and deleting domains.</li>
+<li>Go to Policies &gt; Policy Components &gt; Security Settings, click on add, and check the relevant security settings. Scroll down and under Integrations select 'Phantom Orchestration Feed'.</li>
+</ul>
+<p>At the end of the above steps Cisco Umbrella has been configured to:<br> 
+<ul>
+  <li>Create a 'custom integration' domain list with a <em>customerKey</em> for Phantom to use.</li>
+  <li>Use the domains belonging to the 'Phantom Orchestration Feed' to block DNS requests.</li>
+</ul>
+</p>
+<p>The next step is to configure a 'Cisco Umbrella' app's asset on Phantom and specify the 'Cisco Customer key' and click 'Test Connectivity' to validate the configuration.</p>
+<p>More information about 'custom integrations' can be found <a href="https://support.umbrella.com/hc/en-us/articles/231248748", target="_blank">here</a>.<br /></p>
