@@ -687,11 +687,13 @@ class SlackConnector(phantom.BaseConnector):
             return ret_val
 
         if not resp_json.get('ok', True):
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "{}: {}\r\nDetails: {}".format(SLACK_ERR_INVITING_CHANNEL, self._handle_py_ver_compat_for_input_str(resp_json.get('error', 'N/A')),
-                self._handle_py_ver_compat_for_input_str(resp_json.get('detail', '')))
-            )
+            error = resp_json.get('error', 'N/A')
+            error_details = self._handle_py_ver_compat_for_input_str(resp_json.get('detail', ''))
+            if error_details:
+                error_message = "{}: {}\r\nDetails: {}".format(SLACK_ERR_INVITING_CHANNEL, error, error_details)
+            else:
+                error_message = "{}: {}".format(SLACK_ERR_INVITING_CHANNEL, error)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 

@@ -258,7 +258,7 @@
                     "column_name": "Channel Name",
                     "column_order": 0,
                     "example_values": [
-                        "name"
+                        "channel1"
                     ]
                 },
                 {
@@ -468,8 +468,8 @@
                     "data_type": "string",
                     "column_name": "Channel Name",
                     "column_order": 0,
-                    "contains": [
-                        "slack destination"
+                    "example_values": [
+                        "channel1"
                     ]
                 },
                 {
@@ -654,11 +654,7 @@
                     "data_path": "action_result.data.*.members.*.name",
                     "data_type": "string",
                     "column_name": "Username",
-                    "column_order": 0,
-                    "contains": [
-                        "slack destination",
-                        "slack user"
-                    ]
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.always_active",
@@ -951,11 +947,7 @@
                     "data_path": "action_result.data.*.user.name",
                     "data_type": "string",
                     "column_name": "Username",
-                    "column_order": 1,
-                    "contains": [
-                        "slack destination",
-                        "slack user"
-                    ]
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.avatar_hash",
@@ -1100,7 +1092,11 @@
                     "description": "ID of channel",
                     "data_type": "string",
                     "required": true,
-                    "order": 0
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "slack destination"
+                    ]
                 },
                 "users": {
                     "description": "Comma-separated list of users (IDs) to invite",
@@ -1123,6 +1119,9 @@
                     "data_type": "string",
                     "example_values": [
                         "CLBC12T3R"
+                    ],
+                    "contains": [
+                        "slack destination"
                     ]
                 },
                 {
@@ -1381,13 +1380,13 @@
         {
             "action": "send message",
             "description": "Send a message to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message. Messages are limited to 4000 characters.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA) or a user ID (e.g. U1A1A1AAA). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user ID will send a direct message. Messages are limited to 4000 characters.",
             "type": "generic",
             "identifier": "send_message",
             "read_only": false,
             "parameters": {
                 "destination": {
-                    "description": "Channel (e.g. #channel or C1A1A1AAA) or user (e.g. @user or U1A1A1AAA) to send message to",
+                    "description": "Channel ID (e.g. C1A1A1AAA) or user ID (e.g. U1A1A1AAA) to send message to",
                     "data_type": "string",
                     "primary": true,
                     "required": true,
@@ -1663,13 +1662,13 @@
         {
             "action": "upload file",
             "description": "Upload file to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user or U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA) or a user ID (e.g. U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user ID will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack.",
             "type": "generic",
             "identifier": "upload_file",
             "read_only": false,
             "parameters": {
                 "destination": {
-                    "description": "Channel (e.g. #channel or C1A1A1AAA) or user (e.g. @user or U1A1A1AAA) to upload to",
+                    "description": "Channel ID (e.g. C1A1A1AAA) or user ID (e.g. U1A1A1AAA) to upload to",
                     "data_type": "string",
                     "required": true,
                     "order": 0,
@@ -2118,7 +2117,7 @@
             },
             "parameters": {
                 "destination": {
-                    "description": "User (e.g. @user or U1A1A1AAA) to ask question to",
+                    "description": "User ID (e.g. U1A1A1AAA) to ask question to",
                     "data_type": "string",
                     "primary": true,
                     "required": true,
