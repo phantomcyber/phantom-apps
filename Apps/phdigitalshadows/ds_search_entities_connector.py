@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2020 Digital Shadows Ltd.
+# File: ds_search_entities_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -8,10 +7,10 @@ import phantom.app as phantom
 from phantom.action_result import ActionResult
 
 
-from digital_shadows_consts import DS_API_KEY_CFG, DS_API_SECRET_KEY_CFG
+from digital_shadows_consts import *
 
 from dsapi.service.search_entities_service import SearchEntitiesService
-from bs4 import UnicodeDammit
+from exception_handling_functions import ExceptionHandling
 
 
 class DSSearchEntitiesConnector(object):
@@ -23,7 +22,8 @@ class DSSearchEntitiesConnector(object):
         self._connector = connector
 
         config = connector.get_config()
-        self._ds_api_key = UnicodeDammit(config[DS_API_KEY_CFG]).unicode_markup.encode('utf-8')
+        self._handle_exception_object = ExceptionHandling()
+        self._ds_api_key = config[DS_API_KEY_CFG]
         self._ds_api_secret_key = config[DS_API_SECRET_KEY_CFG]
 
     def search_entities(self, param):
@@ -56,7 +56,17 @@ class DSSearchEntitiesConnector(object):
         end_date = param.get('until')
         """
 
-        search_service = SearchEntitiesService(self._ds_api_key, self._ds_api_secret_key)
+        try:
+            search_service = SearchEntitiesService(self._ds_api_key, self._ds_api_secret_key)
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
+
+        try:
+            search_view = search_service.search_entity_view(dateRange=date_range, query_string=query, types=type)
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_message))
         """
         search_view = search_service.search_entity_view(types=type, dateRange=date_range, incidentTypes=incident_types, incidentSubtypes=incident_subtypes,
                                                         incidentSeverities=incident_severities, webPageNetworks=web_page_networks,
@@ -67,7 +77,6 @@ class DSSearchEntitiesConnector(object):
                                                         blogNames=blog_names, datePeriod=date_period, from_date=start_date,
                                                         until=end_date, query_string=query)
         """
-        search_view = search_service.search_entity_view(dateRange=date_range, query_string=query, types=type)
         self._connector.save_progress("View: {}".format(search_view))
         try:
             search_entity_pages = search_service.find_all_pages(view=search_view)
@@ -76,6 +85,9 @@ class DSSearchEntitiesConnector(object):
         except StopIteration:
             error_message = 'No Search Entity objects retrieved from the Digital Shadows API in page groups'
             return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
         if entity_total > 0:
             summary = {
                 'entity_count': entity_total,

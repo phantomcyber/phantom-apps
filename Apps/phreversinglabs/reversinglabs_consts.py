@@ -1,5 +1,5 @@
 # File: reversinglabs_consts.py
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -25,5 +25,5 @@ REVERSINGLABS_JSON_TOTAL_POSITIVES = "total_positives"
 REVERSINGLABS_JSON_STATUS = "status"
 
 # Other constants used in the connector
-MAL_PRESENCE_API_URL = 'https://api.reversinglabs.com/api/databrowser/malware_presence/bulk_query/json'
-XREF_API_URL = 'https://api.reversinglabs.com/api/xref/v2/bulk_query/json'
+MAL_PRESENCE_API_URL = 'https://ticloud01.reversinglabs.com/api/databrowser/malware_presence/bulk_query/json'
+XREF_API_URL = 'https://ticloud01.reversinglabs.com/api/xref/v2/bulk_query/json'

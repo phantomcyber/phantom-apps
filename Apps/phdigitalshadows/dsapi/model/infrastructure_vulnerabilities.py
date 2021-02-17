@@ -1,10 +1,9 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: infrastructure_vulnerabilities.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-from ds_model import DSModel
+from .ds_model import DSModel
 
 
 class InfrastructureVulnerabilities(DSModel):
@@ -27,4 +26,4 @@ class InfrastructureVulnerabilities(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long), json)
+        return cls(cast(json.get('id'), int), json)

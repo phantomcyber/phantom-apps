@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2020 Digital Shadows Ltd.
+# File: ds_intelligence_incidents_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -9,12 +8,10 @@ from phantom.action_result import ActionResult
 # from datetime import date, timedelta
 # from unidecode import unidecode
 
-from digital_shadows_consts import DS_API_KEY_CFG, DS_API_SECRET_KEY_CFG
-from digital_shadows_consts import DS_GET_INTELLIGENCE_INCIDENT_SUCCESS
-from digital_shadows_consts import DS_DL_SUBTYPE, DS_BP_SUBTYPE, DS_INFR_SUBTYPE, DS_PS_SUBTYPE, DS_SMC_SUBTYPE
+from digital_shadows_consts import *
 
 from dsapi.service.intelligence_incident_service import IntelligenceIncidentService
-from bs4 import UnicodeDammit
+from exception_handling_functions import ExceptionHandling
 
 
 class DSIntelligenceIncidentsConnector(object):
@@ -26,34 +23,28 @@ class DSIntelligenceIncidentsConnector(object):
         self._connector = connector
 
         config = connector.get_config()
-        self._ds_api_key = UnicodeDammit(config[DS_API_KEY_CFG]).unicode_markup.encode('utf-8')
+        self._handle_exception_object = ExceptionHandling()
+        self._ds_api_key = config[DS_API_KEY_CFG]
         self._ds_api_secret_key = config[DS_API_SECRET_KEY_CFG]
 
     def get_intelligence_incident_by_id(self, param):
         action_result = ActionResult(dict(param))
         self._connector.add_action_result(action_result)
-        intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
-        intel_incident_id = param['intel_incident_id']
         try:
-            if isinstance(intel_incident_id, float):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Please provide a valid integer value in the 'intel_incident_id' parameter")
-            intel_incident_id = int(intel_incident_id)
-        except:
-            return action_result.set_status(phantom.APP_ERROR,
-                                            "Please provide a valid integer value in the 'intel_incident_id' parameter")
-
-        if intel_incident_id < 0:
-            return action_result.set_status(phantom.APP_ERROR,
-                                            "Please provide a valid non-negative integer value in the 'intel_incident_id' parameter")
+            intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
+        intel_incident_id = param['intel_incident_id']
+        # validate 'intel_incident_id' action parameter
+        ret_val, intel_incident_id = self._handle_exception_object.validate_integer(action_result, intel_incident_id, INTEL_INCIDENT_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         try:
             intelligence_incident = intelligence_incident_service.find_intel_incident_by_id(intel_incident_id)
         except Exception as e:
-            if hasattr(e, 'message'):
-                error_message = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-            else:
-                error_message = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_message))
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(error_message))
         # intelligence_incident_total = len(intelligence_incident_pages)
         # if intelligence_incident_total > 0:
         if 'id' in intelligence_incident:
@@ -98,39 +89,34 @@ class DSIntelligenceIncidentsConnector(object):
 
         param_types = None if 'types' not in param else param.get('types').split(',')
 
-        intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
-        intelligence_incident_view = IntelligenceIncidentService.intelligence_incident_ioc_view(types=param_types)
-        # self._connector.save_progress("View: " + str(intelligence_incident_view))
-        intel_incident_id = param['intel_incident_id']
         try:
-            if isinstance(intel_incident_id, float):
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Please provide a valid integer value in the 'intel_incident_id' parameter")
-            intel_incident_id = int(intel_incident_id)
-        except:
-            return action_result.set_status(phantom.APP_ERROR,
-                                            "Please provide a valid integer value in the 'intel_incident_id' parameter")
-
-        if intel_incident_id < 0:
-            return action_result.set_status(phantom.APP_ERROR,
-                                            "Please provide a valid non-negative integer value in the 'intel_incident_id' parameter")
+            intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
+            intelligence_incident_view = IntelligenceIncidentService.intelligence_incident_ioc_view(types=param_types)
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
+        intel_incident_id = param['intel_incident_id']
+        # validate 'intel_incident_id' action parameter
+        ret_val, intel_incident_id = self._handle_exception_object.validate_integer(action_result, intel_incident_id, INTEL_INCIDENT_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             intelligence_incident_ioc_pages = intelligence_incident_service.find_intel_incident_ioc_by_id(intel_incident_id=intel_incident_id, view=intelligence_incident_view)
-            # self._connector.save_progress("Result: " + str(intelligence_incident_ioc_pages))
             intelligence_incident_ioc_total = len(intelligence_incident_ioc_pages)
             self._connector.save_progress("II IoC Total: {}".format(intelligence_incident_ioc_total))
         except StopIteration:
             error_message = 'No Incident review objects retrieved from the Digital Shadows API'
             return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
         if intelligence_incident_ioc_total > 0:
             summary = {
                 'intelligence_incident_ioc_count': intelligence_incident_ioc_total,
                 'intelligence_incident_ioc_found': True
             }
             action_result.update_summary(summary)
-            # action_result.add_data(intelligence_incident_ioc_pages)
-            # self._connector.save_progress("Payload: " + str(intelligence_incident_ioc_pages))
 
             for intelligence_incident_ioc_page in intelligence_incident_ioc_pages:
                 for intelligence_incident_ioc in intelligence_incident_ioc_page:
@@ -145,10 +131,8 @@ class DSIntelligenceIncidentsConnector(object):
         self._connector.add_action_result(action_result)
 
         # interval_startdate = date.today() - timedelta(int(param['date_range']))
-        date_ranges = UnicodeDammit(param.get('date_range')).unicode_markup.encode('utf-8')
+        date_ranges = param.get('date_range')
         incident_types = []
-
-        # self._connector.save_progress("Incident_type: " + param.get('incident_types') + "|_|")
         if param.get('incident_types') is not None:
             param_incident_types = param.get('incident_types').split(',')
 
@@ -168,15 +152,21 @@ class DSIntelligenceIncidentsConnector(object):
         else:
             param_incident_types = None
 
-        intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
-        intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_ranges, date_range_field='published', types=incident_types)
+        try:
+            intelligence_incident_service = IntelligenceIncidentService(self._ds_api_key, self._ds_api_secret_key)
+            intelligence_incident_view = IntelligenceIncidentService.intelligence_incidents_view(date_range=date_ranges, date_range_field='published', types=incident_types)
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{0} {1}".format(SERVICE_ERR_MSG, error_message))
         try:
             intelligence_incident_pages = intelligence_incident_service.find_all_pages(view=intelligence_incident_view)
-
             intelligence_incident_total = len(intelligence_incident_pages)
         except StopIteration:
             error_message = 'No IntelligenceIncident objects retrieved from the Digital Shadows API in page groups'
             return action_result.set_status(phantom.APP_ERROR, "Error Details: {0}".format(error_message))
+        except Exception as e:
+            error_message = self._handle_exception_object.get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {}".format(error_message))
         if intelligence_incident_total > 0:
             summary = {
                 'intelligence_incident_count': intelligence_incident_total,

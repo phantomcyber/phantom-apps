@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2020 Digital Shadows Ltd.
+# File: ds_lookup_username_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #

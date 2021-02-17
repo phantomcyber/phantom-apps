@@ -1,10 +1,9 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: data_breach.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-from ds_model import DSModel
+from .ds_model import DSModel
 
 
 class DataBreach(DSModel):
@@ -99,18 +98,18 @@ class DataBreach(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long),
+        return cls(cast(json.get('id'), int),
                    json.get('title'),
                    json.get('domainName'),
                    json.get('occurred'),
                    json.get('modified'),
                    json.get('published'),
-                   cast(json.get('incident').get('id'), long),
+                   cast(json.get('incident').get('id'), int),
                    json.get('incident').get('scope'),
                    json.get('incident').get('type'),
                    json.get('incident').get('severity'),
                    json.get('incident').get('title'),
-                   cast(json.get('domainCount'), long),
-                   cast(json.get('recordCount'), long),
+                   cast(json.get('domainCount'), int),
+                   cast(json.get('recordCount'), int),
                    json.get('sourceUrl'),
-                   cast(json.get('organisationUsernameCount'), long), json)
+                   cast(json.get('organisationUsernameCount'), int), json)
