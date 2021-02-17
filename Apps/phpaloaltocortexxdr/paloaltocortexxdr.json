@@ -1066,6 +1066,10 @@
                 "hostname": {
                     "description": "Name of host",
                     "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ],
                     "order": 10
                 },
                 "scan_status": {
@@ -1159,6 +1163,9 @@
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
                     "column_name": "Hostname",
                     "column_order": 10
                 },
@@ -1283,6 +1290,10 @@
                 "hostname": {
                     "description": "Name of host",
                     "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ],
                     "order": 10
                 },
                 "scan_status": {
@@ -1376,6 +1387,9 @@
                 {
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
                     "column_name": "Hostname",
                     "column_order": 10
                 },
