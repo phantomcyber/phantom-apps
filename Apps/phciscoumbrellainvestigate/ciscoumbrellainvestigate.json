@@ -1,0 +1,1103 @@
+{
+    "appid": "5fc14867-8c8e-4cc2-8198-641df784bf1a",
+    "name": "Cisco Umbrella Investigate",
+    "description": "This app implements investigative actions by querying the Cisco Umbrella Investigate cloud service",
+    "type": "reputation",
+    "main_module": "ciscoumbrellainvestigate_connector.py",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-02-08T06:07:14.670889Z",
+    "product_vendor": "Cisco",
+    "product_name": "Cisco Umbrella Investigate",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "publisher": "Splunk",
+    "package_name": "phantom_ciscoumbrellainvestigate",
+    "logo": "logo_cisco.svg",
+    "logo_dark": "logo_cisco_dark.svg",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "latest_tested_version": [
+        "Cloud, API https://investigate.api.umbrella.com/, February 8 2021"
+    ],
+    "configuration": {
+        "access_token": {
+            "data_type": "password",
+            "order": 0,
+            "description": "Cisco Umbrella Investigate API Access Token",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Query Cisco Umbrella Investigate for domain info",
+            "type": "investigate",
+            "identifier": "lookup_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 2,
+                    "example_values": [
+                        "Search Engines",
+                        "Malware"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category_info.content_categories",
+                    "data_type": "string",
+                    "example_values": [
+                        "Search Engines"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category_info.security_categories",
+                    "data_type": "string",
+                    "column_name": "Security Categories",
+                    "column_order": 4,
+                    "example_values": [
+                        "Malware"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category_info.status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.features.*.feature",
+                    "data_type": "string",
+                    "example_values": [
+                        "Geo Popularity Score",
+                        "Keyword Score",
+                        "Lexical"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.features.*.normalizedScore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2,
+                        60,
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.features.*.score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -3.610878170000002,
+                        0.09264255482489717,
+                        0.606
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relative_links.*",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4289
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
+                    "data_type": "numeric",
+                    "column_name": "Risk Score",
+                    "column_order": 1,
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.asn_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -0.03286849936319416,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.attack",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.dga_score",
+                    "data_type": "numeric",
+                    "column_name": "DGA Score",
+                    "column_order": 5,
+                    "example_values": [
+                        0,
+                        -15.55033332819711
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.entropy",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1.91829583405449,
+                        2.75
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.fastflux",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.found",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.geodiversity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.geodiversity.*",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.0001,
+                        0.1429
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.geodiversity_normalized",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.geodiversity_normalized.*",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.0003299100640734098,
+                        0.009745995689748824
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.geoscore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        0.002894054671255598
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.handlings.normal",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.ks_test",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        0.2846253137451792
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.pagerank",
+                    "data_type": "numeric",
+                    "example_values": [
+                        60.32995,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.perplexity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.1878675610437336,
+                        1.122248102917671
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.popularity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.prefix_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -0.1054320152441063,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.rip_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -3.051340626556875,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.securerank2",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100,
+                        -0.004050008137296145
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.tld_geodiversity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.security_info.tld_geodiversity.*",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.01008192795884705
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status_desc",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "SAFE",
+                        "MALICIOUS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.attacks",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rig"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.categories",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malware"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.period.begin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.period.end",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.threatTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Exploit Kit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tag_info.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1428593707849,
+                        1496547887014
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "SAFE",
+                        "MALICIOUS"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.riskScore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_co_occurances",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_relative_links",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100,
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_tag_info",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total co occurances: 0, Domain status: SAFE, Total tag info: 1, Total relative links: 100",
+                        "Total co occurances: 0\nDomain status: MALICIOUS\nTotal tag info: 2\nTotal relative links: 0"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "Query Cisco Umbrella Investigate for IP info",
+            "type": "investigate",
+            "identifier": "lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "IP Reputation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "22.22.22.22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Domain ID",
+                    "column_order": 1,
+                    "example_values": [
+                        84626522
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Blocked Domain",
+                    "column_order": 0,
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "test_domain.net"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "MALICIOUS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_blocked_domains",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total blocked domains: 37, Ip status: MALICIOUS"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "whois domain",
+            "description": "Run a whois query on Cisco Umbrella Investigate for the given domain",
+            "type": "investigate",
+            "identifier": "whois_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois details"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "test_domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.addresses",
+                    "data_type": "string",
+                    "example_values": [
+                        "1600 amphitheatre parkway,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactCity",
+                    "data_type": "string",
+                    "column_name": "Admin City",
+                    "column_order": 2,
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactCountry",
+                    "data_type": "string",
+                    "column_name": "Admin Country",
+                    "column_order": 3,
+                    "example_values": [
+                        "UNITED STATES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactEmail",
+                    "data_type": "string",
+                    "column_name": "Admin Email",
+                    "column_order": 4,
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "dns-admin@test_domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactFax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactFaxExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactName",
+                    "data_type": "string",
+                    "column_name": "Admin Name",
+                    "column_order": 5,
+                    "example_values": [
+                        "Domain Administrator"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactOrganization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactPostalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "94043"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactState",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactStreet",
+                    "data_type": "string",
+                    "example_values": [
+                        "1600 amphitheatre parkway,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactTelephone",
+                    "data_type": "string",
+                    "example_values": [
+                        "16502530000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.administrativeContactTelephoneExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.auditUpdatedDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-17 12:38:07.000 UTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactCity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactCountry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactEmail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactFax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactFaxExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactPostalCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactState",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactStreet",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactTelephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.billingContactTelephoneExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "1997-09-15"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domainName",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "test_domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails",
+                    "data_type": "string",
+                    "example_values": [
+                        "dns-admin@test_domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-09-14"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hasRawText",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nameServers",
+                    "data_type": "string",
+                    "example_values": [
+                        "ns4.test_domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recordExpired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantCity",
+                    "data_type": "string",
+                    "column_name": "Registrant City",
+                    "column_order": 7,
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantCountry",
+                    "data_type": "string",
+                    "column_name": "Registrant Country",
+                    "column_order": 6,
+                    "example_values": [
+                        "UNITED STATES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantEmail",
+                    "data_type": "string",
+                    "column_name": "Registrant Email",
+                    "column_order": 8,
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "dns-admin@test_domain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantFax",
+                    "data_type": "string",
+                    "example_values": [
+                        "16502530001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantFaxExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.registrantName",
+                    "data_type": "string",
+                    "column_name": "Registrant Name",
+                    "column_order": 9,
+                    "example_values": [
+                        "Domain Administrator"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantOrganization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantPostalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "94043"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantState",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantStreet",
+                    "data_type": "string",
+                    "example_values": [
+                        "1600 amphitheatre parkway,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantTelephone",
+                    "data_type": "string",
+                    "example_values": [
+                        "16502530000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrantTelephoneExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.registrarIANAID",
+                    "data_type": "string",
+                    "example_values": [
+                        "292"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.registrarName",
+                    "data_type": "string",
+                    "example_values": [
+                        "MarkMonitor, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "clientDeleteProhibited clientTransferProhibited clientUpdateProhibited serverDeleteProhibited serverTransferProhibited serverUpdateProhibited"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactCity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactCountry",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNITED STATES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactEmail",
+                    "data_type": "string",
+                    "example_values": [
+                        "dns-admin@test_domain.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactFax",
+                    "data_type": "string",
+                    "example_values": [
+                        "16502530001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactFaxExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Administrator"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactOrganization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactPostalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "94043"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactState",
+                    "data_type": "string",
+                    "example_values": [
+                        "CA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactStreet",
+                    "data_type": "string",
+                    "example_values": [
+                        "1600 amphitheatre parkway,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactTelephone",
+                    "data_type": "string",
+                    "example_values": [
+                        "16502530000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technicalContactTelephoneExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.timeOfLatestRealtimeCheck",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1526564647993
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-02-21"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whoisServers",
+                    "data_type": "string",
+                    "example_values": [
+                        "whois.markmonitor.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactCity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactCountry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactEmail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactFax",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactFaxExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactPostalCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactState",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactStreet",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactTelephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zoneContactTelephoneExt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNITED STATES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google LLC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization: Test LLC, Country: UNITED STATES, City: Mountain View"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
