@@ -272,7 +272,7 @@
             "description": "Lookup the management events captured by CloudTrail",
             "parameters": {
                 "attribute_key": {
-                    "description": "Select an Attribute to query by (or blank) which to search",
+                    "description": "Select an Attribute to query by (or leave blank for retrieve all records)",
                     "data_type": "string",
                     "value_list": [
                         "EventId",
