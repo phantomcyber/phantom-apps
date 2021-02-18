@@ -465,10 +465,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             }
 
         if not self._access_token:
-            if not self._refresh_token:
+            if not self._non_interactive and not self._refresh_token:
                 # If none of the access_token and refresh_token is available
-                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
-                       None
+                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG), None
 
             # If refresh_token is available and access_token is not available, generate new access_token
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
@@ -629,7 +628,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             self.save_state(self._state)
             _save_app_state(self._state, self.get_asset_id(), self)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file.Please delete the state file and run the test connectivity again.")
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file. Please delete the state file and run the test connectivity again.")
 
         self._state = self.load_state()
 
@@ -741,7 +740,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
                 self.save_state(self._state)
                 _save_app_state(self._state, self.get_asset_id(), self)
             except:
-                return action_result.set_status(phantom.APP_ERROR, status_message="Error occurred while saving token in state file.Please delete the state file and run again.")
+                return action_result.set_status(phantom.APP_ERROR, status_message="Error occurred while saving token in state file. Please delete the state file and run again.")
 
         self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
 
@@ -1361,22 +1360,24 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         self._state = self.load_state()
 
         # get the asset config
         config = self.get_config()
 
+        self._non_interactive = config.get('non_interactive', False)
         self._tenant = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_TENANT_ID])
         self._client_id = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_ID])
+        self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET]
+
         try:
             self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
-            self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
+            if not self._non_interactive:
+                self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file.Please delete the state file and run the test connectivity again.")
-        self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET]
-        self._non_interactive = config.get('non_interactive', False)
+            return self.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file. Please delete the state file and run the test connectivity again")
 
         return phantom.APP_SUCCESS
 
