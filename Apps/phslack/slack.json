@@ -299,7 +299,7 @@
                         "name"
                     ],
                     "contains": [
-                        "slack channel"
+                        "slack channel name"
                     ]
                 },
                 {
@@ -427,7 +427,7 @@
                     "column_name": "Channel ID",
                     "column_order": 1,
                     "contains": [
-                        "slack channel"
+                        "slack channel id"
                     ]
                 },
                 {
@@ -472,7 +472,7 @@
                     "column_name": "Channel Name",
                     "column_order": 0,
                     "contains": [
-                        "slack channel"
+                        "slack channel name"
                     ]
                 },
                 {
@@ -690,7 +690,7 @@
                     "column_name": "User ID",
                     "column_order": 2,
                     "contains": [
-                        "slack user"
+                        "slack user id"
                     ]
                 },
                 {
@@ -747,7 +747,7 @@
                     "column_name": "Username",
                     "column_order": 0,
                     "contains": [
-                        "slack user"
+                        "slack user name"
                     ]
                 },
                 {
@@ -1033,7 +1033,7 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack user"
+                        "slack user id"
                     ]
                 }
             },
@@ -1042,7 +1042,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "contains": [
-                        "slack user"
+                        "slack user id"
                     ]
                 },
                 {
@@ -1071,7 +1071,7 @@
                     "column_name": "User ID",
                     "column_order": 0,
                     "contains": [
-                        "slack user"
+                        "slack user id"
                     ]
                 },
                 {
@@ -1128,7 +1128,7 @@
                     "column_name": "Username",
                     "column_order": 1,
                     "contains": [
-                        "slack user"
+                        "slack user name"
                     ]
                 },
                 {
@@ -1379,7 +1379,7 @@
                     "order": 0,
                     "primary": true,
                     "contains": [
-                        "slack channel"
+                        "slack channel id"
                     ]
                 },
                 "users": {
@@ -1404,7 +1404,7 @@
                         "CLBC12T3R"
                     ],
                     "contains": [
-                        "slack channel"
+                        "slack channel id"
                     ]
                 },
                 {
@@ -1590,7 +1590,7 @@
                         "channel1"
                     ],
                     "contains": [
-                        "slack channel"
+                        "slack channel name"
                     ]
                 },
                 {
@@ -1679,8 +1679,10 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 "message": {
@@ -1711,8 +1713,10 @@
                     "column_name": "Destination",
                     "column_order": 0,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -1736,7 +1740,7 @@
                     "data_path": "action_result.data.*.channel",
                     "data_type": "string",
                     "contains": [
-                        "slack channel"
+                        "slack channel id"
                     ]
                 },
                 {
@@ -2297,8 +2301,8 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel id",
+                        "slack user id"
                     ]
                 },
                 "emoji": {
@@ -2325,8 +2329,8 @@
                     "column_name": "Destination",
                     "column_order": 0,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel id",
+                        "slack user id"
                     ],
                     "example_values": [
                         "C1A1A1AAA"
@@ -2417,8 +2421,10 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ],
                     "primary": true
                 },
@@ -2477,8 +2483,10 @@
                     "column_name": "Destination",
                     "column_order": 1,
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -2554,16 +2562,20 @@
                     "data_path": "action_result.data.*.caption.user",
                     "data_type": "string",
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.destinations",
                     "data_type": "string",
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -2712,8 +2724,10 @@
                     "data_path": "action_result.data.*.sender",
                     "data_type": "string",
                     "contains": [
-                        "slack channel",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -3052,7 +3066,8 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack user"
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 "question": {
@@ -3081,7 +3096,8 @@
                     "data_path": "action_result.parameter.destination",
                     "data_type": "string",
                     "contains": [
-                        "slack user"
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -3124,7 +3140,7 @@
                     "data_path": "action_result.data.*.channel",
                     "data_type": "string",
                     "contains": [
-                        "slack channel"
+                        "slack channel id"
                     ]
                 },
                 {
