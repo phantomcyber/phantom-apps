@@ -743,7 +743,11 @@ class SlackConnector(phantom.BaseConnector):
         ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_ADD_REACTION, params)
 
         if not ret_val:
-            return ret_val
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_ADDING_REACTION, message)
+                return action_result.set_status(phantom.APP_ERROR, error_message)
+            return action_result.get_status()
 
         action_result.add_data(resp_json)
 
