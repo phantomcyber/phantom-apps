@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -19,27 +19,27 @@ The pagination mechanism has been implemented for the investigative actions ment
 The pagination mechanism has been explained below.
 
 <ul>
-    <li>Limit Parameter: This input parameter is used to mention total number of items (valid positive integer) to be fetched in action results.</li>
+    <li>Limit Parameter: This input parameter is used to limit the total number of items (a valid positive integer) to be fetched in action results.</li>
 </ul>
 
 <b>Examples</b>
 <br>
-Total items in end system for reference in below examples are 950 and internally, every page fetched will have 200 result items. Based on the value of limit and other parameters combined, the required items from every page will be fetched and added to action results output. The 'after' field (for navigating to next pages) used in API calls is handled internally by the pagination mechanism.
+Total items in the end system for reference in the below examples are 950 and internally, every page fetched will have 200 result items. Based on the value of the limit and other parameters combined, the required items from every page will be fetched and added to the action results output. The 'after' field (for navigating to next pages) used in API calls is handled internally by the pagination mechanism.
 
 <ul>
     <li><b>Example 1:</b> Limit = 50</li>
     <ul>
-        <li>This will fetch first 50 items</li>
+        <li>This will fetch the first 50 items</li>
     </ul>
     <br>
     <li><b>Example 2:</b> Limit = 200</li>
     <ul>
-        <li>This will fetch first 200 items</li>
+        <li>This will fetch the first 200 items</li>
     </ul>
     <br>
     <li><b>Example 3:</b> Limit = 240</li>
     <ul>
-        <li>This will fetch all 200 items of first page and 40 items from second page, hence in all it will fetch 240 items</li>
+        <li>This will fetch all 200 items from the first page and 40 items from the second page. Hence, in total, it will fetch 240 items.</li>
     </ul>
     <br>
     <li><b>Example 4:</b> Limit = 1000</li>
@@ -48,6 +48,7 @@ Total items in end system for reference in below examples are 950 and internally
     </ul>
     <br>
     <li><b>Example 6:</b> Limit = None</li>
+    <p>Here the None is considered as empty parameter value</p>
     <ul>
         <li>This will fetch all 950 items</li>
     </ul>
