@@ -514,6 +514,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         """
 
         resp_json = None
+        if headers is None:
+            headers = {}
 
         try:
             request_func = getattr(requests, method)
