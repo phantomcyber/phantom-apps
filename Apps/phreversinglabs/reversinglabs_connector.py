@@ -1,5 +1,5 @@
 # File: reversinglabs_connector.py
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -72,7 +72,6 @@ class ReversinglabsConnector(BaseConnector):
             r = requests.post(MAL_PRESENCE_API_URL, verify=config[phantom.APP_JSON_VERIFY], auth=self._auth, data=json.dumps(query), headers=self._headers)
         except Exception as e:
             self.set_status(phantom.APP_ERROR, 'Request to server failed', e)
-            self.save_progress(REVERSINGLABS_SUCC_CONNECTIVITY_TEST)
             return self.get_status()
 
         if (r.status_code != 200):

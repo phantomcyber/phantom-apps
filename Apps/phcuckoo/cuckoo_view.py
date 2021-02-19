@@ -1,5 +1,5 @@
 # File: cuckoo_view.py
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -45,7 +45,7 @@ def _process_data(data):
         if isinstance(strings, list):
             data['report']['strings'] = "\n".join(strings)
 
-    # Creat dumped JSON string for 'other' values
+    # Create dumped JSON string for 'other' values
     for k, v in list(data['report'].items()):
         if k not in ['info', 'debug', 'static', 'behavior', 'strings', 'target', 'static']:
             # JSON dump section

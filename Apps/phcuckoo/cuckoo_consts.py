@@ -1,10 +1,9 @@
 # --
 # File: cuckoo_consts.py
 #
-# Copyright (c) 2014-2020 Splunk Inc.
+# Copyright (c) 2014-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-# Define your constants here
 
 POLL_SLEEP_SECS = 10
 CUCKOO_POLL_STATES = ('pending', 'running', 'completed')
