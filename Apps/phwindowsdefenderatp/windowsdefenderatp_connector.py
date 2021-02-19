@@ -465,6 +465,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
             }
 
         if not self._access_token:
+            if self._non_interactive:
+                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG), None
             if not self._non_interactive and not self._refresh_token:
                 # If none of the access_token and refresh_token is available
                 return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG), None
