@@ -841,7 +841,7 @@ class OktaConnector(BaseConnector):
             # response of verify
             ack_flag = False
             hard_limit = 25
-            while ack_flag is False:
+            while not ack_flag:
                 # Wait for 5 seconds and check result
                 time.sleep(5)
                 hard_limit -= 1

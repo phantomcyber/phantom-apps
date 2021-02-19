@@ -39,7 +39,7 @@ OKTA_GET_USER_SUCC = "Successfully retrieved user"
 OKTA_TEST_CONNECTIVITY_FAILED = "Test Connectivity Failed"
 OKTA_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 
-OKTA_INVALID_USER_MSG = "Kindly provide valid user_id"
+OKTA_INVALID_USER_MSG = "Please provide a valid user_id"
 
 OKTA_CLEAR_USER_SESSIONS_SUCC = "Successfully cleared user sessions"
 OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG = "Please configure factor_type '{factor_type}' for the user '{user_id}'"
