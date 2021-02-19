@@ -1,53 +1,46 @@
 {
     "appid": "f3c23540-5606-4e6e-86a0-717faf0aa403",
     "name": "JAMF",
-    "description": "JAMF is a comprehensive enterprise management software for the Apple platform, simplifying IT management for Mac, iPad, iPhone and Apple TV.",
+    "description": "JAMF is a comprehensive enterprise management software for the Apple platform, simplifying IT management for Mac, iPad, iPhone and Apple TV",
     "type": "endpoint",
     "product_vendor": "jamf",
-    "logo": "jamf.png",
-    "logo_dark": "jamf_dark.png",
+    "logo": "logo_jamf.svg",
+    "logo_dark": "logo_jamf_dark.svg",
     "product_name": "jamf",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
-    "license": "Copyright (c) Splunk, 2020",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) Splunk, 2021",
     "app_version": "1.0.0",
     "utctime_updated": "2020-04-14T18:31:25.089506Z",
     "package_name": "phantom_jamf",
     "main_module": "jamf_connector.py",
-    "min_phantom_version": "4.8.23319",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
             "description": "URL to connect to Jamf service",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "username": {
             "description": "Username, LDAP or local",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "password": {
             "description": "Password",
             "data_type": "password",
-            "required": false,
             "order": 2
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -55,21 +48,15 @@
         },
         {
             "action": "get system info",
-            "identifier": "get_system_info",
             "description": "Get information about an endpoint",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "get_system_info",
             "read_only": true,
             "parameters": {
                 "id": {
                     "description": "Computer ID to filter by",
                     "data_type": "numeric",
                     "required": true,
-                    "primary": true,
-                    "contains": [
-                    ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -77,30 +64,44 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "numeric",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -110,60 +111,67 @@
         },
         {
             "action": "get users",
-            "identifier": "get_users",
             "description": "Get information about a user",
-            "verbose": "",
             "type": "investigate",
+            "identifier": "get_users",
             "read_only": true,
             "parameters": {
                 "username": {
                     "description": "Username to filter by",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
-                        "username"
+                        "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 1
+                    "order": 0,
+                    "primary": true
                 }
-             },
+            },
             "output": [
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "column_name": "id",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.username",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "username",
-                    "column_order": 1
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
