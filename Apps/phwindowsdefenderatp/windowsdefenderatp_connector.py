@@ -229,6 +229,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._access_token = None
         self._refresh_token = None
         self._client_secret = None
+        self._non_interactive = None
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -447,19 +448,28 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        token_data = {
-            'client_id': self._client_id,
-            'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
-            'refresh_token': self._refresh_token,
-            'client_secret': self._client_secret,
-            'resource': DEFENDERATP_RESOURCE_URL
-        }
+        if not self._non_interactive:
+            token_data = {
+                'client_id': self._client_id,
+                'grant_type': DEFENDERATP_REFRESH_TOKEN_STRING,
+                'refresh_token': self._refresh_token,
+                'client_secret': self._client_secret,
+                'resource': DEFENDERATP_RESOURCE_URL
+            }
+        else:
+            token_data = {
+                'client_id': self._client_id,
+                'grant_type': DEFENDERATP_CLIENT_CREDENTIALS_STRING,
+                'client_secret': self._client_secret,
+                'resource': DEFENDERATP_RESOURCE_URL
+            }
 
         if not self._access_token:
-            if not self._refresh_token:
+            if self._non_interactive:
+                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG), None
+            if not self._non_interactive and not self._refresh_token:
                 # If none of the access_token and refresh_token is available
-                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG),\
-                       None
+                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG), None
 
             # If refresh_token is available and access_token is not available, generate new access_token
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
@@ -506,6 +516,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         """
 
         resp_json = None
+        if headers is None:
+            headers = {}
 
         try:
             request_func = getattr(requests, method)
@@ -610,13 +622,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
         self._state[DEFENDERATP_TOKEN_STRING] = resp_json
         try:
             self._access_token = resp_json[DEFENDERATP_ACCESS_TOKEN_STRING]
-            self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
+            if DEFENDERATP_REFRESH_TOKEN_STRING in resp_json:
+                self._refresh_token = resp_json[DEFENDERATP_REFRESH_TOKEN_STRING]
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while generating access token {}".format(err))
 
-        self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
+        try:
+            self.save_state(self._state)
+            _save_app_state(self._state, self.get_asset_id(), self)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file. Please delete the state file and run the test connectivity again.")
 
         self._state = self.load_state()
 
@@ -675,67 +691,79 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if not self._state:
             self._state = {}
 
-        # Get initial REST URL
-        ret_val, app_rest_url = self._get_app_rest_url(action_result)
-        if phantom.is_fail(ret_val):
-            self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
-            return action_result.get_status()
+        if not self._non_interactive:
+            # Get initial REST URL
+            ret_val, app_rest_url = self._get_app_rest_url(action_result)
+            if phantom.is_fail(ret_val):
+                self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+                return action_result.get_status()
 
-        # Append /result to create redirect_uri
-        redirect_uri = '{0}/result'.format(app_rest_url)
-        self._state['redirect_uri'] = redirect_uri
+            # Append /result to create redirect_uri
+            redirect_uri = '{0}/result'.format(app_rest_url)
+            self._state['redirect_uri'] = redirect_uri
 
-        self.save_progress(DEFENDERATP_OAUTH_URL_MSG)
-        self.save_progress(redirect_uri)
+            self.save_progress(DEFENDERATP_OAUTH_URL_MSG)
+            self.save_progress(redirect_uri)
 
-        # Authorization URL used to make request for getting code which is used to generate access token
-        authorization_url = DEFENDERATP_AUTHORIZE_URL.format(tenant_id=quote(self._tenant), client_id=quote(self._client_id),
-                                                             redirect_uri=redirect_uri, state=self.get_asset_id(),
-                                                             response_type='code', resource=DEFENDERATP_RESOURCE_URL)
-        authorization_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, authorization_url)
+            # Authorization URL used to make request for getting code which is used to generate access token
+            authorization_url = DEFENDERATP_AUTHORIZE_URL.format(tenant_id=quote(self._tenant), client_id=quote(self._client_id),
+                                                                redirect_uri=redirect_uri, state=self.get_asset_id(),
+                                                                response_type='code', resource=DEFENDERATP_RESOURCE_URL)
+            authorization_url = '{}{}'.format(DEFENDERATP_LOGIN_BASE_URL, authorization_url)
 
-        self._state['authorization_url'] = authorization_url
+            self._state['authorization_url'] = authorization_url
 
-        # URL which would be shown to the user
-        url_for_authorize_request = '{0}/start_oauth?asset_id={1}&'.format(app_rest_url, self.get_asset_id())
-        _save_app_state(self._state, self.get_asset_id(), self)
+            # URL which would be shown to the user
+            url_for_authorize_request = '{0}/start_oauth?asset_id={1}&'.format(app_rest_url, self.get_asset_id())
+            _save_app_state(self._state, self.get_asset_id(), self)
 
-        self.save_progress(DEFENDERATP_AUTHORIZE_USER_MSG)
-        self.save_progress(url_for_authorize_request)
+            self.save_progress(DEFENDERATP_AUTHORIZE_USER_MSG)
+            self.save_progress(url_for_authorize_request)
 
-        # Wait time for authorization
-        time.sleep(DEFENDERATP_AUTHORIZE_WAIT_TIME)
+            # Wait time for authorization
+            time.sleep(DEFENDERATP_AUTHORIZE_WAIT_TIME)
 
-        # Wait for some while user login to Microsoft
-        status = self._wait(action_result=action_result)
+            # Wait for some while user login to Microsoft
+            status = self._wait(action_result=action_result)
 
-        # Empty message to override last message of waiting
-        self.send_progress('')
-        if phantom.is_fail(status):
-            self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
-            return action_result.get_status()
+            # Empty message to override last message of waiting
+            self.send_progress('')
+            if phantom.is_fail(status):
+                self.save_progress(DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+                return action_result.get_status()
 
-        self.save_progress(DEFENDERATP_CODE_RECEIVED_MSG)
-        self._state = _load_app_state(self.get_asset_id(), self)
+            self.save_progress(DEFENDERATP_CODE_RECEIVED_MSG)
+            self._state = _load_app_state(self.get_asset_id(), self)
 
-        # if code is not available in the state file
-        if not self._state or not self._state.get('code'):
-            return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
+            # if code is not available in the state file
+            if not self._state or not self._state.get('code'):
+                return action_result.set_status(phantom.APP_ERROR, status_message=DEFENDERATP_TEST_CONNECTIVITY_FAILED_MSG)
 
-        current_code = self._state['code']
-        self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
+            current_code = self._state['code']
+            try:
+                self.save_state(self._state)
+                _save_app_state(self._state, self.get_asset_id(), self)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, status_message="Error occurred while saving token in state file. Please delete the state file and run again.")
 
         self.save_progress(DEFENDERATP_GENERATING_ACCESS_TOKEN_MSG)
 
-        data = {
-            'client_id': self._client_id,
-            'grant_type': 'authorization_code',
-            'redirect_uri': redirect_uri,
-            'code': current_code,
-            'resource': DEFENDERATP_RESOURCE_URL,
-            'client_secret': self._client_secret
-        }
+        if not self._non_interactive:
+            data = {
+                'client_id': self._client_id,
+                'grant_type': 'authorization_code',
+                'redirect_uri': redirect_uri,
+                'code': current_code,
+                'resource': DEFENDERATP_RESOURCE_URL,
+                'client_secret': self._client_secret
+            }
+        else:
+            data = {
+                'client_id': self._client_id,
+                'grant_type': DEFENDERATP_CLIENT_CREDENTIALS_STRING,
+                'client_secret': self._client_secret,
+                'resource': DEFENDERATP_RESOURCE_URL
+            }
         # for first time access, new access token is generated
         ret_val = self._generate_new_access_token(action_result=action_result, data=data)
 
@@ -1336,18 +1364,24 @@ class WindowsDefenderAtpConnector(BaseConnector):
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         self._state = self.load_state()
 
         # get the asset config
         config = self.get_config()
 
+        self._non_interactive = config.get('non_interactive', False)
         self._tenant = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_TENANT_ID])
         self._client_id = self._handle_py_ver_compat_for_input_str(config[DEFENDERATP_CONFIG_CLIENT_ID])
-        self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
-        self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
         self._client_secret = config[DEFENDERATP_CONFIG_CLIENT_SECRET]
+
+        try:
+            self._access_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING)
+            if not self._non_interactive:
+                self._refresh_token = self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_REFRESH_TOKEN_STRING)
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while parsing the state file. Please delete the state file and run the test connectivity again")
 
         return phantom.APP_SUCCESS
 
@@ -1361,8 +1395,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         """
 
         # Save the state, this data is saved across actions and app upgrades
-        self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
+        try:
+            self.save_state(self._state)
+            _save_app_state(self._state, self.get_asset_id(), self)
+        except:
+            return phantom.APP_ERROR
 
         return phantom.APP_SUCCESS
 

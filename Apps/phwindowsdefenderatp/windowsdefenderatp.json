@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.0.1",
+    "app_version": "3.1.0",
     "utctime_updated": "2021-01-13T06:13:39.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
@@ -43,6 +43,12 @@
             "data_type": "password",
             "required": true,
             "order": 3
+        },
+        "non_interactive":{
+            "description": "Non Interactive Auth",
+            "data_type": "boolean",
+            "default": false,
+            "order": 4
         }
     },
     "actions": [
