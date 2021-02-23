@@ -74,6 +74,12 @@
                         "Tiny"
                     ],
                     "order": 1
+                },
+                "filename": {
+                    "description": "Filename for storing the screenshot in vault",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "render": {

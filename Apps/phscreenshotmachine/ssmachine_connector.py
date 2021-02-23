@@ -151,6 +151,7 @@ class SsmachineConnector(BaseConnector):
 
         params = dict()
         params['url'] = param["url"]
+        params['filename'] = param.get('filename')
         params['key'] = self._api_key
 
         # Check if we have a size
@@ -184,7 +185,10 @@ class SsmachineConnector(BaseConnector):
         if params['hash']:
             permalink = self._get_sspermalink('', params=params, method='post')
 
-        file_name = param["url"] + "_screenshot.jpg"
+        if params['filename']:
+            file_name = "{}.jpg".format(params['filename'])
+        else:
+            file_name = param["url"] + "_screenshot.jpg"
 
         if hasattr(Vault, "create_attachment"):
             vault_ret = Vault.create_attachment(image, self.get_container_id(), file_name=file_name)
