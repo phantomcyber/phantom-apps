@@ -110,10 +110,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "get users",
+            "action": "get user",
             "description": "Get information about a user",
             "type": "investigate",
-            "identifier": "get_users",
+            "identifier": "get_user",
             "read_only": true,
             "parameters": {
                 "username": {

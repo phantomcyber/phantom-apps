@@ -242,9 +242,9 @@ class JamfConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrived system information")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved system information")
 
-    def _handle_get_users(self, param):
+    def _handle_get_user(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -258,7 +258,7 @@ class JamfConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrived user information")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved user information")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -274,8 +274,8 @@ class JamfConnector(BaseConnector):
         elif action_id == 'get_system_info':
             ret_val = self._handle_get_system_info(param)
 
-        elif action_id == 'get_users':
-            ret_val = self._handle_get_users(param)
+        elif action_id == 'get_user':
+            ret_val = self._handle_get_user(param)
         return ret_val
 
     def initialize(self):
