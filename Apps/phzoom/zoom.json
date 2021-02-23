@@ -4,17 +4,18 @@
     "description": "Zoom Meetings App",
     "type": "identity management",
     "product_vendor": "Zoom",
-    "logo": "Logo_Zoom.svg",
-    "logo_dark": "Logo_Zoom_dark.svg",
+    "logo": "logo_zoom.svg",
+    "logo_dark": "logo_zoom_dark.svg",
     "product_name": "Zoom Meetings",
+    "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
-    "license": "Copyright (c) 2020 Splunk Inc.",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-04-03T06:33:59.068584Z",
     "package_name": "phantom_zoom",
-    "main_module": "zoom_connector.pyc",
-    "min_phantom_version": "4.5.15370",
+    "main_module": "zoom_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -27,7 +28,6 @@
         "verify_server_cert": {
             "description": "Verify certificate",
             "data_type": "boolean",
-            "required": false,
             "order": 1
         },
         "api_key": {
@@ -58,10 +58,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -69,30 +68,29 @@
         },
         {
             "action": "get meeting invitation",
-            "identifier": "get_meeting_invitation",
-            "description": "gets a future zoom meeting invitation (works only with future meetings)",
-            "verbose": "",
+            "description": "Gets a future zoom meeting invitation (works only with future meetings)",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "get_meeting_invitation",
+            "read_only": true,
             "parameters": {
                 "meeting_id": {
-                    "description": "zoom meeting id",
+                    "description": "Zoom meeting ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.meeting_id",
                     "data_type": "string",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
                     "coumn_name": "Meeting ID",
                     "column_order": 0
                 },
@@ -123,8 +121,34 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -134,31 +158,30 @@
         },
         {
             "action": "get user settings",
-            "identifier": "get_user_settings",
-            "description": "gets zoom user settings",
-            "verbose": "",
+            "description": "Gets zoom user settings",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "get_user_settings",
+            "read_only": true,
             "parameters": {
                 "user_id": {
-                    "description": "zoom user id",
+                    "description": "Zoom user ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "zoom user id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
-                    "column_name": "user_id",
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "column_name": "User ID",
                     "column_order": 0
                 },
                 {
@@ -442,8 +465,34 @@
                     "data_type": "boolean"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -453,31 +502,30 @@
         },
         {
             "action": "get user",
-            "identifier": "get_user",
-            "description": "gets zoom user info",
-            "verbose": "",
+            "description": "Gets zoom user info",
             "type": "investigate",
-            "read_only": false,
+            "identifier": "get_user",
+            "read_only": true,
             "parameters": {
                 "user_id": {
-                    "description": "zoom user id",
+                    "description": "Zoom user ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "value_list": [],
-                    "default": "",
+                    "contains": [
+                        "zoom user id"
+                    ],
                     "order": 0
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
-                    "column_name": "user_id",
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "column_name": "User ID",
                     "column_order": 0
                 },
                 {
@@ -601,8 +649,34 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -612,39 +686,30 @@
         },
         {
             "action": "get meeting",
-            "identifier": "get_meeting",
-            "description": "gets active zoom meeting details (works only with currently running zoom meetings)",
-            "verbose": "",
+            "description": "Gets active zoom meeting details (works only with currently running zoom meetings)",
             "type": "investigate",
+            "identifier": "get_meeting",
             "read_only": true,
             "parameters": {
                 "meeting_id": {
-                    "description": "zoom meeting id",
+                    "description": "Zoom meeting ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
                 {
                     "data_path": "action_result.parameter.meeting_id",
                     "data_type": "string",
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "column_name": "meeting_id",
+                    "column_name": "Meeting ID",
                     "column_order": 0
                 },
                 {
@@ -896,20 +961,36 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -919,41 +1000,33 @@
         },
         {
             "action": "update meeting",
-            "identifier": "update_meeting",
-            "description": "updates future meeting",
-            "verbose": "",
+            "description": "Updates future meeting",
             "type": "generic",
+            "identifier": "update_meeting",
             "read_only": false,
             "parameters": {
                 "meeting_id": {
-                    "description": "zoom meeting id",
+                    "description": "Zoom meeting ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "password": {
-                    "description": "meeting password",
+                    "description": "Meeting password",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "gen_password": {
-                    "description": "auto generate meeting password",
+                    "description": "Auto generate meeting password",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 2
                 },
                 "waiting_room": {
-                    "description": "enable waiting room",
+                    "description": "Enable waiting room",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -967,12 +1040,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.gen_password",
                     "data_type": "boolean"
                 },
@@ -982,7 +1049,7 @@
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "column_name": "meeting_id",
+                    "column_name": "Meeting ID",
                     "column_order": 0
                 },
                 {
@@ -995,6 +1062,20 @@
                 },
                 {
                     "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -1011,11 +1092,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1025,43 +1112,48 @@
         },
         {
             "action": "delete meeting",
-            "identifier": "delete_meeting",
-            "description": "deletes future meeting",
-            "verbose": "",
+            "description": "Deletes future meeting",
             "type": "generic",
+            "identifier": "delete_meeting",
             "read_only": false,
             "parameters": {
                 "meeting_id": {
-                    "description": "zoom meeting id",
+                    "description": "Zoom meeting ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
                 {
                     "data_path": "action_result.parameter.meeting_id",
                     "data_type": "string",
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "column_name": "meeting_id",
+                    "column_name": "Meeting ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -1070,11 +1162,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1084,26 +1182,23 @@
         },
         {
             "action": "update user settings",
-            "identifier": "update_user_settings",
-            "description": "updates zoom user settings",
-            "verbose": "",
+            "description": "Updates zoom user settings",
             "type": "generic",
+            "identifier": "update_user_settings",
             "read_only": false,
             "parameters": {
                 "user_id": {
-                    "description": "zoom user id",
+                    "description": "Zoom user ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "zoom user id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "req_password_pmi": {
-                    "description": "Req. password for PMI",
+                    "description": "Require password for PMI",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -1115,22 +1210,17 @@
                     "order": 1
                 },
                 "pmi_password": {
-                    "description": "user pmi password",
+                    "description": "User pmi password",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "gen_pmi_password": {
-                    "description": "auto generate pmi password",
+                    "description": "Auto generate pmi password",
                     "data_type": "boolean",
-                    "required": false,
                     "order": 3
                 },
                 "waiting_room": {
-                    "description": "enable waiting room",
+                    "description": "Enable waiting room",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -1142,7 +1232,7 @@
                     "order": 4
                 },
                 "req_password_sched": {
-                    "description": "Req. password for sched. meetings",
+                    "description": "Require password for scheduling meetings",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -1154,7 +1244,7 @@
                     "order": 5
                 },
                 "req_password_inst": {
-                    "description": "Req. password for inst. meetings",
+                    "description": "Require password for instant meetings",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -1167,16 +1257,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.gen_password",
-                    "data_type": "boolean"
-                },
                 {
                     "data_path": "action_result.parameter.gen_pmi_password",
                     "data_type": "boolean"
@@ -1213,6 +1293,20 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.pmi_password",
                     "data_type": "string"
                 },
@@ -1234,87 +1328,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "get files",
-            "identifier": "ge_files",
-            "description": "gets meeting files for past meetings (works only with meetings ended in the last 24 hours)",
-            "verbose": "",
-            "type": "generic",
-            "read_only": false,
-            "parameters": {
-                "meeting_id": {
-                    "description": "zoom meeting id",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "contains": [
-                        "zoom meeting id"
-                    ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
-                }
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.meeting_id",
-                    "data_type": "string",
-                    "contains": [
-                        "zoom meeting id"
-                    ],
-                    "column_name": "meeting_id",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.in_meeting_files.*.download_url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ],
-                    "column_name": "url",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.in_meeting_files.*.file_name",
-                    "data_type": "string",
-                    "column_name": "file",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.in_meeting_files.*.file_size",
                     "data_type": "numeric",
-                    "column_name": "file size",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.summary.total_records",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
