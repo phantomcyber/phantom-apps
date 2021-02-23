@@ -633,7 +633,12 @@ class SlackConnector(phantom.BaseConnector):
         ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_USER_INFO, {'user': user_id})
 
         if not ret_val:
-            return phantom.APP_ERROR
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_FETCHING_USER, message)
+            else:
+                error_message = SLACK_ERR_FETCHING_USER
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
@@ -726,7 +731,12 @@ class SlackConnector(phantom.BaseConnector):
         ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_SEND_MESSAGE, params)
 
         if not ret_val:
-            return ret_val
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_SENDING_MESSAGE, message)
+            else:
+                error_message = SLACK_ERR_SENDING_MESSAGE
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
@@ -746,8 +756,9 @@ class SlackConnector(phantom.BaseConnector):
             message = action_result.get_message()
             if message:
                 error_message = "{}: {}".format(SLACK_ERR_ADDING_REACTION, message)
-                return action_result.set_status(phantom.APP_ERROR, error_message)
-            return action_result.get_status()
+            else:
+                error_message = SLACK_ERR_ADDING_REACTION
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
@@ -814,7 +825,12 @@ class SlackConnector(phantom.BaseConnector):
             upfile.close()
 
         if not ret_val:
-            return ret_val
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_UPLOADING_FILE, message)
+            else:
+                error_message = SLACK_ERR_UPLOADING_FILE
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         file_json = resp_json.get('file', {})
 
@@ -1063,7 +1079,12 @@ class SlackConnector(phantom.BaseConnector):
 
         ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_SEND_MESSAGE, params)
         if not ret_val:
-            return phantom.APP_ERROR
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_ASKING_QUESTION, message)
+            else:
+                error_message = SLACK_ERR_ASKING_QUESTION
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         answer_path = "{0}/{1}".format(local_data_state_dir, answer_filename)
         loop_count = (self._timeout * 60) / self._interval
