@@ -286,7 +286,7 @@ class JamfConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = config['base_url']
+        self._base_url = config['base_url'].strip('/')
         self._username = config.get('username')
         self._password = config.get('password')
 

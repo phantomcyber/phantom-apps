@@ -1,7 +1,7 @@
 {
     "appid": "f3c23540-5606-4e6e-86a0-717faf0aa403",
     "name": "JAMF",
-    "description": "JAMF is a comprehensive enterprise management software for the Apple platform, simplifying IT management for Mac, iPad, iPhone and Apple TV",
+    "description": "JAMF is a comprehensive enterprise management software for the Apple platform, simplifying IT management for Mac, iPad, iPhone, and Apple TV",
     "type": "endpoint",
     "product_vendor": "jamf",
     "logo": "logo_jamf.svg",
@@ -25,7 +25,7 @@
             "order": 0
         },
         "username": {
-            "description": "Username, LDAP or local",
+            "description": "Username, LDAP, or local",
             "data_type": "string",
             "order": 1
         },
