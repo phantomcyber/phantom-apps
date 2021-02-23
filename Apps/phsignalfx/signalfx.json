@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Andreas Buis & Angelo Brancato",
     "license": "Copyright (c) Angelo Brancato, 2021",
-    "app_version": "1.0.2",
+    "app_version": "1.0.1",
     "utctime_updated": "2021-02-09T13:51:01.186096Z",
     "package_name": "phantom_signalfx",
     "main_module": "signalfx_connector.pyc",
@@ -49,7 +49,7 @@
             "action": "run query",
             "identifier": "run_query",
             "description": "Retrieves dimensions based on a query",
-            "verbose": "This action retrieves dimensions based on a query Eg aws_instance_id:i-xxxxxxxxxxxxx",
+            "verbose": "This action retrieves dimensions based on a query",
             "type": "investigate",
             "read_only": true,
             "parameters": {
