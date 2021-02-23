@@ -12,17 +12,15 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
-from warcio.capture_http import capture_http
-import uuid
 
 # Usage of the consts file is recommended
-# from warc_consts import *
+from warc_consts import *
 import requests
 import json
-import os
-from pathlib import Path
+import time
 from warcio.warcwriter import WARCWriter
 from warcio.statusandheaders import StatusAndHeaders
+from urllib.parse import urlparse
 
 
 class RetVal(tuple):
@@ -44,54 +42,23 @@ class WarcConnector(BaseConnector):
         self._base_url = None
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to endpoint")
-        # make rest call
-        ret_val, response = self._make_rest_call(
-            "/endpoint", action_result, params=None, headers=None
-        )
 
-        if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
-            # return action_result.get_status()
+        url = "https://google.com"
+        out_file = "{}test.warc.tgz".format(PHANTOM_VAULT_DIR)
 
-        # Return success
-        # self.save_progress("Test Connectivity Passed")
-        # return action_result.set_status(phantom.APP_SUCCESS)
+        self._fetch_warc(action_result, url, out_file)
+
+        self.save_progress(out_file)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
-    def _handle_get_url(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress(
-            "In action handler for: {0}".format(self.get_action_identifier())
-        )
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
-        url = param["url"]
-
-        tmp_dir = "/opt/phantom/vault/tmp/"
-
-        tmp_id = str(uuid.uuid4())
-        file_path = "{}archive.warc.tgz".format(tmp_dir)
-
-        with open(file_path, "wb") as output:
+    def _fetch_warc(self, action_result, url, out_path):
+        with open(out_path, "wb") as output:
             writer = WARCWriter(output, gzip=True)
 
             resp = requests.get(
@@ -108,10 +75,28 @@ class WarcConnector(BaseConnector):
             )
 
             writer.write_record(record)
+        
+        return out_path
 
+
+    def _handle_get_url(self, param):
+
+        self.save_progress(
+            "In action handler for: {0}".format(self.get_action_identifier())
+        )
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url = param["url"]
+        parsed_url = urlparse(url)
+
+        curr_time = int(time.time())
+        file_path = "{}{}{}_{}.warc.tgz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, parsed_url.path, curr_time)
+
+        file_path = self._fetch_warc(action_result, url, file_path)
         action_result.add_data({"file_path": file_path})
+
         vault_ret = Vault.add_attachment(
-            file_path, self.get_container_id(), file_name=f"{tmp_id}_archive.warc.tgz"
+            file_path, self.get_container_id()
         )
         if vault_ret.get("succeeded"):
             action_result.add_data(vault_ret)
