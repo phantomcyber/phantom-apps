@@ -1,7 +1,7 @@
 {
     "appid": "045338a7-bd8b-4014-b516-27391505c71b",
     "name": "SignalFx",
-    "description": "This App uses the Splunk Infrastructure Monitoring (SignalFx) API to retrieve and send data.",
+    "description": "This App uses the Splunk Infrastructure Monitoring (SignalFx) API to retrieve and send data",
     "type": "endpoint",
     "product_vendor": "Splunk",
     "logo": "signalfx.svg",
@@ -15,7 +15,7 @@
     "utctime_updated": "2021-02-09T13:51:01.186096Z",
     "package_name": "phantom_signalfx",
     "main_module": "signalfx_connector.pyc",
-    "min_phantom_version": "4.9.1.0",
+    "min_phantom_version": "4.9.1",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -28,10 +28,8 @@
         },
         "token": {
             "description": "Go to SignalFx My Profile -> Access Tokens",
-            "data_type": "string",
+            "data_type": "password",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         }
     },
@@ -39,8 +37,8 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration.",
-            "verbose": "Validate the asset configuration for connectivity using supplied configuration.",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -50,8 +48,8 @@
         {
             "action": "run query",
             "identifier": "run_query",
-            "description": "Retrieves dimensions based on a query.",
-            "verbose": "This action retrieves dimensions based on a query. E.g. aws_instance_id:i-xxxxxxxxxxxxx.",
+            "description": "Retrieves dimensions based on a query",
+            "verbose": "This action retrieves dimensions based on a query. E.g. aws_instance_id:i-xxxxxxxxxxxxx",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -119,8 +117,8 @@
         {
             "action": "clear incident",
             "identifier": "clear_incident",
-            "description": "Clears specified incident.",
-            "verbose": "This action clears (resolves) a specific incident that is identified by the paramter incident id.",
+            "description": "Clears specified incident",
+            "verbose": "This action clears (resolves) a specific incident that is identified by the paramter incident id",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -188,8 +186,8 @@
         {
             "action": "get incident",
             "identifier": "get_incident",
-            "description": "Get specified incident details.",
-            "verbose": "This action pulls details from a specific incident that is identified by the paramter incident id.",
+            "description": "Get specified incident details",
+            "verbose": "This action pulls details from a specific incident that is identified by the paramter incident id",
             "type": "investigate",
             "read_only": true,
             "parameters": {
