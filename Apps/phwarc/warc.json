@@ -1,0 +1,90 @@
+{
+    "appid": "f391dc89-d624-4531-a046-da6938878e5d",
+    "name": "WARC",
+    "description": "This app supports the creation of WARC (Web Archive) for any webpage.",
+    "type": "information",
+    "product_vendor": "Generic",
+    "logo": "warc.svg",
+    "logo_dark": "warc_dark.svg",
+    "product_name": "WARC",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) Splunk Community, 2021",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-02-23T11:55:39.532327Z",
+    "package_name": "phantom_warc",
+    "main_module": "warc_connector.pyc",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "pypi": [
+           {"module": "warcio"}
+        ]
+    },
+    "configuration": {},
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get url",
+            "identifier": "get_url",
+            "description": "Retrieve a WARC for the specified URL and add to vault",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to retrieve the WARC for",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
