@@ -93,7 +93,6 @@ class WarcConnector(BaseConnector):
         file_path = "{}{}{}_{}.warc.tgz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, parsed_url.path, curr_time)
 
         file_path = self._fetch_warc(action_result, url, file_path)
-        action_result.add_data({"file_path": file_path})
 
         vault_ret = Vault.add_attachment(
             file_path, self.get_container_id()
