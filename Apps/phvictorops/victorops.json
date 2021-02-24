@@ -35,7 +35,7 @@
         },
         "integration_url": {
             "description": "Custom REST based Integration URL defined in VictorOps",
-            "verbose": "Populate this field if you plan to create, update, or resolve incidents.",
+            "verbose": "Populate this field if you plan to create, update, or resolve incidents. i.e https://alert.victorops.com/integrations/generic/20131114/alert/84d34810-7b78-4cb9-91a4-3425aeecce68",
             "data_type": "string",
             "required": true,
             "order": 2
@@ -978,7 +978,7 @@
                     "order": 1
                 },
                 "entity_id": {
-                    "description": "entity_id of an existing incident. If not included, an update will be posted on timeline",
+                    "description": "The entity_id of an existing incident. If not included, an update will be posted on timeline",
                     "data_type": "string",
                     "primary": true,
                     "contains": [
