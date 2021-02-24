@@ -1,7 +1,7 @@
 {
     "appid": "f391dc89-d624-4531-a046-da6938878e5d",
     "name": "WARC",
-    "description": "This app supports the creation of WARC (Web Archive) for any webpage.",
+    "description": "This app supports the creation of WARC (Web Archive) for any webpage",
     "type": "information",
     "product_vendor": "Generic",
     "logo": "warc.svg",
@@ -15,6 +15,9 @@
     "utctime_updated": "2021-02-23T11:55:39.532327Z",
     "package_name": "phantom_warc",
     "main_module": "warc_connector.pyc",
+    "contributors": [{
+        "name": "Daniel Federschmidt"
+    }],
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -38,7 +41,7 @@
         {
             "action": "get url",
             "identifier": "get_url",
-            "description": "Retrieve a WARC for the specified URL and add to vault",
+            "description": "Retrieve a WARC archive for the specified URL and add to vault",
             "verbose": "",
             "type": "generic",
             "read_only": true,
@@ -73,6 +76,18 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary",
