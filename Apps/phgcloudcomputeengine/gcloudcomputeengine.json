@@ -41,7 +41,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -138,7 +137,6 @@
             "action": "describe instance",
             "identifier": "describe_instance",
             "description": "Get instance information",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -231,7 +229,6 @@
             "action": "stop instance",
             "identifier": "stop_instance",
             "description": "Stops an instance",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -322,7 +319,6 @@
             "action": "start instance",
             "identifier": "start_instance",
             "description": "Starts an instance that was previously stopped",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
