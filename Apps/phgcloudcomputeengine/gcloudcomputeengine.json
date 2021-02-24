@@ -73,7 +73,8 @@
                     "contains": ["gcloud computeengine id"]
                 },
                 "tags": {
-                    "description": "Tags to apply to the instance. Will overwrite existing tags",
+                    "description": "Network tags to apply to the instance. Will overwrite existing tags",
+                    "verbose": "Comma-separated list of network tags to apply to the instance.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
