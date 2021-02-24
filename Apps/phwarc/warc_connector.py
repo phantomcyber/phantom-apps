@@ -75,9 +75,8 @@ class WarcConnector(BaseConnector):
             )
 
             writer.write_record(record)
-        
-        return out_path
 
+        return out_path
 
     def _handle_get_url(self, param):
 
