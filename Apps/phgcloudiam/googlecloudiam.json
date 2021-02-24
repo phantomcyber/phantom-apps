@@ -1,0 +1,388 @@
+{
+    "appid": "2991cab9-e159-4d32-b74e-025030db746e",
+    "name": "Google Cloud IAM",
+    "description": "This app integrates with Google Cloud IAM",
+    "type": "devops",
+    "product_vendor": "Google",
+    "logo": "logo_gcloudiam.svg",
+    "logo_dark": "logo_gcloudiam_dark.svg",
+    "product_name": "Cloud IAM",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "FDSE",
+    "license": "Copyright (c) FDSE, 2020",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-07-27T10:31:05.232366Z",
+    "package_name": "phantom_googlecloudiam",
+    "main_module": "googlecloudiam_connector.pyc",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "key_json": {
+            "description": "Contents of Service Account JSON file",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "project": {
+            "description": "Google Cloud Project ID",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "pip_dependencies": {
+        "pypi": [
+            {"module": "google-api-python-client"}
+        ],
+        "wheel": [
+        ]
+     },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list serviceaccountkey",
+            "identifier": "list_serviceaccountkey",
+            "description": "Lists every ServiceAccountKey for a service account.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.keyOrigin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.validBeforeTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.keyType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.keyAlgorithm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keys.*.validAfterTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get serviceaccountkey",
+            "identifier": "get_serviceaccountkey",
+            "description": "Gets a ServiceAccountKey",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "key": {
+                    "description": "Name of key",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.key",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "key",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.0.keyOrigin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keyType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.validBeforeTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keyAlgorithm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.validAfterTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete serviceaccountkey",
+            "identifier": "delete_serviceaccountkey",
+            "description": "Deletes a ServiceAccountKey",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "key": {
+                    "description": "Name of key",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.key",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "key",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create serviceaccountkey",
+            "identifier": "create_serviceaccountkey",
+            "description": "Creates a ServiceAccountKey",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "save_key_to_vault": {
+                    "description": "Whether or not to save the key to vault",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.0.keyOrigin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keyType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.validBeforeTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.privateKeyData",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.keyAlgorithm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.validAfterTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.vault_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.0.filename",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
