@@ -174,7 +174,7 @@ class VictoropsConnector(BaseConnector):
 
         if self._integration_url:
             self.save_progress("Connecting to integration_url to test connectivity")
-            body = { "message_type": "INFO", "state_message": "Test integration_url connectivity" }
+            body = {"message_type": "INFO", "state_message": "Test integration_url connectivity"}
             # make rest call
             ret_val, response = self._make_rest_call(self._integration_url, action_result, params=None, headers=None, json=body, method="post")
             if (phantom.is_fail(ret_val)):
@@ -376,6 +376,8 @@ class VictoropsConnector(BaseConnector):
             else:
                 endpoint = self._integration_url
         else:
+            summary = action_result.update_summary({})
+            summary['message'] = INTEGRATION_URL_MISSING
             return action_result.set_status(phantom.APP_ERROR, INTEGRATION_URL_MISSING)
 
         param_type = param.get('message_type')
@@ -461,7 +463,7 @@ class VictoropsConnector(BaseConnector):
 
         self._api_id = config.get('api_id')
         self._api_key = config.get('api_key')
-        self._integration_url = config.get('integration_url').rstrip('/')
+        self._integration_url = config.get('integration_url', '').rstrip('/')
 
         return phantom.APP_SUCCESS
 

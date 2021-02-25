@@ -12,7 +12,7 @@
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud. API v1 tested on 2021-02-19"
+        "Cloud. API v1 tested on 2021-02-25"
     ],
     "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:38:20.000000Z",
@@ -37,7 +37,6 @@
             "description": "Custom REST based Integration URL defined in VictorOps",
             "verbose": "Populate this field if you plan to create, update, or resolve incidents. i.e https://alert.victorops.com/integrations/generic/20131114/alert/84d34810-7b78-4cb9-91a4-3425aeecce68",
             "data_type": "string",
-            "required": true,
             "order": 2
         }
     },
