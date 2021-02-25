@@ -607,7 +607,11 @@ class CarbonblackConnector(BaseConnector):
 
         ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
-        pid = param[CARBONBLACK_JSON_PID]
+
+        ret_val, pid = self._validate_integer(self, param.get(CARBONBLACK_JSON_PID), CARBONBLACK_JSON_PID, True)
+        if phantom.is_fail(ret_val):
+            action_result = self.add_action_result(ActionResult(param))
+            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
 
         if ((not ip_hostname) and (sensor_id is None)):
             action_result = self.add_action_result(ActionResult(param))
@@ -619,7 +623,7 @@ class CarbonblackConnector(BaseConnector):
             # set the param to _only_ contain the sensor_id, since that's the only one we are using
             action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id, CARBONBLACK_JSON_PID: pid}))
 
-            ret_val, sensor_id = self._validate_integer(action_result, param.get(CARBONBLACK_JSON_SENSOR_ID), CARBONBLACK_JSON_SENSOR_ID, True)
+            ret_val, sensor_id = self._validate_integer(action_result, sensor_id, CARBONBLACK_JSON_SENSOR_ID, True)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
@@ -1792,8 +1796,11 @@ class CarbonblackConnector(BaseConnector):
           "  how to turn the criteria into parameters for a process search
           " Then, you'll need to decide if ip_hostname is required to be used with it
         """
+        ret_val, pid = self._validate_integer(self, param.get(CARBONBLACK_JSON_PID), CARBONBLACK_JSON_PID, True)
+        if phantom.is_fail(ret_val):
+            action_result = self.add_action_result(ActionResult(param))
+            return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
         ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME, "")
-        pid = param.get(CARBONBLACK_JSON_PID, "")
         process = param.get(CARBONBLACK_JSON_PROCESS_NAME, "")
         cb_id = param.get(CARBONBLACK_JSON_CB_ID, "")
 
