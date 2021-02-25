@@ -12,7 +12,7 @@ import simplejson as json
 import six
 
 from argparse import ArgumentParser
-from websocket import create_connection  # pylint: disable=E0401
+from websocket import create_connection
 
 app_dir = os.path.dirname(os.path.abspath(__file__))  # noqa
 if (os.path.exists('{}/dependencies'.format(app_dir))):  # noqa

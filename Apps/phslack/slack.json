@@ -1828,7 +1828,7 @@
         {
             "action": "send message",
             "description": "Send a message to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA), a channel name (e.g. #general), a username (e.g. @user), or a user ID (e.g. U1A1A1AAA). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message. Messages are limited to 4000 characters. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username, as it may get deprecated in near future.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA), a channel name (e.g. #general), a username (e.g. @user), or a user ID (e.g. U1A1A1AAA). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message. Messages are limited to 4000 characters. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username, since the latter usage has been deprecated by Slack.",
             "type": "generic",
             "identifier": "send_message",
             "read_only": false,
@@ -2569,7 +2569,7 @@
         {
             "action": "upload file",
             "description": "Upload file to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user or U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username, as it may get deprecated in near future.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user or U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username, since the latter usage has been deprecated by Slack.",
             "type": "generic",
             "identifier": "upload_file",
             "read_only": false,
@@ -3210,7 +3210,7 @@
         {
             "action": "ask question",
             "description": "Ask a question to a Slack user",
-            "verbose": "This action will send a Slack user a direct message containing a question with a series of buttons which represent possible responses. Once the user clicks on one of the responses, Slack will send the response back to Phantom. The action will succeed and output this response in the action result. If the user fails to respond within the timeout configured in the asset, the action will succeed, and output the <b>question ID</b> in the action result. The question ID can be used as input to the <b>get response</b> action.<br><br>If the <b>responses</b> parameter is not filled out, the response options will be <b>yes</b> and <b>no</b>.<br><br>The <b>confirmation</b> parameter takes a string that will be sent to the user after the user clicks a response. <b>Note:</b> It is recommended to use user ID instead of username, as it may get deprecated in near future.",
+            "verbose": "This action will send a Slack user a direct message containing a question with a series of buttons which represent possible responses. Once the user clicks on one of the responses, Slack will send the response back to Phantom. The action will succeed and output this response in the action result. If the user fails to respond within the timeout configured in the asset, the action will succeed, and output the <b>question ID</b> in the action result. The question ID can be used as input to the <b>get response</b> action.<br><br>If the <b>responses</b> parameter is not filled out, the response options will be <b>yes</b> and <b>no</b>.<br><br>The <b>confirmation</b> parameter takes a string that will be sent to the user after the user clicks a response. <b>Note:</b> It is recommended to use user ID instead of username, since the latter usage has been deprecated by Slack.",
             "type": "generic",
             "identifier": "ask_question",
             "read_only": false,
