@@ -1526,7 +1526,7 @@
         {
             "action": "invite users",
             "description": "Invite user(s) to a Slack channel",
-            "verbose": "Up to 1000 users may be added at one time. This action requires a Automation User Auth Token defined in the asset. For permissions, see: https://api.slack.com/methods/conversations.invite.",
+            "verbose": "Up to 1000 users may be added at one time. This action requires a OAuth Access Token defined in the asset. For permissions, see: https://api.slack.com/methods/conversations.invite.",
             "type": "generic",
             "identifier": "invite_users",
             "read_only": false,
