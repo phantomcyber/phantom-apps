@@ -211,7 +211,6 @@ class AwsLambdaConnector(BaseConnector):
             empty_payload = True
 
         # make boto3 call
-
         ret_val, response = self._make_boto_call(action_result, 'invoke', False, empty_payload, **args)
 
         if phantom.is_fail(ret_val):
