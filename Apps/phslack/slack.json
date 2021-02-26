@@ -77,7 +77,7 @@
         {
             "action": "create channel",
             "description": "Create a new Slack channel",
-            "verbose": "To create a private channel, use the 'channel_type' selection parameter. This action requires a 'OAuth Access Token' defined in the asset. For naming conventions, see https://api.slack.com/methods/conversations.create.",
+            "verbose": "To create a private channel, use the 'channel_type' selection parameter. This action requires a OAuth Access Token defined in the asset. For naming conventions, see https://api.slack.com/methods/conversations.create.",
             "type": "generic",
             "identifier": "create_channel",
             "read_only": false,
