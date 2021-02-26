@@ -159,10 +159,10 @@ class AwsLambdaConnector(BaseConnector):
         if not self._create_client(action_result, param):
             return action_result.get_status()
 
-        # make rest call
+        # make boto3 call
         ret_val, resp_json = self._make_boto_call(action_result, 'list_functions', MaxItems=1)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
@@ -210,10 +210,11 @@ class AwsLambdaConnector(BaseConnector):
         if invocation_type == 'Event' or invocation_type == 'DryRun':
             empty_payload = True
 
-        # make rest call
+        # make boto3 call
+
         ret_val, response = self._make_boto_call(action_result, 'invoke', False, empty_payload, **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -251,10 +252,10 @@ class AwsLambdaConnector(BaseConnector):
         if max_items is not None:
             args['MaxItems'] = int(max_items)
 
-        # make rest call
+        # make boto3 call
         ret_val, response = self._make_boto_call(action_result, 'list_functions', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if response.get('error', None) is not None:
@@ -308,10 +309,10 @@ class AwsLambdaConnector(BaseConnector):
         if revision_id:
             args['RevisionId'] = revision_id
 
-        # make rest call
+        # make boto3 call
         ret_val, response = self._make_boto_call(action_result, 'add_permission', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -320,6 +321,45 @@ class AwsLambdaConnector(BaseConnector):
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['status'] = "Successfully added permission"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_remove_permission(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not self._create_client(action_result, param):
+            return action_result.get_status()
+
+        function_name = param['function_name']
+        statement_id = param['statement_id']
+        qualifier = param.get('qualifier')
+        revision_id = param.get('revision_id')
+
+        args = {
+            'FunctionName': function_name,
+            'StatementId': statement_id,
+        }
+
+        if qualifier:
+            args['Qualifier'] = qualifier
+        if revision_id:
+            args['RevisionId'] = revision_id
+
+        # make boto3 call
+        ret_val, response = self._make_boto_call(action_result, 'remove_permission', **args)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['status'] = "Successfully removed permission"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -343,6 +383,9 @@ class AwsLambdaConnector(BaseConnector):
 
         elif action_id == 'add_permission':
             ret_val = self._handle_add_permission(param)
+
+        elif action_id == 'remove_permission':
+            ret_val = self._handle_remove_permission(param)
 
         return ret_val
 
@@ -408,13 +451,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print("Accessing the Login page")
@@ -445,7 +488,7 @@ if __name__ == '__main__':
         connector = AwsLambdaConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
