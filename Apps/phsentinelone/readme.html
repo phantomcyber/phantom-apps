@@ -3,7 +3,19 @@
 
     Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
+
 <html>
   <head></head>
-  <body>This version of the SentinelOne app is compatible with Phantom <b>4.9.39220+</b> </body>
+  <body>
+    This version of the SentinelOne app is compatible with Phantom <b>4.9.39220+</b>
+    <h2>Playbook Backward Compatibility</h2>
+      <p>
+        The below-mentioned actions have been modified. Hence, it is requested to the end-user to update their existing playbooks by re-inserting | modifying | deleting | creating the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.
+        <ul>
+          <li>The existing action parameter 'site_tokens' has been removed from the 'Block Hash', 'Unlock Hash', 'Quarantine Device', 'Unquarantine Device', 'Mitigate Threat', and 'Scan Endpoint' actions.</li>
+          <li>New actions 'Get Threat Info' and 'On Poll' have been added. </li>
+          <li>Existing actions 'List Endpoints' and 'List Threats' have been removed.</li>
+        </ul>
+      </p>
+  </body>
 </html>
