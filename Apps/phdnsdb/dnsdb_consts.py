@@ -1,5 +1,4 @@
 # File: dnsdb_consts.py
-# Copyright (c) 2016-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -37,6 +36,8 @@ DNSDB_ERR_API_UNSUPPORTED_METHOD = 'Unsupported method : {method}'
 DNSDB_ERR_INVALID_TIME_FORMAT = 'Invalid time format : {time}'
 DNSDB_ERR_INVALID_LIMIT = 'Invalid response length limit : {limit}'
 DNSDB_ERR_INVALID_NETWORK_PREFIX = 'Invalid network prefix : {prefix}'
+DNSDB_ERR_INVALID_BAILIWICK = 'Invalid bailiwick : %s'
+DNSDB_ERR_INVALID_TYPE = 'Invalid type or search type'
 DNSDB_TEST_CONN_INITIATION = 'Testing connectivity'
 DNSDB_TEST_CONN_DOMAIN = 'www.phantomcyber.com'
 DNSDB_TEST_CONN_FAIL = 'Connectivity test failed'
@@ -64,3 +65,14 @@ DNSDB_ERR_FROM_SERVER = 'API failed, Status code: {status}, Detail: {detail}'
 DNSDB_ERR_SERVER_CONNECTION = 'Connection failed'
 DNSDB_REST_RESP_OTHER_ERROR_MSG = 'Error occurred'
 DNSDB_DATA_NOT_AVAILABLE_MSG = 'Data not available'
+
+# Error message handling constants
+DNSDB_ERR_CODE_MSG = "Error code unavailable"
+DNSDB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+DNSDB_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+# Integer validation constants
+DNSDB_VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
+DNSDB_NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
+DNSDB_LIMIT_KEY = "'limit' action parameter"
+DNSDB_NETWORK_PREFIX_KEY = "'network_prefix' action parameter"
