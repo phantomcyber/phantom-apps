@@ -191,8 +191,8 @@ class ZoomConnector(BaseConnector):
             return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Connected to Zoom API successfully")
+        self.save_progress("Connected to Zoom API successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_user_settings(self, param):
 
@@ -329,7 +329,7 @@ class ZoomConnector(BaseConnector):
         parsed_fields = {}
 
         try:
-            for kv_pair in UnicodeDammit(response.get('invitation', '')).unicode_markup.encode('utf-8').replace('Join Zoom Meeting\r\n', 'invitation_link:').split('\r\n'):
+            for kv_pair in UnicodeDammit(response.get('invitation', '')).unicode_markup.replace('Join Zoom Meeting\r\n', 'invitation_link:').split('\r\n'):
                 if kv_pair:
                     parts = kv_pair.split(':')
                     second_part = ':'.join(parts[1:]).strip()

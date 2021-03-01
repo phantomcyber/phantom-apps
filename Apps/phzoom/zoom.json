@@ -1,7 +1,7 @@
 {
     "appid": "b64f4942-cb0f-4f15-b8aa-47435a0849db",
     "name": "Zoom",
-    "description": "Zoom Meetings App",
+    "description": "The app integrates with Zoom Meetings API to perform investigative and generic actions",
     "type": "identity management",
     "product_vendor": "Zoom",
     "logo": "logo_zoom.svg",
@@ -91,34 +91,40 @@
                     "contains": [
                         "zoom meeting id"
                     ],
-                    "coumn_name": "Meeting ID",
+                    "column_name": "Meeting ID",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.invitation",
-                    "data_type": "string",
-                    "column_name": "Invitation",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.parsed_fields.inivitation_link",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.parsed_fields.invitation_link",
+                    "data_type": "string",
+                    "column_name": "Invitation Link",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.parsed_fields.meeting_id",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.parsed_fields.password",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.parsed_fields.passcode",
+                    "data_type": "string",
+                    "column_name": "Passcode",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.parsed_fields.time",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Time",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.parsed_fields.topic",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Topic",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.status",
@@ -714,7 +720,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.agenda",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Agenda",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.created_at",
@@ -722,7 +730,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.duration",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "column_name": "Duration",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.encrypted_password",
@@ -742,7 +752,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.join_url",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Join URL",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.occurrences.*.duration",
@@ -942,7 +954,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.topic",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Topic",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.tracking_fields.*.field",
@@ -964,7 +978,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
+                    "column_order": 5,
                     "example_values": [
                         "success",
                         "failed"
