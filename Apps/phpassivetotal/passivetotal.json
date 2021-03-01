@@ -2344,7 +2344,7 @@
                     "data_path": "action_result.data.*.ssl_certificates.*.serialNumber",
                     "data_type": "string",
                     "column_name": "Serial Number",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "8571006865812752217367962054313612264"
                     ]
@@ -2353,7 +2353,7 @@
                     "data_path": "action_result.data.*.ssl_certificates.*.issuerCountry",
                     "data_type": "string",
                     "column_name": "Issuer Country",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "US"
                     ]
