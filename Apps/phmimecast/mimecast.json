@@ -9,13 +9,13 @@
     "product_name": "Mimecast",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.0.1",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "2.1.0",
     "python_version": "3",
     "utctime_updated": "2020-10-26T08:53:47.000000Z",
     "package_name": "phantom_mimecast",
     "main_module": "mimecast_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
         "Cloud v4.2.33"
@@ -65,22 +65,20 @@
         "access_key": {
             "description": "Mimecast access key for Bypass Authentication",
             "data_type": "string",
-            "required": false,
             "order": 6
         },
         "secret_key": {
             "description": "Mimecast secret key for Bypass Authentication",
             "data_type": "password",
-            "required": false,
             "order": 7
         }
     },
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -88,9 +86,9 @@
         },
         {
             "action": "blacklist url",
-            "identifier": "blacklist_url",
             "description": "Adds URL to a managed URL blacklist",
             "type": "contain",
+            "identifier": "blacklist_url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -126,11 +124,35 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "https://splunk.com/endpoint"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Blocking explicit match of URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_log_click",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.match_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "explicit"
                     ]
                 },
                 {
@@ -294,42 +316,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added URL to blacklist"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://splunk.com/endpoint"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        "Blocking explicit match of URL"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.enable_log_click",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.match_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "explicit"
                     ]
                 },
                 {
@@ -361,11 +359,10 @@
         },
         {
             "action": "add member",
-            "identifier": "add_member",
             "description": "Add a sender or domain to a Mimecast group",
             "type": "contain",
+            "identifier": "add_member",
             "read_only": false,
-            "undo": "remove member",
             "parameters": {
                 "member": {
                     "contains": [
@@ -382,7 +379,7 @@
                     "contains": [
                         "mimecast group id"
                     ],
-                    "description": "Mimecast ID of the group to add to",
+                    "description": "The Mimecast ID of the group to add to",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -391,11 +388,25 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.member",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "testsplunk.com",
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
                     ]
                 },
                 {
@@ -430,32 +441,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "Email Added",
+                    "column_order": 0,
+                    "example_values": [
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added member to group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.member",
-                    "data_type": "string",
-                    "example_values": [
-                        "testsplunk.com",
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
-                    ],
-                    "contains": [
-                        "mimecast group id"
                     ]
                 },
                 {
@@ -478,26 +495,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.emailAddress",
-                    "data_type": "string",
-                    "column_name": "Email Added",
-                    "column_order": 0,
-                    "example_values": [
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.internal",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
                 }
             ],
             "render": {
@@ -507,11 +504,10 @@
         },
         {
             "action": "remove member",
-            "identifier": "remove_member",
             "description": "Remove a sender or domain from a Mimecast group",
             "type": "correct",
+            "identifier": "remove_member",
             "read_only": false,
-            "undo": "add member",
             "parameters": {
                 "member": {
                     "contains": [
@@ -537,11 +533,25 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.member",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "testsplunk.com",
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
+                    ],
+                    "contains": [
+                        "mimecast group id"
                     ]
                 },
                 {
@@ -576,32 +586,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "column_name": "Email Removed",
+                    "column_order": 0,
+                    "example_values": [
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully removed member from group"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.member",
-                    "data_type": "string",
-                    "example_values": [
-                        "testsplunk.com",
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNoVzr0OgjAUQOF3uasMVv6EjUAQJKBGSWektwZFii1tJMZ3F_eTL-cDClstsWMQAn8VZo3lUNValXI7Z7f7PuVekuZ5Qd-7hGozy3jcHFe13UwZOcT0lPuP7mIix3XpFSzoWTNCyJteoQWtVpN4omwFw4WPz1VCIj9wgiU0KFUnBgiJBVz0DOV_wfFt4n1_fKEv7A"
-                    ],
-                    "contains": [
-                        "mimecast group id"
                     ]
                 },
                 {
@@ -624,26 +640,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.emailAddress",
-                    "data_type": "string",
-                    "column_name": "Email Removed",
-                    "column_order": 0,
-                    "example_values": [
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.internal",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
                 }
             ],
             "render": {
@@ -653,17 +649,16 @@
         },
         {
             "action": "blacklist sender",
-            "identifier": "blacklist_sender",
             "description": "Blacklists a specific sender and recipient in Mimecast",
             "type": "contain",
+            "identifier": "blacklist_sender",
             "read_only": false,
-            "undo": "whitelist sender",
             "parameters": {
                 "sender": {
                     "contains": [
                         "email"
                     ],
-                    "description": "Email address of the sender to blacklist",
+                    "description": "The email address of the sender to blacklist",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -673,7 +668,7 @@
                     "contains": [
                         "email"
                     ],
-                    "description": "Email address of the recipient",
+                    "description": "The email address of the recipient",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -682,11 +677,23 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.sender",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "test@thesplunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
@@ -785,30 +792,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successful block"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.to",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@splunk.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sender",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@thesplunk.com"
-                    ],
-                    "contains": [
-                        "email"
                     ]
                 },
                 {
@@ -840,17 +835,16 @@
         },
         {
             "action": "whitelist sender",
-            "identifier": "whitelist_sender",
             "description": "Whitelists a specific sender and recipient in Mimecast",
             "type": "contain",
+            "identifier": "whitelist_sender",
             "read_only": false,
-            "undo": "blacklist sender",
             "parameters": {
                 "sender": {
                     "contains": [
                         "email"
                     ],
-                    "description": "Email address of the sender to whitelist",
+                    "description": "The email address of the sender to the whitelist",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -860,7 +854,7 @@
                     "contains": [
                         "email"
                     ],
-                    "description": "Email address of the recipient",
+                    "description": "The email address of the recipient",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -869,11 +863,23 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.sender",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@splunk.com"
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
@@ -915,30 +921,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successful permit"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.to",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@splunk.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sender",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email"
                     ]
                 },
                 {
@@ -970,9 +964,9 @@
         },
         {
             "action": "whitelist url",
-            "identifier": "whitelist_url",
             "description": "Adds URL to a managed URL whitelist",
             "type": "contain",
+            "identifier": "whitelist_url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1018,11 +1012,51 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "Added splunk.com to the whitelist"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_log_click",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.match_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://splunk.com/endpoint"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_rewrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.enable_user_awareness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1129,58 +1163,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added URL to whitelist"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        "Added splunk.com to the whitelist"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.enable_log_click",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.match_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://splunk.com/endpoint"
-                    ],
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.enable_rewrite",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.enable_user_awareness",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
                     ]
                 },
                 {
@@ -1212,9 +1206,9 @@
         },
         {
             "action": "unblacklist url",
-            "identifier": "unblacklist_url",
             "description": "Removes URL from a managed URL blacklist",
             "type": "correct",
+            "identifier": "unblacklist_url",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -1229,6 +1223,18 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Mimecast URL ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
@@ -1306,18 +1312,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "column_name": "Mimecast URL ID",
-                    "column_order": 0,
-                    "example_values": [
-                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
-                    ],
-                    "contains": [
-                        "mimecast url id"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
@@ -1346,13 +1340,13 @@
         },
         {
             "action": "unwhitelist url",
-            "identifier": "unwhitelist_url",
             "description": "Removes URL from a managed URL whitelist",
             "type": "correct",
+            "identifier": "unwhitelist_url",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "URL ID to remove from whitelist",
+                    "description": "URL ID to remove from the whitelist",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1363,6 +1357,18 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Mimecast URL ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
+                    ],
+                    "contains": [
+                        "mimecast url id"
+                    ]
+                },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
@@ -1380,18 +1386,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully removed URL from URL Protection List"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "column_name": "Mimecast URL ID",
-                    "column_order": 0,
-                    "example_values": [
-                        "wOi3MCwjYFYhZfkYlp2RMAhvN30QSmqOT7D-I9AbwllQ23F4PQVrq-tqZNR_yyCug4NQWyXLVq6ZJ-1zblgUsu_Md3O6Zi0qmGGdl6R5R5s"
-                    ],
-                    "contains": [
-                        "mimecast url id"
                     ]
                 },
                 {
@@ -1423,20 +1417,12 @@
         },
         {
             "action": "list urls",
-            "identifier": "list_urls",
             "description": "Lists all managed URLs from the black/white list",
             "type": "investigate",
+            "identifier": "list_urls",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.data.*.duration",
                     "data_type": "numeric",
@@ -1600,6 +1586,14 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -1635,9 +1629,9 @@
         },
         {
             "action": "list groups",
-            "identifier": "list_groups",
             "description": "Lists all Mimecast groups matching the requested search criteria",
             "type": "investigate",
+            "identifier": "list_groups",
             "read_only": true,
             "parameters": {
                 "page_size": {
@@ -1658,11 +1652,24 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "Senders"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "cloud"
                     ]
                 },
                 {
@@ -1753,17 +1760,32 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.meta.pagination.previous",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNodjc0KgkAYAN9lrwm5Jth2q6wof1BEsehi66dslhv7uUVG7555HAZmPuRR1ICiB1GSBTUIAtdqBBJRv07dJj80p1l7ntrNtcJXi2YaB_vtJgIdX96BlWbyljCxoqzKLA93_jzstccmRycnBuEaO3kHxWUJQ3KdhC5dOsxmg3uCQiHbcauAS1ViV6ju_za_PzBDMfk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.groups.*.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "Senders"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Num groups: 1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.page_size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -1786,34 +1808,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.previous",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNodjc0KgkAYAN9lrwm5Jth2q6wof1BEsehi66dslhv7uUVG7555HAZmPuRR1ICiB1GSBTUIAtdqBBJRv07dJj80p1l7ntrNtcJXi2YaB_vtJgIdX96BlWbyljCxoqzKLA93_jzstccmRycnBuEaO3kHxWUJQ3KdhC5dOsxmg3uCQiHbcauAS1ViV6ju_za_PzBDMfk"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.groups.*.query",
-                    "data_type": "string",
-                    "example_values": [
-                        "Senders"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.query",
-                    "data_type": "string",
-                    "example_values": [
-                        "Senders"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.source",
-                    "data_type": "string",
-                    "example_values": [
-                        "cloud"
-                    ]
                 }
             ],
             "render": {
@@ -1823,9 +1817,9 @@
         },
         {
             "action": "list members",
-            "identifier": "list_members",
             "description": "Lists the members of a specified Mimecast group",
             "type": "investigate",
+            "identifier": "list_members",
             "read_only": true,
             "parameters": {
                 "page_size": {
@@ -1846,11 +1840,20 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
+                    ],
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
@@ -1979,27 +1982,18 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Num group members: 1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
-                    ],
-                    "contains": [
-                        "mimecast group id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.page_size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -2031,9 +2025,9 @@
         },
         {
             "action": "find member",
-            "identifier": "find_member",
             "description": "Finds a member of a specified Mimecast group",
             "type": "investigate",
+            "identifier": "find_member",
             "read_only": true,
             "parameters": {
                 "member": {
@@ -2059,7 +2053,7 @@
                     "order": 1
                 },
                 "id": {
-                    "description": "Mimecast ID of the group to search",
+                    "description": "The Mimecast ID of the group to search",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2070,6 +2064,38 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.member",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "column_name": "Member",
+                    "column_order": 1,
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
+                    ],
+                    "column_name": "Mimecast Group ID",
+                    "column_order": 2,
+                    "contains": [
+                        "mimecast group id"
+                    ]
+                },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
@@ -2147,38 +2173,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.member",
-                    "data_type": "string",
-                    "example_values": [
-                        "splunk.com"
-                    ],
-                    "column_name": "Member",
-                    "column_order": 1,
-                    "contains": [
-                        "email",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNoVzs0KgkAUQOF3uduEmNRMd6GYIpT2N5s2k3MVyxq541gSvXu2P3ycD2gsDWEjIYAsqYnvyfRC3sZYvvxzXVzm-TKK0zTj703EzTBS2C3y2ckWfcJ2IS9S794ch7XjuvwKFrRSdBBUotVoQWl0rx5IpZI4-eFhG7G15zv-FA5IulFPCJgFlWol0v_B8Wy2-v4AuukwVw"
-                    ],
-                    "column_name": "Mimecast Group ID",
-                    "column_order": 2,
-                    "contains": [
-                        "mimecast group id"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
@@ -2209,10 +2203,10 @@
         },
         {
             "action": "run query",
-            "identifier": "run_query",
             "description": "Get emails across the Mimecast platform",
             "verbose": "Either from, to, subject, or sender_ip parameter must be filled out.",
             "type": "investigate",
+            "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "start": {
@@ -2231,12 +2225,12 @@
                     "order": 2
                 },
                 "message_id": {
-                    "description": "Internet message ID of the message to track",
+                    "description": "The Internet message ID of the message to track",
                     "data_type": "string",
                     "order": 3
                 },
                 "sender_ip": {
-                    "description": "Source IP address of email to track",
+                    "description": "Source IP address of an email to track",
                     "data_type": "string",
                     "primary": true,
                     "order": 4,
@@ -2245,7 +2239,7 @@
                     ]
                 },
                 "subject": {
-                    "description": "Subject of email to track",
+                    "description": "The subject of an email to track",
                     "data_type": "string",
                     "order": 5
                 },
@@ -2271,12 +2265,69 @@
                 }
             },
             "output": [
+
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.to",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "test@testsplunk.com"
+                    ],
+                    "contains": [
+                        "email",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.search_reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "Looking for delivery failures"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-18T17:28:10+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-10-18T17:28:10+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivery status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -2470,37 +2521,39 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.fromHdr.displayableName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain postMaster address"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fromEnv.displayableName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain postMaster address"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Num emails: 14"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.to",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.from",
-                    "data_type": "string",
-                    "example_values": [
-                        "test@testsplunk.com"
-                    ],
-                    "contains": [
-                        "email",
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.message_id",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.num_emails",
@@ -2522,64 +2575,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.fromHdr.displayableName",
-                    "data_type": "string",
-                    "example_values": [
-                        "Domain postMaster address"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.fromEnv.displayableName",
-                    "data_type": "string",
-                    "example_values": [
-                        "Domain postMaster address"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.search_reason",
-                    "data_type": "string",
-                    "example_values": [
-                        "Looking for delivery failures"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.end",
-                    "data_type": "string",
-                    "example_values": [
-                        "2018-10-18T17:28:10+0000"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.start",
-                    "data_type": "string",
-                    "example_values": [
-                        "2018-10-18T17:28:10+0000"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.subject",
-                    "data_type": "string",
-                    "example_values": [
-                        "delivery status"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.sender_ip",
-                    "data_type": "string",
-                    "example_values": [
-                        "8.8.8.8"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
                 }
             ],
             "render": {
@@ -2589,13 +2584,13 @@
         },
         {
             "action": "get email",
-            "identifier": "get_email",
             "description": "Returns message information for a tracked email",
             "type": "investigate",
+            "identifier": "get_email",
             "read_only": true,
             "parameters": {
                 "id": {
-                    "description": "Mimecast ID of the email to load",
+                    "description": "The Mimecast ID of the email to load",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -2607,11 +2602,13 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.id",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "eNpFjl1LwzAUhv9Lbl0h6ZLGDhFGy7TIdGMbcVclH6datO3IR3GK_91Ukd2e97zP834hBzpYaA1aILKWGkOpG13wz6Oh6-dU4E1WrqrqQXzclSKMZ1uc0s3VYS79PXkqxLbib-1-XFLGhEIz1IFz8gV2Xvrg9ucTROwrvJtLtA0QoIo6zlg2Q77rJ7XrjQfbkfing_NDB1YPZmoXu8eSLHlO85hJ7dvxb-zlXk-k-p9QYzyvb4Dh1DCQCckalVDaXCeK5CrRlFNFgWVg5G0EjmBdO_RoQeKU_lcY--j7BwA7Vm8"
+                    ],
+                    "contains": [
+                        "mimecast email id"
                     ]
                 },
                 {
@@ -3692,44 +3689,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully retrieved message information"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eNpFjl1LwzAUhv9Lbl0h6ZLGDhFGy7TIdGMbcVclH6datO3IR3GK_91Ukd2e97zP834hBzpYaA1aILKWGkOpG13wz6Oh6-dU4E1WrqrqQXzclSKMZ1uc0s3VYS79PXkqxLbib-1-XFLGhEIz1IFz8gV2Xvrg9ucTROwrvJtLtA0QoIo6zlg2Q77rJ7XrjQfbkfing_NDB1YPZmoXu8eSLHlO85hJ7dvxb-zlXk-k-p9QYzyvb4Dh1DCQCckalVDaXCeK5CrRlFNFgWVg5G0EjmBdO_RoQeKU_lcY--j7BwA7Vm8"
-                    ],
-                    "contains": [
-                        "mimecast email id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved message information"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.retentionInfo.retentionAdjustmentDays",
                     "data_type": "numeric",
                     "example_values": [
@@ -4117,6 +4076,42 @@
                     "example_values": [
                         28
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully retrieved message information"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved message information"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -4130,9 +4125,9 @@
         },
         {
             "action": "decode url",
-            "identifier": "decode_url",
             "description": "Decodes URL that was rewritten by Mimecast for on-click protection",
             "type": "investigate",
+            "identifier": "decode_url",
             "read_only": true,
             "parameters": {
                 "url": {
@@ -4148,11 +4143,13 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "https://sandbox-api.mimecast.com/s/Q3jhCqj0xiOhZIM36?domain=splunk.com"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -4233,20 +4230,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully decoded URL"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "example_values": [
-                        "https://sandbox-api.mimecast.com/s/Q3jhCqj0xiOhZIM36?domain=splunk.com"
-                    ],
-                    "contains": [
-                        "url"
                     ]
                 },
                 {
