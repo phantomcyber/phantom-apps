@@ -75,11 +75,12 @@ class MimecastConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully set accessKey and secretKey")
 
     def _get_request_headers(self, uri, action_result, expired=False):
-        if self._access_key is None or self._secret_key is None:
-            self._login(action_result)
-            if action_result.get_status() is False:
-                self.save_progress("Failed login with given credentials")
-                return None
+        if self._auth_type != "Bypass (Access Key)":
+            if self._access_key is None or self._secret_key is None:
+                self._login(action_result)
+                if action_result.get_status() is False:
+                    self.save_progress("Failed login with given credentials")
+                    return None
         else:
             self.save_progress("Skipped login")
         request_id = str(uuid.uuid4())
@@ -350,9 +351,6 @@ class MimecastConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         uri = '/api/ttp/url/get-all-managed-urls'
-        if self._auth_type != "Bypass (Access Key)":
-            self._access_key = None
-            self._secret_key = None
         headers = self._get_request_headers(uri, action_result)
         if headers is None:
             self.save_progress("Test Connectivity Failed")
@@ -993,15 +991,15 @@ class MimecastConnector(BaseConnector):
 
         config = self.get_config()
         self._base_url = config['base_url'].rstrip('/')
-        self._username = config['username']
-        self._password = config['password']
+        self._username = config.get('username')
+        self._password = config.get('password')
         self._app_id = config['app_id']
         self._app_key = config['app_key']
         self._auth_type = config['auth_type']
 
         if self._auth_type == "Bypass (Access Key)":
-            self._access_key = config['access_key']
-            self._secret_key = config['secret_key']
+            self._access_key = config.get('access_key')
+            self._secret_key = config.get('secret_key')
         else:
             self._access_key = self._state.get('access_key')
             self._secret_key = self._state.get('secret_key')

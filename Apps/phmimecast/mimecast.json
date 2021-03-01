@@ -22,13 +22,13 @@
     ],
     "configuration": {
         "base_url": {
-            "description": "Base URL of Mimecast",
+            "description": "Mimecast Base URL",
             "data_type": "string",
             "required": true,
             "order": 0
         },
         "auth_type": {
-            "description": "Type of authentication being used",
+            "description": "Type of Authentication",
             "data_type": "string",
             "required": true,
             "order": 1,
@@ -39,36 +39,34 @@
             ]
         },
         "username": {
-            "description": "Username to authenticate with",
+            "description": "Username for Domain or Cloud Authentication",
             "data_type": "string",
-            "required": true,
             "order": 2
         },
         "password": {
-            "description": "Password of user to authenticate with",
+            "description": "Password for Domain or Cloud Authentication",
             "data_type": "password",
-            "required": true,
             "order": 3
         },
         "app_id": {
-            "description": "Mimecast app ID",
+            "description": "Mimecast App ID",
             "data_type": "string",
             "required": true,
             "order": 4
         },
         "app_key": {
-            "description": "Mimecast app key",
+            "description": "Mimecast App Key",
             "data_type": "password",
             "required": true,
             "order": 5
         },
         "access_key": {
-            "description": "Mimecast access key for Bypass Authentication",
-            "data_type": "string",
+            "description": "Mimecast Access Key for Bypass Authentication",
+            "data_type": "password",
             "order": 6
         },
         "secret_key": {
-            "description": "Mimecast secret key for Bypass Authentication",
+            "description": "Mimecast Secret Key for Bypass Authentication",
             "data_type": "password",
             "order": 7
         }
