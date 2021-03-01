@@ -1,0 +1,292 @@
+{
+    "appid": "96f3e021-5396-42d0-97f4-4fab683e9adb",
+    "name": "Cisco Umbrella",
+    "description": "This app allows management of a domain list on the Cisco Umbrella Security platform",
+    "type": "endpoint",
+    "main_module": "ciscoumbrella_connector.py",
+    "app_version": "1.0.2",
+    "utctime_updated": "2021-02-10T10:20:28.000000Z",
+    "product_vendor": "Cisco",
+    "product_name": "Cisco Umbrella",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "latest_tested_versions": [
+        "Cloud, API s-platform.api.opendns, February 5 2021"
+    ],
+    "python_version": "3",
+    "publisher": "Splunk",
+    "package_name": "phantom_ciscoumbrella",
+    "logo": "logo_ciscoumbrella.svg",
+    "logo_dark": "logo_ciscoumbrella_dark.svg",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "configuration": {
+        "customer_key": {
+            "data_type": "password",
+            "order": 0,
+            "description": "Cisco Customer key",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list blocked domains",
+            "description": "Queries Cisco for the blocked domain list",
+            "type": "investigate",
+            "identifier": "list_blocked_domains",
+            "read_only": true,
+            "parameters": {},
+            "render": {
+                "width": 12,
+                "title": "List Blocked Domains",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cisco domain id"
+                    ],
+                    "column_name": "Domain ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.meta.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.next",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.page",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.prev",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.total_domains",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total domains: 21"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block domain",
+            "description": "Block a domain",
+            "type": "contain",
+            "identifier": "block_domain",
+            "read_only": false,
+            "undo": "unblock domain",
+            "verbose": "Cisco has many safeguards in place before adding a domain to a block list. These are present to protect against accidentally submitting domains for highly popular or known sites like google.com. If the 'disable_safeguards' parameter is set to True (or checked), those safeguards will be bypassed. This could potentially allow adding a well-known domain like google.com to a domain block list.",
+            "parameters": {
+                "domain": {
+                    "description": "Domain to block",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "disable_safeguards": {
+                    "description": "Disable safeguards while blocking the domain",
+                    "data_type": "boolean",
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Block Domain",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.disable_safeguards",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "REST API returned success with id: a4070f26,4cfc,4a5f,9a17-532c093ca151"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock domain",
+            "description": "Unblock a domain",
+            "type": "correct",
+            "identifier": "unblock_domain",
+            "read_only": false,
+            "undo": "block domain",
+            "parameters": {
+                "domain": {
+                    "description": "Domain to unblock",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Unblock Domain",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain successfully unblocked"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
