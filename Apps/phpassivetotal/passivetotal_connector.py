@@ -102,7 +102,16 @@ class PassivetotalConnector(BaseConnector):
         except:
             error_msg = PASSIVETOTAL_ERR_MSG_UNAVAILABLE
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        try:
+            if error_code in PASSIVETOTAL_ERR_CODE_UNAVAILABLE:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PASSIVETOTAL_PARSE_ERR_MSG)
+            error_text = PASSIVETOTAL_PARSE_ERR_MSG
+
+        return error_text
 
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
@@ -128,6 +137,14 @@ class PassivetotalConnector(BaseConnector):
         except ValueError:
             return False
 
+    def _is_from_to_valid_date(self, from_date, to_date):
+        """Checks if a given 'from date' should not greater than the 'to date'"""
+        from_date = datetime.strptime(from_date, '%Y-%m-%d')
+        to_date = datetime.strptime(to_date, '%Y-%m-%d')
+        if from_date <= to_date:
+            return True
+        return False
+
     def _make_rest_call(self, endpoint, request_params, action_result):
 
         # init the return values
@@ -143,8 +160,8 @@ class PassivetotalConnector(BaseConnector):
 
         # make the call
         try:
-            r = requests.get(self._base_url + endpoint,
-                             auth=(config[PASSIVETOTAL_JSON_KEY], config[PASSIVETOTAL_JSON_SECRET]),
+            r = requests.get('{}{}'.format(self._base_url, endpoint),
+                             auth=(self._handle_py_ver_compat_for_input_str(config[PASSIVETOTAL_JSON_KEY], True), config[PASSIVETOTAL_JSON_SECRET]),
                              params=params,
                              headers=self._headers)
         except Exception as exc:
@@ -219,6 +236,10 @@ class PassivetotalConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR,
                                             'Incorrect date format for end time, it should be YYYY-MM-DD')
 
+        if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "'From' date should not greater than the 'To' date")
+
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
 
@@ -286,7 +307,7 @@ class PassivetotalConnector(BaseConnector):
                 summary.update({PASSIVETOTAL_JSON_AS_NAME: response['autonomousSystemName']})
 
             if 'country' in response:
-                summary.update({PASSIVETOTAL_JSON_COUTRY: response['country']})
+                summary.update({PASSIVETOTAL_JSON_COUNTRY: response['country']})
 
             if 'dynamicDns' in response:
                 summary.update({PASSIVETOTAL_JSON_DYNAMIC_DOMAIN: response['dynamicDns']})
@@ -474,6 +495,10 @@ class PassivetotalConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR,
                                             'Incorrect date format for end time, it should be YYYY-MM-DD')
 
+        if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "'From' date should not greater than the 'To' date")
+
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
 
@@ -492,9 +517,12 @@ class PassivetotalConnector(BaseConnector):
         # SSL Certificates
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/history', {'query': ip}, action_result)
 
-        if ret_val and response:
-            if response['results']:
-                extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response['results']
+        try:
+            if ret_val and response:
+                if response['results']:
+                    extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response['results']
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         if (not extra_data) and (phantom.is_fail(ret_val)):
             # We don't seem to have any data _and_ the last call failed
@@ -511,19 +539,31 @@ class PassivetotalConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid SHA1 Hash')
 
         extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
 
         self.save_progress('Querying Certificate by Hash')
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/', {'query': query}, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if ret_val and response:
-            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATE] = response["results"]
+        try:
+            if ret_val and response:
+                extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATE] = response["results"]
+                summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: len(response['results'])})
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         self.save_progress('Querying Certificate History by Hash')
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/history', {'query': query},
                                                               action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if ret_val and response:
-            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
+        try:
+            if ret_val and response:
+                extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -532,6 +572,8 @@ class PassivetotalConnector(BaseConnector):
 
         query = param[PASSIVETOTAL_JSON_QUERY]
         field = param[PASSIVETOTAL_JSON_FIELD]
+        if field not in PASSIVETOTAL_FIELD_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_VALUE_LIST_VALIDATION_MSG.format(PASSIVETOTAL_FIELD_VALUE_LIST, 'field'))
 
         params = {
             "query": query,
@@ -539,11 +581,18 @@ class PassivetotalConnector(BaseConnector):
         }
 
         extra_data = action_result.add_data({})
+        summary = action_result.update_summary({})
 
         ret_val, response, status_code = self._make_rest_call('/ssl-certificate/search', params, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if ret_val and response:
-            extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
+        try:
+            if ret_val and response:
+                extra_data[PASSIVETOTAL_JSON_SSL_CERTIFICATES] = response["results"]
+                summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: len(response['results'])})
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -563,6 +612,10 @@ class PassivetotalConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR,
                                             'Incorrect date format for end time, it should be YYYY-MM-DD')
 
+        if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "'From' date should not greater than the 'To' date")
+
         params = {
             "query": query,
             "start": start_time,
@@ -573,9 +626,14 @@ class PassivetotalConnector(BaseConnector):
         summary = action_result.update_summary({})
 
         ret_val, response, status_code = self._make_rest_call('/host-attributes/components', params, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if ret_val and response:
-            extra_data[PASSIVETOTAL_JSON_COMPONENTS] = response["results"]
+        try:
+            if ret_val and response:
+                extra_data[PASSIVETOTAL_JSON_COMPONENTS] = response["results"]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         if 'totalRecords' in response:
             summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: response['totalRecords']})
@@ -591,6 +649,9 @@ class PassivetotalConnector(BaseConnector):
         end_time = param.get(PASSIVETOTAL_JSON_TO)
         page = param.get(PASSIVETOTAL_JSON_PAGE)
 
+        if direction not in PASSIVETOTAL_DIRECTION_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_VALUE_LIST_VALIDATION_MSG.format(PASSIVETOTAL_DIRECTION_VALUE_LIST, 'direction'))
+
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
                                             'Incorrect date format for start time, it should be YYYY-MM-DD')
@@ -598,6 +659,10 @@ class PassivetotalConnector(BaseConnector):
         if end_time and not self._is_date(end_time):
             return action_result.set_status(phantom.APP_ERROR,
                                             'Incorrect date format for end time, it should be YYYY-MM-DD')
+
+        if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "'From' date should not greater than the 'To' date")
 
         params = {
             "query": query,
@@ -611,9 +676,13 @@ class PassivetotalConnector(BaseConnector):
         summary = action_result.update_summary({})
 
         ret_val, response, status_code = self._make_rest_call('/host-attributes/pairs', params, action_result)
-
-        if ret_val and response:
-            extra_data[PASSIVETOTAL_JSON_PAIRS] = response["results"]
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        try:
+            if ret_val and response:
+                extra_data[PASSIVETOTAL_JSON_PAIRS] = response["results"]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
         if 'totalRecords' in response:
             summary.update({PASSIVETOTAL_JSON_TOTAL_RECORDS: response['totalRecords']})

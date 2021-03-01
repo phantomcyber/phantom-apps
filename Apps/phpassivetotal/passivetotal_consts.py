@@ -23,7 +23,7 @@ PASSIVETOTAL_JSON_TAGS = "tags"
 PASSIVETOTAL_JSON_UNIQUE = "unique"
 PASSIVETOTAL_JSON_SSL_CERTIFICATES = "ssl_certificates"
 PASSIVETOTAL_JSON_AS_NAME = "as_name"
-PASSIVETOTAL_JSON_COUTRY = "country"
+PASSIVETOTAL_JSON_COUNTRY = "country"
 PASSIVETOTAL_JSON_FIRST_SEEN = "first_seen"
 PASSIVETOTAL_JSON_LAST_SEEN = "last_seen"
 PASSIVETOTAL_JSON_TOTAL_UNIQUE_DOMAINS = "total_unique_domains"
@@ -52,9 +52,48 @@ PASSIVETOTAL_REST_API_URL = "https://api.passivetotal.org/v2"
 
 # Consts for _get_error_message_from_exception
 PASSIVETOTAL_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters."
+PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters"
+PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters"
+PASSIVETOTAL_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 # API quota exceed messages
 QUOTA_EXCEEDED_MSG = "quota has been exceeded"
 QUOTA_EXCEEDED_MSG_API = "quota exceeded for operation search_api"
+
+# error message while processing the response
+PASSIVETOTAL_RESPONSE_ERR_MSG = "Error occurred while processing response from server"
+
+# Constants relating to value_list check
+PASSIVETOTAL_FIELD_VALUE_LIST = [
+            "issuerSurname",
+            "subjectOrganizationName",
+            "issuerCountry",
+            "issuerOrganizationUnitName",
+            "fingerprint",
+            "subjectOrganizationUnitName",
+            "serialNumber",
+            "subjectEmailAddress",
+            "subjectCountry",
+            "issuerGivenName",
+            "subjectCommonName",
+            "issuerCommonName",
+            "issuerStateOrProvinceName",
+            "issuerProvince",
+            "subjectStateOrProvinceName",
+            "sha1",
+            "subjectStreetAddress",
+            "subjectSerialNumber",
+            "issuerOrganizationName",
+            "subjectSurname",
+            "subjectLocalityName",
+            "issuerStreetAddress",
+            "issuerLocalityName",
+            "subjectGivenName",
+            "subjectProvince",
+            "issuerSerialNumber",
+            "issuerEmailAddress",
+            "name",
+            "issuerAlternativeName",
+            "subjectAlternativeName"]
+PASSIVETOTAL_DIRECTION_VALUE_LIST = ["parents", "children"]
+PASSIVETOTAL_VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"
