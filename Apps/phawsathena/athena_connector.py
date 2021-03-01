@@ -1,5 +1,5 @@
 # File: athena_connector.py
-# Copyright (c) 2017-2019 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -209,7 +209,7 @@ class AthenaConnector(BaseConnector):
         if not execution_id:
             return action_result.set_status(phantom.APP_ERROR, "Could not get query execution ID after starting query.")
 
-        for i in xrange(0, 60):
+        for i in range(0, 60):
 
             ret_val, response = self._make_boto_call(action_result, 'get_query_execution', QueryExecutionId=execution_id)
             if (phantom.is_fail(ret_val)):
@@ -272,7 +272,7 @@ if __name__ == '__main__':
     # pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -283,6 +283,6 @@ if __name__ == '__main__':
         connector = AthenaConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

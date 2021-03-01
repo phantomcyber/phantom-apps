@@ -1,10 +1,9 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: data_breach_record.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-from ds_model import DSModel
+from .ds_model import DSModel
 
 
 class DataBreachRecord(DSModel):
@@ -63,7 +62,7 @@ class DataBreachRecord(DSModel):
     @classmethod
     def from_json(cls, json):
         cast = DSModel.cast
-        return cls(cast(json.get('id'), long),
+        return cls(cast(json.get('id'), int),
                    json.get('username'),
                    json.get('password'),
                    json.get('review'),
