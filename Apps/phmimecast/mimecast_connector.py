@@ -70,17 +70,16 @@ class MimecastConnector(BaseConnector):
             self._access_key = response['data'][0]['accessKey']
             self._secret_key = response['data'][0]['secretKey']
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully set accessKey and secretKey")
 
     def _get_request_headers(self, uri, action_result, expired=False):
-        if self._auth_type != "Bypass (Access Key)":
-            if self._access_key is None or self._secret_key is None:
-                self._login(action_result)
-                if action_result.get_status() is False:
-                    self.save_progress("Failed login with given credentials")
-                    return None
+        if self._access_key is None or self._secret_key is None:
+            self._login(action_result)
+            if action_result.get_status() is False:
+                self.save_progress("Failed login with given credentials")
+                return None
         else:
             self.save_progress("Skipped login")
         request_id = str(uuid.uuid4())
@@ -109,8 +108,7 @@ class MimecastConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR,
-        "Empty response and no information in the header. Please check the asset configuration and|or action parameters."), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_EMPTY_RESPONSE.format(code=response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -129,7 +127,7 @@ class MimecastConnector(BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
-            error_text = "Cannot parse error details"
+            error_text = MIMECAST_UNABLE_TO_PARSE_ERR_DETAILS
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 error_text)
@@ -144,7 +142,8 @@ class MimecastConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_UNABLE_TO_PARSE_JSON_RESPONSE.format(error=error_msg)), None)
 
         # Please specify the status codes here
         if not resp_json['fail']:
@@ -191,24 +190,26 @@ class MimecastConnector(BaseConnector):
         is a non-zero positive integer and returns the integer value of the parameter itself.
         :param action_result: Action result or BaseConnector object
         :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
         :return: integer value of the parameter or None in case of failure
         """
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
+                    action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_INVALID_INT.format(key=key))
                     return None
                 parameter = int(parameter)
 
             except:
-                action_result.set_status(phantom.APP_ERROR, MIMECAST_VALIDATE_INTEGER_MESSAGE.format(key=key))
+                action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_INVALID_INT.format(key=key))
                 return None
 
             if parameter < 0:
-                action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {} parameter".format(key))
+                action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_NEGATIVE_INT.format(key=key))
                 return None
             if not allow_zero and parameter == 0:
-                action_result.set_status(phantom.APP_ERROR, "Please provide non-zero positive integer in {}".format(key))
+                action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_NEGATIVE_AND_ZERO_INT.format(key=key))
                 return None
 
         return parameter
@@ -225,17 +226,17 @@ class MimecastConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = MIMECAST_ERROR_CODE_MESSAGE
+                    error_code = MIMECAST_ERR_CODE_UNAVAILABLE
                     error_msg = e.args[0]
             else:
-                error_code = MIMECAST_ERROR_CODE_MESSAGE
-                error_msg = MIMECAST_ERROR_MESSAGE
+                error_code = MIMECAST_ERR_CODE_UNAVAILABLE
+                error_msg = MIMECAST_ERR_MSG_UNKNOWN
         except:
-            error_code = MIMECAST_ERROR_CODE_MESSAGE
-            error_msg = MIMECAST_ERROR_MESSAGE
+            error_code = MIMECAST_ERR_CODE_UNAVAILABLE
+            error_msg = MIMECAST_ERR_MSG_UNKNOWN
 
         try:
-            if error_code in MIMECAST_ERROR_CODE_MESSAGE:
+            if error_code in MIMECAST_ERR_CODE_UNAVAILABLE:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -343,27 +344,30 @@ class MimecastConnector(BaseConnector):
                             verify=config.get('verify_server_cert', False),
                             params=params)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to the Mimecast server. Details: {0}"
-                        .format(self._get_error_message_from_exception(e))), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_CONNECTING_SERVER
+                        .format(error=self._get_error_message_from_exception(e))), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         uri = '/api/ttp/url/get-all-managed-urls'
+        if self._auth_type != "Bypass (Access Key)":
+            self._access_key = None
+            self._secret_key = None
         headers = self._get_request_headers(uri, action_result)
         if headers is None:
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress(MIMECAST_ERR_TEST_CONN_FAILED)
             return action_result.set_status(phantom.APP_ERROR, action_result.get_message())
         data = {'data': []}
 
         self.save_progress('Querying endpoint')
-        ret_val, response = self._make_rest_call(uri, action_result, params=None, headers=headers, method="post", data=data)
+        ret_val, _ = self._make_rest_call(uri, action_result, params=None, headers=headers, method="post", data=data)
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress(MIMECAST_ERR_TEST_CONN_FAILED)
             return action_result.get_status()
 
-        self.save_progress('Test Connectivity Passed')
+        self.save_progress(MIMECAST_SUCC_TEST_CONN_PASSED)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_blacklist_url(self, param):
@@ -399,10 +403,10 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully added URL to blacklist"
+        summary['status'] = MIMECAST_SUCC_BLACKLIST_URL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -430,7 +434,7 @@ class MimecastConnector(BaseConnector):
         action_result.add_data(response.get('data'))
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully removed URL from URL Protection List"
+        summary['status'] = MIMECAST_SUCC_REMOVE_URL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -480,10 +484,10 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully added URL to whitelist"
+        summary['status'] = MIMECAST_SUCC_WHITELIST_URL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -522,10 +526,10 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully added member to group"
+        summary['status'] = MIMECAST_SUCC_ADD_MEMBER
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -564,10 +568,10 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully removed member from group"
+        summary['status'] = MIMECAST_SUCC_REMOVE_MEMBER
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -605,7 +609,7 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
         summary['status'] = "Successful {0}".format(action)
@@ -691,7 +695,7 @@ class MimecastConnector(BaseConnector):
         try:
             summary['num_groups'] = len(response['groups'][0]['folders'])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -734,7 +738,7 @@ class MimecastConnector(BaseConnector):
             summary = action_result.update_summary({})
             summary['num_group_members'] = len(response['members'][0]['groupMembers'])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -749,7 +753,7 @@ class MimecastConnector(BaseConnector):
         type_list = ['email', 'domain']
         search_type = param['type']
         if search_type and search_type not in type_list:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'type' parameter")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_TYPE_ACTION_PARAMETER)
         if search_type == 'email':
             search_type = 'emailAddress'
 
@@ -780,7 +784,7 @@ class MimecastConnector(BaseConnector):
                 groupMembers = response['members'][0]['groupMembers']
                 nextToken = response['meta']['pagination'].get('next')
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+                return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
             # Successful if member found, fails if nextToken does not exist, repeats loop if nextToken exists
             if any(i[search_type] == member for i in groupMembers):
@@ -824,16 +828,16 @@ class MimecastConnector(BaseConnector):
                 start = dateutil.parser.parse(start)
                 start = start.strftime('%Y-%m-%dT%H:%M:%S+%f')[:-2]
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Start timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(
-                    self._get_error_message_from_exception(e))), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_TIMESTAMP_INVALID.format(key='Start',
+                    error=self._get_error_message_from_exception(e))), None)
         if param.get('end') is not None:
             end = param.get('end')
             try:
                 end = dateutil.parser.parse(end)
                 end = end.strftime('%Y-%m-%dT%H:%M:%S+%f')[:-2]
             except Exception as e:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "End timestamp format should be YYYY-MM-DDTHH:MM:SS+0000 Error: {0}".format(
-                    self._get_error_message_from_exception(e))), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_TIMESTAMP_INVALID.format(key='End',
+                    error=self._get_error_message_from_exception(e))), None)
 
         # Add timestamps to payload
         data_object = {}
@@ -859,7 +863,7 @@ class MimecastConnector(BaseConnector):
             summary = action_result.update_summary({})
             summary['num_emails'] = len(response['data'][0]['trackedEmails'])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -887,10 +891,10 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = "Successfully retrieved message information"
+        summary['status'] = MIMECAST_SUCC_GET_EMAIL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -918,7 +922,7 @@ class MimecastConnector(BaseConnector):
         try:
             action_result.add_data(response['data'][0])
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get a proper response from the server")
+            return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
         summary['status'] = "Successfully decoded URL"
@@ -932,7 +936,7 @@ class MimecastConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
