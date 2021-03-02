@@ -127,9 +127,7 @@ class DnsdbConnector(BaseConnector):
             self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_TEST_CONN_FAIL)
-        self.set_status(phantom.APP_SUCCESS,
-            DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate['limit'], rate['remaining'], rate['reset']))
-        self.save_progress()
+        self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate['limit'], rate['remaining'], rate['reset']))
 
         action_result.add_data(rate)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -202,6 +200,9 @@ class DnsdbConnector(BaseConnector):
         except UnicodeError:
             return action_result.set_status(phantom.APP_ERROR,
                     DNSDB_ERR_INVALID_BAILIWICK % (bailiwick))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # No data is considered as app success
         if len(responses) == 0:
@@ -237,10 +238,10 @@ class DnsdbConnector(BaseConnector):
                     curr_rdata = curr_rdata.rstrip('.')
                     rdata[i] = curr_rdata
 
-            if ('rrname' in resp):
+            if 'rrname' in resp:
                 resp['rrname'] = resp['rrname'].rstrip('.')
 
-            if ('bailiwick' in resp):
+            if 'bailiwick' in resp:
                 resp['bailiwick'] = resp['bailiwick'].rstrip('.')
 
             # Response from the API is list of rrset.
@@ -303,10 +304,8 @@ class DnsdbConnector(BaseConnector):
         ret_val = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
-        self.debug_print("rdata_ip: before get status")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        self.debug_print("rdata_ip: after get status")
 
         try:
             responses = list(self._client.lookup_rdata_ip(ip,
@@ -324,6 +323,9 @@ class DnsdbConnector(BaseConnector):
             self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
@@ -338,7 +340,7 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
 
-            if ('rrname' in resp):
+            if 'rrname' in resp:
                 resp['rrname'] = resp['rrname'].rstrip('.')
                 count_domain.add(resp['rrname'])
 
@@ -398,10 +400,13 @@ class DnsdbConnector(BaseConnector):
             self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
-            return action_result.set_status( phantom.APP_ERROR, "set status")
+            return action_result.get_status()
 
         # No data is considered as app success
         if len(responses) == 0:
@@ -412,7 +417,7 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
 
-            if ('rrname' in resp):
+            if 'rrname' in resp:
                 resp['rrname'] = resp['rrname'].rstrip('.')
                 count_domain.add(resp['rrname'])
 
@@ -474,6 +479,9 @@ class DnsdbConnector(BaseConnector):
             self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
@@ -488,7 +496,7 @@ class DnsdbConnector(BaseConnector):
 
         for resp in responses:
 
-            if (DNSDB_JSON_RRNAME in resp):
+            if DNSDB_JSON_RRNAME in resp:
                 resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
                 count_domain.add(resp[DNSDB_JSON_RRNAME])
 
@@ -580,6 +588,9 @@ class DnsdbConnector(BaseConnector):
             self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # No data is considered as app success
         try:
@@ -593,7 +604,7 @@ class DnsdbConnector(BaseConnector):
         count_domain = set()
 
         for resp in responses:
-            if (DNSDB_JSON_RRNAME in resp):
+            if DNSDB_JSON_RRNAME in resp:
                 resp[DNSDB_JSON_RRNAME] = resp[DNSDB_JSON_RRNAME].rstrip('.')
                 count_domain.add(resp[DNSDB_JSON_RRNAME])
 
