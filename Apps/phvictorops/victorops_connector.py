@@ -1,5 +1,8 @@
 # File: victorops_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
+#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.# File: victorops_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -10,7 +13,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-from victorops_consts import *
+from victorops_consts import INTEGRATION_URL_MISSING, UPDATE_INCIDENT_ERROR
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -49,15 +52,17 @@ class VictoropsConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
+        except Exception:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -77,7 +82,7 @@ class VictoropsConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -92,9 +97,7 @@ class VictoropsConnector(BaseConnector):
         # Process each 'Content-Type' of response separately
 
         # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
-            return self._process_json_response(r, action_result)
-        elif 200 == r.status_code:
+        if 'json' in r.headers.get('Content-Type', '') or 200 == r.status_code:
             return self._process_json_response(r, action_result)
             # Added custom handling as only the alerts API does not respond with JSON header
 
@@ -171,7 +174,7 @@ class VictoropsConnector(BaseConnector):
 
         if self._integration_url:
             self.save_progress("Connecting to integration_url to test connectivity")
-            body = { "message_type": "INFO", "state_message": "Test integration_url connectivity" }
+            body = {"message_type": "INFO", "state_message": "Test integration_url connectivity"}
             # make rest call
             ret_val, response = self._make_rest_call(self._integration_url, action_result, params=None, headers=None, json=body, method="post")
             if (phantom.is_fail(ret_val)):
@@ -231,7 +234,7 @@ class VictoropsConnector(BaseConnector):
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
             summary['num_users'] = len(users[0])
-        except:
+        except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Could not retrieve users")
 
         # Return success, no need to set the message, only the status
@@ -373,6 +376,8 @@ class VictoropsConnector(BaseConnector):
             else:
                 endpoint = self._integration_url
         else:
+            summary = action_result.update_summary({})
+            summary['message'] = INTEGRATION_URL_MISSING
             return action_result.set_status(phantom.APP_ERROR, INTEGRATION_URL_MISSING)
 
         param_type = param.get('message_type')
@@ -458,7 +463,7 @@ class VictoropsConnector(BaseConnector):
 
         self._api_id = config.get('api_id')
         self._api_key = config.get('api_key')
-        self._integration_url = config.get('integration_url').rstrip('/')
+        self._integration_url = config.get('integration_url', '').rstrip('/')
 
         return phantom.APP_SUCCESS
 
@@ -496,7 +501,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -509,11 +514,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -529,6 +534,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
