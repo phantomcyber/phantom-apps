@@ -55,14 +55,14 @@ JIRA_JSON_USERNAME = 'username'
 JIRA_JSON_DISPLAY_NAME = 'display_name'
 JIRA_JSON_USER_ACCOUNT_ID = 'user_account_id'
 
-JIRA_WATCHERS_ERROR = "Please provide either 'user_account_id' or 'username' action parameter. "
-JIRA_WATCHERS_ERROR += "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'user_account_id' action parameter"
-JIRA_SEARCH_USERS_ERROR = "Please provide either 'display_name' or 'username' action parameter. "
-JIRA_SEARCH_USERS_ERROR += "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'display_name' action parameter"
+JIRA_WATCHERS_ERROR = "Please provide either 'user_account_id' or 'username' action parameter. " \
+    "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'user_account_id' action parameter"
+JIRA_SEARCH_USERS_ERROR = "Please provide either 'display_name' or 'username' action parameter. " \
+    "For JIRA on-prem, use 'username' action parameter, and, for JIRA cloud, use 'display_name' action parameter"
 JIRA_CUSTOM_FIELD_FORMAT_ERROR = "Could not load JSON formatted list from the custom_fields asset configuration parameter. {0}"
 JIRA_CUSTOM_FIELD_NON_EMPTY_ERROR = "Please provide 'custom_fields' asset configuration parameter as a non-empty JSON formatted list"
-JIRA_ASSIGNEE_ERROR = "Please provide either 'assignee' or 'assignee_account_id' action parameter. "
-JIRA_ASSIGNEE_ERROR += "For JIRA on-prem, use 'assignee' action parameter, and, for JIRA cloud, use 'assignee_account_id' action parameter"
+JIRA_ASSIGNEE_ERROR = "Please provide either 'assignee' or 'assignee_account_id' action parameter. " \
+    "For JIRA on-prem, use 'assignee' action parameter, and, for JIRA cloud, use 'assignee_account_id' action parameter"
 JIRA_INVALID_LIMIT = "Please provide non-zero positive integer in limit"
 JIRA_ERR_STATE_FILE_LOAD_ERROR = "Could not load the state file"
 JIRA_ERR_FETCH_CUSTOM_FIELDS = "Error occurred while fetching the custom fields metadata"
@@ -74,8 +74,8 @@ JIRA_SUCC_CONNECTIVITY_TEST = "Connectivity test passed"
 JIRA_ERR_TICKET_ASSIGNMENT_FAILED = "Ticket assignment to user '{0}' failed. {1}"
 JIRA_ERR_CREATE_TICKET_FAILED = "Ticket creation failed"
 JIRA_SUCC_TICKET_CREATED = "Created ticket with id: {id}, key: {key}"
-JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER = "Either the ticket artifact with issue key: {issue_key} got deleted from the container: {container_id} "
-JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER += "or the type of the issue has changed on the JIRA instance. Please delete the container and re-run the ingestion."
+JIRA_ERR_ARTIFACT_NOT_FOUND_IN_CONTAINER = "Either the ticket artifact with issue key: {issue_key} got deleted from the container: {container_id} " \
+    "or the type of the issue has changed on the JIRA instance. Please delete the container and re-run the ingestion."
 JIRA_ERR_FILE_NOT_IN_VAULT = "Could not find specified vault ID in vault"
 JIRA_ERR_ATTACH_FAILED = "Adding attachment failed. {0}"
 JIRA_ERR_LIST_TICKETS_FAILED = "Failed to get ticket listing"
@@ -85,13 +85,13 @@ JIRA_ERR_ISSUE_VALID_TRANSITIONS = "Input status does not seem to be a valid sta
 JIRA_ERR_ISSUE_VALID_RESOLUTION = "Input resolution does not seem to be valid"
 JIRA_ERR_UPDATE_NO_PARAM = "Either the Vault ID or the JSON field must be filled out to perform this action"
 JIRA_ERR_UPDATE_FAILED = "Unable to update the ticket with the given JSON"
-JIRA_ERR_COMMENT_SET_STATUS_FAIL = "Comment could not be added successfully due to either permissions or configuration issue "
-JIRA_ERR_COMMENT_SET_STATUS_FAIL += "(changing the status of the ticket to Closed and then, trying to add comment to it is one such scenario)."
+JIRA_ERR_COMMENT_SET_STATUS_FAIL = "Comment could not be added successfully due to either permissions or configuration issue " \
+    "(changing the status of the ticket to Closed and then, trying to add comment to it is one such scenario)."
 JIRA_SUCC_TICKET_UPDATED = "Successfully updated the ticket"
 JIRA_SUCC_TICKET_DELETED = "Successfully deleted the ticket"
-JIRA_ERR_INPUT_FIELDS_NOT_THE_ONLY_ONE = "Invalid fields value."
-JIRA_ERR_INPUT_FIELDS_NOT_THE_ONLY_ONE += " The input json has a 'fields' key in it in addition to other keys."
-JIRA_ERR_INPUT_FIELDS_NOT_THE_ONLY_ONE += " Either specify a dictionary with only one parent 'fields' key or multiple keys without the 'fields' key"
+JIRA_ERR_INPUT_FIELDS_NOT_THE_ONLY_ONE = "Invalid fields value." \
+    " The input json has a 'fields' key in it in addition to other keys." \
+    " Either specify a dictionary with only one parent 'fields' key or multiple keys without the 'fields' key"
 JIRA_ERR_FAILURES = "Some tickets had issues during ingestion, see logs for the details"
 JIRA_ERR_NEGATIVE_INPUT = "'start_index' cannot be a negative value"
 JIRA_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or positive integer value in the {parameter} parameter"
