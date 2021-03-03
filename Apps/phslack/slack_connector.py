@@ -5,10 +5,14 @@
 
 # Phantom App imports
 import phantom.app as phantom
-from phantom.vault import Vault
+import phantom.rules as ph_rules
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 
 # Imports local to this App
-import slack_consts as consts
+from slack_consts import *
 
 from django.http import HttpResponse
 from bs4 import BeautifulSoup
@@ -97,6 +101,8 @@ def _save_app_state(state, asset_id, app_connector=None):
         with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
+        if app_connector:
+            app_connector.debug_print('Unable to save state file: {0}'.format(str(e)))
         print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
@@ -109,78 +115,70 @@ def handle_request(request, path):
         payload = json.loads(request.POST.get('payload'))
 
         if not payload:
-            return HttpResponse("Found no payload field in rest post body", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_PAYLOAD_NOT_FOUND, content_type="text/plain", status=400)
 
         callback_id = dict(payload).get('callback_id')
         if not callback_id:
-            return HttpResponse("Found no callback_id field in payload", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_CALLBACK_ID_NOT_FOUND, content_type="text/plain", status=400)
 
         try:
             callback_json = json.loads(UnicodeDammit(callback_id).unicode_markup)
         except Exception as e:
-            return HttpResponse("Could not parse JSON from callback_id field in payload: {0}".format(e), content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_PARSE_JSON_FROM_CALLBACK_ID.format(error=e), content_type="text/plain", status=400)
 
         directory = dict(callback_json).get('directory')
         if not directory:
-            return HttpResponse("Found no state directory in callback", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_STATE_DIR_NOT_FOUND, content_type="text/plain", status=400)
 
         if len(directory.split(",")) != 2:
-            return HttpResponse("Unexpected state directory found in callback", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_UNEXPECTED_STATE_DIR, content_type="text/plain", status=400)
 
         apps_directory, local_data_directory = [x.strip() for x in directory.split(',')]
 
         state_filename = dict(callback_json).get('state')
         if not state_filename:
-            return HttpResponse("Found no state filename in callback", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_STATE_FILE_NOT_FOUND, content_type="text/plain", status=400)
 
         state_path = "{0}/{1}".format(apps_directory, state_filename)
         try:
-            state = json.loads(open(state_path, 'r').read())
+            with open(state_path, 'r') as state_file_obj:
+                state_file_data = state_file_obj.read()
+                state = json.loads(state_file_data)
         except Exception as e:
-            return HttpResponse("Could not properly read state file: {0}".format(e), content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_UNABLE_TO_READ_STATE_FILE.format(error=e), content_type="text/plain", status=400)
 
         my_token = dict(state).get('token', 'my token does not exist')
         their_token = dict(payload).get('token', 'their token is missing')
 
         if my_token != their_token:
-            return HttpResponse("Authorization failed. Tokens do not match.", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_AUTH_FAILED, content_type="text/plain", status=400)
 
         answer_filename = dict(callback_json).get('answer')
         if not answer_filename:
-            return HttpResponse("Found no answer filename in callback", content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_ANSWER_FILE_NOT_FOUND, content_type="text/plain", status=400)
 
         answer_path = "{0}/{1}".format(local_data_directory, answer_filename)
         try:
             answer_file = open(answer_path, 'w')
         except Exception as e:
-            return HttpResponse("Could not open answer file for writing: {0}".format(e), content_type="text/plain", status=400)
+            return HttpResponse(SLACK_ERR_COULD_NOT_OPEN_ANSWER_FILE.format(error=e), content_type="text/plain", status=400)
 
-        answer_file.write(json.dumps(payload))
-        answer_file.close()
+        try:
+            answer_file.write(json.dumps(payload))
+            answer_file.close()
+        except Exception as e:
+            return HttpResponse(SLACK_ERR_WHILE_WRITING_ANSWER_FILE.format(error=e), content_type="text/plain", status=400)
 
         confirmation = dict(callback_json).get('confirmation')
 
     except Exception as e:
-        return HttpResponse("There was an error processing the response: {0}".format(e), content_type="text/plain", status=500)
+        return HttpResponse(SLACK_ERR_PROCESS_RESPONSE.format(error=e), content_type="text/plain", status=500)
 
     return HttpResponse(confirmation, content_type="text/plain")
 
 
 # Define the App Class
 class SlackConnector(phantom.BaseConnector):
-
-    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
-    ACTION_ID_LIST_CHANNELS = "list_channels"
-    ACTION_ID_POST_MESSAGE = "send_message"
-    ACTION_ID_ASK_QUESTION = "ask_question"
-    ACTION_ID_GET_RESPONSE = "get_response"
-    ACTION_ID_UPLOAD_FILE = "upload_file"
-    ACTION_ID_LIST_USERS = "list_users"
-    ACTION_ID_GET_USER = "get_user"
-    ACTION_ID_STOP_BOT = "stop_bot"
-    ACTION_ID_ON_POLL = "on_poll"
-    ACTION_ID_CREATE_CHANNEL = "create_channel"
-    ACTION_ID_INVITE_USERS = "invite_users"
 
     def __init__(self):
 
@@ -195,17 +193,17 @@ class SlackConnector(phantom.BaseConnector):
 
     def initialize(self):
 
-        self._bot_token = self.get_config()[consts.SLACK_JSON_BOT_TOKEN]
-        self._base_url = consts.SLACK_BASE_URL
-        self._state = self.load_state()
-
         config = self.get_config()
 
-        self._interval = self._validate_integers(self, config.get("response_poll_interval", 30), consts.SLACK_RESP_POLL_INTERVAL_KEY)
+        self._bot_token = config[SLACK_JSON_BOT_TOKEN]
+        self._base_url = SLACK_BASE_URL
+        self._state = self.load_state()
+
+        self._interval = self._validate_integers(self, config.get("response_poll_interval", 30), SLACK_RESP_POLL_INTERVAL_KEY)
         if self._interval is None:
             return self.get_status()
 
-        self._timeout = self._validate_integers(self, config.get("timeout", 30), consts.SLACK_TIMEOUT_KEY)
+        self._timeout = self._validate_integers(self, config.get("timeout", 30), SLACK_TIMEOUT_KEY)
         if self._timeout is None:
             return self.get_status()
 
@@ -213,7 +211,7 @@ class SlackConnector(phantom.BaseConnector):
         try:
             self._python_version = int(sys.version_info[0])
         except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+            return self.set_status(phantom.APP_ERROR, SLACK_ERR_FETCHING_PYTHON_VERSION)
 
         return phantom.APP_SUCCESS
 
@@ -226,7 +224,7 @@ class SlackConnector(phantom.BaseConnector):
 
     def _get_phantom_base_url_slack(self, action_result):
 
-        rest_url = consts.SLACK_PHANTOM_SYS_INFO_URL.format(url=self.get_phantom_base_url())
+        rest_url = SLACK_PHANTOM_SYS_INFO_URL.format(url=self.get_phantom_base_url())
 
         ret_val, resp_json = self._make_rest_call(action_result, rest_url, False)
 
@@ -236,7 +234,7 @@ class SlackConnector(phantom.BaseConnector):
         phantom_base_url = resp_json.get('base_url')
 
         if not phantom_base_url:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Phantom Base URL not found in System Setting. Please specify this value in System Settings"))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, SLACK_ERR_BASE_URL_NOT_FOUND))
 
         return RetVal(phantom.APP_SUCCESS, phantom_base_url)
 
@@ -245,7 +243,7 @@ class SlackConnector(phantom.BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, SLACK_ERR_EMPTY_RESPONSE.format(code=response.status_code)), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -264,7 +262,7 @@ class SlackConnector(phantom.BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
-            error_text = "Cannot parse error details"
+            error_text = SLACK_UNABLE_TO_PARSE_ERR_DETAILS
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                 self._handle_py_ver_compat_for_input_str(error_text))
@@ -279,9 +277,9 @@ class SlackConnector(phantom.BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse response as JSON. {}".format(self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_PARSE_JSON_RESPONSE.format(error=self._get_error_message_from_exception(e))), None)
 
-        # the ok parameter in a response from slack says if the call passed or failed
+        # The 'ok' parameter in a response from slack says if the call passed or failed
         if resp_json.get('ok', '') is not False:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
@@ -289,11 +287,11 @@ class SlackConnector(phantom.BaseConnector):
 
         error = resp_json.get('error', '')
         if error == 'invalid_auth':
-            error = 'The configured bot token is invalid.'
+            error = SLACK_ERR_BOT_TOKEN_INVALID
         elif error == 'not_in_channel':
-            error = 'The configured bot is not in the specified channel. Invite the bot to that channel to send messages there.'
+            error = SLACK_ERR_NOT_IN_CHANNEL
         elif not error:
-            error = consts.SLACK_ERR_FROM_SERVER
+            error = SLACK_ERR_FROM_SERVER
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, error), None)
 
@@ -307,7 +305,7 @@ class SlackConnector(phantom.BaseConnector):
                 action_result.add_debug_data({'r_headers': r.headers})
             else:
                 action_result.add_debug_data({'r_text': 'r is None'})
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Got no response from InsightVM instance"), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NO_RESPONSE_FROM_SERVER), None)
 
         # There are just too many differences in the response to handle all of them in the same function
         if 'json' in r.headers.get('Content-Type', ''):
@@ -338,21 +336,21 @@ class SlackConnector(phantom.BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = consts.SLACK_ERR_CODE_UNAVAILABLE
+                    error_code = SLACK_ERR_CODE_UNAVAILABLE
                     error_msg = e.args[0]
             else:
-                error_code = consts.SLACK_ERR_CODE_UNAVAILABLE
-                error_msg = consts.SLACK_ERR_MESSAGE_UNKNOWN
+                error_code = SLACK_ERR_CODE_UNAVAILABLE
+                error_msg = SLACK_ERR_MESSAGE_UNKNOWN
         except:
-            error_code = consts.SLACK_ERR_CODE_UNAVAILABLE
-            error_msg = consts.SLACK_ERR_MESSAGE_UNKNOWN
+            error_code = SLACK_ERR_CODE_UNAVAILABLE
+            error_msg = SLACK_ERR_MESSAGE_UNKNOWN
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = consts.SLACK_UNICODE_DAMMIT_TYPE_ERR_MESSAGE
+            error_msg = SLACK_UNICODE_DAMMIT_TYPE_ERR_MESSAGE
         except:
-            error_msg = consts.SLACK_ERR_MESSAGE_UNKNOWN
+            error_msg = SLACK_ERR_MESSAGE_UNKNOWN
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -361,15 +359,15 @@ class SlackConnector(phantom.BaseConnector):
         try:
             r = method(rest_url, verify=verify, headers=headers, data=json.dumps(body))
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "REST call failed. {0}".format(self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "{0}. {1}".format(SLACK_ERR_REST_CALL_FAILED, self._get_error_message_from_exception(e))), None)
 
         try:
             resp_json = r.json()
         except:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to decode the response as JSON"), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_DECODE_JSON_RESPONSE), None)
 
         if 'failed' in resp_json:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "REST call failed. Message: {0}".format(resp_json.get('message', 'NA'))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "{0}. Message: {1}".format(SLACK_ERR_REST_CALL_FAILED, resp_json.get('message', 'NA'))), None)
 
         if 200 <= r.status_code <= 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
@@ -381,7 +379,7 @@ class SlackConnector(phantom.BaseConnector):
 
         details = self._handle_py_ver_compat_for_input_str(details)
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server: status code: {0} details: {1}".format(r.status_code, details)), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server: Status code: {0} Details: {1}".format(r.status_code, details)), None)
 
     def _make_slack_rest_call(self, action_result, endpoint, body, headers={}, files={}):
 
@@ -389,37 +387,43 @@ class SlackConnector(phantom.BaseConnector):
 
         # send api call to slack
         try:
-            response = requests.post(self._base_url + endpoint,
+            response = requests.post("{}{}".format(self._base_url, endpoint),
                     data=body,
                     headers=headers,
                     files=files)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "{}. {}".format(consts.SLACK_ERR_SERVER_CONNECTION, self._get_error_message_from_exception(e))), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SLACK_ERR_SERVER_CONNECTION, self._get_error_message_from_exception(e))), None)
 
         return self._process_response(response, action_result)
 
-    def _validate_integers(self, action_result, parameter, key):
+    def _validate_integers(self, action_result, parameter, key, allow_zero=False):
         """Validate the provided input parameter value is a non-zero positive integer and returns the integer value of the parameter itself.
 
         Parameters:
             :param action_result: object of ActionResult class
             :param parameter: input parameter
+            :param key: input parameter message key
+            :allow_zero: whether zero should be considered as valid value or not
+            :return: integer value of the parameter or None in case of failure
 
         Returns:
             :return: integer value of the parameter
         """
         try:
             if not float(parameter).is_integer():
-                action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_INVALID_INT.format(key=key))
+                action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_INT.format(key=key))
                 return None
 
             parameter = int(parameter)
         except:
-            action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_INVALID_INT.format(key=key))
+            action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_INT.format(key=key))
             return None
 
-        if parameter <= 0:
-            action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_NEGATIVE_AND_ZERO_INT.format(key=key))
+        if parameter < 0:
+            action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NEGATIVE_INT.format(key=key))
+            return None
+        if not allow_zero and parameter == 0:
+            action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NEGATIVE_AND_ZERO_INT.format(key=key))
             return None
 
         return parameter
@@ -435,7 +439,7 @@ class SlackConnector(phantom.BaseConnector):
             if input_str and self._python_version == 2:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
         except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+            self.debug_print(SLACK_ERR_PY_2TO3)
 
         return input_str
 
@@ -443,10 +447,10 @@ class SlackConnector(phantom.BaseConnector):
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_AUTH_TEST, {})
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_AUTH_TEST, {})
 
         if not ret_val:
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress(SLACK_ERR_TEST_CONN_FAILED)
             return ret_val
 
         action_result.add_data(resp_json)
@@ -461,7 +465,7 @@ class SlackConnector(phantom.BaseConnector):
         self._state['bot_name'] = bot_username
         self._state['bot_id'] = bot_user_id
 
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(SLACK_SUCC_TEST_CONN_PASSED)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -472,10 +476,10 @@ class SlackConnector(phantom.BaseConnector):
         user_token = self.get_config().get('user_token')
 
         if not user_token:
-            return action_result.set_status(phantom.APP_ERROR, "user_token is required for this action. Navigate to the asset's configuration and add a token now and try again.")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_USER_TOKEN_NOT_PROVIDED)
 
         headers = {
-            "Authorization": "Bearer " + user_token,
+            "Authorization": "Bearer {}".format(user_token),
             'Content-Type': 'application/json'
         }
 
@@ -484,10 +488,13 @@ class SlackConnector(phantom.BaseConnector):
             'token': user_token,
             'validate': True
         }
-        endpoint = consts.SLACK_BASE_URL + consts.SLACK_CHANNEL_CREATE_ENDPOINT
+        endpoint = "{}{}".format(SLACK_BASE_URL, SLACK_CHANNEL_CREATE_ENDPOINT)
 
         # private channel
-        if param['channel_type'] == "private":
+        channel_type = param.get("channel_type", "public")
+        if channel_type not in ["public", "private"]:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_CHANNEL_TYPE)
+        if channel_type == "private":
             params.update({"is_private": True})
 
         ret_val, resp_json = self._make_rest_call(
@@ -503,26 +510,28 @@ class SlackConnector(phantom.BaseConnector):
             return ret_val
 
         if not resp_json.get('ok', True):
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Error creating channel: {}\r\nDetails: {}".format(self._handle_py_ver_compat_for_input_str(resp_json.get('error', 'N/A')),
-                self._handle_py_ver_compat_for_input_str(resp_json.get('detail', '')))
-            )
+            error = resp_json.get('error', 'N/A')
+            error_details = self._handle_py_ver_compat_for_input_str(resp_json.get('detail', ''))
+            if error_details:
+                error_message = "{}: {}\r\nDetails: {}".format(SLACK_ERR_CREATING_CHANNEL, error, error_details)
+            else:
+                error_message = "{}: {}".format(SLACK_ERR_CREATING_CHANNEL, error)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_CHANNEL_CREATED)
 
     def _list_channels(self, param):
 
         self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
-        limit = self._validate_integers(action_result, param.get("limit", consts.SLACK_DEFAULT_LIMIT), consts.SLACK_LIMIT_KEY)
+        limit = self._validate_integers(action_result, param.get("limit", SLACK_DEFAULT_LIMIT), SLACK_LIMIT_KEY)
         if limit is None:
             return action_result.get_status()
 
-        ret_val, resp_json = self._paginator(action_result, consts.SLACK_LIST_CHANNEL, "channels", limit=limit)
+        ret_val, resp_json = self._paginator(action_result, SLACK_LIST_CHANNEL, "channels", limit=limit)
 
         if not ret_val:
             return action_result.get_status()
@@ -533,7 +542,7 @@ class SlackConnector(phantom.BaseConnector):
 
         for chan in channels:
             name = chan.get('name', 'unknownchannel')
-            chan['name'] = '#' + name
+            chan['name'] = '#{}'.format(name)
 
         action_result.set_summary({"num_public_channels": len(channels)})
 
@@ -551,7 +560,7 @@ class SlackConnector(phantom.BaseConnector):
             results : The aggregated response
         """
 
-        body.update({"limit": consts.SLACK_DEFAULT_LIMIT})
+        body.update({"limit": SLACK_DEFAULT_LIMIT})
         results = {}
 
         while True:
@@ -564,7 +573,7 @@ class SlackConnector(phantom.BaseConnector):
 
             if not results:
                 if not key_result_value:
-                    return action_result.set_status(phantom.APP_ERROR, "{} data not found in json output".format("users" if key == "members" else key)), None
+                    return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_DATA_NOT_FOUND_IN_OUTPUT.format(key=("users" if key == "members" else key))), None
                 results = resp_json
             else:
                 results[key].extend(key_result_value)
@@ -590,11 +599,11 @@ class SlackConnector(phantom.BaseConnector):
         self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
-        limit = self._validate_integers(action_result, param.get("limit", consts.SLACK_DEFAULT_LIMIT), consts.SLACK_LIMIT_KEY)
+        limit = self._validate_integers(action_result, param.get("limit", SLACK_DEFAULT_LIMIT), SLACK_LIMIT_KEY)
         if limit is None:
             return action_result.get_status()
 
-        ret_val, resp_json = self._paginator(action_result, consts.SLACK_USER_LIST, "members", limit=limit)
+        ret_val, resp_json = self._paginator(action_result, SLACK_USER_LIST, "members", limit=limit)
 
         if not ret_val:
             return action_result.get_status()
@@ -605,7 +614,7 @@ class SlackConnector(phantom.BaseConnector):
 
         for user in users:
             name = user.get('name', 'unknownuser')
-            user['name'] = '@' + name
+            user['name'] = '@{}'.format(name)
 
         action_result.set_summary({"num_users": len(users)})
 
@@ -619,24 +628,29 @@ class SlackConnector(phantom.BaseConnector):
         user_id = param['user_id']
 
         if not user_id.startswith('U'):
-            return action_result.set_status(phantom.APP_ERROR, "The user parameter must be a user ID")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_NOT_A_USER_ID)
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_USER_INFO, {'user': user_id})
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_USER_INFO, {'user': user_id})
 
         if not ret_val:
-            return phantom.APP_ERROR
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_FETCHING_USER, message)
+            else:
+                error_message = SLACK_ERR_FETCHING_USER
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
         user = resp_json.get('user')
 
         if not user:
-            return action_result.set_status(phantom.APP_ERROR, "User data not found in json output")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_DATA_NOT_FOUND_IN_OUTPUT.format(key="User"))
 
         name = user.get('name', '')
-        user['name'] = '@' + name
+        user['name'] = '@{}'.format(name)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "User data successfully retrieved")
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_USER_DATA_RETRIEVED)
 
     def _invite_users(self, param):
 
@@ -645,15 +659,17 @@ class SlackConnector(phantom.BaseConnector):
         user_token = self.get_config().get('user_token')
 
         if not user_token:
-            return action_result.set_status(phantom.APP_ERROR, "user_token is required for this action. Navigate to the asset's configuration and add a token now and try again.")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_USER_TOKEN_NOT_PROVIDED)
 
         headers = {
-            "Authorization": "Bearer " + user_token,
+            "Authorization": "Bearer {}".format(user_token),
             'Content-Type': 'application/json'
         }
 
         users = [x.strip() for x in param['users'].split(',')]
         users = list(filter(None, users))
+        if not users:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_INVALID_USER)
 
         params = {
             'users': users,
@@ -661,7 +677,7 @@ class SlackConnector(phantom.BaseConnector):
             'token': user_token
         }
 
-        endpoint = consts.SLACK_BASE_URL + consts.SLACK_INVITE_TO_CHANNEL
+        endpoint = "{}{}".format(SLACK_BASE_URL, SLACK_INVITE_TO_CHANNEL)
 
         ret_val, resp_json = self._make_rest_call(
             action_result,
@@ -676,19 +692,20 @@ class SlackConnector(phantom.BaseConnector):
             return ret_val
 
         if not resp_json.get('ok', True):
-            return action_result.set_status(
-                phantom.APP_ERROR,
-                "Error inviting to channel: {}\r\nDetails: {}".format(self._handle_py_ver_compat_for_input_str(resp_json.get('error', 'N/A')),
-                self._handle_py_ver_compat_for_input_str(resp_json.get('detail', '')))
-            )
+            error = resp_json.get('error', 'N/A')
+            error_details = self._handle_py_ver_compat_for_input_str(resp_json.get('detail', ''))
+            if error_details:
+                error_message = "{}: {}\r\nDetails: {}".format(SLACK_ERR_INVITING_CHANNEL, error, error_details)
+            else:
+                error_message = "{}: {}".format(SLACK_ERR_INVITING_CHANNEL, error)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Invite sent to user(s)")
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_INVITE_SENT)
 
     def _send_message(self, param):
 
-        self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         message = self._handle_py_ver_compat_for_input_str(param['message'])
@@ -699,23 +716,56 @@ class SlackConnector(phantom.BaseConnector):
             else:
                 message = bytes(message, "utf-8").decode("unicode_escape")
 
-        if len(message) > consts.SLACK_MESSAGE_LIMIT:
-            return (action_result.set_status(phantom.APP_ERROR, "Message too long. Please limit messages to {0} characters.".format(consts.SLACK_MESSAGE_LIMIT)))
+        if len(message) > SLACK_MESSAGE_LIMIT:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_MESSAGE_TOO_LONG.format(limit=SLACK_MESSAGE_LIMIT))
 
-        params = {'channel': param['destination'], 'text': message, 'as_user': True}
+        params = {'channel': param['destination'], 'text': message}
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_SEND_MESSAGE, params)
+        if 'parent_message_ts' in param:
+            # Support for replying in thread
+            params['thread_ts'] = param.get('parent_message_ts')
+
+            if 'reply_broadcast' in param:
+                params['reply_broadcast'] = param.get('reply_broadcast', False)
+
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_SEND_MESSAGE, params)
 
         if not ret_val:
-            return ret_val
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_SENDING_MESSAGE, message)
+            else:
+                error_message = SLACK_ERR_SENDING_MESSAGE
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         action_result.add_data(resp_json)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Message sent successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_MESSAGE_SENT)
+
+    def _add_reaction(self, param):
+
+        action_result = self.add_action_result(phantom.ActionResult(dict(param)))
+
+        emoji = self._handle_py_ver_compat_for_input_str(param['emoji'])
+
+        params = {'channel': param['destination'], 'name': emoji, 'timestamp': param['message_ts']}
+
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_ADD_REACTION, params)
+
+        if not ret_val:
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_ADDING_REACTION, message)
+            else:
+                error_message = SLACK_ERR_ADDING_REACTION
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_REACTION_ADDED)
 
     def _upload_file(self, param):
 
-        self.debug_print("param", param)
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
         caption = param.get('caption', '')
@@ -725,32 +775,62 @@ class SlackConnector(phantom.BaseConnector):
 
         caption += 'Uploaded from Phantom'
 
-        vault_id = param['file']
+        kwargs = {}
+        params = {'channels': param['destination'], 'initial_comment': caption}
 
-        # check the vault for a file with the supplied ID
-        try:
-            file_info = Vault.get_file_info(vault_id)
-            if not file_info:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="info"))
+        if 'filetype' in param:
+            params['filetype'] = param.get('filetype')
 
-            file_path = file_info[0].get("path")
+        if 'filename' in param:
+            params['filename'] = param.get('filename')
+
+        if 'parent_message_ts' in param:
+            # Support for replying in thread
+            params['thread_ts'] = param.get('parent_message_ts')
+
+        if 'file' in param:
+            vault_id = param.get('file')
+
+            # check the vault for a file with the supplied ID
+            try:
+                success, message, vault_meta_info = ph_rules.vault_info(vault_id=vault_id)
+                vault_meta_info = list(vault_meta_info)
+                if not success or not vault_meta_info:
+                    error_msg = " Error Details: {}".format(unquote(message)) if message else ''
+                    return action_result.set_status(phantom.APP_ERROR, "{}.{}".format(SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="info"), error_msg))
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="info"), err))
+
+            # phantom vault file path
+            file_path = vault_meta_info[0].get('path')
             if not file_path:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
+                return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
 
-            file_name = file_info[0].get("name")
+            # phantom vault file name
+            file_name = vault_meta_info[0].get('name')
             if not file_name:
-                return action_result.set_status(phantom.APP_ERROR, consts.SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="name"))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Could not find the specified Vault ID in vault")
+                return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_FETCH_FILE.format(key="name"))
 
-        upfile = open(file_path, 'rb')
+            upfile = open(file_path, 'rb')
+            params['filename'] = file_name
+            kwargs['files'] = {'file': upfile}
+        elif 'content' in param:
+            params['content'] = self._handle_py_ver_compat_for_input_str(param.get('content'))
+        else:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_FILE_OR_CONTENT_NOT_PROVIDED)
 
-        params = {'channels': param['destination'], 'initial_comment': caption, 'filename': file_name}
-
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_UPLOAD_FILE, params, files={'file': upfile})
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_UPLOAD_FILE, params, **kwargs)
+        if 'files' in kwargs:
+            upfile.close()
 
         if not ret_val:
-            return ret_val
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_UPLOADING_FILE, message)
+            else:
+                error_message = SLACK_ERR_UPLOADING_FILE
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         file_json = resp_json.get('file', {})
 
@@ -808,7 +888,7 @@ class SlackConnector(phantom.BaseConnector):
 
         action_result.add_data(resp_json)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "File uploaded successfully.")
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_FILE_UPLOAD)
 
     def _stop_bot(self, param):
 
@@ -822,15 +902,15 @@ class SlackConnector(phantom.BaseConnector):
             try:
                 if 'slack_bot.pyc' in sh.ps('ww', pid):  # pylint: disable=E1101
                     sh.kill(pid)  # pylint: disable=E1101
-                    action_result.set_status(phantom.APP_SUCCESS, "SlackBot has been stopped.")
+                    action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_SLACKBOT_STOPPED)
 
             except:
-                action_result.set_status(phantom.APP_SUCCESS, "SlackBot isn't running, not going to stop it.")
+                action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_SLACKBOT_NOT_RUNNING)
 
         else:
-            action_result.set_status(phantom.APP_SUCCESS, "SlackBot isn't running, not going to stop it.")
+            action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_SLACKBOT_NOT_RUNNING)
 
-        rest_url = consts.SLACK_PHANTOM_ASSET_INFO_URL.format(url=self.get_phantom_base_url(), asset_id=self.get_asset_id())
+        rest_url = SLACK_PHANTOM_ASSET_INFO_URL.format(url=self.get_phantom_base_url(), asset_id=self.get_asset_id())
 
         ret_val, resp_json = self._make_rest_call(action_result, rest_url, False)
 
@@ -844,11 +924,11 @@ class SlackConnector(phantom.BaseConnector):
         poll = ingest_config.get('poll')
 
         if poll is None:
-            return action_result.set_status(phantom.APP_SUCCESS, "{} Failed to disable ingestion, please check that ingest settings are correct."
-                    .format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_SUCCESS, SLACK_FAILED_TO_DISABLE_INGESTION
+                    .format(message=action_result.get_message()))
 
         if not poll:
-            return action_result.set_status(phantom.APP_SUCCESS, "{} Ingestion isn't enabled, not going to disable it.".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_SUCCESS, SLACK_INGESTION_NOT_ENABLED.format(message=action_result.get_message()))
 
         ingest_config['poll'] = False
 
@@ -859,13 +939,13 @@ class SlackConnector(phantom.BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
 
-        return action_result.set_status(phantom.APP_SUCCESS, "{} Ingestion has been disabled.".format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_INGESTION_DISABLED.format(message=action_result.get_message()))
 
     def _on_poll(self, param):
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_AUTH_TEST, {})
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_AUTH_TEST, {})
 
         if not ret_val:
             return ret_val
@@ -873,7 +953,7 @@ class SlackConnector(phantom.BaseConnector):
         bot_id = resp_json.get('user_id')
 
         if not bot_id:
-            return action_result.set_status(phantom.APP_ERROR, "Could not get bot ID from Slack")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_COULD_NOT_GET_BOT_ID)
 
         pid = self._state.get('pid', '')
 
@@ -882,7 +962,7 @@ class SlackConnector(phantom.BaseConnector):
             try:
                 if 'slack_bot.pyc' in sh.ps('ww', pid):  # pylint: disable=E1101
                     self.save_progress("Detected SlackBot running with pid {0}".format(pid))
-                    return action_result.set_status(phantom.APP_SUCCESS, "SlackBot already running")
+                    return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_SLACKBOT_RUNNING)
             except:
                 pass
 
@@ -891,7 +971,7 @@ class SlackConnector(phantom.BaseConnector):
         ph_auth_token = config.get('ph_auth_token', None)
 
         if not ph_auth_token:
-            return action_result.set_status(phantom.APP_ERROR, "The ph_auth_token asset configuration parameter is required to run the on_poll action.")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_AUTH_TOKEN_NOT_PROVIDED)
 
         app_version = self.get_app_json().get('app_version', '')
 
@@ -911,7 +991,7 @@ class SlackConnector(phantom.BaseConnector):
 
         try:
             if bot_token in sh.grep(sh.ps('ww', 'aux'), 'slack_bot.pyc'):  # pylint: disable=E1101
-                return action_result.set_status(phantom.APP_ERROR, "Detected an instance of SlackBot running with the same bot token. Not going to start new instance.")
+                return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_SLACKBOT_RUNNING_WITH_SAME_BOT_TOKEN)
 
         except:
             pass
@@ -933,7 +1013,7 @@ class SlackConnector(phantom.BaseConnector):
 
         self.save_progress("Started SlackBot with pid: {0}".format(proc.pid))
 
-        return action_result.set_status(phantom.APP_SUCCESS, "SlackBot started")
+        return action_result.set_status(phantom.APP_SUCCESS, SLACK_SUCC_SLACKBOT_STARTED)
 
     def _ask_question(self, param):
 
@@ -942,10 +1022,10 @@ class SlackConnector(phantom.BaseConnector):
 
         # Need to make sure the configured verification token is in the app state so the request_handler can use it to verify POST requests
         if 'token' not in self._state:
-            self._state['token'] = config[consts.SLACK_JSON_VERIFICATION_TOKEN]
+            self._state['token'] = config[SLACK_JSON_VERIFICATION_TOKEN]
             self.save_state(self._state)
-        elif self._state['token'] != config[consts.SLACK_JSON_VERIFICATION_TOKEN]:
-            self._state['token'] = config[consts.SLACK_JSON_VERIFICATION_TOKEN]
+        elif self._state['token'] != config[SLACK_JSON_VERIFICATION_TOKEN]:
+            self._state['token'] = config[SLACK_JSON_VERIFICATION_TOKEN]
             self.save_state(self._state)
 
         # The default permission of state file in Phantom v4.9 is 600. So when from rest handler method (handle_request) reads this state file,
@@ -954,13 +1034,13 @@ class SlackConnector(phantom.BaseConnector):
         _save_app_state(self._state, self.get_asset_id(), self)
 
         question = param['question']
-        if len(question) > consts.SLACK_MESSAGE_LIMIT:
-            return action_result.set_status(phantom.APP_ERROR, "Question too long. Please limit questions to {0} characters.".format(consts.SLACK_MESSAGE_LIMIT))
+        if len(question) > SLACK_MESSAGE_LIMIT:
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_QUESTION_TOO_LONG.format(limit=SLACK_MESSAGE_LIMIT))
 
         user = param['destination']
         if user.startswith('#') or user.startswith('C'):
             # Don't want to send question to channels because then we would not know who was answering
-            return action_result.set_status(phantom.APP_ERROR, "Questions may only be sent as direct messages to users. They may not be sent to channels.")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_SEND_QUESTION_TO_CHANNEL)
 
         qid = uuid.uuid4().hex
         apps_state_dir = os.path.dirname(os.path.abspath(__file__))
@@ -997,9 +1077,14 @@ class SlackConnector(phantom.BaseConnector):
 
         params = {'channel': user, 'attachments': json.dumps(answer_json), 'as_user': True}
 
-        ret_val, resp_json = self._make_slack_rest_call(action_result, consts.SLACK_SEND_MESSAGE, params)
+        ret_val, resp_json = self._make_slack_rest_call(action_result, SLACK_SEND_MESSAGE, params)
         if not ret_val:
-            return phantom.APP_ERROR
+            message = action_result.get_message()
+            if message:
+                error_message = "{}: {}".format(SLACK_ERR_ASKING_QUESTION, message)
+            else:
+                error_message = SLACK_ERR_ASKING_QUESTION
+            return action_result.set_status(phantom.APP_ERROR, error_message)
 
         answer_path = "{0}/{1}".format(local_data_state_dir, answer_filename)
         loop_count = (self._timeout * 60) / self._interval
@@ -1018,7 +1103,11 @@ class SlackConnector(phantom.BaseConnector):
                 time.sleep(self._interval)
                 continue
 
-            resp_json = json.loads(answer_file.read())
+            try:
+                resp_json = json.loads(answer_file.read())
+                answer_file.close()
+            except:
+                return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_PARSE_RESPONSE)
 
             break
 
@@ -1042,12 +1131,13 @@ class SlackConnector(phantom.BaseConnector):
         try:
             answer_file = open(answer_path, 'r')
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Response to question not available")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_QUESTION_RESPONSE_NOT_AVAILABLE)
 
         try:
             resp_json = json.loads(answer_file.read())
+            answer_file.close()
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while parsing the response")
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_PARSE_RESPONSE)
 
         action_result.add_data(resp_json)
         action_result.set_summary({'response_received': True, 'response': resp_json.get("actions", [{}])[0].get("value")})
@@ -1061,31 +1151,33 @@ class SlackConnector(phantom.BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
-        if action_id == self.ACTION_ID_TEST_CONNECTIVITY:
+        if action_id == ACTION_ID_TEST_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
-        elif action_id == self.ACTION_ID_LIST_CHANNELS:
+        elif action_id == ACTION_ID_LIST_CHANNELS:
             ret_val = self._list_channels(param)
-        elif action_id == self.ACTION_ID_POST_MESSAGE:
+        elif action_id == ACTION_ID_POST_MESSAGE:
             ret_val = self._send_message(param)
-        elif action_id == self.ACTION_ID_ASK_QUESTION:
+        elif action_id == ACTION_ID_ADD_REACTION:
+            ret_val = self._add_reaction(param)
+        elif action_id == ACTION_ID_ASK_QUESTION:
             ret_val = self._ask_question(param)
-        elif action_id == self.ACTION_ID_GET_RESPONSE:
+        elif action_id == ACTION_ID_GET_RESPONSE:
             ret_val = self._get_response(param)
-        elif action_id == self.ACTION_ID_UPLOAD_FILE:
+        elif action_id == ACTION_ID_UPLOAD_FILE:
             ret_val = self._upload_file(param)
-        elif action_id == self.ACTION_ID_LIST_USERS:
+        elif action_id == ACTION_ID_LIST_USERS:
             ret_val = self._list_users(param)
-        elif action_id == self.ACTION_ID_GET_USER:
+        elif action_id == ACTION_ID_GET_USER:
             ret_val = self._get_user(param)
-        elif action_id == self.ACTION_ID_STOP_BOT:
+        elif action_id == ACTION_ID_STOP_BOT:
             ret_val = self._stop_bot(param)
-        elif action_id == self.ACTION_ID_ON_POLL:
+        elif action_id == ACTION_ID_ON_POLL:
             ret_val = self._on_poll(param)
-        elif action_id == self.ACTION_ID_CREATE_CHANNEL:
+        elif action_id == ACTION_ID_CREATE_CHANNEL:
             ret_val = self._create_channel(param)
-        elif action_id == self.ACTION_ID_INVITE_USERS:
+        elif action_id == ACTION_ID_INVITE_USERS:
             ret_val = self._invite_users(param)
 
         return ret_val
