@@ -17,6 +17,7 @@ from datetime import timedelta
 import jwt
 from bs4 import UnicodeDammit
 from password_generator import PasswordGenerator
+from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -91,7 +92,7 @@ class ZoomConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, unquote(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 

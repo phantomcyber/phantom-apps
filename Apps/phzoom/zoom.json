@@ -68,7 +68,7 @@
         },
         {
             "action": "get meeting invitation",
-            "description": "Gets a future zoom meeting invitation (works only with future meetings)",
+            "description": "Gets zoom meeting invitation",
             "type": "investigate",
             "identifier": "get_meeting_invitation",
             "read_only": true,
@@ -692,7 +692,7 @@
         },
         {
             "action": "get meeting",
-            "description": "Gets active zoom meeting details (works only with currently running zoom meetings)",
+            "description": "Gets zoom meeting details",
             "type": "investigate",
             "identifier": "get_meeting",
             "read_only": true,
@@ -720,9 +720,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.agenda",
-                    "data_type": "string",
-                    "column_name": "Agenda",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_at",
@@ -732,7 +730,7 @@
                     "data_path": "action_result.data.*.duration",
                     "data_type": "numeric",
                     "column_name": "Duration",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.encrypted_password",
@@ -754,7 +752,7 @@
                     "data_path": "action_result.data.*.join_url",
                     "data_type": "string",
                     "column_name": "Join URL",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.occurrences.*.duration",
@@ -978,7 +976,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 5,
+                    "column_order": 4,
                     "example_values": [
                         "success",
                         "failed"
@@ -1014,7 +1012,7 @@
         },
         {
             "action": "update meeting",
-            "description": "Updates future meeting",
+            "description": "Updates zoom meeting",
             "type": "generic",
             "identifier": "update_meeting",
             "read_only": false,
@@ -1126,7 +1124,7 @@
         },
         {
             "action": "delete meeting",
-            "description": "Deletes future meeting",
+            "description": "Deletes zoom meeting",
             "type": "generic",
             "identifier": "delete_meeting",
             "read_only": false,
