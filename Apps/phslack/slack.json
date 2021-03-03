@@ -7,15 +7,15 @@
     "type": "information",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "main_module": "slack_connector.py",
-    "app_version": "2.0.2",
-    "utctime_updated": "2020-10-23T21:58:36.000000Z",
+    "app_version": "2.1.0",
+    "utctime_updated": "2020-11-23T08:14:10.000000Z",
     "product_vendor": "Slack Technologies",
     "product_name": "Slack",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, October 16, 2020"
+        "Cloud API, February 1, 2021"
     ],
     "logo": "logo_slack.svg",
     "logo_dark": "logo_slack_dark.svg",
@@ -36,7 +36,7 @@
         },
         "user_token": {
             "data_type": "password",
-            "description": "User Token",
+            "description": "OAuth Access Token",
             "order": 2
         },
         "ph_0": {
@@ -77,7 +77,7 @@
         {
             "action": "create channel",
             "description": "Create a new Slack channel",
-            "verbose": "To create a private channel, use the channel_type selection parameter. This action requires a user_token defined in the asset. For naming conventions, see https://api.slack.com/methods/channels.create.",
+            "verbose": "To create a private channel, use the 'channel_type' selection parameter. This action requires a OAuth Access Token defined in the asset. For naming conventions, see https://api.slack.com/methods/conversations.create.",
             "type": "generic",
             "identifier": "create_channel",
             "read_only": false,
@@ -99,19 +99,19 @@
                     ]
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Create Channel",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.channel_type",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "public"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "name"
                     ]
                 },
                 {
@@ -297,6 +297,9 @@
                     "column_order": 0,
                     "example_values": [
                         "name"
+                    ],
+                    "contains": [
+                        "slack channel name"
                     ]
                 },
                 {
@@ -331,6 +334,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.channel.is_open",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.response_metadata.warnings",
                     "data_type": "string",
                     "example_values": [
@@ -338,22 +349,23 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Channel created successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.channel_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "public"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "name"
-                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -370,6 +382,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Create Channel",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -387,21 +405,7 @@
                     "order": 0
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "List Channels",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
@@ -411,11 +415,17 @@
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.created",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1545061069
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.creator",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "UEVKZ9ZLL"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.id",
@@ -423,24 +433,40 @@
                     "column_name": "Channel ID",
                     "column_order": 1,
                     "contains": [
-                        "slack destination"
+                        "slack channel id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_archived",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_channel",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_general",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.is_member",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.members",
@@ -452,40 +478,169 @@
                     "column_name": "Channel Name",
                     "column_order": 0,
                     "contains": [
-                        "slack destination"
+                        "slack channel name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.num_members",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        23
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.purpose.creator",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "UEVKZ9ZLL"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.purpose.last_set",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1545061069
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.purpose.value",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "This channel is for workspace-wide communication and announcements. All members are in this channel."
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.topic.creator",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "UEVKZ9ZLL"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.topic.last_set",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1545061069
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.channels.*.topic.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "Non-work banter and water cooler conversation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_im",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_mpim",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_group",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.unlinked",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_private",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_ext_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.is_org_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.name_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "general"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.channels.*.parent_conversation",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.channels.*.is_pending_ext_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response_metadata.next_cursor",
+                    "data_type": "string",
+                    "example_values": [
+                        "dGVhbTpDMDE3WENOQVE4TA=="
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num public channels: 100"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -493,21 +648,32 @@
                 },
                 {
                     "data_path": "action_result.summary.num_public_channels",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "List Channels",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -524,21 +690,7 @@
                     "order": 0
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "List Users",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
@@ -556,7 +708,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.deleted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.id",
@@ -564,33 +720,56 @@
                     "column_name": "User ID",
                     "column_order": 2,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_admin",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_primary_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.is_ultra_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.name",
@@ -598,25 +777,37 @@
                     "column_name": "Username",
                     "column_order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.always_active",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.api_app_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "AEVNKT17D"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.avatar_hash",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "g6f8c4b87d3e"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.bot_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "BEV82RKAM"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.email",
@@ -625,17 +816,26 @@
                     "column_order": 3,
                     "contains": [
                         "email"
+                    ],
+                    "example_values": [
+                        "slackbot@test.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.first_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.image_1024",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_1024.png"
                     ]
                 },
                 {
@@ -643,6 +843,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_192.png"
                     ]
                 },
                 {
@@ -650,6 +853,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_24.png"
                     ]
                 },
                 {
@@ -657,6 +863,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_32.png"
                     ]
                 },
                 {
@@ -664,6 +873,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_48.png"
                     ]
                 },
                 {
@@ -671,6 +883,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_512.png"
                     ]
                 },
                 {
@@ -678,6 +893,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_72.png"
                     ]
                 },
                 {
@@ -689,17 +907,26 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.last_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.real_name",
                     "data_type": "string",
                     "column_name": "Real Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.real_name_normalized",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.profile.title",
@@ -707,49 +934,185 @@
                 },
                 {
                     "data_path": "action_result.data.*.members.*.real_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Invite Bot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.team_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.tz",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.tz_label",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.tz_offset",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        -28800
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.members.*.updated",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1569140077
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_path": "action_result.data.*.members.*.profile.team",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary.num_users",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.members.*.profile.phone",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.members.*.profile.skype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.status_text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.status_emoji",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.status_expiration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.status_text_canonical",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.display_name_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.is_app_user",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.is_email_confirmed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.profile.is_custom_image",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.members.*.is_invited_user",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response_metadata.next_cursor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ok",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num users: 28"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        28
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "List Users",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -766,45 +1129,40 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user id"
                     ]
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Get User",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.color",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "4bbe2e"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.deleted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.id",
@@ -812,33 +1170,59 @@
                     "column_name": "User ID",
                     "column_order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user id"
+                    ],
+                    "example_values": [
+                        "UEV44MD9N"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_admin",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_primary_owner",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.is_ultra_restricted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.name",
@@ -846,13 +1230,18 @@
                     "column_name": "Username",
                     "column_order": 1,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user name"
+                    ],
+                    "example_values": [
+                        "@phantominvite-noreply"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.avatar_hash",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "g6f8c4b87d3e"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.email",
@@ -861,17 +1250,26 @@
                     "column_order": 3,
                     "contains": [
                         "email"
+                    ],
+                    "example_values": [
+                        "slackbot@test.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.first_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.image_192",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_192.png"
                     ]
                 },
                 {
@@ -879,6 +1277,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_24.png"
                     ]
                 },
                 {
@@ -886,6 +1287,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_32.png"
                     ]
                 },
                 {
@@ -893,6 +1297,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_48.png"
                     ]
                 },
                 {
@@ -900,6 +1307,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_512.png"
                     ]
                 },
                 {
@@ -907,93 +1317,170 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/slackbot_72.png"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.last_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.real_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.profile.real_name_normalized",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom Invite Bot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.real_name",
                     "data_type": "string",
                     "column_name": "Real Name",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "Slackbot"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.team_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.tz",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.tz_label",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.tz_offset",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        -28800
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user.updated",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1569140077
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.data.*.user.profile.team",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.phone",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.user.profile.skype",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.user.profile.title",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "invite users",
-            "description": "Invite user(s) to a Slack channel",
-            "verbose": "Up to 1000 users may be added at one time. This action requires a user_token defined in the asset. For permissions, see: https://api.slack.com/methods/conversations.invite.",
-            "type": "generic",
-            "identifier": "invite_users",
-            "read_only": false,
-            "parameters": {
-                "channel_id": {
-                    "description": "ID of channel",
-                    "data_type": "string",
-                    "required": true,
-                    "order": 0
+                    "data_path": "action_result.data.*.user.profile.fields",
+                    "data_type": "string"
                 },
-                "users": {
-                    "description": "Comma-separated list of users (IDs) to invite",
+                {
+                    "data_path": "action_result.data.*.user.profile.status_text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.display_name",
                     "data_type": "string",
-                    "required": true,
-                    "order": 1
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Invite Users To Channel",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
+                    "example_values": [
+                        "Slackbot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.status_emoji",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.always_active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.status_expiration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.status_text_canonical",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.display_name_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "Slackbot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.is_app_user",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.is_email_confirmed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.bot_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "B017LK9BYTC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user.profile.api_app_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "A017K8386N9"
+                    ]
+                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -1003,15 +1490,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Invite sent to user(s)"
+                        "User data successfully retrieved"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1026,7 +1513,42 @@
                     "example_values": [
                         1
                     ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Get User",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "invite users",
+            "description": "Invite user(s) to a Slack channel",
+            "verbose": "Up to 1000 users may be added at one time. This action requires a OAuth Access Token defined in the asset. For permissions, see: https://api.slack.com/methods/conversations.invite.",
+            "type": "generic",
+            "identifier": "invite_users",
+            "read_only": false,
+            "parameters": {
+                "channel_id": {
+                    "description": "ID of channel",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "slack channel id"
+                    ]
                 },
+                "users": {
+                    "description": "Comma-separated list of users (IDs) to invite",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "output": [
                 {
                     "data_path": "action_result.parameter.users",
                     "data_type": "string",
@@ -1039,6 +1561,9 @@
                     "data_type": "string",
                     "example_values": [
                         "CLBC12T3R"
+                    ],
+                    "contains": [
+                        "slack channel id"
                     ]
                 },
                 {
@@ -1068,7 +1593,7 @@
                     "data_path": "action_result.data.*.channel.name_normalized",
                     "data_type": "string",
                     "example_values": [
-                        "splunk"
+                        "channel1"
                     ]
                 },
                 {
@@ -1221,7 +1746,10 @@
                     "column_name": "Channel Name",
                     "column_order": 0,
                     "example_values": [
-                        "splunk"
+                        "channel1"
+                    ],
+                    "contains": [
+                        "slack channel name"
                     ]
                 },
                 {
@@ -1252,14 +1780,53 @@
                     "example_values": [
                         "missing_charset"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Invite sent to user(s)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Invite Users To Channel",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "send message",
             "description": "Send a message to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message. Messages are limited to 4000 characters.",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g. C1A1A1AAA), a channel name (e.g. #general), a username (e.g. @user), or a user ID (e.g. U1A1A1AAA). When sending a message to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message. Messages are limited to 4000 characters. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username since the latter usage has been deprecated by Slack.",
             "type": "generic",
             "identifier": "send_message",
             "read_only": false,
@@ -1271,8 +1838,10 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 "message": {
@@ -1280,33 +1849,40 @@
                     "data_type": "string",
                     "required": true,
                     "order": 1
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Send Message",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
-                {
-                    "data_path": "action_result.status",
+                },
+                "parent_message_ts": {
+                    "description": "Parent message timestamp to reply in thread",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 2,
-                    "example_values": [
-                        "success",
-                        "failed"
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "slack message ts"
                     ]
                 },
+                "reply_broadcast": {
+                    "description": "Used in conjunction with 'parent_message_ts' and indicates whether reply should be made visible to everyone in the channel or conversation",
+                    "data_type": "boolean",
+                    "order": 3
+                }
+            },
+            "output": [
                 {
                     "data_path": "action_result.parameter.destination",
                     "data_type": "string",
                     "column_name": "Destination",
                     "column_order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.parent_message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
                     ]
                 },
                 {
@@ -1316,10 +1892,14 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.parameter.reply_broadcast",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.channel",
                     "data_type": "string",
                     "contains": [
-                        "slack destination"
+                        "slack channel id"
                     ]
                 },
                 {
@@ -1332,7 +1912,12 @@
                 },
                 {
                     "data_path": "action_result.data.*.message.ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ],
+                    "column_name": "Message Timestamp",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.message.type",
@@ -1344,74 +1929,478 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.team",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "B017U24BH25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom_Playbook"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.icons.image_36",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.icons.image_48",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.icons.image_72",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.app_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "A017E1NAPSR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.team_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.bot_profile.updated",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1595596858
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.subtype",
+                    "data_type": "string",
+                    "example_values": [
+                        "thread_broadcast"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.thread_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613561693.000300"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.parent_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613561692.001200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.team",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.text",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a message from Playbook to channel_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "message"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "B017U24BH25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.thread_ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613561692.001200"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.subscribed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "B017U24BH25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom_Playbook"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.icons.image_36",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/bot_36.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.icons.image_48",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/bot_48.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.icons.image_72",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://a.slack-edge.com/80588/img/plugins/app/service_72.png"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.app_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "A017E1NAPSR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.team_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.bot_profile.updated",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1595596858
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.reply_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.latest_reply",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613564048.001700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.reply_users_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "F01ND14T56W"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "snippet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "adb3e6f532264cee9ccf4589808bb489"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        73
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.lines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "adb3e6f532264cee9ccf4589808bb489"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.created",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1613560453
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.preview",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is test Text File...!!!\r\n\r\nMalicious....Me....Not at all...!!!!!\r\n\r\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.editable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.filetype",
+                    "data_type": "string",
+                    "example_values": [
+                        "text"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.mimetype",
+                    "data_type": "string",
+                    "example_values": [
+                        "text/plain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.edit_link",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testphantom.slack.com/files/U017MJM0352/F01ND14T56W/adb3e6f532264cee9ccf4589808bb489/edit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.is_public",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.permalink",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testphantom.slack.com/files/U017MJM0352/F01ND14T56W/adb3e6f532264cee9ccf4589808bb489"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1613560453
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.is_starred",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.lines_more",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.is_external",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.pretty_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Plain Text"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.url_private",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://files.slack.com/files-pri/TEW1DJ485-F01ND14T56W/adb3e6f532264cee9ccf4589808bb489"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.external_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.display_as_bot",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.has_rich_preview",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.permalink_public",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://slack-files.com/TEW1DJ485-F01ND14T56W-d68a8bf630"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.preview_highlight",
+                    "data_type": "string",
+                    "example_values": [
+                        "<div class=\"CodeMirror cm-s-default CodeMirrorServer\" oncopy=\"if(event.clipboardData){event.clipboardData.setData('text/plain',window.getSelection().toString().replace(/\\u200b/g,''));event.preventDefault();event.stopPropagation();}\">\n<div class=\"CodeMirror-code\">\n<div><pre>This is test Text File...!!!</pre></div>\n<div><pre></pre></div>\n<div><pre>Malicious....Me....Not at all...!!!!!</pre></div>\n<div><pre></pre></div>\n<div><pre></pre></div>\n</div>\n</div>\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.public_url_shared",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.preview_is_truncated",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.files.*.url_private_download",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://files.slack.com/files-pri/TEW1DJ485-F01ND14T56W/download/adb3e6f532264cee9ccf4589808bb489"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.upload",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.root.display_as_bot",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ts",
                     "data_type": "string"
                 },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "upload file",
-            "description": "Upload file to Slack",
-            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack.",
-            "type": "generic",
-            "identifier": "upload_file",
-            "read_only": false,
-            "parameters": {
-                "destination": {
-                    "description": "Channel (e.g. #channel or C1A1A1AAA) or user (e.g. @user or U1A1A1AAA) to upload to",
-                    "data_type": "string",
-                    "required": true,
-                    "order": 0,
-                    "contains": [
-                        "slack destination",
-                        "slack user"
-                    ],
-                    "primary": true
-                },
-                "file": {
-                    "description": "Vault ID of file to upload",
-                    "data_type": "string",
-                    "primary": true,
-                    "required": true,
-                    "order": 1,
-                    "contains": [
-                        "vault id",
-                        "sha1"
-                    ]
-                },
-                "caption": {
-                    "description": "Caption to add to the file",
-                    "data_type": "string",
-                    "order": 2
-                }
-            },
-            "render": {
-                "width": 12,
-                "title": "Upload File",
-                "type": "table",
-                "height": 5
-            },
-            "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -1423,6 +2412,225 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message sent successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Send Message",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add reaction",
+            "description": "React to a message in Slack",
+            "verbose": "This method adds a reaction (emoji) to a message.",
+            "type": "generic",
+            "identifier": "add_reaction",
+            "read_only": false,
+            "parameters": {
+                "destination": {
+                    "description": "Channel ID (C1A1A1AAA) to send message to",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "slack channel id"
+                    ]
+                },
+                "emoji": {
+                    "description": "Reaction (emoji) to add",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "message_ts": {
+                    "description": "Timestamp of the message to add reaction to",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "slack message ts"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.destination",
+                    "data_type": "string",
+                    "column_name": "Destination",
+                    "column_order": 0,
+                    "contains": [
+                        "slack channel id"
+                    ],
+                    "example_values": [
+                        "C1A1A1AAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.emoji",
+                    "data_type": "string",
+                    "example_values": [
+                        "thumbsup"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ],
+                    "example_values": [
+                        "1612429747.000100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ok",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Reaction added successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Add Reaction",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "upload file",
+            "description": "Upload file to Slack",
+            "verbose": "The <b>destination</b> parameter can be a channel ID (e.g.  C1A1A1AAA), a channel name (e.g. #general), or a username (e.g. @user or U1A1A1AAA). When uploading to a channel, the configured bot user must have been added to the channel. Specifying a user will send a direct message containing the file. The <b>file</b> parameter takes the vault ID of a file that will be uploaded to Slack. Only files in the vault can be uploaded to Slack. <b>Note:</b> It is recommended to use channel ID/user ID instead of channel name/username since the latter usage has been deprecated by Slack.",
+            "type": "generic",
+            "identifier": "upload_file",
+            "read_only": false,
+            "parameters": {
+                "destination": {
+                    "description": "Channel (e.g. #channel or C1A1A1AAA) or user (e.g. @user or U1A1A1AAA) to upload to",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
+                    ],
+                    "primary": true
+                },
+                "parent_message_ts": {
+                    "description": "Parent message timestamp to reply in thread",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "slack message ts"
+                    ]
+                },
+                "file": {
+                    "description": "Vault ID of file to upload",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 2,
+                    "contains": [
+                        "vault id",
+                        "sha1"
+                    ]
+                },
+                "content": {
+                    "description": "Contents of the file",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "caption": {
+                    "description": "Caption to add to the file",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "filetype": {
+                    "description": "A file type identifier (https://api.slack.com/types/file#file_types)",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "filename": {
+                    "description": "Name of the file",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 6,
+                    "contains": [
+                        "file name"
+                    ]
+                }
+            },
+            "output": [
+                {
                     "data_path": "action_result.parameter.caption",
                     "data_type": "string"
                 },
@@ -1432,8 +2640,10 @@
                     "column_name": "Destination",
                     "column_order": 1,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -1444,6 +2654,37 @@
                     "contains": [
                         "vault id",
                         "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filetype",
+                    "data_type": "string",
+                    "column_name": "File Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.parent_message_ts",
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ],
+                    "example_values": [
+                        "1612429747.000100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
+                    "data_type": "string",
+                    "column_name": "File Content",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "column_name": "File Name",
+                    "column_order": 5,
+                    "contains": [
+                        "file name"
                     ]
                 },
                 {
@@ -1464,7 +2705,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.caption.is_intro",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.caption.timestamp",
@@ -1474,16 +2719,20 @@
                     "data_path": "action_result.data.*.caption.user",
                     "data_type": "string",
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.destinations",
                     "data_type": "string",
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -1496,11 +2745,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.display_as_bot",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.editable",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.external_type",
@@ -1520,11 +2777,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.is_external",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.is_public",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.mimetype",
@@ -1569,7 +2834,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.file.public_url_shared",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.file.size",
@@ -1602,14 +2871,20 @@
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sender",
                     "data_type": "string",
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack channel name",
+                        "slack channel id",
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -1709,28 +2984,231 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.file.lines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613561691.000900"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.team_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.reply_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.channel_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "general"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.share_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.CEVKZACJ0.*.reply_users_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.preview",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is test Text File...!!!\r\n\r\nMalicious....Me....Not at all...!!!!!\r\n\r\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.edit_link",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testphantom.slack.com/files/U017MJM0352/F01NK7Y5LSG/adb3e6f532264cee9ccf4589808bb489/edit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.is_starred",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.lines_more",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.has_rich_preview",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.preview_highlight",
+                    "data_type": "string",
+                    "example_values": [
+                        "<div class=\"CodeMirror cm-s-default CodeMirrorServer\" oncopy=\"if(event.clipboardData){event.clipboardData.setData('text/plain',window.getSelection().toString().replace(/\\u200b/g,''));event.preventDefault();event.stopPropagation();}\">\n<div class=\"CodeMirror-code\">\n<div><pre>This is test Text File...!!!</pre></div>\n<div><pre></pre></div>\n<div><pre>Malicious....Me....Not at all...!!!!!</pre></div>\n<div><pre></pre></div>\n<div><pre></pre></div>\n</div>\n</div>\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.preview_is_truncated",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613560595.000700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.team_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TEW1DJ485"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.reply_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.channel_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "channel_1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.share_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.public.C0183RKACNM.*.reply_users_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.private.D0178M2S1F0.*.ts",
+                    "data_type": "string",
+                    "example_values": [
+                        "1613561698.000800"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.private.D0178M2S1F0.*.reply_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.private.D0178M2S1F0.*.share_user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "U017MJM0352"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.file.shares.private.D0178M2S1F0.*.reply_users_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.thumbnails.thumb_tiny.img_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "AwAZABlYEjWLJACjqcck0/dB6N+QqAHFl/20/pUzPKtwI41/d8YGOCK0sZ3FljTyyduR3BHIqh5Ke9W2I2XIU5UEAfnVWmkDZLE6GMxyEhSchh2NSAqF2i6IX02mqcX3KfRuLYmZo0iMcbFixGWIxUG9fUUP9w1XpN2Glc//2Q=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "File uploaded successfully"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Upload File",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "ask question",
             "description": "Ask a question to a Slack user",
-            "verbose": "This action will send a Slack user a direct message containing a question with a series of buttons which represent possible responses. Once the user clicks on one of the responses, Slack will send the response back to Phantom. The action will succeed and output this response in the action result. If the user fails to respond within the timeout configured in the asset, the action will succeed, and output the <b>question ID</b> in the action result. The question ID can be used as input to the <b>get response</b> action.<br><br>If the <b>responses</b> parameter is not filled out, the response options will be <b>yes</b> and <b>no</b>.<br><br>The <b>confirmation</b> parameter takes a string that will be sent to the user after the user clicks a response.",
+            "verbose": "This action will send a Slack user a direct message containing a question with a series of buttons which represent possible responses. Once the user clicks on one of the responses, Slack will send the response back to Phantom. The action will succeed and output this response in the action result. If the user fails to respond within the timeout configured in the asset, the action will succeed, and output the <b>question ID</b> in the action result. The question ID can be used as input to the <b>get response</b> action.<br><br>If the <b>responses</b> parameter is not filled out, the response options will be <b>yes</b> and <b>no</b>.<br><br>The <b>confirmation</b> parameter takes a string that will be sent to the user after the user clicks a response. <b>Note:</b> It is recommended to use user ID instead of username since the latter usage has been deprecated by Slack.",
             "type": "generic",
             "identifier": "ask_question",
             "read_only": false,
@@ -1745,8 +3223,8 @@
                     "required": true,
                     "order": 0,
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 "question": {
@@ -1766,21 +3244,7 @@
                     "order": 3
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Question",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.confirmation",
                     "data_type": "string"
@@ -1789,8 +3253,8 @@
                     "data_path": "action_result.parameter.destination",
                     "data_type": "string",
                     "contains": [
-                        "slack destination",
-                        "slack user"
+                        "slack user name",
+                        "slack user id"
                     ]
                 },
                 {
@@ -1833,7 +3297,7 @@
                     "data_path": "action_result.data.*.channel",
                     "data_type": "string",
                     "contains": [
-                        "slack destination"
+                        "slack channel id"
                     ]
                 },
                 {
@@ -1846,7 +3310,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_app_unfurl",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.message.attachments.*.actions.*.id",
@@ -1914,11 +3382,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.message_ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ok",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.attachments.*.actions.*.id",
@@ -1974,7 +3449,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.original_message.ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.type",
@@ -2016,6 +3494,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Response received: True, Question id: c2bc5f7cfbb34e13a7ada4aa6e6bb7b5, Response: yes"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.question_id",
                     "data_type": "string",
                     "column_name": "Question ID",
@@ -2030,21 +3523,33 @@
                 },
                 {
                     "data_path": "action_result.summary.response_received",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Question",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -2066,21 +3571,7 @@
                     ]
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Response",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.question_id",
                     "data_type": "string",
@@ -2124,11 +3615,18 @@
                 },
                 {
                     "data_path": "action_result.data.*.is_app_unfurl",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.message_ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.attachments.*.actions.*.id",
@@ -2186,7 +3684,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.original_message.ts",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "slack message ts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.original_message.type",
@@ -2224,6 +3725,21 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Response received: True, Response: yes"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.response",
                     "data_type": "string",
                     "column_name": "Response",
@@ -2231,21 +3747,33 @@
                 },
                 {
                     "data_path": "action_result.summary.response_received",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Response",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -2258,23 +3786,28 @@
             "parameters": {
                 "start_time": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 0
                 },
                 "end_time": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 1
                 },
                 "container_id": {
                     "data_type": "string",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 2
                 },
                 "container_count": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 3
                 },
                 "artifact_count": {
                     "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
+                    "description": "Parameter ignored in this app",
+                    "order": 4
                 }
             },
             "output": [],
@@ -2286,15 +3819,13 @@
             "verbose": "This action will stop SlackBot if it is running. It will also disable ingestion if it is enabled.",
             "type": "correct",
             "identifier": "stop_bot",
-            "read_only": true,
+            "read_only": false,
             "parameters": {},
-            "render": {
-                "width": 12,
-                "title": "Stop SlackBot",
-                "type": "table",
-                "height": 5
-            },
             "output": [
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -2306,28 +3837,39 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "SlackBot isn't running, not going to stop it. Ingestion has been disabled."
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Stop SlackBot",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         }
     ]
