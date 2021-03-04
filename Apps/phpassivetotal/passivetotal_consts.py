@@ -50,7 +50,7 @@ PASSIVETOTAL_USING_BASE_URL = "Using url: {base_url}"
 # Rest API URL
 PASSIVETOTAL_REST_API_URL = "https://api.passivetotal.org/v2"
 
-# Consts for _get_error_message_from_exception
+# Consts relating _get_error_message_from_exception
 PASSIVETOTAL_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters"
 PASSIVETOTAL_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the PassiveTotal server. Please check the asset configuration and|or the action parameters"
@@ -60,7 +60,7 @@ PASSIVETOTAL_PARSE_ERR_MSG = "Unable to parse the error message. Please check th
 QUOTA_EXCEEDED_MSG = "quota has been exceeded"
 QUOTA_EXCEEDED_MSG_API = "quota exceeded for operation search_api"
 
-# error message while processing the response
+# Error message while processing the response
 PASSIVETOTAL_RESPONSE_ERR_MSG = "Error occurred while processing response from server"
 
 # Constants relating to value_list check
@@ -97,3 +97,8 @@ PASSIVETOTAL_FIELD_VALUE_LIST = [
             "subjectAlternativeName"]
 PASSIVETOTAL_DIRECTION_VALUE_LIST = ["parents", "children"]
 PASSIVETOTAL_VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"
+
+# Constants relating to '_validate_integer'
+VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
+NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {}"
+PAGE_KEY = "'page' action parameter"

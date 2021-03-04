@@ -4,7 +4,7 @@
     "description": "This app implements investigative actions by integrating with the PassiveTotal cloud reputation service",
     "type": "reputation",
     "main_module": "passivetotal_connector.py",
-    "app_version": "2.0.2",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-01-06T10:36:48.000000Z",
     "product_vendor": "PassiveTotal",
     "product_name": "PassiveTotal",
@@ -2596,7 +2596,7 @@
                 },
                 "page": {
                     "description": "Page number for paging through results, defaults to 0",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "order": 3
                 }
             },
@@ -2630,11 +2630,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.page",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Page",
                     "column_order": 3,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {
@@ -2772,7 +2772,7 @@
                 },
                 "page": {
                     "description": "Page number for paging through results, defaults to 0",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "order": 4
                 }
             },
@@ -2816,11 +2816,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.page",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "Page",
                     "column_order": 4,
                     "example_values": [
-                        "1"
+                        1
                     ]
                 },
                 {

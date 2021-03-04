@@ -145,6 +145,28 @@ class PassivetotalConnector(BaseConnector):
             return True
         return False
 
+    def _validate_integer(self, action_result, parameter, key):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: action parameter key
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+        return phantom.APP_SUCCESS, parameter
+
     def _make_rest_call(self, endpoint, request_params, action_result):
 
         # init the return values
@@ -238,7 +260,7 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            "'From' date should not greater than the 'To' date")
+                                            "'From' date should not be greater than the 'To' date")
 
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
@@ -497,7 +519,7 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            "'From' date should not greater than the 'To' date")
+                                            "'From' date should not be greater than the 'To' date")
 
         # Progress
         self.save_progress(PASSIVETOTAL_USING_BASE_URL, base_url=self._base_url)
@@ -602,7 +624,11 @@ class PassivetotalConnector(BaseConnector):
         query = param[PASSIVETOTAL_JSON_QUERY]
         start_time = param.get(PASSIVETOTAL_JSON_FROM)
         end_time = param.get(PASSIVETOTAL_JSON_TO)
-        page = param.get(PASSIVETOTAL_JSON_PAGE)
+
+        # Check the 'page' parameter
+        ret_val, page = self._validate_integer(action_result, param.get(PASSIVETOTAL_JSON_PAGE, '0'), PAGE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
@@ -614,7 +640,7 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            "'From' date should not greater than the 'To' date")
+                                            "'From' date should not be greater than the 'To' date")
 
         params = {
             "query": query,
@@ -632,6 +658,7 @@ class PassivetotalConnector(BaseConnector):
         try:
             if ret_val and response:
                 extra_data[PASSIVETOTAL_JSON_COMPONENTS] = response["results"]
+                self.debug_print("TEST : ", response)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
@@ -647,7 +674,11 @@ class PassivetotalConnector(BaseConnector):
         direction = param[PASSIVETOTAL_JSON_DIRECTION]
         start_time = param.get(PASSIVETOTAL_JSON_FROM)
         end_time = param.get(PASSIVETOTAL_JSON_TO)
-        page = param.get(PASSIVETOTAL_JSON_PAGE)
+
+        # Check the 'page' parameter
+        ret_val, page = self._validate_integer(action_result, param.get(PASSIVETOTAL_JSON_PAGE, '0'), PAGE_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if direction not in PASSIVETOTAL_DIRECTION_VALUE_LIST:
             return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_VALUE_LIST_VALIDATION_MSG.format(PASSIVETOTAL_DIRECTION_VALUE_LIST, 'direction'))
@@ -662,7 +693,7 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            "'From' date should not greater than the 'To' date")
+                                            "'From' date should not be greater than the 'To' date")
 
         params = {
             "query": query,
