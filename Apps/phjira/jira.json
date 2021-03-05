@@ -5,8 +5,8 @@
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "3.0.1",
-    "utctime_updated": "2021-02-03T05:40:49.000000Z",
+    "app_version": "3.0.2",
+    "utctime_updated": "2021-03-05T12:20:35.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
@@ -1521,7 +1521,7 @@
                     ],
                     "column_name": "Vault ID",
                     "column_order": 1
-                }, 
+                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
