@@ -1,8 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: gcloudcomputeengine_connector.py
+#
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -33,6 +33,38 @@ class GcloudComputeEngineConnector(BaseConnector):
         self._project = None
         self._key_json = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _create_discovery_client(self, action_result):
         try:
             service_account_json = json.loads(self._key_json)
@@ -47,8 +79,9 @@ class GcloudComputeEngineConnector(BaseConnector):
             )
 
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, "Could not create google api client: {0}".format(e)
+                phantom.APP_ERROR, "Could not create google api client: {0}".format(err)
             )
 
         return phantom.APP_SUCCESS
@@ -89,16 +122,21 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress("Could not create API client.")
             return action_result.get_status()
 
         zone = param["zone"]
         resourceid = param["id"]
         tags = param["tags"]
 
-        request = self._client.instances().get(
-            project=self._project, zone=zone, instance=resourceid
-        )
+        try:
+            request = self._client.instances().get(
+                project=self._project, zone=zone, instance=resourceid
+            )
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
+
         ret_val, instance_details = self._send_request(request, action_result)
         if phantom.is_fail(ret_val):
             return ret_val
@@ -108,9 +146,14 @@ class GcloudComputeEngineConnector(BaseConnector):
             "items": tags.split(","),
         }
 
-        request = self._client.instances().setTags(
-            project=self._project, zone=zone, instance=resourceid, body=tags_body
-        )
+        try:
+            request = self._client.instances().setTags(
+                project=self._project, zone=zone, instance=resourceid, body=tags_body
+            )
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
+
         ret_val, instance_details = self._send_request(request, action_result)
 
         action_result.add_data(instance_details)
@@ -123,15 +166,20 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress("Could not create API client.")
             return action_result.get_status()
 
         zone = param["zone"]
         resourceid = param["id"]
 
-        request = self._client.instances().get(
-            project=self._project, zone=zone, instance=resourceid
-        )
+        try:
+            request = self._client.instances().get(
+                project=self._project, zone=zone, instance=resourceid
+            )
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
+
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -153,15 +201,20 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress("Could not create API client.")
             return action_result.get_status()
 
         zone = param["zone"]
         resourceid = param["id"]
 
-        request = self._client.instances().stop(
-            project=self._project, zone=zone, instance=resourceid
-        )
+        try:
+            request = self._client.instances().stop(
+                project=self._project, zone=zone, instance=resourceid
+            )
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
+
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -179,15 +232,20 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress("Could not create API client.")
             return action_result.get_status()
 
         zone = param["zone"]
         resourceid = param["id"]
 
-        request = self._client.instances().start(
-            project=self._project, zone=zone, instance=resourceid
-        )
+        try:
+            request = self._client.instances().start(
+                project=self._project, zone=zone, instance=resourceid
+            )
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
+
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):

@@ -19,9 +19,11 @@
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "pypi": [
-           {"module": "google-api-python-client"}
+            {
+                "module": "google-api-python-client"
+            }
         ]
-     },
+    },
     "configuration": {
         "key_json": {
             "description": "Contents of Service Account JSON file",
@@ -39,9 +41,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -49,35 +51,36 @@
         },
         {
             "action": "tag instance",
-            "identifier": "tag_instance",
             "description": "Modify tags on instance",
             "type": "generic",
+            "identifier": "tag_instance",
             "read_only": false,
             "parameters": {
                 "zone": {
                     "description": "Zone of the instance",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 "id": {
                     "description": "ID of the instance",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
                     "order": 1,
-                    "contains": ["gcloud computeengine id"]
+                    "contains": [
+                        "gcloud computeengine id"
+                    ],
+                    "primary": true
                 },
                 "tags": {
                     "description": "Network tags to apply to the instance. Will overwrite existing tags",
                     "verbose": "Comma-separated list of network tags to apply to the instance.",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
                     "order": 2
                 }
             },
@@ -85,34 +88,43 @@
                 {
                     "data_path": "action_result.parameter.zone",
                     "data_type": "string",
-                    "column_name": "zone",
-                    "column_order": 0
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 1,
-                    "contains": ["gcloud computeengine id"]
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tags",
                     "data_type": "string",
-                    "column_name": "tags",
+                    "column_name": "Tags",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 3
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -121,11 +133,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -135,48 +153,50 @@
         },
         {
             "action": "describe instance",
-            "identifier": "describe_instance",
             "description": "Get instance information",
-            "type": "generic",
+            "type": "investigate",
+            "identifier": "describe_instance",
             "read_only": true,
             "parameters": {
                 "zone": {
                     "description": "Zone of the instance",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 "id": {
                     "description": "ID of the instance",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "default": "",
                     "order": 1,
-                    "contains": ["gcloud computeengine id"]
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.zone",
                     "data_type": "string",
-                    "column_name": "zone",
-                    "column_order": 0
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 1,
-                    "contains": ["gcloud computeengine id"]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.machineType",
@@ -201,7 +221,23 @@
                 {
                     "data_path": "action_result.data.*.creationTimestamp",
                     "data_type": "string",
-                    "example_values": ["2020-07-09T01:51:13.393-07:00"]
+                    "example_values": [
+                        "2020-07-09T01:51:13.393-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.id",
@@ -216,8 +252,18 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -227,61 +273,57 @@
         },
         {
             "action": "stop instance",
-            "identifier": "stop_instance",
             "description": "Stops an instance",
             "type": "generic",
+            "identifier": "stop_instance",
             "read_only": false,
             "parameters": {
                 "zone": {
                     "description": "Zone of the instance",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 "id": {
                     "description": "ID of the instance",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "default": "",
                     "order": 1,
-                    "contains": ["gcloud computeengine id"]
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.zone",
                     "data_type": "string",
-                    "column_name": "zone",
-                    "column_order": 0
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 1,
-                    "contains": ["gcloud computeengine id"]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
-                    "example_values": ["DONE"]
+                    "example_values": [
+                        "DONE"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -298,16 +340,52 @@
                 {
                     "data_path": "action_result.data.*.startTime",
                     "data_type": "string",
-                    "example_values": ["2020-07-14T04:42:34.287-07:00"]
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.endTime",
                     "data_type": "string",
-                    "example_values": ["2020-07-14T04:42:34.287-07:00"]
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.operationType",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -317,61 +395,57 @@
         },
         {
             "action": "start instance",
-            "identifier": "start_instance",
             "description": "Starts an instance that was previously stopped",
             "type": "generic",
+            "identifier": "start_instance",
             "read_only": false,
             "parameters": {
                 "zone": {
                     "description": "Zone of the instance",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 "id": {
                     "description": "ID of the instance",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "default": "",
                     "order": 1,
-                    "contains": ["gcloud computeengine id"]
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.zone",
                     "data_type": "string",
-                    "column_name": "zone",
-                    "column_order": 0
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 1,
-                    "contains": ["gcloud computeengine id"]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
-                    "example_values": ["DONE"]
+                    "example_values": [
+                        "DONE"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -388,16 +462,52 @@
                 {
                     "data_path": "action_result.data.*.startTime",
                     "data_type": "string",
-                    "example_values": ["2020-07-14T04:42:34.287-07:00"]
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.endTime",
                     "data_type": "string",
-                    "example_values": ["2020-07-14T04:42:34.287-07:00"]
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.operationType",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
