@@ -50,6 +50,16 @@ PASSIVETOTAL_USING_BASE_URL = "Using url: {base_url}"
 # Rest API URL
 PASSIVETOTAL_REST_API_URL = "https://api.passivetotal.org/v2"
 
+# actions supported by this app
+ACTION_ID_LOOKUP_IP = "lookup_ip"
+ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
+ACTION_ID_WHOIS_IP = "whois_ip"
+ACTION_ID_WHOIS_DOMAIN = "whois_domain"
+ACTION_ID_LOOKUP_CERTIFICATE_HASH = "lookup_certificate_hash"
+ACTION_ID_LOOKUP_CERTIFICATE = "lookup_certificate"
+ACTION_ID_GET_HOST_COMPONENTS = "get_host_components"
+ACTION_ID_GET_HOST_PAIRS = "get_host_pairs"
+
 # Consts relating _get_error_message_from_exception
 PASSIVETOTAL_ERR_CODE_UNAVAILABLE = "Error code unavailable"
 PASSIVETOTAL_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters"

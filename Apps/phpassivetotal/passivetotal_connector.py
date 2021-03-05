@@ -23,16 +23,6 @@ import sys
 
 
 class PassivetotalConnector(BaseConnector):
-    # actions supported by this script
-    ACTION_ID_LOOKUP_IP = "lookup_ip"
-    ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
-    ACTION_ID_WHOIS_IP = "whois_ip"
-    ACTION_ID_WHOIS_DOMAIN = "whois_domain"
-    ACTION_ID_LOOKUP_CERTIFICATE_HASH = "lookup_certificate_hash"
-    ACTION_ID_LOOKUP_CERTIFICATE = "lookup_certificate"
-    ACTION_ID_GET_HOST_COMPONENTS = "get_host_components"
-    ACTION_ID_GET_HOST_PAIRS = "get_host_pairs"
-
     def __init__(self):
 
         # Call the BaseConnectors init first
@@ -739,21 +729,21 @@ class PassivetotalConnector(BaseConnector):
 
         ret_val = phantom.APP_SUCCESS
 
-        if action == self.ACTION_ID_LOOKUP_CERTIFICATE_HASH:
+        if action == ACTION_ID_LOOKUP_CERTIFICATE_HASH:
             ret_val = self._lookup_certificate_hash(param)
-        elif action == self.ACTION_ID_LOOKUP_CERTIFICATE:
+        elif action == ACTION_ID_LOOKUP_CERTIFICATE:
             ret_val = self._lookup_certificate(param)
-        elif action == self.ACTION_ID_LOOKUP_IP:
+        elif action == ACTION_ID_LOOKUP_IP:
             ret_val = self._lookup_ip(param)
-        elif action == self.ACTION_ID_LOOKUP_DOMAIN:
+        elif action == ACTION_ID_LOOKUP_DOMAIN:
             ret_val = self._lookup_domain(param)
-        elif action == self.ACTION_ID_WHOIS_IP:
+        elif action == ACTION_ID_WHOIS_IP:
             ret_val = self._whois_ip(param)
-        elif action == self.ACTION_ID_WHOIS_DOMAIN:
+        elif action == ACTION_ID_WHOIS_DOMAIN:
             ret_val = self._whois_domain(param)
-        elif action == self.ACTION_ID_GET_HOST_COMPONENTS:
+        elif action == ACTION_ID_GET_HOST_COMPONENTS:
             ret_val = self._get_host_components(param)
-        elif action == self.ACTION_ID_GET_HOST_PAIRS:
+        elif action == ACTION_ID_GET_HOST_PAIRS:
             ret_val = self._get_host_pairs(param)
         elif action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
