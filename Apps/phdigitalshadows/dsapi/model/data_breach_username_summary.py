@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2017 Digital Shadows Ltd.
+# File: data_breach_username_summary.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -39,6 +38,6 @@ class DataBreachUsernameSummary(DSModel):
     def from_json(cls, json):
         cast = DSModel.cast
         return cls(json.get('username'),
-                   cast(json.get('distinctPasswordCount'), long),
-                   cast(json.get('breachCount'), long),
+                   cast(json.get('distinctPasswordCount'), int),
+                   cast(json.get('breachCount'), int),
                    json)

@@ -78,3 +78,11 @@ GET_FILE = """
 $d = "{}"
 [Convert]::ToBase64String([IO.File]::ReadAllBytes($d))
 """
+
+WINRM_UNICODE_ERR_MESSAGE = "Invalid unicode detected"
+WINRM_ERR_CODE_UNAVAILABLE = "Error code unavailable"
+WINRM_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters."
+WINRM_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
+WINRM_ERR_INVALID_INT = 'Please provide a valid {msg} integer value in the "{param}"'
+WINRM_ERR_PARTITION = "Failed to fetch system volume, Please check the asset configuration and|or \"ip hostname\" parameter."
+WINRM_ERR_INVALID_VAULT_ID = "Could not retrieve vault file"

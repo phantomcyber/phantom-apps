@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_add_group.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -34,22 +34,20 @@
 .okta-app .wf-table-horizontal  {
   margin-right: 10px;
   width: initial;
-  border: 1px solid;
   font-size: 12px;
 }
 
 .okta-app .wf-table-horizontal th {
-  text-align: center;
-  border: 1px solid;
   text-transform: uppercase;
   font-weight: normal;
   padding: 5px;
+  border: 1px solid;
 }
 
 .okta-app .wf-table-horizontal td {
-  border: 1px solid;
   padding: 5px;
   padding-left: 4px;
+  border: 1px solid;
 }
 
 .okta-app .wf-h3-style {
@@ -78,7 +76,13 @@
     {% for curr_data in result.data %}
     <h3 class="wf-h3-style">{{ curr_data.name }}</h3>
       <table class="wf-table-horizontal">
-        <tr><th colspan="2">INFO</th></tr>
+        <tr><th colspan="2" style="text-align: center;">INFO</th></tr>
+        <tr><th>ID</th>
+          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta group id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
+              {{ curr_data.id }}
+              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a></td>
+        </tr>
         <tr><th>NAME</th>
           <td>{{ curr_data.profile.name }}
           </td>
@@ -91,17 +95,13 @@
           <td>{{ curr_data.type }}
           </td>
         </tr>
-        <tr><th>ID</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta group id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_data.id }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
-        </tr>
       </table>
       <br>
     {% endfor %}
+  {% elif result.status and result.message %}
+  <p class="wf-h4-style"> {{result.message}} </p>
   {% else %}
-  <p> Group not added </p>
+  <p class="wf-h4-style"> Group is not added </p>
   {% endif %}
 
 <br>

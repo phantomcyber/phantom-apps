@@ -1,0 +1,102 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- 
+  File: run_query.html
+
+  Copyright (c) 2017-2021 Splunk Inc.
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+    .phantom a:hover {
+        text-decoration:underline;
+    }
+
+    .phantom .wf-h4-style {
+        font-size : 20px;
+    }
+
+    .phantom .dataTable th.widget-th {
+        border-top: 1px solid !important;
+        border-bottom: 1px solid !important;
+    }
+
+    .phantom .dataTable td {
+        vertical-align: top;
+    }
+
+    .phantom .dataTable td.widget-td a{
+        font-size: 12px;
+    }
+
+    .phantom .dataTable {
+        font-size: 12px;
+    }
+
+    .phantom .dataTable .glyphicon.glyphicon-dot:before {
+        content: "\25cf"; font-size: 10px;
+    }
+</style>
+
+<div class="phantom" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    {% for result in results %} <!-- loop for each result -->
+        {% if not result.data %}
+           <h4 class="wf-h4-style">No data found</h4>
+        {% else %}
+            <div class="phantom">
+                <!--Default View-->
+                <table class="phantom-table dataTable">
+                    <thead>
+                        <tr>
+                            {% for column_name in result.header%}
+                                <th class="widget-th">{{ column_name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in result.data %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td class="widget-td">{{ cell.value }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div> <!-- Main Div -->
+
+
+<script>
+  $.extend(true, $.fn.dataTable.defaults, {
+    "pageLength": 5,
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+{% endblock %} <!-- Main Start Block -->

@@ -1,5 +1,5 @@
 # File: jira_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -8,6 +8,7 @@
 # Phantom imports
 import phantom.app as phantom
 from phantom.vault import Vault
+import phantom.rules as phantom_rules
 
 # THIS Connector imports
 from jira_consts import *
@@ -77,7 +78,7 @@ class JiraConnector(phantom.BaseConnector):
         self._host = self._base_url[self._base_url.find('//') + 2:]
         self._timezone = self._handle_py_ver_compat_for_input_str(config.get(JIRA_JSON_TIMEZONE, JIRA_JSON_DEFAULT_TIMEZONE))
 
-        self._verify_cert = config[phantom.APP_JSON_VERIFY]
+        self._verify_cert = config.get(phantom.APP_JSON_VERIFY, False)
         self._username = self._handle_py_ver_compat_for_input_str(config[phantom.APP_JSON_USERNAME])
         self._password = config[phantom.APP_JSON_PASSWORD]
         self._custom_fields_list = None
@@ -270,21 +271,21 @@ class JiraConnector(phantom.BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = "Error code unavailable"
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = "Error code unavailable"
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Jira server. Please check the asset configuration and|or the action parameters."
+            error_msg = TYPE_ERR_MSG
         except:
-            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+            error_msg = ERR_MSG_UNAVAILABLE
 
         return error_code, error_msg
 
@@ -352,7 +353,7 @@ class JiraConnector(phantom.BaseConnector):
             error_text = '\n'.join(split_lines)
         except:
             try:
-                error_text = "Cannot parse error details. Unparsed error: {0}.".format(self._handle_py_ver_compat_for_input_str(error_text))
+                error_text = "Cannot parse error details. Unparsed error: {0}".format(self._handle_py_ver_compat_for_input_str(error_text))
             except:
                 error_text = "Unable to parse the details of the error received in the output response"
 
@@ -463,7 +464,7 @@ class JiraConnector(phantom.BaseConnector):
         fields_meta = edit_meta.get('fields')
         if (not fields_meta):
             return (action_result.set_status(phantom.APP_ERROR,
-                "Got empty response to the 'editmeta' REST endpoint. This may be caused by a jira permission problem."), None, None)
+                "Got empty response to the 'editmeta' REST endpoint. This may be caused by a jira permission problem"), None, None)
 
         # create an array of custom fields
         try:
@@ -597,10 +598,10 @@ class JiraConnector(phantom.BaseConnector):
         try:
             issue = self._jira.issue(issue_id)
         except Exception as e:
-            return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the id exist", e)
+            return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
         if (not issue):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the id exist.")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists")
 
         kwargs.update({'issue': issue_id})
 
@@ -612,7 +613,7 @@ class JiraConnector(phantom.BaseConnector):
         try:
             transition_info = [x for x in transitions if self._handle_py_ver_compat_for_input_str(x['name']) == status_to_set]
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to parse response from server while trying to get information about status values.")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to parse response from server while trying to get information about status values")
 
         if (not transition_info):
             message = JIRA_ERR_ISSUE_VALID_TRANSITIONS
@@ -746,7 +747,7 @@ class JiraConnector(phantom.BaseConnector):
             return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
         if (not issue):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists.")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists")
 
         update_result = True
 
@@ -819,7 +820,7 @@ class JiraConnector(phantom.BaseConnector):
             return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
         if (not issue):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists.")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists")
 
         self.save_progress("Deleting the ticket")
 
@@ -830,7 +831,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, JIRA_SUCC_TICKET_DELETED)
 
-    def _create_ticket(self, param):
+    def _create_ticket(self, param):  # noqa: C901
 
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
 
@@ -910,7 +911,7 @@ class JiraConnector(phantom.BaseConnector):
             new_issue = self._jira.create_issue(fields=fields)
         except KeyError as ke:
             error_code, error_msg = self._get_error_message_from_exception(ke)
-            error_text = "{0}. Missing required key. Error Code:{1}. Error Message:{2}.".format(JIRA_ERR_CREATE_TICKET_FAILED, error_code, error_msg)
+            error_text = "{0}. Missing required key. Error Code:{1}. Error Message:{2}".format(JIRA_ERR_CREATE_TICKET_FAILED, error_code, error_msg)
 
             return action_result.set_status(phantom.APP_ERROR, error_text)
         except Exception as e:
@@ -997,12 +998,12 @@ class JiraConnector(phantom.BaseConnector):
         action_query = self._handle_py_ver_compat_for_input_str(param.get(JIRA_JSON_QUERY, ""))
 
         start_index = param.get(JIRA_JSON_START_INDEX, DEFAULT_START_INDEX)
-        start_index = self._validate_integers(action_result, start_index, 'start_index', allow_zero=True)
+        start_index = self._validate_integers(action_result, start_index, 'start_index action', allow_zero=True)
         if start_index is None:
             return action_result.get_status()
 
         limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_VALUE)
-        limit = self._validate_integers(action_result, limit, 'limit')
+        limit = self._validate_integers(action_result, limit, 'max_results action')
         if limit is None:
             return action_result.get_status()
 
@@ -1042,7 +1043,7 @@ class JiraConnector(phantom.BaseConnector):
                 return None
 
             if users is None:
-                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira on-prem.')
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira on-prem')
                 return None
 
             users_list.extend(users)
@@ -1074,7 +1075,7 @@ class JiraConnector(phantom.BaseConnector):
                 ret_val, users = self._make_rest_call("user/search", action_result, params=param)
             except Exception as e:
                 error_code, error_msg = self._get_error_message_from_exception(e)
-                error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+                error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
                 action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the list of users for Jira cloud. Error: {0}".format(
                             error_text))
@@ -1084,7 +1085,7 @@ class JiraConnector(phantom.BaseConnector):
                 return None
 
             if users is None:
-                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira cloud.')
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of users using pagination for Jira cloud')
                 return None
 
             users_list.extend(users)
@@ -1123,7 +1124,7 @@ class JiraConnector(phantom.BaseConnector):
         start_index = 0
 
         limit = param.get(JIRA_JSON_MAX_RESULTS, DEFAULT_MAX_VALUE)
-        limit = self._validate_integers(action_result, limit, 'limit')
+        limit = self._validate_integers(action_result, limit, 'max_results action')
         if limit is None:
             return action_result.get_status()
 
@@ -1143,7 +1144,7 @@ class JiraConnector(phantom.BaseConnector):
                     action_result.add_data(user.raw)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing fetched response. Error: {0}".format(
                             error_text))
@@ -1208,12 +1209,12 @@ class JiraConnector(phantom.BaseConnector):
             return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
 
         if (not issue):
-            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists.")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to find ticket info. Please make sure the issue exists")
 
         try:
             self._jira.add_comment(issue_id, body, is_internal=param.get('internal', False))
         except Exception as e:
-            return self._set_jira_error(action_result, "Unable to find ticket info. Please make sure the issue exists", e)
+            return self._set_jira_error(action_result, "Failed to add the comment", e)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added the comment")
 
@@ -1254,9 +1255,8 @@ class JiraConnector(phantom.BaseConnector):
 
         # Check for file in vault
         try:
-            vault_meta = Vault.get_file_info(vault_id=vault_id)  # Vault IDs are unique
-
-            if (not vault_meta):
+            _, _, vault_meta = phantom_rules.vault_info(vault_id=vault_id)  # Vault IDs are unique
+            if not vault_meta:
                 self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
                 return JIRA_ERR_FILE_NOT_IN_VAULT
 
@@ -1282,7 +1282,7 @@ class JiraConnector(phantom.BaseConnector):
             file_meta = vault_meta[0]
 
         try:
-            path = Vault.get_file_path(vault_id)
+            path = list(vault_meta)[0].get('path')
             filename = file_meta["name"]
 
             try:
@@ -1317,7 +1317,7 @@ class JiraConnector(phantom.BaseConnector):
             self.debug_print("Error while attaching")
 
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
             return JIRA_ERR_ATTACH_FAILED.format(error_text)
 
@@ -1611,7 +1611,7 @@ class JiraConnector(phantom.BaseConnector):
             r = requests.get(url, verify=self.get_config().get("verify_server_cert"), stream=True, auth=auth)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
             self.debug_print("Could not connect to url to download attachment: ", error_text)
             return phantom.APP_ERROR
 
@@ -1634,7 +1634,7 @@ class JiraConnector(phantom.BaseConnector):
                         self.send_progress("Downloaded {0} bytes".format(bytes_downloaded))
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
             self.debug_print("Error downloading file: ", error_text)
             return phantom.APP_ERROR
 
@@ -1657,10 +1657,10 @@ class JiraConnector(phantom.BaseConnector):
 
             filename = self._handle_py_ver_compat_for_input_str(attachment.filename)
 
-            vault_ret = Vault.add_attachment(tmp.name, container_id, filename)
+            success, message, vault_id = phantom_rules.vault_add(file_location=tmp.name, container=container_id, file_name=filename)
 
-            if not vault_ret.get('succeeded'):
-                self.debug_print("Error saving file to vault: ", vault_ret.get('message', "Could not save file to vault"))
+            if not success:
+                self.debug_print("Error saving file to vault: ", message)
                 return phantom.APP_ERROR
 
             artifact_json = {}
@@ -1687,14 +1687,14 @@ class JiraConnector(phantom.BaseConnector):
                 artifact_cef['author'] = attachment.author.displayName
                 artifact_cef['is_on_prem'] = False
 
-            artifact_cef['vault_id'] = vault_ret[phantom.APP_JSON_HASH]
+            artifact_cef['vault_id'] = vault_id
 
             artifact_json['cef'] = artifact_cef
 
             artifact_list.append(artifact_json)
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
             action_result.set_status(phantom.APP_ERROR, "Error occurred while creation of the attachment artifact. Error message: {0}".format(
                         error_text))
@@ -1765,7 +1765,7 @@ class JiraConnector(phantom.BaseConnector):
                 return None
 
             if issues is None:
-                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of tickets (issues) using pagination.')
+                action_result.set_status(phantom.APP_ERROR, 'Unknown error occurred while fetching list of tickets (issues) using pagination')
                 return None
 
             issues_list.extend(issues)
@@ -1813,7 +1813,7 @@ class JiraConnector(phantom.BaseConnector):
         try:
             UnicodeDammit(link_type).unicode_markup.encode('utf-8')
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Parameter value failed validation. Enter a valid value.")
+            return action_result.set_status(phantom.APP_ERROR, "'link_type' action parameter value failed validation. Enter a valid value")
 
         if comment_body:
             comment = {
@@ -1897,7 +1897,7 @@ class JiraConnector(phantom.BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, JIRA_WATCHERS_ERROR), None
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error occurred while fetching the watchers list. Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error occurred while fetching the watchers list. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
             self.save_progress("Response from the server: {}".format(error_text))
             return action_result.set_status(phantom.APP_ERROR, error_text), None
@@ -1958,12 +1958,11 @@ class JiraConnector(phantom.BaseConnector):
                 attachment_content = attachment.get()
                 f.write(attachment_content)
 
-            vault_ret = Vault.add_attachment(file_location=full_path, container_id=container_id)
+            success, message, vault_id = phantom_rules.vault_add(file_location=full_path, container=container_id)
+            action_result.add_data({"vault_id": vault_id})
 
-            action_result.add_data(vault_ret)
-
-            if not vault_ret.get('succeeded'):
-                err_msg = vault_ret.get('message', "Could not save file to vault")
+            if not success:
+                err_msg = message
                 return action_result.set_status(phantom.APP_ERROR, "Error saving file to vault: {}".format(
                     self._handle_py_ver_compat_for_input_str(err_msg if err_msg else "Could not save file to vault")))
 
@@ -2041,7 +2040,7 @@ class JiraConnector(phantom.BaseConnector):
                 return action_result.set_status(phantom.APP_SUCCESS, msg)
 
             else:
-                return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters.")
+                return action_result.set_status(phantom.APP_SUCCESS, "Please check the Jira Ticket ID. This issue has no attachments. Please check the provided parameters")
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
             error_text = "Unable to get attachments. Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
@@ -2060,7 +2059,7 @@ class JiraConnector(phantom.BaseConnector):
             resp_json = r.json()
         except Exception as e:
             error_code, error_msg = self._get_error_message_from_exception(e)
-            error_text = "Error Code:{0}. Error Message:{1}.".format(error_code, error_msg)
+            error_text = "Error Code:{0}. Error Message:{1}".format(error_code, error_msg)
 
             self.debug_print("Error while updating the container. ", error_text)
             action_result.set_status(phantom.APP_ERROR, "Error occurred while updating the container for the issue key: {0}. {1}".format(issue.key, error_text))
@@ -2222,7 +2221,7 @@ class JiraConnector(phantom.BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _on_poll(self, param):
+    def _on_poll(self, param):  # noqa: C901
 
         # Add action result
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
@@ -2254,29 +2253,36 @@ class JiraConnector(phantom.BaseConnector):
         # Get time from last poll, save now as time for this poll
         last_time = state.get('last_time', 0)
 
-        if last_time:
-            try:
-                # Shifting the last_time by one minute to ensure that
-                # the tickets are not missed in the On Poll due to
-                # a minute's granularity of the Jira
-                last_time = int(last_time)
-                last_time = last_time - 60
+        # This is to handle the cases if the end-user has by-mistake kept the state file status as
+        # {'app_version': '<app_version>', 'last_time': ''} or {'app_version': '<app_version>', 'last_time': null} or
+        # there was an issue in storing the 'last_time' key-value into the state file during the first scheduled poll run.
+        # In such cases, we will continue similar to the scenario of first run of the scheduled poll.
+        # We never know what the end-user can change the value of the state file to. Hence, handling such edge cases here.
+        if not last_time:
+            last_time = 0
 
-                if last_time < 0:
-                    last_time = 0
+        try:
+            # Shifting the last_time by one minute to ensure that
+            # the tickets are not missed in the On Poll due to
+            # a minute's granularity of the Jira
+            last_time = int(last_time)
+            last_time = last_time - 60
 
-                # Updating the timestamp based on the timezone mentioned
-                # in the asset configuration parameters
-                ts_dt = datetime.fromtimestamp(last_time)
-                ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
+            if last_time < 0:
+                last_time = 0
 
-                timez = pytz.timezone(self._timezone)
-                ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
-                last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
+            # Updating the timestamp based on the timezone mentioned
+            # in the asset configuration parameters
+            ts_dt = datetime.fromtimestamp(last_time)
+            ts_dt_local_tzinfo = ts_dt.replace(tzinfo=dateutil.tz.tzlocal())
 
-            except:
-                return action_result.set_status(phantom.APP_ERROR,
-                                                "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
+            timez = pytz.timezone(self._timezone)
+            ts_dt_jira_ui_tzinfo = ts_dt_local_tzinfo.astimezone(timez)
+            last_time_str = ts_dt_jira_ui_tzinfo.strftime(JIRA_TIME_FORMAT)
+
+        except:
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "Error occurred while parsing the last ingested ticket's (issue's) 'updated' timestamp from the previous ingestion run")
 
         # Build the query for the issue search
         query = ""
@@ -2301,10 +2307,16 @@ class JiraConnector(phantom.BaseConnector):
         # If it's the first poll, don't filter based on update time
         elif (state.get('first_run', True)):
             max_tickets = int(config.get('first_run_max_tickets', DEFAULT_SCHEDULED_INTERVAL_INGESTION_COUNT))
+            max_tickets = self._validate_integers(action_result, max_tickets, 'first_run_max_tickets config')
+            if max_tickets is None:
+                return action_result.get_status()
 
         # If it's scheduled polling add a filter for update time being greater than the last poll time
         else:
             max_tickets = int(config.get('max_tickets', DEFAULT_SCHEDULED_INTERVAL_INGESTION_COUNT))
+            max_tickets = self._validate_integers(action_result, max_tickets, 'max_tickets config')
+            if max_tickets is None:
+                return action_result.get_status()
             query = '{0}{1}updated>="{2}"'.format(query, ' and ' if query else '', last_time_str)
 
         # Order by update time
