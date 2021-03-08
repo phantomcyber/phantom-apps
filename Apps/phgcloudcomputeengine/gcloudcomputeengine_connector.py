@@ -90,15 +90,15 @@ class GcloudComputeEngineConnector(BaseConnector):
         try:
             response = request.execute()
         except errors.HttpError as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
-                action_result.set_status(phantom.APP_ERROR, "Google API HTTP Error", e),
+                action_result.set_status(phantom.APP_ERROR, "Google API HTTP Error", err),
                 None,
             )
         except errors.Error as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Google API Request Error", e
-                ),
+                action_result.set_status(phantom.APP_ERROR, "Google API Request Error", err),
                 None,
             )
 
@@ -109,7 +109,8 @@ class GcloudComputeEngineConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
@@ -122,12 +123,18 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         zone = param["zone"]
         resourceid = param["id"]
         tags = param["tags"]
+        tags = [tags.strip() for tags in tags.split(',')]
+        tags = list(filter(None, tags))
+        if not tags:
+            tags = ""
+        else:
+            tags = ",".join(tags)
 
         try:
             request = self._client.instances().get(
@@ -142,7 +149,7 @@ class GcloudComputeEngineConnector(BaseConnector):
             return ret_val
 
         tags_body = {
-            "fingerprint": instance_details["tags"]["fingerprint"],
+            "fingerprint": instance_details.get("tags", {}).get("fingerprint"),
             "items": tags.split(","),
         }
 
@@ -166,7 +173,7 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         zone = param["zone"]
@@ -188,9 +195,13 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result.add_data(response)
 
         summary = action_result.update_summary({})
-        summary["id"] = response["id"]
-        summary["name"] = response["name"]
-        summary["machineType"] = response["machineType"]
+        try:
+            summary["id"] = response["id"]
+            summary["name"] = response["name"]
+            summary["machineType"] = response["machineType"]
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Success")
 
@@ -201,7 +212,7 @@ class GcloudComputeEngineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         zone = param["zone"]
@@ -224,15 +235,13 @@ class GcloudComputeEngineConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Success")
 
     def _handle_start_instance(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress(
             "In action handler for: {0}".format(self.get_action_identifier())
         )
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_discovery_client(action_result):
-            self.save_progress("Could not create API client.")
+            self.save_progress("Could not create API client")
             return action_result.get_status()
 
         zone = param["zone"]
@@ -257,7 +266,6 @@ class GcloudComputeEngineConnector(BaseConnector):
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
-        # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
         self.debug_print("action_id", self.get_action_identifier())
@@ -297,6 +305,7 @@ class GcloudComputeEngineConnector(BaseConnector):
 def main():
     import pudb
     import argparse
+    import requests
 
     pudb.set_trace()
 
