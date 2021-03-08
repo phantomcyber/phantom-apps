@@ -110,7 +110,7 @@ class SsmachineConnector(BaseConnector):
         if "X-Screenshotmachine-Response" in list(r.headers.keys()):
             return RetVal(result.set_status(phantom.APP_ERROR, "Screenshot Machine Returned an error: {0}".format(r.headers["X-Screenshotmachine-Response"])), None)
 
-        if ('html' in r.headers.get('Content-Type', '')):
+        if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, result)
 
         """
@@ -124,7 +124,7 @@ class SsmachineConnector(BaseConnector):
             message = r.text.replace('{', '{{').replace('}', '}}')
             return RetVal(result.set_status(phantom.APP_ERROR, "Call returned error, status_code: {0}, data: {1}".format(r.status_code, message)), None)
 
-        if ('image' not in r.headers.get('Content-Type', '')):
+        if 'image' not in r.headers.get('Content-Type', ''):
             message = r.text.replace('{', '{{').replace('}', '}}')
             return RetVal(result.set_status(phantom.APP_ERROR, "Response does not contain an image. status_code: {0}, data: {1}".format(r.status_code, message)), None)
 
@@ -181,7 +181,7 @@ class SsmachineConnector(BaseConnector):
         params['cacheLimit'] = '0'
         ret_val, resp_data = self._make_rest_call('', action_result, params, method='post', stream=True)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             action_result.append_to_message('Test connectivity failed')
             return action_result.get_status()
 
@@ -221,7 +221,7 @@ class SsmachineConnector(BaseConnector):
         params['timeout'] = '200'
 
         ret_val, image = self._make_rest_call('', action_result, params, method='post', stream=True)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         permalink = None
@@ -232,7 +232,7 @@ class SsmachineConnector(BaseConnector):
         if params['filename']:
             file_name = "{}.jpg".format(params['filename'])
         else:
-            file_name = param["url"] + "_screenshot.jpg"
+            file_name = "{0}{1}".format(param["url"], "_screenshot.jpg")
 
         is_download = False
         if hasattr(Vault, "create_attachment"):
@@ -241,7 +241,7 @@ class SsmachineConnector(BaseConnector):
             if vault_ret.get('succeeded'):
                 action_result.set_status(phantom.APP_SUCCESS, "Downloaded screenshot")
                 _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_ret[phantom.APP_JSON_HASH])
-                if (not vault_meta_info):
+                if not vault_meta_info:
                     self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_ret[phantom.APP_JSON_HASH]))
                     return action_result.set_status(phantom.APP_ERROR, "Could not find meta information of the downloaded screenshot's Vault")
 
@@ -262,7 +262,7 @@ class SsmachineConnector(BaseConnector):
                 temp_dir = Vault.get_vault_tmp_dir()
             else:
                 temp_dir = '/opt/phantom/vault/tmp'
-            temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+            temp_dir = "{0}{1}".format(temp_dir, '/{}'.format(uuid.uuid4()))
             os.makedirs(temp_dir)
             file_path = os.path.join(temp_dir, 'tempimage.jpg')
 
@@ -274,7 +274,7 @@ class SsmachineConnector(BaseConnector):
             if success:
                 action_result.set_status(phantom.APP_SUCCESS, "Downloaded screenshot")
                 _, _, vault_meta_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
-                if (not vault_meta_info):
+                if not vault_meta_info:
                     self.debug_print("Error while fetching meta information for vault ID: {}".format(vault_id))
                     return action_result.set_status(phantom.APP_ERROR, "Could not find meta information of the downloaded screenshot's Vault")
 
@@ -310,9 +310,9 @@ class SsmachineConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if (action_id == "get_screenshot"):
+        if action_id == "get_screenshot":
             ret_val = self._handle_post_url(param)
-        elif (action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        elif action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
 
         return ret_val
@@ -339,13 +339,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
@@ -367,7 +367,7 @@ if __name__ == '__main__':
             print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         exit(0)
 
@@ -379,7 +379,7 @@ if __name__ == '__main__':
         connector = SsmachineConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
