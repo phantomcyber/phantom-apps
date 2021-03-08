@@ -10,36 +10,39 @@
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
     "product_name": "Panorama",
-    "product_version_regex": "7\\..*\\..*",
+    "product_version_regex": ".*",
+    "latest_tested_versions": [
+        "On prem v7.0.4"
+    ],
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
-    "logo": "logo_pan.svg",
-    "logo_dark": "logo_pan_dark.svg",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "logo": "logo_panorama.svg",
+    "logo_dark": "logo_panorama_dark.svg",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "configuration": {
         "device": {
-            "data_type": "string",
-            "order": 0,
             "description": "Device IP/Hostname",
-            "required": true
+            "data_type": "string",
+            "required": true,
+            "order": 0
         },
         "verify_server_cert": {
-            "data_type": "boolean",
             "description": "Verify server certificate",
+            "data_type": "boolean",
             "order": 1,
             "default": true
         },
         "username": {
-            "data_type": "string",
-            "order": 2,
             "description": "Username",
-            "required": true
+            "data_type": "string",
+            "required": true,
+            "order": 2
         },
         "password": {
-            "data_type": "password",
-            "order": 3,
             "description": "Password",
-            "required": true
+            "data_type": "password",
+            "required": true,
+            "order": 3
         }
     },
     "actions": [
@@ -57,11 +60,10 @@
         {
             "action": "block url",
             "description": "Block an URL",
+            "verbose": "This action does the following to block a URL:<ul><li>Create an URL Filtering profile object named '<b>Phantom URL List for [device_group]</b>' containing the URL to block.</br>If the profile is already present, then it will be updated to include the URL to block.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created URL Filtering profile.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama</li><li>, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>",
             "type": "contain",
             "identifier": "block_url",
             "read_only": false,
-            "undo": "unblock url",
-            "verbose": "This action does the following to block a URL:<ul><li>Create an URL Filtering profile object named '<b>Phantom URL List for [device_group]</b>' containing the URL to block.</br>If the profile is already present, then it will be updated to include the URL to block.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created URL Filtering profile.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama</li><li>Followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>",
             "parameters": {
                 "url": {
                     "description": "URL to block",
@@ -96,12 +98,6 @@
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Block Url",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.parameter.url",
@@ -125,6 +121,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -138,26 +138,45 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Block Url",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "unblock url",
             "description": "Unblock an URL",
+            "verbose": "This action will remove the URL from the URL Filtering profile that was created/updated in the <b>block url</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
             "type": "correct",
             "identifier": "unblock_url",
             "read_only": false,
-            "verbose": "This action will remove the URL from the URL Filtering profile that was created/updated in the <b>block url</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
             "parameters": {
                 "url": {
                     "description": "URL to unblock",
@@ -176,12 +195,6 @@
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Block Url",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.parameter.url",
@@ -194,6 +207,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.device_group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -210,27 +227,45 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Unblock Url",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "block application",
             "description": "Block an application",
-            "verbose": "This action does the following to block an application:<ul><li>Create an Application group named '<b>Phantom App List for [device_group]</b>' containing the application to block.</br>If the group is already present, then it will be updated to include the application.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created application group.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama.</li><li>Followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>To get a list of applications that can be blocked, execute the <b>list applications</b> action.",
+            "verbose": "This action does the following to block an application:<ul><li>Create an Application group named '<b>Phantom App List for [device_group]</b>' containing the application to block.</br>If the group is already present, then it will be updated to include the application.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created application group.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama.</li><li>, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>To get a list of applications that can be blocked, execute the <b>list applications</b> action.",
             "type": "contain",
             "identifier": "block_application",
             "read_only": false,
-            "undo": "unblock application",
             "parameters": {
                 "application": {
                     "description": "Application to block",
@@ -265,12 +300,6 @@
                     "required": true
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 12,
-                "height": 5,
-                "title": "Block Application"
-            },
             "output": [
                 {
                     "data_path": "action_result.parameter.application",
@@ -294,75 +323,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "unblock application",
-            "description": "Unblock an application",
-            "type": "correct",
-            "identifier": "unblock_application",
-            "read_only": false,
-            "verbose": "This action will remove the application from the Application group that was created/updated in the <b>block application</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.<br>Note: This action will pass for any non-existing application name as API doesn't return an error for incorrect application name.",
-            "parameters": {
-                "application": {
-                    "description": "Application to unblock",
-                    "data_type": "string",
-                    "order": 0,
-                    "contains": [
-                        "network application"
-                    ],
-                    "primary": true,
-                    "required": true
-                },
-                "device_group": {
-                    "description": "Device group to configure, or 'shared'",
-                    "data_type": "string",
-                    "order": 1,
-                    "required": true
-                }
-            },
-            "render": {
-                "type": "table",
-                "width": 12,
-                "height": 5,
-                "title": "Unblock Application"
-            },
-            "output": [
-                {
-                    "data_path": "action_result.parameter.application",
-                    "data_type": "string",
-                    "column_name": "Application",
-                    "column_order": 0,
-                    "contains": [
-                        "network application"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.device_group",
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -379,26 +340,133 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Block Application"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock application",
+            "description": "Unblock an application",
+            "verbose": "This action will remove the application from the Application group that was created/updated in the <b>block application</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.<br>Note: This action will pass for any non-existing application name as API doesn't return an error for an incorrect application name.",
+            "type": "correct",
+            "identifier": "unblock_application",
+            "read_only": false,
+            "parameters": {
+                "application": {
+                    "description": "Application to unblock",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "network application"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "device_group": {
+                    "description": "Device group to configure or 'shared'",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.application",
+                    "data_type": "string",
+                    "column_name": "Application",
+                    "column_order": 0,
+                    "contains": [
+                        "network application"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Unblock Application"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "block ip",
             "description": "Block an IP",
-            "verbose": "<p>This action uses a multistep approach to block an IP.  The approach differs whether <b>is_source_address</b> is true or not.  By default, it is false.  The procedure is as follows:</p><ul><li>Create an address entry named '<b>[ip_address] Added By Phantom</b>' with the specified IP address<li>The container id of the phantom action is added as a tag to the address entry when it's created<li>If <b>is_source_address</b> is false:<ul><li> add this entry to an address group called <b>Phantom Network List for [device_group]</b></li><li>The address entry and group will be created in the device group specified in the <b>device_group</b> parameter</li><li>configure the address group as a <i>destination</i> to the policy specified in the <b>policy_name</b> parameter</li></ul>If <b>is_source_address</b> is true:<ul><li>add this entry to an address group called <b>PhantomNtwrkSrcLst[device_group]</b></li><li>The address entry and group will be created in the device group specified in the <b>device_group</b> parameter</li><li>configure the address group as a <i>source</i> to the policy specified in the <b>policy_name</b> parameter</ul><b>Note:</b> If the policy is not found on the device, the action will return an error.<li>The action then proceeds to <b>commit</b> the changes to Panorama.<li>Followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</ul><p><b>Please Note:</b> If the Panorama Policy that is used to block a source or destination address has 'Any' in the Source Address or Destination Address field, Block IP will succeed but it will not work.  Therefore, make sure that the policy that the address group will be appended to has no 'Any' in the field that you are blocking from.  i.e, if you are blocking an IP from source, make sure the policy does not have 'Any' under Source Address.</p><p>The address group name is limited to 32 characters.  The device group chosen will be appended to the address group name created.  If the resulting name is too long, the name will be trimmed, which may result in clipped or unusual names.  This is as intended, as it is a limitation by Panorama.",
+            "verbose": "<p>This action uses a multistep approach to block an IP.  The approach differs whether <b>is_source_address</b> is true or not.  By default, it is false.  The procedure is as follows:</p><ul><li>Create an address entry named '<b>[ip_address] Added By Phantom</b>' with the specified IP address<li>The container id of the phantom action is added as a tag to the address entry when it's created<li>If <b>is_source_address</b> is false:<ul><li> add this entry to an address group called <b>Phantom Network List for [device_group]</b></li><li>The address entry and group will be created in the device group specified in the <b>device_group</b> parameter</li><li>configure the address group as a <i>destination</i> to the policy specified in the <b>policy_name</b> parameter</li></ul>If <b>is_source_address</b> is true:<ul><li>add this entry to an address group called <b>PhantomNtwrkSrcLst[device_group]</b></li><li>The address entry and group will be created in the device group specified in the <b>device_group</b> parameter</li><li>configure the address group as a <i>source</i> to the policy specified in the <b>policy_name</b> parameter</ul><b>Note:</b> If the policy is not found on the device, the action will return an error.<li>The action then proceeds to <b>commit</b> the changes to Panorama.<li>, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</ul><p><b>Please Note:</b> If the Panorama Policy that is used to block a source or destination address has 'Any' in the Source Address or Destination Address field, Block IP will succeed but it will not work.  Therefore, make sure that the policy that the address group will be appended to has no 'Any' in the field that you are blocking from.  i.e, if you are blocking an IP from source, make sure the policy does not have 'Any' under Source Address.</p><p>The address group name is limited to 32 characters.  The device group chosen will be appended to the address group name created.  If the resulting name is too long, the name will be trimmed, which may result in clipped or unusual names.  This is as intended, as it is a limitation by Panorama.",
             "type": "contain",
             "identifier": "block_ip",
-            "undo": "unblock ip",
             "read_only": false,
             "parameters": {
                 "ip": {
@@ -439,12 +507,6 @@
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Block Ip",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.parameter.ip",
@@ -472,6 +534,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -485,26 +551,45 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Block Ip",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "unblock ip",
             "description": "Unblock an IP",
+            "verbose": "This action will remove the address entry from the Address group that was created/updated in the <b>block ip</b> action.  This action behaves differently based upon whether <b>is_source_address</b> is true or false.  By default, it is false.<br>If <b>is_source_address</b> is false:<ul><li>The given IP address will be removed from the <b>Phantom Network List for [device_group]</b> Address Group.</li></ul>If <b>is_source_address</b> is true:<ul><li>The given IP address will be removed from the <b>PhantomNtwrkSrcLst[device_group]</b> Address Group.</li></ul>The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
             "type": "correct",
             "identifier": "unblock_ip",
             "read_only": false,
-            "verbose": "This action will remove the address entry from the Address group that was created/updated in the <b>block ip</b> action.  This action behaves differently based upon whether <b>is_source_address</b> is true or false.  By default, it is false.<br>If <b>is_source_address</b> is false:<ul><li>The given IP address will be removed from the <b>Phantom Network List for [device_group]</b> Address Group.</li></ul>If <b>is_source_address</b> is true:<ul><li>The given IP address will be removed from the <b>PhantomNtwrkSrcLst[device_group]</b> Address Group.</li></ul>The action then proceeds to <b>commit</b> the changes to Panorama. Followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
             "parameters": {
                 "ip": {
                     "description": "IP to unblock",
@@ -528,12 +613,6 @@
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Unblock Ip",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
                     "data_path": "action_result.parameter.ip",
@@ -553,6 +632,10 @@
                     "data_type": "boolean"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -566,17 +649,36 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "column_name": "Message",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "command succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Unblock Ip",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -586,21 +688,7 @@
             "identifier": "list_apps",
             "read_only": true,
             "parameters": {},
-            "render": {
-                "type": "table",
-                "width": 12,
-                "height": 5,
-                "title": "Application List"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.@name",
                     "data_type": "string",
@@ -609,10 +697,6 @@
                     "contains": [
                         "network application"
                     ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.category",
@@ -963,24 +1047,55 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values":[
+                        "Total applications: 2421"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_applications",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Application List"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "run query",
             "description": "Run a query on Panorama",
-            "verbose": "This action runs a query on Panorama and returns the set of logs matching the search criteria.<br><br>Use the <b>range</b> parameter to limit the amount of logs returned by the action. If no range is given, the action will use the range <b>1-5000</b>. The action can retrieve up to a maximum of 5000 logs. If more logs need to be retrieved, rerun the action with the next sequential range of values.<br><br>The <b>log_type</b> parameter can be one of the following:<ul><li><b>traffic</b> - traffic logs</li><li><b>url</b> - URL filtering logs</li><li><b>data</b> - data filtering logs</li><li><b>threat</b> - threat logs</li><li><b>config</b> - config logs</li><li><b>system</b> - system logs</li><li><b>hipmatch</b> - HIP match logs</li><li><b>wildfire</b> - wildfire logs</li><li><b>corr</b> - correlated event logs</li><li><b>corr-categ</b> - correlated events by category</li><li><b>corr-detail</b> - correlated event details</li></ul>",
+            "verbose": "This action runs a query on Panorama and returns the set of logs matching the search criteria.<br><br>Use the <b>range</b> parameter to limit the number of logs returned by the action. If no range is given, the action will use the range <b>1-5000</b>. The action can retrieve up to a maximum of 5000 logs. If more logs need to be retrieved, rerun the action with the next sequential range of values.<br><br>The <b>log_type</b> parameter can be one of the following:<ul><li><b>traffic</b> - traffic logs</li><li><b>url</b> - URL filtering logs</li><li><b>data</b> - data filtering logs</li><li><b>threat</b> - threat logs</li><li><b>config</b> - config logs</li><li><b>system</b> - system logs</li><li><b>hipmatch</b> - HIP match logs</li><li><b>wildfire</b> - wildfire logs</li><li><b>corr</b> - correlated event logs</li><li><b>corr-categ</b> - correlated events by category</li><li><b>corr-detail</b> - correlated event details</li></ul>",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
@@ -1027,13 +1142,35 @@
                     "order": 3
                 }
             },
-            "render": {
-                "type": "table",
-                "width": 12,
-                "height": 5,
-                "title": "Query"
-            },
             "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "( port.dst eq 161 )"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.log_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "traffic"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "backward"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.range",
+                    "data_type": "string",
+                    "example_values": [
+                        "1-5000"
+                    ]
+                },
                 {
                     "data_path": "action_result.data.*.job.id",
                     "data_type": "string",
@@ -1575,7 +1712,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "REST Api call succeeded. code: '19'"
+                        "Num logs: 1"
                     ]
                 },
                 {
@@ -1583,34 +1720,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         21
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.query",
-                    "data_type": "string",
-                    "example_values": [
-                        "( port.dst eq 161 )"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.log_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "traffic"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.direction",
-                    "data_type": "string",
-                    "example_values": [
-                        "backward"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.range",
-                    "data_type": "string",
-                    "example_values": [
-                        "1-5000"
                     ]
                 },
                 {
@@ -1628,6 +1737,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Query"
+            },
             "versions": "EQ(*)"
         }
     ]

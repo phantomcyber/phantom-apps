@@ -1,8 +1,7 @@
 # File: panorama_consts.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 PAN_ERR_REPLY_FORMAT_KEY_MISSING = "None '{key}' missing in reply from device"
 PAN_ERR_REPLY_NOT_SUCCESS = "REST call returned '{status}'"
@@ -16,13 +15,14 @@ PAN_ERR_DEVICE_CONNECTIVITY = "Error in connecting to device"
 PAN_ERR_PARSE_POLICY_DATA = "Unable to parse security policy config"
 PAN_ERR_NO_POLICY_ENTRIES_FOUND = "Could not find any security policies to update"
 PAN_ERR_NO_ALLOW_POLICY_ENTRIES_FOUND = "Did not find any policies with an 'allow' action for device group '{dev_sys_value}' and type '{policy_type}'."
-PAN_ERR_NO_ALLOW_POLICY_ENTRIES_FOUND += "\nNeed atleast one such policy."
-PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE = "Policy not found. Please make sure the policy name specified in the parameter exists."
+PAN_ERR_NO_ALLOW_POLICY_ENTRIES_FOUND += "\nNeed atleast one such policy"
+PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE = "Policy not found. Please verify that provided parameter values are correct"
 PAN_ERR_NO_JOB_ID = "Could not find Job ID in response body"
 PAN_ERR_CODE_MESSAGE = "Error code unavailable"
 PAN_ERR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters"
 TYPE_ERR_MESSAGE = "Error occurred while connecting to the Panorama server. Please check the asset configuration and|or the action parameters"
 PARSE_ERR_MESSAGE = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+PAN_ERR_MSG = "Error occurred while {}. Details: {}"
 
 PAN_PROG_USING_BASE_URL = "Using base URL '{base_url}'"
 PAN_PROG_GOT_REPLY = "Got reply, parsing..."
@@ -109,3 +109,9 @@ TAG_ELEM = "<entry name='{tag}'><color>{tag_color}</color><comments>{tag_comment
 APP_LIST_XPATH = "/config/predefined/application"
 COMMIT_ALL_DEV_GRP_DEV_CMD = '<commit-all><shared-policy>'
 COMMIT_ALL_DEV_GRP_DEV_CMD += '<device-group><entry name="{device_group}"><devices><entry name="{dev_ser_num}"/></devices></entry></device-group></shared-policy></commit-all>'
+
+# Constants relating to value_list check
+POLICY_TYPE_VALUE_LIST = ["pre-rulebase", "post-rulebase"]
+LOG_TYPE_VALUE_LIST = ["traffic", "url", "corr", "data", "threat", "config", "system", "hipmatch", "wildfire", "corr-categ", "corr-detail"]
+DIRECTION_VALUE_LIST = ["backward", "forward"]
+VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

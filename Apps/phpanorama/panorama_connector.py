@@ -1,8 +1,7 @@
 # File: panorama_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom imports
 import phantom.app as phantom
@@ -54,7 +53,7 @@ class PanoramaConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
 
         # Base URL
-        self._base_url = 'https://' + config[phantom.APP_JSON_DEVICE] + '/api/'
+        self._base_url = 'https://{}/api/'.format(config[phantom.APP_JSON_DEVICE])
 
         self._dev_sys_key = "device-group"
 
@@ -121,29 +120,29 @@ class PanoramaConnector(BaseConnector):
 
         msg = response.get('msg')
 
-        if (msg is None):
+        if msg is None:
             return
 
         # parse it as a dictionary
-        if (isinstance(msg, dict)):
+        if isinstance(msg, dict):
             line = msg.get('line')
-            if (line is None):
+            if line is None:
                 return
-            if (isinstance(line, list)):
-                action_result.append_to_message("message: '{}'".format(', '.join(line)))
-            elif (isinstance(line, dict)):
-                action_result.append_to_message("message: '{}'".format(line.get('line', '')))
+            if isinstance(line, list):
+                action_result.append_to_message(', '.join(line))
+            elif isinstance(line, dict):
+                action_result.append_to_message(line.get('line', ''))
             else:
-                action_result.append_to_message("message: '{}'".format(line))
+                action_result.append_to_message(line)
             return
 
         # parse it as a string
         try:
-            if (type(msg) == str) or (type(msg) == unicode):
-                action_result.append_to_message("message: '{}'".format(msg))
+            if type(msg) == str or type(msg) == unicode:
+                action_result.append_to_message(msg)
         except:
-            if (type(msg) == str):
-                action_result.append_to_message("message: '{}'".format(msg))
+            if type(msg) == str:
+                action_result.append_to_message(msg)
         return
 
     def _parse_response(self, response_dict, action_result):
@@ -153,35 +152,36 @@ class PanoramaConnector(BaseConnector):
 
         response = response_dict.get('response')
 
-        if (response is None):
+        if response is None:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response'))
 
         status = response.get('@status')
 
-        if (status is None):
+        if status is None:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response/status'))
 
-        if (status != 'success'):
+        if status != 'success':
             action_result.set_status(phantom.APP_ERROR, PAN_ERR_REPLY_NOT_SUCCESS.format(status=status))
         else:
-            action_result.set_status(phantom.APP_SUCCESS, PAN_SUCC_REST_CALL_SUCCEEDED)
+            action_result.set_status(phantom.APP_SUCCESS)
 
+        '''
         code = response.get('@code')
-        if (code is not None):
-            action_result.append_to_message("code: '{}'".format(code))
+        if code is not None:
+            action_result.append_to_message("code: '{}'".format(code))'''
 
         self._parse_response_msg(response, action_result)
 
         result = response.get('result')
 
-        if (result is not None):
+        if result is not None:
             action_result.add_data(result)
 
         return action_result.get_status()
 
     def _get_key(self):
 
-        if (self._key is not None):
+        if self._key is not None:
             # key already created for this call
             return phantom.APP_SUCCESS
 
@@ -210,29 +210,29 @@ class PanoramaConnector(BaseConnector):
 
         response = response_dict.get('response')
 
-        if (response is None):
+        if response is None:
             message = PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response')
             return self.set_status(phantom.APP_ERROR, message)
 
         status = response.get('@status')
 
-        if (status is None):
+        if status is None:
             message = PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response/status')
             return self.set_status(phantom.APP_ERROR, message)
 
-        if (status != 'success'):
+        if status != 'success':
             message = PAN_ERR_REPLY_NOT_SUCCESS.format(status=status)
             return self.set_status(phantom.APP_ERROR, message)
 
         result = response.get('result')
 
-        if (result is None):
+        if result is None:
             message = PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response/result')
             return self.set_status(phantom.APP_ERROR, message)
 
         key = result.get('key')
 
-        if (key is None):
+        if key is None:
             message = PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response/result/key')
             return self.set_status(phantom.APP_ERROR, message)
 
@@ -247,7 +247,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             self.append_to_message(PAN_ERR_TEST_CONNECTIVITY_FAILED)
             return self.get_status()
 
@@ -283,24 +283,24 @@ class PanoramaConnector(BaseConnector):
 
         status = self._parse_response(response_dict, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         return action_result.get_status()
 
     def _add_commit_status(self, job, action_result):
 
-        if (job['result'] == 'OK'):
+        if job['result'] == 'OK':
             return phantom.APP_SUCCESS
 
         status_string = ""
 
-        if (job['result'] == 'FAIL'):
+        if job['result'] == 'FAIL':
 
             action_result.set_status(phantom.APP_ERROR)
 
             try:
-                status_string += '\n'.join(job['details']['line'])
+                status_string = '{}{}'.format(status_string, '\n'.join(job['details']['line']))
             except Exception as e:
                 self.debug_print("Parsing commit status dict, handled exception", self._get_error_message_from_exception(e))
                 pass
@@ -324,14 +324,14 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         # Get the job id of the commit call from the result_data, also pop it since we don't need it
         # to be in the action result
         result_data = action_result.get_data()
 
-        if (len(result_data) == 0):
+        if len(result_data) == 0:
             return action_result.get_status()
 
         result_data = result_data.pop(0)
@@ -351,7 +351,7 @@ class PanoramaConnector(BaseConnector):
 
             status = self._make_rest_call(data, status_action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 action_result.set_status(phantom.APP_SUCCESS, status_action_result.get_message())
                 return action_result.get_status()
 
@@ -359,10 +359,14 @@ class PanoramaConnector(BaseConnector):
 
             # get the result_data and the job status
             result_data = status_action_result.get_data()
-            job = result_data[0]['job']
-            if (job['status'] == 'FIN'):
-                self._add_commit_status(job, action_result)
-                break
+            try:
+                job = result_data[0]['job']
+                if job['status'] == 'FIN':
+                    self._add_commit_status(job, action_result)
+                    break
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
             # send the % progress
             self.send_progress(PAN_PROG_COMMIT_PROGRESS, progress=job.get('progress'))
@@ -383,13 +387,13 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return (action_result.get_status(), device_groups)
 
         # Get the data, if the policy existed, we will have some data
         result_data = action_result.get_data()
 
-        if (not result_data):
+        if not result_data:
             return (action_result.set_status(phantom.APP_ERROR, "Got empty list for device groups"), device_groups)
 
         try:
@@ -411,13 +415,13 @@ class PanoramaConnector(BaseConnector):
     def _get_device_commit_details_string(self, commit_all_device_details):
 
         try:
-            if (type(commit_all_device_details) == str) or (type(commit_all_device_details) == unicode):
+            if type(commit_all_device_details) == str or type(commit_all_device_details) == unicode:
                 return commit_all_device_details
         except:
-            if (type(commit_all_device_details) == str):
+            if type(commit_all_device_details) == str:
                 return commit_all_device_details
 
-        if (type(commit_all_device_details) == dict):
+        if type(commit_all_device_details) == dict:
             try:
                 return "{0}, warnings: {1}".format('\n'.join(commit_all_device_details['msg']['errors']['line']),
                         '\n'.join(commit_all_device_details['msg']['warnings']['line']))
@@ -430,7 +434,7 @@ class PanoramaConnector(BaseConnector):
         status_string = ''
         device_group_status = phantom.APP_ERROR
 
-        if (job['result'] == 'OK'):
+        if job['result'] == 'OK':
             device_group_status |= phantom.APP_SUCCESS
 
         devices = []
@@ -441,25 +445,25 @@ class PanoramaConnector(BaseConnector):
             self.debug_print("Parsing commit all message, handled exception", self._get_error_message_from_exception(e))
             devices = []
 
-        if (isinstance(devices, dict)):
+        if isinstance(devices, dict):
             devices = [devices]
 
-        status_string += '<ul>'
-        if (not devices):
-            status_string += '<li>No device status found, possible that no devices configured</li>'
+        status_string = '{}<ul>'.format(status_string)
+        if not devices:
+            status_string = '{}<li>No device status found, possible that no devices configured</li>'.format(status_string)
 
         for device in devices:
             try:
-                if (device['result'] != 'FAIL'):
+                if device['result'] != 'FAIL':
                     device_group_status |= phantom.APP_SUCCESS
 
                 device_status = "Device Name: {0}, Result: {1}, Details: {2}".format(device['devicename'], device['result'],
                         self._get_device_commit_details_string(device['details']))
-                status_string += "<li>{0}</li>".format(device_status)
+                status_string = "{0}<li>{1}</li>".format(status_string, device_status)
             except Exception as e:
                 self.debug_print("Parsing commit all message for a single device, handled exception", self._get_error_message_from_exception(e))
 
-        status_string += '</ul>'
+        status_string = '{}</ul>'.format(status_string)
 
         status_string = "Commit status for device group '{0}':\n{1}".format(job['dgname'], status_string)
 
@@ -475,7 +479,7 @@ class PanoramaConnector(BaseConnector):
         except:
             return device_ar.set_status(phantom.APP_ERROR, "Unable to parse job response")
 
-        if (result == 'OK'):
+        if result == 'OK':
             status = phantom.APP_SUCCESS
 
         try:
@@ -483,43 +487,47 @@ class PanoramaConnector(BaseConnector):
         except:
             return device_ar.set_status(status, "Job response did not contain device specific information")
 
-        if (isinstance(devices, dict)):
+        if isinstance(devices, dict):
             devices = [devices]
 
-        for device in devices:
-            status_message += "\nDevice '{0} ({1})'".format(device['devicename'], device['serial-no'])
-            status_message += "\nStatus: {0}".format(device['status'])
+        try:
+            for device in devices:
+                status_message = "{0}\nDevice '{1} ({2})'".format(status_message, device['devicename'], device['serial-no'])
+                status_message = "{0}\nStatus: {1}".format(status_message, device['status'])
 
-            detail_lines = []
-            details = device.get('details')
-            try:
-                if ((isinstance(details, str)) or (isinstance(details, unicode))):
-                    detail_lines.append(details)
-            except:
-                if ((isinstance(details, str)) or (isinstance(details, unicode))):
-                    detail_lines.append(details)
-            else:
+                detail_lines = []
+                details = device.get('details')
                 try:
-                    errors = device['details']['msg']['errors']['line']
-                    if (not isinstance(errors, list)):
-                        detail_lines.append(errors)
-                    else:
-                        detail_lines.extend(errors)
+                    if isinstance(details, str) or isinstance(details, unicode):
+                        detail_lines.append(details)
                 except:
-                    pass
+                    if isinstance(details, str) or isinstance(details, unicode):
+                        detail_lines.append(details)
+                else:
+                    try:
+                        errors = device['details']['msg']['errors']['line']
+                        if not isinstance(errors, list):
+                            detail_lines.append(errors)
+                        else:
+                            detail_lines.extend(errors)
+                    except:
+                        pass
 
-                try:
-                    warnings = device['details']['msg']['warnings']['line']
-                    if (not isinstance(warnings, list)):
-                        detail_lines.append(warnings)
-                    else:
-                        detail_lines.extend(warnings)
-                except:
-                    pass
+                    try:
+                        warnings = device['details']['msg']['warnings']['line']
+                        if not isinstance(warnings, list):
+                            detail_lines.append(warnings)
+                        else:
+                            detail_lines.extend(warnings)
+                    except:
+                        pass
 
-            status_message += "\nDetails:"
-            for detail_line in detail_lines:
-                status_message += "\n{0}".format(detail_line)
+                status_message = "{}\nDetails:".format(status_message)
+                for detail_line in detail_lines:
+                    status_message = "{0}\n{1}".format(status_message, detail_line)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return device_ar.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
         return device_ar.set_status(status, status_message)
 
@@ -540,14 +548,14 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, commit_dev_ar)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return device_ar.set_status(commit_dev_ar.get_status(), commit_dev_ar.get_message())
 
         # Get the job id of the commit call from the result_data, also pop it since we don't need it
         # to be in the action result
         result_data = commit_dev_ar.get_data()
 
-        if (len(result_data) == 0):
+        if len(result_data) == 0:
             return device_ar.set_status(commit_dev_ar.get_status(), commit_dev_ar.get_message())
 
         result_data = result_data.pop(0)
@@ -567,7 +575,7 @@ class PanoramaConnector(BaseConnector):
 
             status = self._make_rest_call(data, status_action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return device_ar.set_status(phantom.APP_SUCCESS, status_action_result.get_message())
 
             self.debug_print("status", status_action_result)
@@ -577,10 +585,13 @@ class PanoramaConnector(BaseConnector):
             job = result_data[0].get('job')
             if not job:
                 continue
-
-            if (job['status'] == 'FIN'):
-                self._parse_device_job_response(job, device_ar)
-                break
+            try:
+                if job['status'] == 'FIN':
+                    self._parse_device_job_response(job, device_ar)
+                    break
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return device_ar.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
             # send the % progress
             self.send_progress(PAN_PROG_COMMIT_PROGRESS, progress=job.get('progress'))
@@ -602,14 +613,14 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, rest_call_action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.set_status(rest_call_action_result.get_status(), rest_call_action_result.get_message())
 
         # Get the job id of the commit call from the result_data, also pop it since we don't need it
         # to be in the action result
         result_data = rest_call_action_result.get_data()
 
-        if (len(result_data) == 0):
+        if len(result_data) == 0:
             return action_result.set_status(rest_call_action_result.get_status(), rest_call_action_result.get_message())
 
         result_data = result_data.pop(0)
@@ -629,7 +640,7 @@ class PanoramaConnector(BaseConnector):
 
             status = self._make_rest_call(data, status_action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 action_result.set_status(phantom.APP_SUCCESS, status_action_result.get_message())
                 return action_result.get_status()
 
@@ -637,10 +648,14 @@ class PanoramaConnector(BaseConnector):
 
             # get the result_data and the job status
             result_data = status_action_result.get_data()
-            job = result_data[0]['job']
-            if (job['status'] == 'FIN'):
-                self._parse_device_group_job_response(job, action_result)
-                break
+            try:
+                job = result_data[0]['job']
+                if job['status'] == 'FIN':
+                    self._parse_device_group_job_response(job, action_result)
+                    break
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
             # send the % progress
             self.send_progress(PAN_PROG_COMMIT_PROGRESS, progress=job.get('progress'))
@@ -674,17 +689,17 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return (action_result.get_status(), name)
 
         # Try to figure out the type of ip
-        if (block_ip.find('/') != -1):
+        if block_ip.find('/') != -1:
             ip_type = 'ip-netmask'
-        elif (block_ip.find('-') != -1):
+        elif block_ip.find('-') != -1:
             ip_type = 'ip-range'
-        elif (phantom.is_ip(block_ip)):
+        elif phantom.is_ip(block_ip):
             ip_type = 'ip-netmask'
-        elif(phantom.is_hostname(block_ip)):
+        elif phantom.is_hostname(block_ip):
             ip_type = 'fqdn'
         else:
             return (action_result.set_status(phantom.APP_ERROR, PAN_ERR_INVALID_IP_FORMAT), name)
@@ -701,7 +716,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return (action_result.get_status(), name)
 
         return (phantom.APP_SUCCESS, name)
@@ -712,7 +727,7 @@ class PanoramaConnector(BaseConnector):
             rules_xpath = '{config_xpath}/{policy_type}/security/rules'.format(config_xpath=self._get_config_xpath(param),
                     policy_type=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_POLICY_TYPE]))
             policy_name = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_POLICY_NAME])
-            rules_xpath += "/entry[@name='{policy_name}']".format(policy_name=policy_name)
+            rules_xpath = "{rules_xpath}/entry[@name='{policy_name}']".format(rules_xpath=rules_xpath, policy_name=policy_name)
         except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, "Unable to create xpath to the security policies", self._get_error_message_from_exception(e)), None)
 
@@ -724,20 +739,20 @@ class PanoramaConnector(BaseConnector):
 
         self.debug_print("Updating Security Policy", sec_policy_name)
 
-        if((sec_policy_type == SEC_POL_IP_TYPE) and (not use_source)):
+        if (sec_policy_type == SEC_POL_IP_TYPE) and (not use_source):
             element = IP_GRP_SEC_POL_ELEM.format(ip_group_name=name)
-        elif((sec_policy_type == SEC_POL_IP_TYPE) and (use_source)):
+        elif (sec_policy_type == SEC_POL_IP_TYPE) and (use_source):
             element = IP_GRP_SEC_POL_ELEM_SRC.format(ip_group_name=name)
-        elif(sec_policy_type == SEC_POL_APP_TYPE):
+        elif sec_policy_type == SEC_POL_APP_TYPE:
             element = APP_GRP_SEC_POL_ELEM.format(app_group_name=name)
-        elif(sec_policy_type == SEC_POL_URL_TYPE):
+        elif sec_policy_type == SEC_POL_URL_TYPE:
             element = URL_PROF_SEC_POL_ELEM.format(url_prof_name=name)
         else:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_CREATE_UNKNOWN_TYPE_SEC_POL)
 
         status, rules_xpath = self._get_security_policy_xpath(param, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         data = {'type': 'config',
@@ -750,7 +765,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         return phantom.APP_SUCCESS
@@ -759,7 +774,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -779,30 +794,34 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking application", action_result.get_message()))
 
+        message = action_result.get_message()
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _block_application(self, param):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
+
         # Check if policy is present or not
         status, policy_present = self._does_policy_exist(param, action_result)
         action_result.set_data_size(0)
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking application", action_result.get_message()))
 
-        if (not policy_present):
+        if not policy_present:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
 
         self.debug_print("Creating the Application Group")
@@ -820,24 +839,26 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking application", action_result.get_message()))
+
+        message = action_result.get_message()
 
         # Update the security policy
         status = self._update_security_policy(param, SEC_POL_APP_TYPE, action_result, app_group_name)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking application", action_result.get_message()))
 
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _unblock_url(self, param):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -859,30 +880,34 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
 
+        message = action_result.get_message()
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _block_url(self, param):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
+
         # Check if policy is present or not
         status, policy_present = self._does_policy_exist(param, action_result)
         action_result.set_data_size(0)
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
-        if (not policy_present):
+        if not policy_present:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
 
         self.debug_print("Adding the Block URL")
@@ -899,19 +924,21 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        message = action_result.get_message()
 
         # Create the policy
         status = self._update_security_policy(param, SEC_POL_URL_TYPE, action_result, url_prof_name)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _get_dgs(self, action_result):
 
@@ -923,12 +950,12 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, dgs_ar)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return (action_result.set_status(action_result.get_status(), action_result.get_message()), None)
 
         dgs = dgs_ar.get_data()
 
-        if (not dgs):
+        if not dgs:
             return (action_result.set_status(phantom.APP_ERROR, "Got an empty list of connected devices"), None)
 
         try:
@@ -937,37 +964,41 @@ class PanoramaConnector(BaseConnector):
             self.debug_print("Parsing connected devices exception:", e)
             return (action_result.set_status(phantom.APP_ERROR, "Unable to parse connected devices query response"), None)
 
-        if (not dgs):
+        if not dgs:
             return (action_result.set_status(phantom.APP_ERROR, "Got an empty list of connected devices"), None)
 
         ret_dgs = {}
         # Do some cleanup, the response is a xml parsed into json.
-        for curr_dg in dgs:
+        try:
+            for curr_dg in dgs:
 
-            # set this dg in the master dictionary of dgs
-            name = curr_dg['@name']
-            dg = {'devices': {}, '@name': name}
-            ret_dgs[name] = dg
+                # set this dg in the master dictionary of dgs
+                name = curr_dg['@name']
+                dg = {'devices': {}, '@name': name}
+                ret_dgs[name] = dg
 
-            devices = curr_dg.get('devices')
+                devices = curr_dg.get('devices')
 
-            if (not devices):
-                continue
+                if not devices:
+                    continue
 
-            entry = curr_dg['devices'].get('entry')
-            if (not entry):
-                continue
+                entry = curr_dg['devices'].get('entry')
+                if not entry:
+                    continue
 
-            if (isinstance(entry, dict)):
-                devices = [entry]
-            else:
+                if isinstance(entry, dict):
+                    devices = [entry]
+                else:
+                    # it's a list
+                    devices = entry
+
                 # it's a list
-                devices = entry
-
-            # it's a list
-            for device in devices:
-                name = device['@name']
-                dg['devices'][name] = device
+                for device in devices:
+                    name = device['@name']
+                    dg['devices'][name] = device
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return (action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err)), None)
 
         return (phantom.APP_SUCCESS, ret_dgs)
 
@@ -982,11 +1013,11 @@ class PanoramaConnector(BaseConnector):
             dg_status_value = dg_status.items()
         for dg, dg_status in dg_status_value:
 
-            status_message += "Device Group: '{0}'\n".format(dg)
+            status_message = "{0}Device Group: '{1}'\n".format(status_message, dg)
             devices = dg_status.get('devices')
-            if (not devices):
+            if not devices:
                 status |= phantom.APP_ERROR
-                status_message += 'No Devices'
+                status_message = '{}No Devices'.format(status_message)
                 continue
 
             try:
@@ -995,7 +1026,7 @@ class PanoramaConnector(BaseConnector):
                 devices_value = devices.items()
             for device, dev_ar in devices_value:
                 status |= dev_ar.get_status()
-                status_message += '{0}\n'.format(dev_ar.get_message())
+                status_message = '{0}{1}\n'.format(status_message, dev_ar.get_message())
 
         return action_result.set_status(status, status_message)
 
@@ -1004,19 +1035,19 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         status = self._commit_config(action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
         device_groups = [device_group]
 
-        if (device_group.lower() == PAN_DEV_GRP_SHARED):
+        if device_group.lower() == PAN_DEV_GRP_SHARED:
             # get all the device groups
             status, device_groups = self._get_all_device_groups(param, action_result)
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return action_result.get_status()
 
-        if (not device_groups):
+        if not device_groups:
             return action_result.set_status(phantom.APP_ERROR, "Got empty device group list")
 
         # Reset the action_result object to error
@@ -1032,7 +1063,7 @@ class PanoramaConnector(BaseConnector):
         status_message = ''
         for dev_group_ar in dev_groups_ar:
             status |= dev_group_ar.get_status()
-            status_message += dev_group_ar.get_message()
+            status_message = '{}{}'.format(status_message, dev_group_ar.get_message())
 
         action_result.set_status(status, status_message)
 
@@ -1043,7 +1074,7 @@ class PanoramaConnector(BaseConnector):
         # Get the list of connected devices
         status, dgs = self._get_dgs(action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         self._device_groups = dgs
@@ -1051,20 +1082,20 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         status = self._commit_config(action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         # Now Commit for each device in the device group
         device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
         device_groups = [device_group]
 
-        if (device_group.lower() == PAN_DEV_GRP_SHARED):
+        if device_group.lower() == PAN_DEV_GRP_SHARED:
             # get all the device groups
             status, device_groups = self._get_all_device_groups(param, action_result)
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return action_result.get_status()
 
-        if (not device_groups):
+        if not device_groups:
             return action_result.set_status(phantom.APP_ERROR, "Got empty device group list")
 
         # Reset the action_result object to error
@@ -1080,13 +1111,13 @@ class PanoramaConnector(BaseConnector):
 
             dg_info = dgs.get(device_group)
 
-            if (not dg_info):
+            if not dg_info:
                 dg_status[device_group] = {'status': phantom.APP_ERROR, 'message': 'Device group {0} not found in the response from the device'.format(device_group)}
                 continue
 
             devices = dg_info.get('devices')
 
-            if (not devices):
+            if not devices:
                 dg_status[device_group] = {'status': phantom.APP_ERROR, 'message': 'Device group {0} does not contain any devices'.format(device_group)}
                 continue
 
@@ -1103,7 +1134,7 @@ class PanoramaConnector(BaseConnector):
                 # create a status dictionary
                 curr_dg_devices[device] = device_ar = ActionResult()
 
-                if (dev_info['connected'].lower() == 'no'):
+                if dev_info['connected'].lower() == 'no':
                     device_ar.set_status(phantom.APP_ERROR, "Device '{0} ({1})' ignored since it's not connected to the device group".format(dev_info['hostname'],
                         dev_info['serial']))
                     continue
@@ -1119,7 +1150,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1152,30 +1183,34 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking ip", action_result.get_message()))
 
+        message = action_result.get_message()
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _block_ip(self, param):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
+
         # Check if policy is present or not
         status, policy_present = self._does_policy_exist(param, action_result)
         action_result.set_data_size(0)
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking ip", action_result.get_message()))
 
-        if (not policy_present):
+        if not policy_present:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
 
         # Next create the ip
@@ -1186,8 +1221,8 @@ class PanoramaConnector(BaseConnector):
 
         status, addr_name = self._add_address_entry(param, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking ip", action_result.get_message()))
 
         if use_source:
             block_ip_grp = BLOCK_IP_GROUP_NAME_SRC.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
@@ -1206,30 +1241,35 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        message = action_result.get_message()
+
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking ip", action_result.get_message()))
 
         # Update the security policy
         status = self._update_security_policy(param, SEC_POL_IP_TYPE, action_result, ip_group_name, use_source=use_source)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Committed successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _run_query(self, param):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         query = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_QUERY])
         log_type = param.get(PAN_JSON_LOG_TYPE, 'traffic')
+
+        if log_type not in LOG_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(LOG_TYPE_VALUE_LIST, 'log_type'))
 
         offset_range = param.get('range', '1-{0}'.format(MAX_QUERY_COUNT))
 
@@ -1251,25 +1291,29 @@ class PanoramaConnector(BaseConnector):
         if offset_diff > MAX_QUERY_COUNT:
             return action_result.set_status(phantom.APP_ERROR, "The given range is too large. Maxmimum range is {0}.".format(MAX_QUERY_COUNT))
 
+        direction = param.get('direction', 'backward')
+        if direction not in DIRECTION_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(DIRECTION_VALUE_LIST, 'direction'))
+
         data = {'type': 'log',
                 'log-type': log_type,
                 'key': self._key,
                 'query': query,
                 'skip': min_offset - 1,
                 'nlogs': offset_diff,
-                'dir': param.get('direction', 'backward')}
+                'dir': direction}
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("running query", action_result.get_message()))
 
         # Get the job id of the query call from the result_data, also pop it since we don't need it
         # to be in the action result
         result_data = action_result.get_data()
 
-        if (len(result_data) == 0):
-            return action_result.get_status()
+        if len(result_data) == 0:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response. Details: {}".format(action_result.get_message()))
 
         result_data = result_data.pop(0)
         job_id = result_data.get('job')
@@ -1289,8 +1333,8 @@ class PanoramaConnector(BaseConnector):
 
             status = self._make_rest_call(data, status_action_result)
 
-            if (phantom.is_fail(status)):
-                action_result.set_status(phantom.APP_ERROR, status_action_result.get_message())
+            if phantom.is_fail(status):
+                action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response. Details: {}".format(status_action_result.get_message()))
                 return action_result.get_status()
 
             self.debug_print("status", status_action_result)
@@ -1301,7 +1345,9 @@ class PanoramaConnector(BaseConnector):
             if not job_id:
                 continue
 
-            if (job.get('status', '') == 'FIN'):
+            if job.get('status', '') == 'FIN':
+                if isinstance(result_data.get('log').get('logs').get('entry'), dict):
+                    result_data['log']['logs']['entry'] = [result_data['log']['logs']['entry']]
                 action_result.add_data(result_data)
                 break
 
@@ -1321,7 +1367,7 @@ class PanoramaConnector(BaseConnector):
 
         device_group = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP])
 
-        if (device_group.lower() == PAN_DEV_GRP_SHARED):
+        if device_group.lower() == PAN_DEV_GRP_SHARED:
             return '/config/shared'
 
         return "/config/devices/entry/device-group/entry[@name='{device_group}']".format(device_group=device_group)
@@ -1330,7 +1376,7 @@ class PanoramaConnector(BaseConnector):
 
         status, rules_xpath = self._get_security_policy_xpath(param, action_result)
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return action_result.get_status()
 
         data = {'type': 'config',
@@ -1340,13 +1386,13 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return (action_result.get_status(), None)
+        if phantom.is_fail(status):
+            return action_result.get_status(), None
 
         # Get the data, if the policy existed, we will have some data
         result_data = action_result.get_data()
 
-        if (not result_data):
+        if not result_data:
             return (phantom.APP_SUCCESS, False)
 
         total_count = 0
@@ -1357,7 +1403,7 @@ class PanoramaConnector(BaseConnector):
             self.debug_print("_does_policy_exist handled exception: ", e)
             return (phantom.APP_SUCCESS, False)
 
-        if (not total_count):
+        if not total_count:
             return (phantom.APP_SUCCESS, False)
 
         return (phantom.APP_SUCCESS, True)
@@ -1366,7 +1412,7 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_key()
 
-        if (phantom.is_fail(status)):
+        if phantom.is_fail(status):
             return self.get_status()
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1379,13 +1425,17 @@ class PanoramaConnector(BaseConnector):
 
         status = self._make_rest_call(data, action_result)
 
-        if (phantom.is_fail(status)):
-            return action_result.get_status()
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("retrieving list of application", action_result.get_message()))
 
         # Move things around, so that result data is an array of applications
         result_data = action_result.get_data()
         result_data = result_data.pop(0)
-        result_data = result_data['application']['entry']
+        try:
+            result_data = result_data['application']['entry']
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
         action_result.update_summary({PAN_JSON_TOTAL_APPLICATIONS: len(result_data)})
 
@@ -1405,23 +1455,23 @@ class PanoramaConnector(BaseConnector):
 
         self._param = param
 
-        if (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        if action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self._test_connectivity(param)
-        elif (action == self.ACTION_ID_BLOCK_IP):
+        elif action == self.ACTION_ID_BLOCK_IP:
             result = self._block_ip(param)
-        elif (action == self.ACTION_ID_UNBLOCK_IP):
+        elif action == self.ACTION_ID_UNBLOCK_IP:
             result = self._unblock_ip(param)
-        elif (action == self.ACTION_ID_BLOCK_APPLICATION):
+        elif action == self.ACTION_ID_BLOCK_APPLICATION:
             result = self._block_application(param)
-        elif (action == self.ACTION_ID_UNBLOCK_APPLICATION):
+        elif action == self.ACTION_ID_UNBLOCK_APPLICATION:
             result = self._unblock_application(param)
-        elif (action == self.ACTION_ID_BLOCK_URL):
+        elif action == self.ACTION_ID_BLOCK_URL:
             result = self._block_url(param)
-        elif (action == self.ACTION_ID_UNBLOCK_URL):
+        elif action == self.ACTION_ID_UNBLOCK_URL:
             result = self._unblock_url(param)
-        elif (action == self.ACTION_ID_LIST_APPS):
+        elif action == self.ACTION_ID_LIST_APPS:
             result = self._list_apps(param)
-        elif (action == self.ACTION_ID_RUN_QUERY):
+        elif action == self.ACTION_ID_RUN_QUERY:
             result = self._run_query(param)
 
         return result
