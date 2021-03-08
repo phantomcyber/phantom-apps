@@ -37,7 +37,6 @@ DNSDB_ERR_INVALID_TIME_FORMAT = 'Invalid time format : {time}'
 DNSDB_ERR_INVALID_LIMIT = 'Invalid response length limit : {limit}'
 DNSDB_ERR_INVALID_NETWORK_PREFIX = 'Invalid network prefix : {prefix}'
 DNSDB_ERR_INVALID_BAILIWICK = 'Invalid bailiwick : %s'
-DNSDB_ERR_INVALID_TYPE = "Invalid 'type' or 'search type'"
 DNSDB_TEST_CONN_INITIATION = 'Testing connectivity'
 DNSDB_TEST_CONN_DOMAIN = 'www.phantomcyber.com'
 DNSDB_TEST_CONN_FAIL = 'Connectivity test failed'
@@ -76,3 +75,9 @@ DNSDB_VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
 DNSDB_NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
 DNSDB_LIMIT_KEY = "'limit' action parameter"
 DNSDB_NETWORK_PREFIX_KEY = "'network_prefix' action parameter"
+
+DNSDB_LOOKUP_TYPE_VALUE_LIST = ["ANY", "A", "A6", "AAAA", "AFSDB", "CNAME", "DNAME", "HINFO", "ISDN", "KX", "NAPTR", "NXT", "MB", "MD", "MF", "MG", "MINFO", "MR", "MX", "NS",
+    "PTR", "PX", "RP", "RT", "SIG", "SOA", "SRV", "TXT", "ANY-DNSSEC", "DLV", "DNSKEY", "DS", "NSEC", "NSEC3", "NSEC3PARAM", "RRSIG"]
+DNSDB_JSON_TYPE_VALUE_LIST = ["RDATA", "RRNAMES"]
+DNSDB_JSON_SEARCH_TYPE_VALUE_LIST = ["regex", "glob"]
+DNSDB_VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

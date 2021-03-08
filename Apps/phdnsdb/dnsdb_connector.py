@@ -114,17 +114,17 @@ class DnsdbConnector(BaseConnector):
         try:
             rate = self._client.rate_limit()[DNSDB_JSON_RATE]
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
+            self.debug_print(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
 
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
+            self.debug_print(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
 
         except:
-            self.save_progress(action_result.get_message())
+            self.debug_print(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_TEST_CONN_FAIL)
         self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate['limit'], rate['remaining'], rate['reset']))
@@ -150,6 +150,9 @@ class DnsdbConnector(BaseConnector):
         owner_name = param[DNSDB_JSON_OWNER_NAME]
         # Getting optional input parameters
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
+        if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+
         bailiwick = param.get(DNSDB_JSON_BAILIWICK)
         limit = param.get(DNSDB_JSON_LIMIT, 200)
         time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
@@ -437,6 +440,9 @@ class DnsdbConnector(BaseConnector):
         raw_rdata = param[DNSDB_JSON_RAW_RDATA]
         # Getting optional input parameter
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
+        if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
+
         limit = param.get(DNSDB_JSON_LIMIT, 200)
         time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
         time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
@@ -515,7 +521,12 @@ class DnsdbConnector(BaseConnector):
         # Getting mandatory input parameter
         query = param[DNSDB_JSON_QUERY]
         rrtype = param[DNSDB_JSON_TYPE]
+        if rrtype not in DNSDB_JSON_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_JSON_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
         search_type = param[DNSDB_JSON_SEARCH_TYPE]
+        if search_type not in DNSDB_JSON_SEARCH_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_JSON_SEARCH_TYPE_VALUE_LIST, DNSDB_JSON_SEARCH_TYPE))
+
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 10000)
         time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
@@ -593,12 +604,8 @@ class DnsdbConnector(BaseConnector):
             ret_val = action_result.set_status(phantom.APP_ERROR, err)
 
         # No data is considered as app success
-        try:
-            if len(responses) == 0:
-                return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(DNSDB_ERR_INVALID_TYPE, err))
+        if len(responses) == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, DNSDB_DATA_NOT_AVAILABLE_MSG)
 
         # To display count of domains in summary data
         count_domain = set()

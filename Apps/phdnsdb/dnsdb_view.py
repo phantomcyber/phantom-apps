@@ -131,7 +131,6 @@ def show_rate_limits(provides, all_app_runs, context):
 
             if not data:
                 ctx_result['data'] = {}
-                return ctx_result
             else:
                 ctx_result['data'] = data
             results.append(ctx_result)

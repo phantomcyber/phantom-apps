@@ -1,0 +1,33 @@
+<!-- File: readme.html
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+  <body>
+    <h2>Playbook Backward Compatibility</h2>
+      <p>
+        <ul>
+          <li>The existing action names and their parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+          <ul>
+            <li>Lookup IP - This action has been renamed to 'RDATA IP Lookup'.</li>
+            <ul>
+                <li>The paramaters 'record seen after' and 'record seen below' have been removed.</li>
+                <li>New parameters 'time first after', 'time first before', 'time last after' and 'time last before' have been added</li>
+            </ul>
+            <li>Lookup Domain - This action has been renamed to 'RDATA Name Lookup'.</li>
+            <ul>
+                <li>The paramaters 'domain', 'type', 'record seen after' and 'record seen below' have been removed.</li>
+                <li>New parameters 'name', 'time first after', 'time first before', 'time last after' and 'time last before' have been added</li>
+            </ul>
+          </ul>
+          <li>New actions have been added. Hence, it is requested to the end-user to please update their existing playbooks by inserting the corresponding action blocks for this action on the earlier versions of the app.</li>
+          <ul>
+            <li>Check Rate Limit</li>
+            <li>Flex Search</li>
+            <li>RRSET Lookup</li>
+            <li>RDATA Raw Lookup</li>
+          </ul>
+        </ul>
+      </p>
+  </body>
+</html>
