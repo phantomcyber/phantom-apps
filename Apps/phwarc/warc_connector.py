@@ -89,7 +89,7 @@ class WarcConnector(BaseConnector):
         parsed_url = urlparse(url)
 
         curr_time = int(time.time())
-        file_path = "{}{}{}_{}.warc.tgz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, parsed_url.path, curr_time)
+        file_path = "{}{}_{}.warc.gz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, curr_time)
 
         file_path = self._fetch_warc(action_result, url, file_path)
 
