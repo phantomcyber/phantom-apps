@@ -29,9 +29,8 @@ This page is intended to serve as a _living_ document for this app with plently 
 ## App Information
 This LDAP application utilizes the [LDAP3](https://ldap3.readthedocs.io/) library for Python. This was chosen, in part, due to the pythonic design of the library and the quality of the documentation.
 
-The AD LDAP app only supports [Simple Binding](https://ldap3.readthedocs.io/bind.html#simple-bind) at this time but other methods (e.g. NTLM) could be added relatively easily. It should be noted that [SSL](https://ldap3.readthedocs.io/ssltls.html) is suppoted and enabled by default, but [TLS](https://ldap3.readthedocs.io/ssltls.html#the-tls-object) (start_tls) has not due to certificate complexity within the configuration page.
+The AD LDAP app only supports [Simple Binding](https://ldap3.readthedocs.io/bind.html#simple-bind) at this time but other methods (e.g. NTLM) could be added relatively easily. It should be noted that [SSL](https://ldap3.readthedocs.io/ssltls.html) and [TLS](https://ldap3.readthedocs.io/ssltls.html#the-tls-object) are supported.
 
-If someone in the community requests either of these (or adds them with pull-request), I/we will try and make it happen. However, if neither of those happen - I'll implement NTLM soon, but probably not TLS.
 
 ### App Configuration
 The configuration for this app is relatively straightforward. Let's looks at each component:
