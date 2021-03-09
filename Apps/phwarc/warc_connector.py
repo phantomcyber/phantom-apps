@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: warc_connector.py
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -41,21 +40,55 @@ class WarcConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _handle_test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
 
         url = "https://google.com"
-        out_file = "{}test.warc.tgz".format(PHANTOM_VAULT_DIR)
-
-        self._fetch_warc(action_result, url, out_file)
+        out_file = "{}test.warc.gz".format(PHANTOM_VAULT_DIR)
+        try:
+            self._fetch_warc(action_result, url, out_file)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.save_progress("Connectivity Test Failed")
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         self.save_progress(out_file)
+        self.save_progress("Connectivity Test Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
-
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
 
     def _fetch_warc(self, action_result, url, out_path):
         with open(out_path, "wb") as output:
@@ -90,14 +123,18 @@ class WarcConnector(BaseConnector):
 
         curr_time = int(time.time())
         file_path = "{}{}_{}.warc.gz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, curr_time)
+        try:
+            file_path = self._fetch_warc(action_result, url, file_path)
 
-        file_path = self._fetch_warc(action_result, url, file_path)
+            vault_ret = Vault.add_attachment(
+                file_path, self.get_container_id()
+            )
+            if vault_ret.get("succeeded"):
+                action_result.add_data(vault_ret)
 
-        vault_ret = Vault.add_attachment(
-            file_path, self.get_container_id()
-        )
-        if vault_ret.get("succeeded"):
-            action_result.add_data(vault_ret)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -107,7 +144,7 @@ class WarcConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
@@ -124,16 +161,6 @@ class WarcConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
         self._base_url = config.get("base_url")
 
         return phantom.APP_SUCCESS

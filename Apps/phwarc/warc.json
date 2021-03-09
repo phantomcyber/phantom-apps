@@ -4,8 +4,8 @@
     "description": "This app supports the creation of WARC (Web Archive) for any webpage",
     "type": "information",
     "product_vendor": "Generic",
-    "logo": "warc.svg",
-    "logo_dark": "warc_dark.svg",
+    "logo": "logo_warc.svg",
+    "logo_dark": "logo_warc_dark.svg",
     "product_name": "WARC",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -14,15 +14,19 @@
     "app_version": "1.0.0",
     "utctime_updated": "2021-02-23T11:55:39.532327Z",
     "package_name": "phantom_warc",
-    "main_module": "warc_connector.pyc",
-    "contributors": [{
-        "name": "Daniel Federschmidt"
-    }],
+    "main_module": "warc_connector.py",
+    "contributors": [
+        {
+            "name": "Daniel Federschmidt"
+        }
+    ],
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "pypi": [
-           {"module": "warcio"}
+            {
+                "module": "warcio"
+            }
         ]
     },
     "configuration": {},
@@ -40,8 +44,8 @@
         {
             "action": "get url",
             "identifier": "get_url",
-            "description": "Retrieve a WARC archive for the specified URL and add to vault",
-            "type": "generic",
+            "description": "Retrieve a WARC archive for the specified URL and add it to the vault",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "url": {
@@ -49,7 +53,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": ["url"],
+                    "contains": [
+                        "url"
+                    ],
                     "order": 0
                 }
             },
@@ -57,19 +63,11 @@
                 {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
-                    "column_name": "url",
-                    "contains": ["url"],
+                    "column_name": "URL",
+                    "contains": [
+                        "url"
+                    ],
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data",
@@ -86,6 +84,20 @@
                 {
                     "data_path": "action_result.data.*.size",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
