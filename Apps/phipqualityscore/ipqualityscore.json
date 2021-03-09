@@ -155,7 +155,7 @@
 					"example_values": [
 						2
 					],
-					"column_order": 7
+					"column_order": 6
 				},
 				{
 					"data_path": "action_result.parameter.suggest_domain",
@@ -164,7 +164,7 @@
 						true,
 						false
 					],
-					"column_order": 8
+					"column_order": 7
 				},
 				{
 					"data_path": "action_result.parameter.strictness",
@@ -179,7 +179,7 @@
 					"example_values": [
 						2
 					],
-					"column_order": 9
+					"column_order": 8
 				},
 				{
 					"column_name": "Valid",
@@ -189,7 +189,7 @@
 						true,
 						false
 					],
-					"column_order": 10
+					"column_order": 9
 				},
 				{
 					"column_name": "Timeout",
@@ -199,7 +199,7 @@
 						true,
 						false
 					],
-					"column_order": 11
+					"column_order": 10
 				},
 				{
 					"column_name": "Disposable",
@@ -209,7 +209,7 @@
 						true,
 						false
 					],
-					"column_order": 12
+					"column_order": 11
 				},
 				{
 					"column_name": "First Name",
@@ -218,7 +218,7 @@
 					"example_values": [
 						"Unknown"
 					],
-					"column_order": 13
+					"column_order": 12
 				},
 				{
 					"column_name": "Deliverability",
@@ -227,7 +227,7 @@
 					"example_values": [
 						"high"
 					],
-					"column_order": 14
+					"column_order": 13
 				},
 				{
 					"column_name": "SMTP Score",
@@ -236,7 +236,7 @@
 					"example_values": [
 						3
 					],
-					"column_order": 15
+					"column_order": 14
 				},
 				{
 					"column_name": "Overall Score",
@@ -245,7 +245,7 @@
 					"example_values": [
 						3
 					],
-					"column_order": 16
+					"column_order": 15
 				},
 				{
 					"column_name": "Catch All",
@@ -255,7 +255,7 @@
 						true,
 						false
 					],
-					"column_order": 17
+					"column_order": 16
 				},
 				{
 					"column_name": "Generic",
@@ -265,7 +265,7 @@
 						true,
 						false
 					],
-					"column_order": 18
+					"column_order": 17
 				},
 				{
 					"column_name": "Common",
@@ -275,7 +275,7 @@
 						true,
 						false
 					],
-					"column_order": 19
+					"column_order": 18
 				},
 				{
 					"column_name": "DNS Valid",
@@ -285,7 +285,7 @@
 						true,
 						false
 					],
-					"column_order": 20
+					"column_order": 19
 				},
 				{
 					"column_name": "Honeypot",
@@ -295,7 +295,7 @@
 						true,
 						false
 					],
-					"column_order": 21
+					"column_order": 20
 				},
 				{
 					"column_name": "Frequent Complainer",
@@ -305,7 +305,7 @@
 						true,
 						false
 					],
-					"column_order": 22
+					"column_order": 21
 				},
 				{
 					"column_name": "Suspect",
@@ -315,7 +315,7 @@
 						true,
 						false
 					],
-					"column_order": 23
+					"column_order": 22
 				},
 				{
 					"column_name": "Recent Abuse",
@@ -325,7 +325,7 @@
 						true,
 						false
 					],
-					"column_order": 24
+					"column_order": 23
 				},
 				{
 					"column_name": "Fraud Score",
@@ -334,7 +334,7 @@
 					"example_values": [
 						34
 					],
-					"column_order": 25
+					"column_order": 24
 				},
 				{
 					"column_name": "Leaked",
@@ -344,7 +344,7 @@
 						true,
 						false
 					],
-					"column_order": 26
+					"column_order": 25
 				},
 				{
 					"column_name": "Suggested Domain",
@@ -353,7 +353,7 @@
 					"example_values": [
 						"N/A"
 					],
-					"column_order": 27
+					"column_order": 26
 				},
 				{
 					"column_name": "First Seen",
@@ -362,7 +362,7 @@
 					"example_values": [
 						"1 month ago"
 					],
-					"column_order": 28
+					"column_order": 27
 				},
 				{
 					"column_name": "Domain Age",
@@ -371,7 +371,7 @@
 					"example_values": [
 						"1 month ago"
 					],
-					"column_order": 29
+					"column_order": 28
 				},
 				{
 					"column_name": "Spam Trap Score",
@@ -380,7 +380,7 @@
 					"example_values": [
 						"none"
 					],
-					"column_order": 30
+					"column_order": 29
 				},
 				{
 					"column_name": "Sanitized Email",
@@ -389,7 +389,7 @@
 					"example_values": [
 						"someone@domain.com"
 					],
-					"column_order": 31
+					"column_order": 30
 				},
 				{
 					"column_name": "Request ID",
@@ -398,7 +398,7 @@
 					"example_values": [
 						"abc123"
 					],
-					"column_order": 32
+					"column_order": 31
 				}
 			]
 		},
@@ -1019,7 +1019,7 @@
 						true,
 						false
 					],
-					"column_order": 28
+					"column_order": 30
 				},
 				{
 					"column_name": "Active TOR",
@@ -1029,7 +1029,7 @@
 						true,
 						false
 					],
-					"column_order": 30
+					"column_order": 31
 				},
 				{
 					"column_name": "Connection Type",
@@ -1038,7 +1038,7 @@
 					"example_values": [
 						"data center"
 					],
-					"column_order": 31
+					"column_order": 32
 				},
 				{
 					"column_name": "Recent Abuse",
@@ -1048,7 +1048,7 @@
 						true,
 						false
 					],
-					"column_order": 32
+					"column_order": 33
 				},
 				{
 					"column_name": "Abuse Velocity",
@@ -1057,7 +1057,7 @@
 					"example_values": [
 						"low"
 					],
-					"column_order": 33
+					"column_order": 34
 				},
 				{
 					"column_name": "BOT Status",
@@ -1067,7 +1067,7 @@
 						true,
 						false
 					],
-					"column_order": 34
+					"column_order": 35
 				},
 				{
 					"column_name": "Mobile",
@@ -1077,7 +1077,7 @@
 						true,
 						false
 					],
-					"column_order": 35
+					"column_order": 36
 				},
 				{
 					"column_name": "Country Code",
@@ -1086,7 +1086,7 @@
 					"example_values": [
 						"us"
 					],
-					"column_order": 36
+					"column_order": 37
 				},
 				{
 					"column_name": "Fraud Score",
@@ -1095,7 +1095,7 @@
 					"example_values": [
 						1213
 					],
-					"column_order": 37
+					"column_order": 38
 				},
 				{
 					"column_name": "Request ID",
@@ -1104,7 +1104,7 @@
 					"example_values": [
 						"low"
 					],
-					"column_order": 38
+					"column_order": 39
 				},
 				{
 					"column_name": "Operating System",
@@ -1113,7 +1113,7 @@
 					"example_values": [
 						"linux"
 					],
-					"column_order": 39
+					"column_order": 40
 				}
 			]
 		}
