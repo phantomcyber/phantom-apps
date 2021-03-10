@@ -78,7 +78,14 @@ class WarcConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         url = "https://google.com"
-        out_file = "{}test.warc.gz".format(PHANTOM_VAULT_DIR)
+
+        # Vault support for NRI instances.
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
+        else:
+            temp_dir = '/vault/tmp'
+
+        out_file = "{}/{}".format(temp_dir, 'test.warc.gz')
         try:
             self._fetch_warc(action_result, url, out_file)
         except Exception as e:
@@ -122,7 +129,14 @@ class WarcConnector(BaseConnector):
         parsed_url = urlparse(url)
 
         curr_time = int(time.time())
-        file_path = "{}{}_{}.warc.gz".format(PHANTOM_VAULT_DIR, parsed_url.netloc, curr_time)
+
+        # Vault support for NRI instances.
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
+        else:
+            temp_dir = '/vault/tmp'
+
+        file_path = "{}/{}_{}.warc.gz".format(temp_dir, parsed_url.netloc, curr_time)
         try:
             file_path = self._fetch_warc(action_result, url, file_path)
 
@@ -136,7 +150,7 @@ class WarcConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created warc archive for the specified url")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
