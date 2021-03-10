@@ -19,6 +19,7 @@ import uuid
 import requests
 import hashlib
 from bs4 import BeautifulSoup
+import urllib.parse
 
 
 class RetVal(tuple):
@@ -299,7 +300,10 @@ class SsmachineConnector(BaseConnector):
         params.pop('cacheLimit', None)
         req = requests.Request(method=method, url=url, params=params)
         r = req.prepare()
-        return r.url
+        try:
+            return urllib.parse.unquote(r.url)
+        except:
+            return r.url
 
     def handle_action(self, param):
 
