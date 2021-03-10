@@ -150,7 +150,7 @@ class WarcConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created warc archive for the specified url")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved a WARC archive for the specified URL")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
