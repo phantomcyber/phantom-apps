@@ -243,10 +243,10 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'From' parameter, it should be YYYY-MM-DD")
         if end_time and not self._is_date(end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'To' parameter, it should be YYYY-MM-DD")
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
@@ -501,11 +501,11 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'From' parameter, it should be YYYY-MM-DD")
 
         if end_time and not self._is_date(end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'To' parameter, it should be YYYY-MM-DD")
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
@@ -554,7 +554,7 @@ class PassivetotalConnector(BaseConnector):
         summary = action_result.update_summary({})
 
         self.save_progress('Querying Certificate by Hash')
-        ret_val, response, status_code = self._make_rest_call('/ssl-certificate/', {'query': query}, action_result)
+        ret_val, response, status_code = self._make_rest_call('/ssl-certificate', {'query': query}, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -622,11 +622,11 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'From' parameter, it should be YYYY-MM-DD")
 
         if end_time and not self._is_date(end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'To' parameter, it should be YYYY-MM-DD")
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,
@@ -648,7 +648,6 @@ class PassivetotalConnector(BaseConnector):
         try:
             if ret_val and response:
                 extra_data[PASSIVETOTAL_JSON_COMPONENTS] = response["results"]
-                self.debug_print("TEST : ", response)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, PASSIVETOTAL_RESPONSE_ERR_MSG)
 
@@ -675,11 +674,11 @@ class PassivetotalConnector(BaseConnector):
 
         if start_time and not self._is_date(start_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for start time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'From' parameter, it should be YYYY-MM-DD")
 
         if end_time and not self._is_date(end_time):
             return action_result.set_status(phantom.APP_ERROR,
-                                            'Incorrect date format for end time, it should be YYYY-MM-DD')
+                                            "Incorrect date format for 'To' parameter, it should be YYYY-MM-DD")
 
         if start_time and end_time and not self._is_from_to_valid_date(start_time, end_time):
             return action_result.set_status(phantom.APP_ERROR,

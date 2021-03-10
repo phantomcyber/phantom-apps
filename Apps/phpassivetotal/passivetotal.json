@@ -68,12 +68,12 @@
                     "order": 1
                 },
                 "from": {
-                    "description": "The start date for Passive data (YYYY-mm-dd)",
+                    "description": "The start date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 2
                 },
                 "to": {
-                    "description": "The end date for Passive data (YYYY-mm-dd)",
+                    "description": "The end date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 3
                 }
@@ -531,12 +531,12 @@
                     "order": 1
                 },
                 "from": {
-                    "description": "The start date for Passive data (YYYY-mm-dd)",
+                    "description": "The start date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 2
                 },
                 "to": {
-                    "description": "The end date for Passive data (YYYY-mm-dd)",
+                    "description": "The end date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 3
                 }
@@ -2574,6 +2574,7 @@
         {
             "action": "get host components",
             "description": "Retrieves the host attribute components of a query",
+            "verbose": "<p>Per page maximum 2000 record we got. If more data exist then use the 'page' parameter for pagination.</p>",
             "type": "investigate",
             "identifier": "get_host_components",
             "read_only": true,
@@ -2585,12 +2586,12 @@
                     "required": true
                 },
                 "from": {
-                    "description": "Start datetime (YYYY-mm-dd)",
+                    "description": "Start datetime (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 1
                 },
                 "to": {
-                    "description": "End datetime (YYYY-mm-dd)",
+                    "description": "End datetime (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 2
                 },
@@ -2739,6 +2740,7 @@
         {
             "action": "get host pairs",
             "description": "Retrieves the host attribute pairs related to the query",
+            "verbose": "<p>Per page maximum 2000 record we got. If more data exist then use the 'page' parameter for pagination.</p>",
             "type": "investigate",
             "identifier": "get_host_pairs",
             "read_only": true,
@@ -2761,12 +2763,12 @@
                     ]
                 },
                 "from": {
-                    "description": "Start datetime (YYYY-mm-dd)",
+                    "description": "Start datetime (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 2
                 },
                 "to": {
-                    "description": "End datetime (YYYY-mm-dd)",
+                    "description": "End datetime (YYYY-MM-DD)",
                     "data_type": "string",
                     "order": 3
                 },
