@@ -678,9 +678,10 @@ class MimecastConnector(BaseConnector):
             data['data'].append(data_object)
 
         limit = param.get('page_size')
-        limit = self._validate_integers(action_result, limit, "page_size")
-        if limit is None:
-            return action_result.get_status()
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
 
         ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
@@ -721,9 +722,10 @@ class MimecastConnector(BaseConnector):
         }
 
         limit = param.get('page_size')
-        limit = self._validate_integers(action_result, limit, "page_size")
-        if limit is None:
-            return action_result.get_status()
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "page_size")
+            if limit is None:
+                return action_result.get_status()
 
         ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
