@@ -165,11 +165,6 @@ class PanoramaConnector(BaseConnector):
         else:
             action_result.set_status(phantom.APP_SUCCESS)
 
-        '''
-        code = response.get('@code')
-        if code is not None:
-            action_result.append_to_message("code: '{}'".format(code))'''
-
         self._parse_response_msg(response, action_result)
 
         result = response.get('result')
@@ -202,7 +197,6 @@ class PanoramaConnector(BaseConnector):
 
         xml = response.text
 
-        # self.save_progress(PAN_PROG_GOT_REPLY)
         try:
             response_dict = xmltodict.parse(xml)
         except Exception as e:
@@ -259,8 +253,6 @@ class PanoramaConnector(BaseConnector):
 
         self.debug_print("Making rest call")
 
-        self.debug_print("_make_rest_call::data", data)
-
         config = self.get_config()
 
         try:
@@ -272,8 +264,6 @@ class PanoramaConnector(BaseConnector):
         xml = response.text
 
         action_result.add_debug_data(xml)
-
-        # self.debug_print("REST Response", str(xml))
 
         try:
             response_dict = xmltodict.parse(xml)
@@ -760,8 +750,6 @@ class PanoramaConnector(BaseConnector):
                 'key': self._key,
                 'xpath': rules_xpath,
                 'element': element}
-
-        self.debug_print("_update_security_policy::data", data)
 
         status = self._make_rest_call(data, action_result)
 
