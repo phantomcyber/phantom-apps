@@ -27,3 +27,5 @@ MIMECAST_ERR_TYPE_ACTION_PARAMETER = "Please provide a valid value in the 'type'
 MIMECAST_ERR_TIMESTAMP_INVALID = "{key} timestamp format should be YYYY-MM-DDTHH:MM:SS+0000. Error: {error}"
 MIMECAST_SUCC_GET_EMAIL = "Successfully retrieved message information"
 MIMECAST_SUCC_DECODE_URL = "Successfully decoded URL"
+MIMECAST_ERR_ENCODING_SECRET_KEY = "Error occurred while encoding secret key. Please provide a valid secret key value."
+MIMECAST_ERR_BYPASS_AUTH = "Please provide Mimecast 'Secret Key' and 'Access Key' for Bypass Authentication"

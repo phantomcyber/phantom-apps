@@ -91,8 +91,13 @@ class MimecastConnector(BaseConnector):
         # provided input to string on Python v2 and bytes on Python v3.
         encoded_secret_key = UnicodeDammit(self._secret_key).unicode_markup.encode("utf-8")
         encoded_msg = UnicodeDammit(':'.join([hdr_date, request_id, uri, self._app_key])).unicode_markup.encode("utf-8")
-        hmac_sha1 = hmac.new(base64.b64decode(encoded_secret_key), encoded_msg, digestmod=hashlib.sha1).digest()
-        sig = base64.encodestring(hmac_sha1).rstrip()
+        try:
+            hmac_sha1 = hmac.new(base64.b64decode(encoded_secret_key), encoded_msg, digestmod=hashlib.sha1).digest()
+            sig = base64.encodestring(hmac_sha1).rstrip()
+        except Exception as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            self.save_progress(MIMECAST_ERR_ENCODING_SECRET_KEY)
+            return None
         # For Python v3 'bytes' need to be converted back to 'string'
         # as the contents of headers are of the 'string' form
         decoded_sig = UnicodeDammit(sig).unicode_markup
@@ -1006,9 +1011,12 @@ class MimecastConnector(BaseConnector):
         if self._auth_type == "Bypass (Access Key)":
             self._access_key = config.get('access_key')
             self._secret_key = config.get('secret_key')
+            if self._access_key is None or self._secret_key is None:
+                return self.set_status(phantom.APP_ERROR, MIMECAST_ERR_BYPASS_AUTH)
         else:
             self._access_key = self._state.get('access_key')
             self._secret_key = self._state.get('secret_key')
+        self.save_progress(self._auth_type)
         return phantom.APP_SUCCESS
 
     def finalize(self):
