@@ -170,6 +170,7 @@
         {
             "action": "get threat indicators",
             "description": "Retrieve the subjects, senders, domains, URLs, or MD5 or SHA256 hashes that operators identified in Cofense Triage as threat indicators within a specified timeframe",
+            "verbose": "The cef_mapping parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields.",
             "type": "investigate",
             "identifier": "get_threat_indicators",
             "read_only": true,
@@ -265,7 +266,7 @@
                     "order": 10
                 },
                 "cef_mapping": {
-                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string",
                     "data_type": "string",
                     "order": 11
                 }
@@ -492,6 +493,7 @@
         {
             "action": "get reports",
             "description": "Retrieve all reports in the Inbox, Recon, and Processed folders that match specified parameters",
+            "verbose": "Category ID is only valid when retrieving \"All\" or \"Processed\" reports. Category IDs correspond to category names as follows: 5 (lowest): Phishing Simulation; 1: Non-Malicious; 2: Spam; 3: Crimeware; 4 (highest): Advanced Threats. The cef_mapping parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields.",
             "type": "investigate",
             "identifier": "get_reports",
             "read_only": true,
@@ -535,7 +537,7 @@
                     ]
                 },
                 "category_id": {
-                    "description": "Filter by category ID, default retrieves All. The category ID (1-5) for processed reports. Takes either string or number. Only valid when retrieving \"All\" or \"Processed\" reports. Category IDs correspond to category names as follows: 5 (lowest): Phishing Simulation; 1: Non-Malicious; 2: Spam; 3: Crimeware; 4 (highest): Advanced Threats",
+                    "description": "Filter by category ID, default retrieves All. The category ID (1-5) for processed reports. Takes either string or number",
                     "data_type": "string",
                     "primary": true,
                     "default": "All",
@@ -614,7 +616,7 @@
                     "order": 13
                 },
                 "cef_mapping": {
-                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string",
                     "data_type": "string",
                     "order": 14
                 }
@@ -914,6 +916,7 @@
         {
             "action": "get report",
             "description": "Retrieve a single report that matches the specified report ID. Optionally ingest to a provided label",
+            "verbose": "The cef_mapping parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields.",
             "type": "investigate",
             "identifier": "get_report",
             "read_only": true,
@@ -946,7 +949,7 @@
                     "order": 3
                 },
                 "cef_mapping": {
-                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string, such as the result of json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the value. For example, if the cef_mapping is {\"website\":\"requestURL\"} your artifact will have requestURL cef fields in place of website cef fields",
+                    "description": "Only applicable if ingesting new artifacts. This parameter is a JSON dictionary represented as a serialized JSON string",
                     "data_type": "string",
                     "order": 4
                 }
