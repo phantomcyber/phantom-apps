@@ -196,9 +196,9 @@ class GcloudComputeEngineConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         try:
-            summary["id"] = response["id"]
-            summary["name"] = response["name"]
-            summary["machineType"] = response["machineType"]
+            summary["id"] = response.get("id")
+            summary["name"] = response.get("name")
+            summary["machineType"] = response.get("machineType")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, err)
