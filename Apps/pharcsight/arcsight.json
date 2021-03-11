@@ -12,6 +12,7 @@
     "product_name": "ArcSight ESM",
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
+    "python_version": "3",
     "license": "Copyright (c) 2021 Splunk Inc.",
     "logo": "logo_hewlettpackardenterprise.svg",
     "logo_dark": "logo_hewlettpackardenterprise_dark.svg",
@@ -346,7 +347,7 @@
                     "description": "JSON containing field values",
                     "data_type": "string",
                     "required": true,
-                    "order": 2
+                    "order": 1
                 }
             },
             "render": {
