@@ -12,7 +12,7 @@
     "publisher": "Splunk Community",
     "license": "Copyright (c) 2020-2021 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2020-11-10T07:23:37.000000Z",
+    "utctime_updated": "2021-03-12T14:14:02.000000Z",
     "package_name": "phantom_cofensetriage",
     "main_module": "cofensetriage_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1327,7 +1327,7 @@
                     "contains": [
                         "file path"
                     ],
-                    "example_values":[
+                    "example_values": [
                         "/vault/path/4ef03a5e510cb4a930c51ceaa6110928a8f99257"
                     ]
                 },
