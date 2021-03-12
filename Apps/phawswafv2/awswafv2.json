@@ -113,7 +113,7 @@
             "action": "add ip",
             "identifier": "add_ip",
             "description": "Add new IP(s) to an existing IP set or a new IP set",
-            "verbose": "ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input. If the given ip_set_name does not exist on the server and the name matches the WAF IP set name criteria, the new IP set with a given input will be created on the server.",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input. If the given ip_set_name does not exist on the server and the name matches the WAF IP set name criteria, the new IP set with a given input will be created on the server.",
             "type": "contain",
             "undo": "delete ip",
             "read_only": false,
@@ -299,7 +299,7 @@
             "action": "delete ip",
             "identifier": "delete_ip",
             "description": "Remove IP(s) from an existing IP set",
-            "verbose": "ip_set_id or ip_set_name must be given as input for deleting an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input.",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for deleting an IP from the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input.",
             "type": "correct",
             "undo": "add ip",
             "read_only": false,
@@ -585,7 +585,7 @@
                     "description": "Maximum number of results (default: 100)",
                     "data_type": "numeric",
                     "default": 100,
-                    "order": 1
+                    "order": 0
                 }
             },
             "output": [
