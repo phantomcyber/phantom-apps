@@ -2574,7 +2574,7 @@
         {
             "action": "get host components",
             "description": "Retrieves the host attribute components of a query",
-            "verbose": "<p>Per page maximum 2000 record we got. If more data exist then use the 'page' parameter for pagination.</p>",
+            "verbose": "<p>By default, 2000 records will be fetched per page. If more data exists, then use the 'page' parameter for pagination.</p>",
             "type": "investigate",
             "identifier": "get_host_components",
             "read_only": true,
