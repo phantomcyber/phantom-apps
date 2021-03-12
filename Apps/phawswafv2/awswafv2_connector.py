@@ -142,7 +142,7 @@ class AwsWafConnector(BaseConnector):
         return ip_set_id, ip_set_name
 
     def _validate_ip(self, ip_address):
-        x = re.search(".*\/[0-9]+$", ip_address)
+        x = re.search(".*\\/[0-9]+$", ip_address)
         if not x:
             return None
 
