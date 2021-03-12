@@ -789,7 +789,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _block_application(self, param):
 
@@ -840,7 +840,7 @@ class PanoramaConnector(BaseConnector):
 
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _unblock_url(self, param):
 
@@ -875,7 +875,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _block_url(self, param):
 
@@ -926,7 +926,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _get_dgs(self, action_result):
 
@@ -1178,7 +1178,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _block_ip(self, param):
 
@@ -1242,7 +1242,7 @@ class PanoramaConnector(BaseConnector):
 
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, message)
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
 
     def _run_query(self, param):
 
