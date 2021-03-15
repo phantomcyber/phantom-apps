@@ -375,7 +375,7 @@ class MimecastConnector(BaseConnector):
         self.save_progress(MIMECAST_SUCC_TEST_CONN_PASSED)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_blacklist_url(self, param):
+    def _handle_block_url(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -411,7 +411,7 @@ class MimecastConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = MIMECAST_SUCC_BLACKLIST_URL
+        summary['status'] = MIMECAST_SUCC_BLOCK_URL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -443,7 +443,7 @@ class MimecastConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_whitelist_url(self, param):
+    def _handle_allow_url(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -492,7 +492,7 @@ class MimecastConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
         summary = action_result.update_summary({})
-        summary['status'] = MIMECAST_SUCC_WHITELIST_URL
+        summary['status'] = MIMECAST_SUCC_ALLOW_URL
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -580,7 +580,7 @@ class MimecastConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_blacklist_sender(self, param):
+    def _handle_block_sender(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -591,7 +591,7 @@ class MimecastConnector(BaseConnector):
         action_id = self.get_action_identifier()
         action = None
 
-        if action_id == 'blacklist_sender':
+        if action_id == 'block_sender':
             action = 'block'
         else:
             action = 'permit'
@@ -948,16 +948,16 @@ class MimecastConnector(BaseConnector):
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == 'blacklist_url':
-            ret_val = self._handle_blacklist_url(param)
+        elif action_id == 'block_url':
+            ret_val = self._handle_block_url(param)
 
-        elif action_id == 'unblacklist_url':
+        elif action_id == 'unblock_url':
             ret_val = self._handle_remove_url(param)
 
-        elif action_id == 'whitelist_url':
-            ret_val = self._handle_whitelist_url(param)
+        elif action_id == 'allow_url':
+            ret_val = self._handle_allow_url(param)
 
-        elif action_id == 'unwhitelist_url':
+        elif action_id == 'unallow_url':
             ret_val = self._handle_remove_url(param)
 
         elif action_id == 'add_member':
@@ -966,11 +966,11 @@ class MimecastConnector(BaseConnector):
         elif action_id == 'remove_member':
             ret_val = self._handle_remove_member(param)
 
-        elif action_id == 'blacklist_sender':
-            ret_val = self._handle_blacklist_sender(param)
+        elif action_id == 'block_sender':
+            ret_val = self._handle_block_sender(param)
 
-        elif action_id == 'whitelist_sender':
-            ret_val = self._handle_blacklist_sender(param)
+        elif action_id == 'allow_sender':
+            ret_val = self._handle_block_sender(param)
 
         elif action_id == 'list_urls':
             ret_val = self._handle_list_urls(param)

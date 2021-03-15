@@ -83,17 +83,17 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "blacklist url",
-            "description": "Adds URL to a managed URL blacklist",
+            "action": "block url",
+            "description": "Adds URL to a managed URL blocklist",
             "type": "contain",
-            "identifier": "blacklist_url",
+            "identifier": "block_url",
             "read_only": false,
             "parameters": {
                 "url": {
                     "contains": [
                         "url"
                     ],
-                    "description": "URL to blacklist",
+                    "description": "URL to block",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -115,7 +115,7 @@
                     "order": 2
                 },
                 "comment": {
-                    "description": "Comment to add to blacklisted URL",
+                    "description": "Comment to add to the blocked URL",
                     "data_type": "string",
                     "order": 3
                 }
@@ -325,14 +325,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully added URL to blacklist"
+                        "Status: Successfully added URL to the blocklist"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added URL to blacklist"
+                        "Successfully added URL to the blocklist"
                     ]
                 },
                 {
@@ -646,17 +646,17 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "blacklist sender",
-            "description": "Blacklists a specific sender and recipient in Mimecast",
+            "action": "block sender",
+            "description": "Blocks a specific sender and recipient in Mimecast",
             "type": "contain",
-            "identifier": "blacklist_sender",
+            "identifier": "block_sender",
             "read_only": false,
             "parameters": {
                 "sender": {
                     "contains": [
                         "email"
                     ],
-                    "description": "The email address of the sender to blacklist",
+                    "description": "The email address of the sender to block",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -832,17 +832,17 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "whitelist sender",
-            "description": "Whitelists a specific sender and recipient in Mimecast",
+            "action": "allow sender",
+            "description": "Allows a specific sender and recipient in Mimecast",
             "type": "contain",
-            "identifier": "whitelist_sender",
+            "identifier": "allow_sender",
             "read_only": false,
             "parameters": {
                 "sender": {
                     "contains": [
                         "email"
                     ],
-                    "description": "The email address of the sender to the whitelist",
+                    "description": "The email address of the sender to allow",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -961,17 +961,17 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "whitelist url",
-            "description": "Adds URL to a managed URL whitelist",
+            "action": "allow url",
+            "description": "Adds URL to a managed URL allowlist",
             "type": "contain",
-            "identifier": "whitelist_url",
+            "identifier": "allow_url",
             "read_only": false,
             "parameters": {
                 "url": {
                     "contains": [
                         "url"
                     ],
-                    "description": "URL to whitelist",
+                    "description": "URL to allow",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -993,7 +993,7 @@
                     "order": 2
                 },
                 "comment": {
-                    "description": "Comment to add to whitelisted URL",
+                    "description": "Comment to add to the allowed URL",
                     "data_type": "string",
                     "order": 3
                 },
@@ -1013,7 +1013,7 @@
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "Added splunk.com to the whitelist"
+                        "Added splunk.com to the allowlist"
                     ]
                 },
                 {
@@ -1065,7 +1065,7 @@
                     "data_path": "action_result.data.*.comment",
                     "data_type": "string",
                     "example_values": [
-                        "Added splunk.com to the whitelist"
+                        "Added splunk.com to the allowlist"
                     ]
                 },
                 {
@@ -1172,14 +1172,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully added URL to whitelist"
+                        "Status: Successfully added URL to the allowlist"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added URL to whitelist"
+                        "Successfully added URL to the allowlist"
                     ]
                 },
                 {
@@ -1203,14 +1203,14 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "unblacklist url",
-            "description": "Removes URL from a managed URL blacklist",
+            "action": "unblock url",
+            "description": "Removes URL from a managed URL blocklist",
             "type": "correct",
-            "identifier": "unblacklist_url",
+            "identifier": "unblock_url",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "URL ID to unblacklist",
+                    "description": "URL ID to unblock",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1337,14 +1337,14 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "unwhitelist url",
-            "description": "Removes URL from a managed URL whitelist",
+            "action": "unallow url",
+            "description": "Removes URL from a managed URL allowlist",
             "type": "correct",
-            "identifier": "unwhitelist_url",
+            "identifier": "unallow_url",
             "read_only": false,
             "parameters": {
                 "id": {
-                    "description": "URL ID to remove from the whitelist",
+                    "description": "URL ID to remove from the allowlist",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
