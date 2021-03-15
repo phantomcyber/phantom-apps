@@ -684,7 +684,7 @@
             "action": "get ticket",
             "description": "Get case information",
             "verbose": "ArcSight uses a Resource ID (for example <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item, use a case's Resource ID as the <b>id</b> parameter value.",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "get_ticket",
             "read_only": true,
             "parameters": {
