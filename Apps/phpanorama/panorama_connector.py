@@ -116,7 +116,7 @@ class PanoramaConnector(BaseConnector):
 
         return error_text
 
-    def _parse_response_msg(self, response, action_result):
+    def _parse_response_msg(self, response, action_result, response_message):
 
         msg = response.get('msg')
 
@@ -129,21 +129,26 @@ class PanoramaConnector(BaseConnector):
             if line is None:
                 return
             if isinstance(line, list):
+                response_message = "{} message: '{}'".format(response_message, ', '.join(line))
                 action_result.append_to_message(', '.join(line))
             elif isinstance(line, dict):
+                response_message = "{} message: '{}'".format(response_message, line.get('line', ''))
                 action_result.append_to_message(line.get('line', ''))
             else:
+                response_message = "{} message: '{}'".format(response_message, line)
                 action_result.append_to_message(line)
             return
 
         # parse it as a string
         try:
             if type(msg) == str or type(msg) == unicode:
+                response_message = "{} message: '{}'".format(response_message, msg)
                 action_result.append_to_message(msg)
         except:
             if type(msg) == str:
+                response_message = "{} message: '{}'".format(response_message, msg)
                 action_result.append_to_message(msg)
-        return
+        return response_message
 
     def _parse_response(self, response_dict, action_result):
 
@@ -151,6 +156,7 @@ class PanoramaConnector(BaseConnector):
         self.debug_print('response_dict', response_dict)
 
         response = response_dict.get('response')
+        response_message = None
 
         if response is None:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_REPLY_FORMAT_KEY_MISSING.format(key='response'))
@@ -163,9 +169,15 @@ class PanoramaConnector(BaseConnector):
         if status != 'success':
             action_result.set_status(phantom.APP_ERROR, PAN_ERR_REPLY_NOT_SUCCESS.format(status=status))
         else:
+            response_message = PAN_SUCC_REST_CALL_SUCCEEDED
             action_result.set_status(phantom.APP_SUCCESS)
 
-        self._parse_response_msg(response, action_result)
+        code = response.get('@code')
+        if code is not None:
+            response_message = "{} code: '{}'".format(response_message, code)
+
+        response_message = self._parse_response_msg(response, action_result, response_message)
+        self.debug_print(response_message)
 
         result = response.get('result')
 
@@ -491,7 +503,7 @@ class PanoramaConnector(BaseConnector):
                     if isinstance(details, str) or isinstance(details, unicode):
                         detail_lines.append(details)
                 except:
-                    if isinstance(details, str) or isinstance(details, unicode):
+                    if isinstance(details, str):
                         detail_lines.append(details)
                 else:
                     try:
@@ -995,10 +1007,7 @@ class PanoramaConnector(BaseConnector):
         status = phantom.APP_ERROR
         status_message = ''
 
-        try:
-            dg_status_value = dg_status.iteritems()
-        except:
-            dg_status_value = dg_status.items()
+        dg_status_value = list(dg_status.items())
         for dg, dg_status in dg_status_value:
 
             status_message = "{0}Device Group: '{1}'\n".format(status_message, dg)
@@ -1008,10 +1017,7 @@ class PanoramaConnector(BaseConnector):
                 status_message = '{}No Devices'.format(status_message)
                 continue
 
-            try:
-                devices_value = devices.iteritems()
-            except:
-                devices_value = devices.items()
+            devices_value = list(devices.items())
             for device, dev_ar in devices_value:
                 status |= dev_ar.get_status()
                 status_message = '{0}{1}\n'.format(status_message, dev_ar.get_message())
@@ -1113,10 +1119,7 @@ class PanoramaConnector(BaseConnector):
 
             curr_dg_status['devices'] = curr_dg_devices = {}
 
-            try:
-                devices_values = devices.iteritems()
-            except:
-                devices_values = devices.items()
+            devices_values = list(devices.items())
             for device, dev_info in devices_values:
 
                 # create a status dictionary
