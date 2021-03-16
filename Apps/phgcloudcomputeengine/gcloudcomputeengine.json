@@ -1,0 +1,519 @@
+{
+    "appid": "75fc6f53-dffd-4b1a-9083-0313b3d0178e",
+    "name": "Google Cloud Compute Engine",
+    "description": "This app integrates with google cloud compute engine API that supports investigative and generic actions",
+    "type": "virtualization",
+    "product_vendor": "Google",
+    "logo": "logo_gcloudcomputeengine.svg",
+    "logo_dark": "logo_gcloudcomputeengine_dark.svg",
+    "product_name": "Compute Engine",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-07-09T11:50:08.833690Z",
+    "package_name": "phantom_gcloudcomputeengine",
+    "main_module": "gcloudcomputeengine_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "pypi": [
+            {
+                "module": "google-api-python-client"
+            }
+        ]
+    },
+    "configuration": {
+        "key_json": {
+            "description": "Contents of Service Account JSON file",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "project": {
+            "description": "Project ID",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "tag instance",
+            "description": "Modify tags on instance",
+            "type": "generic",
+            "identifier": "tag_instance",
+            "read_only": false,
+            "parameters": {
+                "zone": {
+                    "description": "Zone of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                "id": {
+                    "description": "ID of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ],
+                    "primary": true
+                },
+                "tags": {
+                    "description": "Network tags to apply to the instance. Will overwrite existing tags",
+                    "verbose": "Comma-separated list of network tags to apply to the instance.",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "column_name": "Tags",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "describe instance",
+            "description": "Get instance information",
+            "type": "investigate",
+            "identifier": "describe_instance",
+            "read_only": true,
+            "parameters": {
+                "zone": {
+                    "description": "Zone of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                "id": {
+                    "description": "ID of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cpuPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.canIpForward",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.creationTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-09T01:51:13.393-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.machineType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "stop instance",
+            "description": "Stops an instance",
+            "type": "generic",
+            "identifier": "stop_instance",
+            "read_only": false,
+            "parameters": {
+                "zone": {
+                    "description": "Zone of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                "id": {
+                    "description": "ID of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "DONE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.startTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.endTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.operationType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start instance",
+            "description": "Starts an instance that was previously stopped",
+            "type": "generic",
+            "identifier": "start_instance",
+            "read_only": false,
+            "parameters": {
+                "zone": {
+                    "description": "Zone of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                "id": {
+                    "description": "ID of the instance",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 0,
+                    "contains": [
+                        "gcloud computeengine zone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "gcloud computeengine id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "DONE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.zone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.startTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.endTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-07-14T04:42:34.287-07:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.operationType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
