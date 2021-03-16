@@ -1,5 +1,5 @@
 # File: rt_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -8,6 +8,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from phantom.rules import vault_info
 from phantom.vault import Vault
 
 # THIS Connector imports
@@ -65,6 +66,10 @@ class RTConnector(BaseConnector):
         # Create a sessions to manage cookies
         self._session = requests.Session()
 
+        # Set validator for ticket and attachment ID inputs
+        self.set_validator('rt ticket id', self._is_rt_id)
+        self.set_validator('rt attachment id', self._is_rt_id)
+
         return phantom.APP_SUCCESS
 
     def _process_empty_reponse(self, response, action_result):
@@ -76,9 +81,12 @@ class RTConnector(BaseConnector):
 
     def _process_text_response(self, response, action_result):
 
-        # An html response, treat it like an error
-        status_code = response.status_code
+        # A text reponse is expected for every action
         response_text = response.text
+        status_code = int(re.findall('\d{3}', response_text[:response_text.index('\n')])[0])
+
+        self.debug_print(status_code)
+        self.debug_print(response_text)
 
         # Please specify the status codes here
         if 200 <= status_code < 399:
@@ -203,6 +211,17 @@ class RTConnector(BaseConnector):
 
         return ret_val
 
+    def _is_rt_id(self, rt_id):
+
+        # Check that ticket and attachment IDs are integers
+        try:
+            if int(rt_id) > 0:
+                return True
+            else:
+                return False
+        except:
+            return False
+
     def _test_connectivity(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
@@ -239,6 +258,9 @@ class RTConnector(BaseConnector):
         fields = param.get(RT_JSON_FIELDS)
         subject = param.get(RT_JSON_SUBJECT)
         comment = param.get(RT_JSON_COMMENT)
+
+        if not any([fields, subject, comment]):
+            return action_result.set_status(phantom.APP_ERROR, 'At least one parameter of fields, subject, or comment is required')
 
         if fields:
             try:
@@ -311,6 +333,11 @@ class RTConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
 
+        if '# Could not create ticket.' in resp_text:
+            if 'Queue not set' in resp_text:
+                return action_result.set_status(phantom.APP_ERROR, "Error creating ticket. Invalid queue given.")
+            return action_result.set_status(phantom.APP_ERROR, "Error creating ticket. Response from server:\n{0}".format(resp_text))
+
         ticket_id = None
 
         for line in resp_text.split('\n'):
@@ -341,12 +368,12 @@ class RTConnector(BaseConnector):
         ret_val, resp_text = self._make_rest_call("ticket/{0}/show".format(ticket_id), action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Get ticket details for id '{0}' failed")
             return ret_val
 
-        ticket_info = {}
+        if re.findall('# Ticket .+ does not exist.', resp_text):
+            return action_result.set_status(phantom.APP_ERROR, "Ticket {0} does not exist.".format(ticket_id))
 
-        self.debug_print(resp_text)
+        ticket_info = {}
 
         for line in resp_text.split('\n'):
             if ':' in line:
@@ -405,17 +432,29 @@ class RTConnector(BaseConnector):
         if phantom.is_fail(self._create_rt_session(action_result)):
             return action_result.get_status()
 
+        queue = param.get(RT_JSON_QUEUE, DEFAULT_QUEUE)
+        query = param.get(RT_JSON_QUERY, '').strip()
+
+        if query and not query.startswith('AND'):
+            query = ' AND {0}'.format(query)
+
         # Set up the query
-        query = "Queue='{0}' AND {1}".format(param.get(RT_JSON_QUEUE, DEFAULT_QUEUE), param.get(RT_JSON_QUERY, ''))
+        query = "Queue='{0}'{1}".format(queue, query)
 
         # Query the device for the list of tickets
         ret_val, resp_text = self._make_rest_call("search/ticket", action_result, params={'query': query})
 
-        self.debug_print('IT THIS:')
-        self.debug_print(resp_text)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        if 'No matching results.' in resp_text:
+            return action_result.set_status(phantom.APP_SUCCESS, 'Query returned no results')
 
         # Get ticket ID for each line in response
         tickets = [x.split(':')[0] for x in resp_text.strip().split('\n')[2:]]
+
+        if tickets and "Invalid query" in tickets[0]:
+            return action_result.set_status(phantom.APP_ERROR, 'Given query is invalid. Details:\n\n{0}'.format(resp_text))
 
         # Tickets will be a list of tuples, where the first element will be the ticket ID and the second element will be the subject
         for ticket in tickets:
@@ -450,8 +489,19 @@ class RTConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val
 
+        if re.findall('# Ticket .+ does not exist.', resp_text):
+            return action_result.set_status(phantom.APP_ERROR, "Ticket {0} does not exist.".format(ticket_id))
+
+        # Find the start of the attachments list
+        resp_text = resp_text.strip()
+        attachment_index = resp_text.index('Attachments:')
+
+        if attachment_index == -1:
+            self.save_progress("No attachments found for ticket id '{0}'".format(ticket_id))
+            return action_result.set_status(phantom.APP_SUCCESS)
+
         # Each attachment it on a separate line in the third "block" of text
-        attachments = [x.strip() for x in resp_text.split('\n\n')[2].split('\n')]
+        attachments = [x.strip() for x in resp_text[attachment_index:].split('\n')]
 
         # Set the summary
         action_result.set_summary({'attachments': len(attachments)})
@@ -459,6 +509,7 @@ class RTConnector(BaseConnector):
         # No reason to move on if we find no attachments
         if len(attachments) == 0:
             self.save_progress("No attachments found for ticket id '{0}'".format(ticket_id))
+            return action_result.set_status(phantom.APP_SUCCESS)
 
         # The first line of the attachments block starts with "Attachments: "
         attachments[0] = attachments[0][13:]
@@ -513,8 +564,8 @@ class RTConnector(BaseConnector):
         if '# Invalid attachment id' in resp_text:
             return action_result.set_status(phantom.APP_ERROR, "Attachment with ID {0} not found on ticket {1}".format(attachment_id, ticket_id))
 
-        if '# Ticket ' in resp_text and ' does not exist.' in resp_text:
-            return action_result.set_status(phantom.APP_ERROR, "Ticket {0} not found".format(ticket_id))
+        if re.findall('# Ticket .+ does not exist.', resp_text):
+            return action_result.set_status(phantom.APP_ERROR, "Ticket {0} does not exist.".format(ticket_id))
 
         # Look for the filename in the meta data
         filename_index = resp_text.find('filename')
@@ -569,7 +620,7 @@ class RTConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error saving file to vault: {0}".format(ret_val.get('error', 'Unknwon error')))
 
         vault_id = ret_val['vault_id']
-        file_info = Vault.get_file_info(vault_id=vault_id, container_id=self.get_container_id())
+        _, _, file_info = vault_info(vault_id=vault_id, container_id=self.get_container_id())
 
         if len(file_info) == 0:
             return action_result.set_status(phantom.APP_ERROR, "File not found in vault after adding".format(vault_id))
@@ -605,7 +656,7 @@ class RTConnector(BaseConnector):
             comment = 'File uploaded from Phantom'
 
         # Check for vault file
-        file_info = Vault.get_file_info(container_id=self.get_container_id(), vault_id=vault_id)
+        _, _, file_info = vault_info(vault_id=vault_id, container_id=self.get_container_id())
 
         if not file_info:
             return action_result.set_status(phantom.APP_ERROR, "Vault ID is invalid. Vault file not found".format(vault_id))
