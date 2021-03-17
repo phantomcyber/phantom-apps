@@ -1125,6 +1125,7 @@
         {
             "action": "delete meeting",
             "description": "Deletes zoom meeting",
+            "verbose": "Deletes previous and future zoom meeting.",
             "type": "generic",
             "identifier": "delete_meeting",
             "read_only": false,
