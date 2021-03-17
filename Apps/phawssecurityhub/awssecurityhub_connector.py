@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 from boto3 import client
 from botocore.config import Config
 from awssecurityhub_consts import *
-from bs4 import UnicodeDammit
 import sys
 
 
@@ -89,24 +88,8 @@ class AwsSecurityHubConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
-    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :param always_encode: Used if the string needs to be encoded for python 3
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str is not None and (self._python_version == 2 or always_encode):
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print(AWSSECURITYHUB_PY_2TO3_ERR_MSG)
-
-        return input_str
-
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error message from the exception.
+        """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -125,13 +108,15 @@ class AwsSecurityHubConnector(BaseConnector):
             pass
 
         try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = AWSSECURITYHUB_UNICODE_DAMMIT_TYPE_ERR_MSG
+            if error_code in AWSSECURITYHUB_ERR_CODE_UNAVAILABLE:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            error_msg = AWSSECURITYHUB_ERR_MSG_UNAVAILABLE
+            self.debug_print("Error occurred while parsing error message")
+            error_text = AWSSECURITYHUB_PARSE_ERR_MSG
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return error_text
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         """ This method is to check if the provided input parameter value
@@ -310,7 +295,12 @@ class AwsSecurityHubConnector(BaseConnector):
                 return findings
 
             for message in resp_json['Messages']:
-                message_dict = json.loads(message.get('Body', '{}'))
+                try:
+                    message_dict = json.loads(message.get('Body', '{}'))
+                except:
+                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(message.get('Body', '{}')))
+                    continue
+
                 if message_dict and message_dict.get('detail', {}).get('findings', []):
                     findings.extend(json.loads(message['Body'])['detail']['findings'])
                 else:
@@ -763,7 +753,7 @@ class AwsSecurityHubConnector(BaseConnector):
                 "Comparison": AWSSECURITYHUB_EQUALS_CONSTS
             }]
         }
-
+        note = note.replace("\\", "\\\\").replace('"', '\\"')
         note1 = {
                 'Text': '(Splunk Phantom - {0}) {1}'.format(note_time, note),
                 'UpdatedBy': 'automation-splunk'

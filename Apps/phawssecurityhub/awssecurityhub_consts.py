@@ -49,7 +49,7 @@ AWSSECURITYHUB_PY_2TO3_ERR_MSG = "Error occurred while handling python 2to3 comp
 # constants relating to 'get_error_message_from_exception'
 AWSSECURITYHUB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 AWSSECURITYHUB_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-AWSSECURITYHUB_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the AWS Security Hub server. Please check the asset configuration and|or the action parameters."
+AWSSECURITYHUB_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 
 # constants relating to 'validate_integer'
 AWSSECURITYHUB_VALID_INT_MSG = "Please provide a valid integer value in the {param}"
