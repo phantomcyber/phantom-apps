@@ -200,15 +200,19 @@ class AwsWafConnector(BaseConnector):
         if not self._create_client(action_result):
             return action_result.get_status()
 
-        dic_map = {
+        action_identifier_map = {
             'list_ip_sets': ['list_ip_sets', 'IPSets'],
             'list_acls': ['list_web_acls', 'WebACLs'],
             'add_ip': ['list_ip_sets', 'IPSets'],
             'delete_ip': ['list_ip_sets', 'IPSets']
         }
 
-        method_name = dic_map.get(self.get_action_identifier())[0]
-        set_name = dic_map.get(self.get_action_identifier())[1]
+        action_identifier = self.get_action_identifier()
+        if action_identifier not in action_identifier_map.keys():
+            return {}
+
+        method_name = action_identifier_map.get(action_identifier)[0]
+        set_name = action_identifier_map.get(action_identifier)[1]
 
         resp_json = dict()
         set_list = list()
@@ -232,7 +236,7 @@ class AwsWafConnector(BaseConnector):
                 if not resp_json.get('NextMarker'):
                     break
                 if limit:
-                    limit = limit - AWSWAF_DEFAULT_LIMIT
+                    limit -= AWSWAF_DEFAULT_LIMIT
 
         return set_list
 
