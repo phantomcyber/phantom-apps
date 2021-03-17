@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 from boto3 import client
 from botocore.config import Config
 from awssecurityhub_consts import *
-import sys
 
 
 class RetVal(tuple):
@@ -46,12 +45,6 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self._state = self.load_state()
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_FETCHING_PYTHON_VERSION_MSG)
-
         config = self.get_config()
 
         # integer validation for 'poll_now_days' configuration parameter
@@ -66,7 +59,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self._region = AWSSECURITYHUB_REGION_DICT.get(config['region'])
         if not self._region:
-            return self.set_status(phantom.APP_ERROR, "Specified region is not valid")
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_REGION_INVALID)
 
         if 'access_key' in config:
             self._access_key = config['access_key']
@@ -169,7 +162,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(err))
+            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CLIENT_NOT_CREATED.format(err=err))
 
         return phantom.APP_SUCCESS
 
@@ -178,13 +171,13 @@ class AwsSecurityHubConnector(BaseConnector):
         try:
             boto_func = getattr(self._client, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_METHOD.format(method=method)), None)
 
         try:
             resp_json = boto_func(**kwargs)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Security Hub failed', err), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CALL_FAILED.format(err=err)), None)
 
         return phantom.APP_SUCCESS, resp_json
 
@@ -200,10 +193,10 @@ class AwsSecurityHubConnector(BaseConnector):
         ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress(AWSSECURITYHUB_ERR_TEST_CONNECTIVITY)
             return ret_val
 
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_container(self, finding):
@@ -281,7 +274,7 @@ class AwsSecurityHubConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result, service='sqs')):
             return None
 
-        self.debug_print("max containers to poll for: {0}".format(max_containers))
+        self.debug_print("Max containers to poll for: {0}".format(max_containers))
 
         findings = []
         while len(findings) < max_containers:
@@ -466,7 +459,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, 'Resource ec2 IP validation failed for all the provided IPs')
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_RESOURCE_IP_VALIDATION)
 
             filters.update({
                 "ResourceAwsEc2InstanceIpV4Addresses": ip_add_list
@@ -484,7 +477,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, 'Network source IP validation failed validation failed for all the provided IPs')
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION)
 
             filters.update({
                 "NetworkSourceIpV4": ip_add_list
@@ -614,12 +607,12 @@ class AwsSecurityHubConnector(BaseConnector):
         for finding in list_findings:
             if finding.get('Id') == findings_id:
                 if record_state and finding.get('RecordState') == record_state:
-                    action_result.set_status(phantom.APP_SUCCESS, 'Provided findings ID is already {}'.format(record_state))
+                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE.format(record_state=record_state))
                     return (True, False, finding)
                 valid_finding = finding
                 break
         else:
-            action_result.set_status(phantom.APP_ERROR, 'Please provide a valid findings ID')
+            action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_FINDING_ID)
             return (False, False, None)
 
         return (True, True, valid_finding)
@@ -768,11 +761,11 @@ class AwsSecurityHubConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary['add_note'] = 'Success'
-        return action_result.set_status(phantom.APP_SUCCESS, 'Note added successfully to the provided findings ID')
+        return action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_SUCC_ADD_NOTE)
 
     def handle_action(self, param):
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         # Dictionary mapping each action with its corresponding actions
         action_mapping = {

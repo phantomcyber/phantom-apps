@@ -3,7 +3,7 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
-AWSSECURITYHUB_EQUALS_CONSTS = 'EQUALS'
+AWSSECURITYHUB_EQUALS_CONSTS = "EQUALS"
 AWSSECURITYHUB_MAX_PER_PAGE_LIMIT = 100
 AWSSECURITYHUB_SQS_MESSAGE_LIMIT = 10
 
@@ -42,9 +42,17 @@ AWSSECURITYHUB_RESOURCE_CEF_TYPES = {
         "Details.AwsEc2Instance.IpV4Addresses": ["ip"]
     }
 
-# constants relating to error messages
-AWSSECURITYHUB_ERR_FETCHING_PYTHON_VERSION_MSG = "Error occurred while fetching the Phantom server's Python major version"
-AWSSECURITYHUB_PY_2TO3_ERR_MSG = "Error occurred while handling python 2to3 compatibility for the input string"
+AWSSECURITYHUB_ERR_TEST_CONNECTIVITY = "Test Connectivity Failed"
+AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY = "Test Connectivity Passed"
+AWSSECURITYHUB_ERR_REGION_INVALID = "Specified region is not valid"
+AWSSECURITYHUB_ERR_BOTO3_CLIENT_NOT_CREATED = "Could not create boto3 client: {err}"
+AWSSECURITYHUB_ERR_INVALID_METHOD = "Invalid method: {method}"
+AWSSECURITYHUB_ERR_BOTO3_CALL_FAILED = "Boto3 call to Security Hub failed: {err}"
+AWSSECURITYHUB_ERR_ALL_RESOURCE_IP_VALIDATION = "Resource ec2 IP validation failed for all the provided IPs"
+AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION = "Network source IP validation failed validation failed for all the provided IPs"
+AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE = "Provided findings ID is already in {record_state}"
+AWSSECURITYHUB_ERR_INVALID_FINDING_ID = "Please provide a valid findings ID"
+AWSSECURITYHUB_SUCC_ADD_NOTE = "Note added successfully to the provided findings ID"
 
 # constants relating to 'get_error_message_from_exception'
 AWSSECURITYHUB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
