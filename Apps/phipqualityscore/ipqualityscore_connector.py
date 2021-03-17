@@ -1,3 +1,7 @@
+# File: ipqualityscore_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 # Phantom imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -33,6 +37,53 @@ class IpqualityscoreConnector(BaseConnector):
         elif action_id == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self.test_asset_connectivity(param)
         return result
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ipqualityscore_consts.ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ipqualityscore_consts.ERR_CODE_MSG
+                error_msg = ipqualityscore_consts.ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ipqualityscore_consts.ERR_CODE_MSG
+            error_msg = ipqualityscore_consts.ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ipqualityscore_consts.ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(ipqualityscore_consts.PARSE_ERR_MSG)
+            error_text = ipqualityscore_consts.PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, ipqualityscore_consts.VALID_INTEGER_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, ipqualityscore_consts.VALID_INTEGER_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, ipqualityscore_consts.NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
 
     def test_asset_connectivity(self, param):
         config = self.get_config()
@@ -80,38 +131,29 @@ class IpqualityscoreConnector(BaseConnector):
         # optional parameters
         optional_param = ''
         if param.get('strictness') is not None:
-            optional_param = optional_param + \
-                "&strictness=" + str(param.get('strictness'))
+            optional_param = "{}&strictness={}".format(optional_param, param.get('strictness'))
         if param.get('user_agent') is not None:
-            optional_param = optional_param + \
-                "&user_agent=" + str(param.get('user_agent'))
+            optional_param = "{}&user_agent={}".format(optional_param, param.get('user_agent'))
         if param.get('user_language') is not None:
-            optional_param = optional_param + \
-                "&user_language=" + str(param.get('user_language'))
+            optional_param = "{}&user_language={}".format(optional_param, param.get('user_language'))
         if param.get('fast') is not None:
-            optional_param = optional_param + "&fast=" + str(param.get('fast'))
+            optional_param = "{}&fast={}".format(optional_param, param.get('fast'))
         if param.get('mobile') is not None:
-            optional_param = optional_param + "&mobile=" + str(param.get('mobile'))
+            optional_param = "{}&mobile={}".format(optional_param, param.get('mobile'))
         if param.get('allow_public_access_points') is not None:
-            optional_param = optional_param + "&allow_public_access_points=" + \
-                str(param.get('allow_public_access_points'))
+            optional_param = "{}&allow_public_access_points={}".format(optional_param, param.get('allow_public_access_points'))
         if param.get('lighter_penalties') is not None:
-            optional_param = optional_param + "&lighter_penalties=" + \
-                str(param.get('lighter_penalties'))
+            optional_param = "{}&lighter_penalties={}".format(optional_param, param.get('lighter_penalties'))
         if param.get('transaction_strictness') is not None:
-            optional_param = optional_param + "&transaction_strictness=" + \
-                str(param.get('transaction_strictness'))
+            optional_param = "{}&transaction_strictness={}".format(optional_param, param.get('transaction_strictness'))
         if param.get('timeout') is not None:
-            optional_param = optional_param + \
-                "&timeout=" + str(param.get('timeout'))
+            optional_param = "{}&timeout={}".format(optional_param, param.get('timeout'))
         if param.get('suggest_domain') is not None:
-            optional_param = optional_param + \
-                "&suggest_domain=" + str(param.get('suggest_domain'))
+            optional_param = "{}&suggest_domain={}".format(optional_param, param.get('suggest_domain'))
         if param.get('abuse_strictness') is not None:
-            optional_param = optional_param + \
-                "&abuse_strictness=" + str(param.get('abuse_strictness'))
+            optional_param = "{}&abuse_strictness={}".format(optional_param, param.get('abuse_strictness'))
         if optional_param != '':
-            req_url = req_url + '?' + optional_param[1:]
+            req_url = "{}?{}".format(req_url, optional_param[1:])
         self.debug_print('req_url', req_url)
         return req_url
 
@@ -120,6 +162,11 @@ class IpqualityscoreConnector(BaseConnector):
         app_key = config.get('apikey', None)
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
+
+        ret_val, _ = self._validate_integer(action_result, param.get('strictness'), ipqualityscore_consts.STRICTNESS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         if param is None or param.get('url') is None:
             self.debug_print('Mandatory action parameters missing')
             action_result.set_status(phantom.APP_ERROR,
@@ -163,10 +210,10 @@ class IpqualityscoreConnector(BaseConnector):
             try:
                 result = query_res.json()
             except Exception as e:
-                self.debug_print('Response from server not a valid JSON', e)
+                self.debug_print('Response from server is not a valid JSON', e)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    'Response from server not' + ' a valid JSON')
+                    'Response from server is not a valid JSON')
 
             if 'status_code' in result and result['status_code'] == 200:
                 status = result['message']
@@ -203,6 +250,15 @@ class IpqualityscoreConnector(BaseConnector):
         app_key = config.get('apikey', None)
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
+
+        ret_val, _ = self._validate_integer(action_result, param.get('strictness'), ipqualityscore_consts.STRICTNESS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        ret_val, _ = self._validate_integer(action_result, param.get('transaction_strictness'), ipqualityscore_consts.TRANSACTION_STRICTNESS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         if param is None or param.get('ip') is None:
             self.debug_print('Mandatory action parameters missing')
             action_result.set_status(phantom.APP_ERROR,
@@ -245,10 +301,10 @@ class IpqualityscoreConnector(BaseConnector):
             try:
                 result = query_res.json()
             except Exception as e:
-                self.debug_print('Response from server not a valid JSON', e)
+                self.debug_print('Response from server is not a valid JSON', e)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    'Response from server not' + ' a valid JSON')
+                    'Response from server is not a valid JSON')
 
             if 'success' in result and result['success'] is True:
                 status = result['message']
@@ -284,6 +340,19 @@ class IpqualityscoreConnector(BaseConnector):
         app_key = config.get('apikey', None)
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
+
+        ret_val, _ = self._validate_integer(action_result, param.get('timeout'), ipqualityscore_consts.TIMEOUT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        ret_val, _ = self._validate_integer(action_result, param.get('strictness'), ipqualityscore_consts.STRICTNESS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        ret_val, _ = self._validate_integer(action_result, param.get('abuse_strictness'), ipqualityscore_consts.ABUSE_STRICTNESS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         if param is None or param.get('email') is None:
             self.debug_print('Mandatory action parameters missing')
             action_result.set_status(phantom.APP_ERROR,
@@ -326,10 +395,10 @@ class IpqualityscoreConnector(BaseConnector):
             try:
                 result = query_res.json()
             except Exception as e:
-                self.debug_print('Response from server not a valid JSON', e)
+                self.debug_print('Response from server is not a valid JSON', e)
                 return action_result.set_status(
                     phantom.APP_ERROR,
-                    'Response from server not' + ' a valid JSON')
+                    'Response from server is not a valid JSON')
 
             if 'success' in result and result['success'] is True:
                 status = result['message']
