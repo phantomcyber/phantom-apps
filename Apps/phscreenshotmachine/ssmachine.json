@@ -7,15 +7,15 @@
     "type": "information",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "main_module": "ssmachine_connector.py",
-    "app_version": "2.0.1",
-    "utctime_updated": "2021-02-03T05:02:06.000000Z",
+    "app_version": "2.0.2",
+    "utctime_updated": "2021-03-12T08:26:00.000000Z",
     "product_vendor": "Screenshot Machine",
     "product_name": "Screenshot Machine",
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud, API api.screenshotmachine.com, January 22 2021"
+        "Cloud, API api.screenshotmachine.com, January 22, 2021"
     ],
     "logo": "logo_screenshotmachine.svg",
     "logo_dark": "logo_screenshotmachine_dark.svg",
@@ -35,7 +35,7 @@
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
             "identifier": "test_asset_connectivity",
             "read_only": true,
@@ -45,11 +45,11 @@
         },
         {
             "action": "get screenshot",
-            "description": "Get a screenshot of a url",
+            "description": "Get a screenshot of a URL",
+            "verbose": "The supported size types are:<ul><li>Tiny: (120 x 90px)</li><li>Small: (200 x 150px)</li><li>Normal: (400 x 300px)</li><li>Medium: (640 x 480px)</li><li>Large: (800 x 600px)</li><li>Full Page: Complete page from the top to the bottom (can be pretty long)</li></ul><p>Sizes are passed with their full names (e.g. <b>Tiny</b>, or <b>Full Page</b>). The default size is <b>Full Page</b> if no size is defined.",
             "type": "investigate",
             "identifier": "get_screenshot",
             "read_only": true,
-            "verbose": "The supported size types are:<ul><li>Tiny: (120 x 90px)</li><li>Small: (200 x 150px)</li><li>Normal: (400 x 300px)</li><li>Medium: (640 x 480px)</li><li>Large: (800 x 600px)</li><li>Full Page: complete page from the top to the bottom (can be pretty long)</li></ul><p>Sizes are passed with their full names (e.g. <b>Tiny</b>, or <b>Full Page</b>). The default size is <b>Full Page</b> if no size is defined.",
             "parameters": {
                 "url": {
                     "description": "URL to screenshot",
@@ -74,24 +74,14 @@
                         "Tiny"
                     ],
                     "order": 1
+                },
+                "filename": {
+                    "description": "The filename for storing the screenshot in the Vault",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
-            "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 5,
-                "view": "ssmachine_view.display_scrshot",
-                "title": "Screen Shot"
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.size",
                     "data_type": "string",
@@ -112,18 +102,37 @@
                         "domain"
                     ],
                     "example_values": [
-                        "https://www.google.com"
+                        "https://www.testurl.com"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Downloaded screenshot"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.name",
                     "data_type": "string",
                     "example_values": [
-                        "https://www.google.com_screenshot.jpg"
+                        "https://www.testurl.com_screenshot.jpg"
                     ],
                     "contains": [
                         "url"
@@ -162,13 +171,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Downloaded screenshot"
-                    ]
-                },
-                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -183,6 +185,13 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "ssmachine_view.display_scrshot",
+                "title": "Screen Shot"
+            },
             "versions": "EQ(*)"
         }
     ]
