@@ -53,7 +53,7 @@ conf = None
 
 def find_char_nth(string, char, n):
     """Find the n'th occurence of a character within a string."""
-    return [i for i, c in enumerate(string) if c == char][n-1]
+    return [i for i, c in enumerate(string) if c == char][n - 1]
 
 
 def get_base_url(api_url):
@@ -126,7 +126,7 @@ class BitglassConnector(BaseConnector):
             if 200 <= status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, error_text)
         except Exception as ex:
-            error_text = "Cannot parse error details"
+            error_text = "Cannot parse error details: {0}".format(str(ex))
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
@@ -267,7 +267,7 @@ class BitglassConnector(BaseConnector):
                     user = d[u'owner']
                     pattern = d[u'patterns']
                     field = 'owner'
-        except Exception as ex:
+        except Exception:
             pass
 
         if user:
@@ -275,7 +275,6 @@ class BitglassConnector(BaseConnector):
             if user not in self.newUsers:
                 self.newUsers.append(user)
             self.newMatches.append(PatternMatch(user, pattern, d[u'time'], d, field))
-
 
     def bgFlushLogEvents(self):
         # A new container is created in _save_new_container
@@ -299,7 +298,7 @@ class BitglassConnector(BaseConnector):
                     # 'dataPatterns': GC_BG_PATTERN_CONTAINS,
                 },
 
-                } for u in artifacts]
+                    } for u in artifacts]
         }
 
         # Don't add empty containers
@@ -417,19 +416,24 @@ class BitglassConnector(BaseConnector):
 
     def _handle_create_update_group(self, param):
         groupName = param['bg_group_name']
-        newGroupName = param['bg_new_group_name']
-        params = json.loads('{' +
-                            '"groupname": "{0}"'.format(groupName) +
-                            ', "newgroupname": [{0}]'.format(newGroupName) if newGroupName != '' else '' +
-                            '}')
+        newGroupName = param.get('bg_new_group_name', '')
+        # Workaround W503
+        params = json.loads(''.join([
+            '{',
+            '"groupname": "{0}"'.format(groupName),
+            ', "newgroupname": [{0}]'.format(newGroupName) if newGroupName != '' else '',
+            '}',
+        ]))
 
         return self._callBitglassApi('group', 'createupdate', param, params)
 
     def _handle_delete_group(self, param):
         groupName = param['bg_group_name']
-        params = json.loads('{' +
-                            '"groupname": "{0}"'.format(groupName) +
-                            '}')
+        params = json.loads(''.join([
+            '{',
+            '"groupname": "{0}"'.format(groupName),
+            '}',
+        ]))
 
         return self._callBitglassApi('group', 'delete', param, params)
 
@@ -446,11 +450,13 @@ class BitglassConnector(BaseConnector):
 
         params = None
         if haveUserName:
-            params = json.loads('{' +
-                                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
-                                                                                   ','.join(['"' + u + '"'
-                                                                                            for u in self.newUsers])) +
-                                '}')
+            params = json.loads(''.join([
+                '{',
+                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
+                                                                   ','.join(['"' + u + '"'
+                                                                            for u in self.newUsers])),
+                '}',
+            ]))
 
         return self._callBitglassApi('group', 'addmembers', param, params)
 
@@ -465,60 +471,68 @@ class BitglassConnector(BaseConnector):
 
         params = None
         if haveUserName:
-            params = json.loads('{' +
-                                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
-                                                                                   ','.join(['"' + u + '"'
-                                                                                            for u in [param['bg_user_name']]])) +
-                                '}')
+            params = json.loads(''.join([
+                '{',
+                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
+                                                                   ','.join(['"' + u + '"'
+                                                                            for u in [param['bg_user_name']]])),
+                '}',
+            ]))
 
         return self._callBitglassApi('group', 'removemembers', param, params)
 
     def _handle_create_update_user(self, param):
         userName = param['bg_user_name']
 
-        firstName           = param['bg_first_name']
-        lastName            = param['bg_last_name']
-        secondaryEmail      = param['bg_secondary_email']
-        netbiosDomain       = param['bg_netbios_domain']
-        samAccountName      = param['bg_sam_account_name']
-        userPrincipalName   = param['bg_user_principal_name']
-        objectGuid          = param['bg_object_guid']
-        countryCode         = param['bg_country_code']
-        mobileNumber        = param['bg_mobile_number']
-        adminRole           = param['bg_admin_role']
-        groupMembership     = param['bg_group_membership']
+        firstName = param.get('bg_first_name', '')
+        lastName = param.get('bg_last_name', '')
+        secondaryEmail = param.get('bg_secondary_email', '')
+        netbiosDomain = param.get('bg_netbios_domain', '')
+        samAccountName = param.get('bg_sam_account_name', '')
+        userPrincipalName = param.get('bg_user_principal_name', '')
+        objectGuid = param.get('bg_object_guid', '')
+        countryCode = param.get('bg_country_code', '')
+        mobileNumber = param.get('bg_mobile_number', '')
+        adminRole = param.get('bg_admin_role', '')
+        groupMembership = param.get('bg_group_membership', '')
 
-        params = json.loads('{' +
-                            '"companyemail": "{0}"'.format(userName) +
-                            ', "firstname": [{0}]'.format(firstName) if firstName != '' else '' +
-                            ', "lastname": "{0}"'.format(lastName) if lastName != '' else '' +
-                            ', "secondaryemail": "{0}"'.format(secondaryEmail) if secondaryEmail != '' else '' +
-                            ', "netbiosdomain": "{0}"'.format(netbiosDomain) if netbiosDomain != '' else '' +
-                            ', "samaccountname": "{0}"'.format(samAccountName) if samAccountName != '' else '' +
-                            ', "userprincipalname": "{0}"'.format(userPrincipalName) if userPrincipalName != '' else '' +
-                            ', "objectguid": "{0}"'.format(objectGuid) if objectGuid != '' else '' +
-                            ', "countrycode": "{0}"'.format(countryCode) if countryCode != '' else '' +
-                            ', "mobilenumber": "{0}"'.format(mobileNumber) if mobileNumber != '' else '' +
-                            ', "adminrole": "{0}"'.format(adminRole) if adminRole != '' else '' +
-                            # Support just one group for now
-                            ', "groupmembership": ["{0}"]'.format(groupMembership) if groupMembership != '' else '' +
-                            '}')
+        params = json.loads(''.join([
+            '{',
+            '"companyemail": "{0}"'.format(userName),
+            ', "firstname": [{0}]'.format(firstName) if firstName != '' else '',
+            ', "lastname": "{0}"'.format(lastName) if lastName != '' else '',
+            ', "secondaryemail": "{0}"'.format(secondaryEmail) if secondaryEmail != '' else '',
+            ', "netbiosdomain": "{0}"'.format(netbiosDomain) if netbiosDomain != '' else '',
+            ', "samaccountname": "{0}"'.format(samAccountName) if samAccountName != '' else '',
+            ', "userprincipalname": "{0}"'.format(userPrincipalName) if userPrincipalName != '' else '',
+            ', "objectguid": "{0}"'.format(objectGuid) if objectGuid != '' else '',
+            ', "countrycode": "{0}"'.format(countryCode) if countryCode != '' else '',
+            ', "mobilenumber": "{0}"'.format(mobileNumber) if mobileNumber != '' else '',
+            ', "adminrole": "{0}"'.format(adminRole) if adminRole != '' else '',
+            # Support just one group for now
+            ', "groupmembership": ["{0}"]'.format(groupMembership) if groupMembership != '' else '',
+            '}',
+        ]))
 
         return self._callBitglassApi('user', 'createupdate', param, params)
 
     def _handle_deactivate_user(self, param):
         userName = param['bg_user_name']
-        params = json.loads('{' +
-                            '"companyemail": "{0}"'.format(userName) +
-                            '}')
+        params = json.loads(''.join([
+            '{',
+            '"companyemail": "{0}"'.format(userName),
+            '}',
+        ]))
 
         return self._callBitglassApi('user', 'deactivate', param, params)
 
     def _handle_reactivate_user(self, param):
         userName = param['bg_user_name']
-        params = json.loads('{' +
-                            '"companyemail": "{0}"'.format(userName) +
-                            '}')
+        params = json.loads(''.join([
+            '{',
+            '"companyemail": "{0}"'.format(userName),
+            '}',
+        ]))
 
         return self._callBitglassApi('user', 'reactivate', param, params)
 
@@ -715,177 +729,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-""" Log Event Data Model
-
-Merged fields used in Phantom cef for log data referencing in actions:
-    'userName'      - email and owner
-    'dataPatterns'  - dlppattern and patterns
-
-                                    Alternative Name (* - QRadar-borrowed)
-
-
-    commonbase
-logtype*
-
-action
-syslogheader                        Syslog Header
-time                                Timestamp
-
-
-	common : commonbase
-activity                            User Activity
-application                         *
-filename                            *
-
-
-	admin : common
-details
-device                              Endpoint ID
-dlppattern  *1  pattern             Cloud Data Pattern
-email       *2  email               User Email
-emailbcc                            Email BCC
-emailcc                             Email CC
-emailfrom                           Email Sender
-emailsenttime                       Email Sent Time
-emailsubject                        Email Subject
-emailto                             Email To
-ipaddress                           Source IP Address
-location
-pagetitle                           Page Title
-request
-transactionid                       Transaction ID
-user
-useragent                           User Agent
-
-
-	access : admin
-deviceguid                          Device GUID
-instancename                        Instance Name
-orgid                               Organisation ID
-url                                 URL*
-usergroup                           User Group
-
-
-	cloudaudit : common
-copies
-fileid                              File ID*
-filelink                            File Link
-folder                              File Path*
-owner       *2  email
-patterns    *1  pattern             Access Data Pattern
-sharedwith                          Shared With
-size                                Size of File
-status
-
-policyid                            Policy ID
-
-
-    swgweb : commonbase
-arguments
-bgcategories
-bgcloudscore
-city
-country
-countrycode
-customcategories
-customlocation
-destinationip
-deviceguid
-devicehostname
-email
-firstname
-indexedtime
-ipaddress
-lastname
-lat
-long
-nextpagetoken
-protocol
-referrer
-region
-regioncode
-requestdomain
-requestmethod
-setransactionid
-size
-uploadedbytes
-uri
-useragent
-usergroup
-webcategories
-webcategoryclass
-webreputation
-
-
-    swgwebdlp : swgweb
-dlppattern
-docextension
-docmd5
-docsha1
-docsha256
-doctype
-keyword
-policyid
-threatindicator
-transactionid
-
-
-PHANTOM:
-
-    <appear in UI
-
-    Artifact:
-
-id                      - generated by ph
-version                 1
-    name                    log event json field
-    label                   'logEvent' (?? or should be alert or offense) - ### any standard ones to use like 'AVAlert'
-source_data_identifier  'name_time'
-create_time             get utc time
-start_time              ?? same as time
-end_time                ?? same as time
-    severity                ??
-type                    ?? bitglass
-kill_chain              ??
-hash                    calculate
-data                    raw json
-
-    cef		                - flattened and parsed actual data
-container	            - parent container id
-    tags		            ??
-
-    cef_types               - mapping to populate the data fields in the ui to pick for other actions' params
-
-    Container:
-
-    id                      - generated by ph
-version                 1
-    name                    ?? 'incident name'  ### Only this one required??
-    label                   ?? 'incident'
-source_data_identifier  ?? generated by ph
-    create_time             get utc time
-    start_time              update based on added artifacts over time
-end_time                update based on added artifacts over time
-    severity                ??
-kill_chain              ??
-hash                    ?? can't base it on the fields as some of them change over time
-data                    - leave empty, based on the asset data
-
-description             'Filtered Bitglass Log Events'
-    status                  'open'
-    sensitivity             'amber'
-    due_time                ?? SLA
-close_time              ?? Not closing ever
-    owner                   'admin' ?? Any other roles/logins?
-asset                   ?? get from the API
-asset_name              ??
-artifact_update_time    - update when adding artifacts ?? auto
-container_update_time   ?? auto
-artifact_count          ?? auto
-
-    Found only in source code:
-    artifacts
-
-"""

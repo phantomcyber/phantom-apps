@@ -9,13 +9,13 @@
     "product_name": "Bitglass Phantom App",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Bitglass App Publisher",
-    "license": "Copyright (c) Bitglass App Publisher, 2020",
+    "publisher": "Bitglass Inc.",
+    "license": "Copyright (c) 2020-2021 Bitglass App Inc.",
     "app_version": "1.0.9",
     "utctime_updated": "2020-12-02T14:21:45.475883Z",
     "package_name": "phantom_bitglass",
     "main_module": "bitglass_connector.py",
-    "min_phantom_version": "4.9.34514",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "auth_token": {
@@ -105,27 +105,10 @@
             "action": "on poll",
             "identifier": "on_poll",
             "description": "Polls for new pattern-matched Bitglass events used for other actions to act upon",
-            "verbose": "Use this action to poll for and ingest new pattern-matched Bitglass log events. These events will be used as input for other playbook actions",
+            "verbose": "Use this action to poll for and ingest new pattern-matched Bitglass log events. These events will be used as input for other playbook actions.",
             "type": "ingest",
             "read_only": true,
-            "parameters": {
-                "start_time": {
-                    "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
-                },
-                "end_time": {
-                    "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
-                },
-                "container_count": {
-                    "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
-                },
-                "artifact_count": {
-                    "data_type": "numeric",
-                    "description": "Parameter ignored in this app"
-                }
-            },
+            "parameters": {},
             "output": [],
             "versions": "EQ(*)"
         },
@@ -133,7 +116,7 @@
             "action": "filter by dlp pattern",
             "identifier": "filter_by_dlp_pattern",
             "description": "Filter log artifacts by DLP pattern",
-            "verbose": "Use this action to filter log artifacts by DLP patterns with a Python regex",
+            "verbose": "Use this action to filter log artifacts by DLP patterns with a Python regex.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -142,7 +125,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
                     "value_list": [],
                     "default": "Malware.*",
                     "order": 0
@@ -164,21 +146,29 @@
                 {
                     "data_path": "action_result.parameter.bg_match_expression",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "bg_match_expression",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_log_event",
+                    "data_type": "string",
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "column_name": "bg_log_event",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.userName",
                     "data_type": "string",
                     "column_name": "userName",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "joedoe@whitehat.com"
                     ],
@@ -191,11 +181,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -208,7 +198,7 @@
             "action": "create update group",
             "identifier": "create_update_group",
             "description": "Create or update a group",
-            "verbose": "Use this action to create or update group for risky users",
+            "verbose": "Use this action to create or update group for risky users.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -217,7 +207,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
@@ -227,7 +216,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "RiskyUsers",
                     "order": 1
@@ -237,26 +225,37 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "bg_group_name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_new_group_name",
+                    "data_type": "string",
+                    "column_name": "bg_new_group_name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -269,7 +268,7 @@
             "action": "delete group",
             "identifier": "delete_group",
             "description": "Delete a group",
-            "verbose": "Use this action to delete group for risky users",
+            "verbose": "Use this action to delete group for risky users.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -278,7 +277,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
@@ -288,7 +286,6 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "bg_group_name",
                     "column_order": 0
                 },
@@ -299,15 +296,21 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -320,7 +323,7 @@
             "action": "add user to group",
             "identifier": "add_user_to_group",
             "description": "Add risky user to a group",
-            "verbose": "Use this action to add user determined risky to a special group",
+            "verbose": "Use this action to add user determined risky to a special group.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -329,7 +332,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
@@ -351,26 +353,40 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "bg_group_name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "bg_user_name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -383,7 +399,7 @@
             "action": "remove user from group",
             "identifier": "remove_user_from_group",
             "description": "Remove risky user from a group",
-            "verbose": "Use this action to remove user previously determined risky from the group",
+            "verbose": "Use this action to remove user previously determined risky from the group.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -392,7 +408,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
@@ -414,26 +429,40 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "bg_group_name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "bg_user_name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -446,7 +475,7 @@
             "action": "create update user",
             "identifier": "create_update_user",
             "description": "Create or update user",
-            "verbose": "Use this action to create or update user",
+            "verbose": "Use this action to create or update user.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -455,7 +484,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "value_list": [],
                     "default": "",
                     "order": 0
@@ -465,7 +496,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 1
@@ -475,7 +505,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 2
@@ -485,7 +514,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 3
@@ -495,7 +523,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 4
@@ -505,7 +532,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 5
@@ -515,7 +541,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 6
@@ -525,7 +550,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 7
@@ -535,7 +559,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 8
@@ -545,7 +568,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 9
@@ -555,7 +577,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 10
@@ -565,36 +586,109 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 10
+                    "order": 11
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.bg_user_name",
                     "data_type": "string",
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "column_name": "bg_user_name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_first_name",
+                    "data_type": "string",
+                    "column_name": "bg_first_name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.bg_last_name",
+                    "data_type": "string",
+                    "column_name": "bg_last_name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.bg_secondary_email",
+                    "data_type": "string",
+                    "column_name": "bg_secondary_email",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.bg_netbios_domain",
+                    "data_type": "string",
+                    "column_name": "bg_netbios_domain",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.bg_sam_account_name",
+                    "data_type": "string",
+                    "column_name": "bg_sam_account_name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_principal_name",
+                    "data_type": "string",
+                    "column_name": "bg_user_principal_name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.bg_object_guid",
+                    "data_type": "string",
+                    "column_name": "bg_object_guid",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.bg_country_code",
+                    "data_type": "string",
+                    "column_name": "bg_country_code",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.bg_mobile_number",
+                    "data_type": "string",
+                    "column_name": "bg_mobile_number",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.bg_admin_role",
+                    "data_type": "string",
+                    "column_name": "bg_admin_role",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.parameter.bg_group_membership",
+                    "data_type": "string",
+                    "column_name": "bg_group_membership",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 13
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -607,7 +701,7 @@
             "action": "deactivate user",
             "identifier": "deactivate_user",
             "description": "Deactivate user",
-            "verbose": "Use this action to deactivate user",
+            "verbose": "Use this action to deactivate user.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -616,7 +710,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "value_list": [],
                     "default": "",
                     "order": 0
@@ -626,7 +722,9 @@
                 {
                     "data_path": "action_result.parameter.bg_user_name",
                     "data_type": "string",
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "column_name": "bg_user_name",
                     "column_order": 0
                 },
@@ -637,15 +735,21 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -658,7 +762,7 @@
             "action": "reactivate user",
             "identifier": "reactivate_user",
             "description": "Reactivate user",
-            "verbose": "Use this action to reactivate user",
+            "verbose": "Use this action to reactivate user.",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -667,7 +771,9 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "value_list": [],
                     "default": "",
                     "order": 0
@@ -677,7 +783,9 @@
                 {
                     "data_path": "action_result.parameter.bg_user_name",
                     "data_type": "string",
-                    "contains": [],
+                    "contains": [
+                        "user name"
+                    ],
                     "column_name": "bg_user_name",
                     "column_order": 0
                 },
@@ -688,15 +796,21 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "data",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
