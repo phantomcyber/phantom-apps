@@ -208,8 +208,8 @@ class AwsWafConnector(BaseConnector):
         }
 
         action_identifier = self.get_action_identifier()
-        if action_identifier not in action_identifier_map.keys():
-            return {}
+        if action_identifier not in action_identifier_map:
+            return []
 
         method_name = action_identifier_map.get(action_identifier)[0]
         set_name = action_identifier_map.get(action_identifier)[1]
