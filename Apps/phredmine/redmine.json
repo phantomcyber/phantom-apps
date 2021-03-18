@@ -54,6 +54,12 @@
             "value_list": [],
             "default": "",
             "order": 4
+        },
+        "custom_fields": {
+            "description": "Comma-separated list of custom Fields to extract from tickets",
+            "data_type": "string",
+            "required": false,
+            "order": 5
         }
     },
     "actions": [
@@ -133,6 +139,22 @@
                     "default": "",
                     "order": 1
                 },
+                "priority": {
+                    "description": "Priority of the ticket",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "order": 2
+                },
+                "tracker": {
+                    "description": "Priority of the ticket",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "order": 3
+                },
                 "custom_fields": {
                     "description": "JSON containing field values",
                     "data_type": "string",
@@ -141,7 +163,7 @@
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 2
+                    "order": 4
                 }
             },
             "output": [
@@ -364,16 +386,6 @@
             "type": "generic",
             "read_only": true,
             "parameters": {
-                "project_key": {
-                    "description": "Project Key to list the tickets (issues) of",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
-                },
                 "query": {
                     "description": "Additional parameters to query for in JQL",
                     "data_type": "string",
@@ -382,7 +394,7 @@
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 1
+                    "order": 0
                 },
                 "start_index": {
                     "description": "Start index of the list",
@@ -392,7 +404,7 @@
                     "contains": [],
                     "value_list": [],
                     "default": "0",
-                    "order": 2
+                    "order": 1
                 },
                 "max_results": {
                     "description": "Max number of issues to return",
@@ -402,7 +414,7 @@
                     "contains": [],
                     "value_list": [],
                     "default": "50",
-                    "order": 3
+                    "order": 2
                 }
             },
             "output": [
@@ -626,39 +638,6 @@
                     "data_type": "string",
                     "column_name": "status",
                     "column_order": 3
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "list projects",
-            "identifier": "list_projects",
-            "description": "List all projects",
-            "verbose": "",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {},
-            "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
