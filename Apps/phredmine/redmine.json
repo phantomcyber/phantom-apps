@@ -122,21 +122,15 @@
                 "subject": {
                     "description": "Title",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "required": true,
+                    "primary": true,
                     "order": 0
                 },
                 "description": {
                     "description": "Description of the ticket",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
+                    "required": true,
+                    "primary": true,
                     "order": 1
                 },
                 "priority": {
@@ -144,7 +138,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "order": 2
                 },
                 "tracker": {
@@ -152,7 +145,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
                     "order": 3
                 },
                 "custom_fields": {
@@ -160,48 +152,87 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.title",
+                    "data_path": "action_result.parameter.subject",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "title",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "description",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.fields",
+                    "data_path": "action_result.parameter.priority",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "fields",
+                    "column_name": "priority",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.parameter.vault_id",
+                    "data_path": "action_result.parameter.tracker",
                     "data_type": "string",
-                    "contains": [
-                        "vault id"
-                    ],
-                    "column_name": "vault_id",
+                    "column_name": "tracker",
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.custom_fields",
+                    "data_type": "string",
+                    "column_name": "custom_fields"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.updated_on",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 4
+                    "column_name": "status"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -234,9 +265,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "update_fields": {
@@ -244,9 +272,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "vault_id": {
@@ -266,14 +291,12 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.update_fields",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "update_fields",
                     "column_order": 1
                 },
@@ -293,16 +316,52 @@
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.id",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.updated_on",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -323,7 +382,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 0
@@ -333,7 +391,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
                     "value_list": [],
                     "default": "",
                     "order": 1
@@ -343,14 +400,12 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "comment",
                     "column_order": 1
                 },
@@ -365,12 +420,48 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.updated_on",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -391,8 +482,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
                     "default": "",
                     "order": 0
                 },
@@ -401,8 +490,6 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
                     "default": "0",
                     "order": 1
                 },
@@ -411,58 +498,82 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
                     "default": "50",
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.project_key",
-                    "data_type": "string",
-                    "contains": [],
-                    "column_name": "project_key",
-                    "column_order": 0
-                },
-                {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "query",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.start_index",
                     "data_type": "numeric",
-                    "contains": [],
                     "column_name": "start_index",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
-                    "contains": [],
                     "column_name": "max_results",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issues.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issues.*.priority.updated_on",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -483,9 +594,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -493,7 +601,6 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
@@ -508,12 +615,48 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.updated_on",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -534,9 +677,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -544,7 +684,6 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
@@ -559,12 +698,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -585,18 +724,13 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "status": {
                     "description": "Status to set",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
+                    "primary": true,
                     "default": "",
                     "order": 1
                 },
@@ -605,9 +739,6 @@
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 }
             },
@@ -615,21 +746,18 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.status",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "status",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "comment",
                     "column_order": 2
                 },
@@ -640,16 +768,52 @@
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.id",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.issue.author.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.project.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.tracker.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.created_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.closed_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.issue.priority.updated_on",
+                    "data_type": "string"
                 }
             ],
             "render": {

@@ -540,8 +540,8 @@ class RedmineConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Parameters
-        subject = param.get("subject", "")
-        description = param.get("description", "")
+        subject = param["subject"]
+        description = param["description"]
         priority = param.get("priority", None)
         tracker = param.get("tracker", None)
         custom_fields = param.get("custom_fields", "{}")
