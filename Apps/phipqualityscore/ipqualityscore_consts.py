@@ -23,7 +23,6 @@ IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY = 'Please check your network connectivity'
 IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE = 'Server returned error code: {code}'
 IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED = "IPQualityScore response didn't \
                                     send expected response"
-IPQUALITYSCORE_ERR_MSG_ACTION_PARAM = 'Mandatory action parameter missing'
 IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT = 'Query is being rate limited. \
                                      Server returned 509'
 

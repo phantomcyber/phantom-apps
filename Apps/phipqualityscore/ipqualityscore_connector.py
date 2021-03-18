@@ -83,38 +83,35 @@ class IpqualityscoreConnector(BaseConnector):
 
     def test_asset_connectivity(self, param):
         config = self.get_config()
-        app_key = config.get('apikey', None)
+        app_key = config['apikey']
         self.save_progress(IPQUALITYSCORE_MSG_CONNECTING)
         try:
-            if app_key:
-                response_code = requests.get(
-                    IPQUALITYSCORE_API_TEST.format(apikey=app_key)).status_code
+            response_code = requests.get(
+                IPQUALITYSCORE_API_TEST.format(apikey=app_key)).status_code
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.debug_print('test_asset_connectivity: ', err)
-            err_msg = '{}{}{}'.format(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST, err, IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY)
+            self.debug_print('test_asset_connectivity: {}'.format(err))
+            err_msg = '{}. {}. Error Occurred: {}'.format(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST, IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY, err)
             return self.set_status(phantom.APP_ERROR, err_msg)
 
         if response_code == 200:
             self.save_progress(IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST)
-            return self.set_status(
-                phantom.APP_SUCCESS,
-                IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST)
-        else:
-            return self.set_status(phantom.APP_ERROR,
-                            '{}{}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+            return self.set_status(phantom.APP_SUCCESS)
+
+        self.save_progress('{}. {}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
                             format(code=response_code), IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY))
+        return self.set_status(phantom.APP_ERROR)
 
     def create_req_url(self, urltype, param, app_key):
         if urltype == "url":
             req_url = IPQUALITYSCORE_API_URL_CHECKER.format(
-                apikey=app_key, url=urllib.parse.quote_plus(param.get('url')))
+                apikey=app_key, url=urllib.parse.quote_plus(param['url']))
         elif urltype == "ip":
             req_url = IPQUALITYSCORE_API_IP_REPUTATION.format(
-                apikey=app_key, ip=(param.get('ip')))
+                apikey=app_key, ip=(param['ip']))
         elif urltype == "email":
             req_url = IPQUALITYSCORE_API_EMAIL_VALIDATION.format(
-                apikey=app_key, email=param.get('email'))
+                apikey=app_key, email=param['email'])
         else:
             req_url = ''
         # optional parameters
@@ -143,12 +140,12 @@ class IpqualityscoreConnector(BaseConnector):
             optional_param = "{}&abuse_strictness={}".format(optional_param, param.get('abuse_strictness'))
         if optional_param != '':
             req_url = "{}?{}".format(req_url, optional_param[1:])
-        self.debug_print('req_url', req_url)
+        self.debug_print('req_url {}'.format(req_url))
         return req_url
 
     def check_url(self, param):
         config = self.get_config()
-        app_key = config.get('apikey', None)
+        app_key = config['apikey']
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
 
@@ -156,80 +153,69 @@ class IpqualityscoreConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if param is None or param.get('url') is None:
-            self.debug_print('Mandatory action parameters missing')
-            return action_result.set_status(phantom.APP_ERROR,
-                                     IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+        self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
+                        query_url=param['url'])
+        try:
+            req_url = self.create_req_url('url', param, app_key)
+            query_res = requests.get(req_url)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('check_url: {}'.format(err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
 
+        action_result.add_debug_data({'response_text': query_res.text
+                                        if query_res else ''})
+        self.debug_print('status_code {}'.format(query_res.status_code))
+        if query_res.status_code == 509:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+        if query_res.status_code != 200:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                format(code=query_res.status_code))
+        try:
+            result = query_res.json()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Response from server is not a valid JSON {}'.format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Response from server is not a valid JSON')
+
+        if 'status_code' in result and result['status_code'] == 200:
+            status = result['message']
+            action_result.append_to_message(
+                IPQUALITYSCORE_SERVICE_SUCC_MSG)
         else:
-            if app_key:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
 
-                self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
-                                   query_url=param.get('url'))
-                try:
-                    req_url = self.create_req_url('url', param, app_key)
-                    query_res = requests.get(req_url)
-                except Exception as e:
-                    err = self._get_error_message_from_exception(e)
-                    self.debug_print('check_url: ', err)
-                    return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
-
+        try:
+            status_summary = {}
+            if result['success'] is True:
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = result["status_code"]
+                status = {}
+                for key, val in result.items():
+                    status[key] = val
             else:
-                return action_result.set_status(phantom.APP_ERROR, IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = result["status_code"]
+            summary.update(status_summary)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(
+                phantom.APP_ERROR, 'Error populating summary {}'.format(err))
 
-            action_result.add_debug_data({'response_text': query_res.text
-                                          if query_res else ''})
-            self.debug_print('status_code', query_res.status_code)
-            if query_res.status_code == 509:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
-            if query_res.status_code != 200:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
-                    format(code=query_res.status_code))
-            try:
-                result = query_res.json()
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                self.debug_print('Response from server is not a valid JSON', err)
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Response from server is not a valid JSON')
-
-            if 'status_code' in result and result['status_code'] == 200:
-                status = result['message']
-                action_result.append_to_message(
-                    IPQUALITYSCORE_SERVICE_SUCC_MSG)
-            else:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
-
-            try:
-                status_summary = {}
-                if result['success'] is True:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = result["status_code"]
-                    status = {}
-                    for key, val in result.items():
-                        status[key] = val
-                else:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = result["status_code"]
-                summary.update(status_summary)
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                return action_result.set_status(
-                    phantom.APP_ERROR, 'Error populating summary {}'.format(err))
-
-            action_result.add_data(status)
-            return action_result.set_status(phantom.APP_SUCCESS)
+        action_result.add_data(status)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def ip_reputation(self, param):
         config = self.get_config()
-        app_key = config.get('apikey', None)
+        app_key = config['apikey']
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
 
@@ -241,75 +227,67 @@ class IpqualityscoreConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if param is None or param.get('ip') is None:
-            self.debug_print('Mandatory action parameters missing')
-            return action_result.set_status(phantom.APP_ERROR,
-                                     IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+        self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
+                            query_ip=param['ip'])
+        try:
+            req_url = self.create_req_url('ip', param, app_key)
+            query_res = requests.get(req_url)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('ip_reputation: {}'.format(err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+
+        action_result.add_debug_data({'response_text': query_res.text
+                                        if query_res else ''})
+        self.debug_print('status_code {}'.format(query_res.status_code))
+        if query_res.status_code == 509:
+            return action_result.set_status(
+                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+        if query_res.status_code != 200:
+            return action_result.set_status(
+                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                format(code=query_res.status_code))
+        try:
+            result = query_res.json()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Response from server is not a valid JSON {}'.format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Response from server is not a valid JSON')
+
+        if 'success' in result and result['success'] is True:
+            status = result['message']
+            action_result.append_to_message(
+                IPQUALITYSCORE_SERVICE_SUCC_MSG)
         else:
-            if app_key:
-                self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
-                                   query_ip=param.get('ip'))
-                try:
-                    req_url = self.create_req_url('ip', param, app_key)
-                    query_res = requests.get(req_url)
-                except Exception as e:
-                    err = self._get_error_message_from_exception(e)
-                    self.debug_print('ip_reputation: ', err)
-                    return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
+
+        try:
+            status_summary = {}
+            if result['success'] is True:
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = 200
+                status = {}
+                for key, val in result.items():
+                    status[key] = val
             else:
-                return action_result.set_status(phantom.APP_ERROR, IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = 500
+            summary.update(status_summary)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(
+                phantom.APP_ERROR, 'Error populating summary {}'.format(err))
 
-            action_result.add_debug_data({'response_text': query_res.text
-                                          if query_res else ''})
-            self.debug_print('status_code', query_res.status_code)
-            if query_res.status_code == 509:
-                return action_result.set_status(
-                    phantom.APP_ERROR, IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
-            if query_res.status_code != 200:
-                return action_result.set_status(
-                    phantom.APP_ERROR, IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
-                    format(code=query_res.status_code))
-            try:
-                result = query_res.json()
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                self.debug_print('Response from server is not a valid JSON', err)
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Response from server is not a valid JSON')
-
-            if 'success' in result and result['success'] is True:
-                status = result['message']
-                action_result.append_to_message(
-                    IPQUALITYSCORE_SERVICE_SUCC_MSG)
-            else:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
-
-            try:
-                status_summary = {}
-                if result['success'] is True:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = 200
-                    status = {}
-                    for key, val in result.items():
-                        status[key] = val
-                else:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = 500
-                summary.update(status_summary)
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                return action_result.set_status(
-                    phantom.APP_ERROR, 'Error populating summary {}'.format(err))
-
-            action_result.add_data(status)
-            return action_result.set_status(phantom.APP_SUCCESS)
+        action_result.add_data(status)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def email_validation(self, param):
         config = self.get_config()
-        app_key = config.get('apikey', None)
+        app_key = config['apikey']
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
 
@@ -325,69 +303,62 @@ class IpqualityscoreConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if param is None or param.get('email') is None:
-            self.debug_print('Mandatory action parameters missing')
-            return action_result.set_status(phantom.APP_ERROR, IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+        self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
+                            query_ip=param['email'])
+        try:
+            req_url = self.create_req_url('email', param, app_key)
+            query_res = requests.get(req_url)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('ip_reputation: {}'.format(err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+
+        action_result.add_debug_data({'response_text': query_res.text
+                                        if query_res else ''})
+        self.debug_print('status_code {}'.format(query_res.status_code))
+        if query_res.status_code == 509:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+        if query_res.status_code != 200:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                format(code=query_res.status_code))
+        try:
+            result = query_res.json()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Response from server is not a valid JSON {}'.format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Response from server is not a valid JSON')
+
+        if 'success' in result and result['success'] is True:
+            status = result['message']
+            action_result.append_to_message(
+                IPQUALITYSCORE_SERVICE_SUCC_MSG)
         else:
-            if app_key:
-                self.save_progress(IPQUALITYSCORE_MSG_QUERY_URL,
-                                   query_ip=param.get('email'))
-                try:
-                    req_url = self.create_req_url('email', param, app_key)
-                    query_res = requests.get(req_url)
-                except Exception as e:
-                    err = self._get_error_message_from_exception(e)
-                    self.debug_print('ip_reputation: ', err)
-                    return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
+        try:
+            status_summary = {}
+            if result['success'] is True:
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = 200
+                status = result.copy()
             else:
-                return action_result.set_status(phantom.APP_ERROR, IPQUALITYSCORE_ERR_MSG_ACTION_PARAM)
+                status_summary['Message'] = result["message"]
+                status_summary['Status_Code'] = 500
+            summary.update(status_summary)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(
+                phantom.APP_ERROR, 'Error populating summary {}'.format(err))
 
-            action_result.add_debug_data({'response_text': query_res.text
-                                          if query_res else ''})
-            self.debug_print('status_code', query_res.status_code)
-            if query_res.status_code == 509:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
-            if query_res.status_code != 200:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
-                    format(code=query_res.status_code))
-            try:
-                result = query_res.json()
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                self.debug_print('Response from server is not a valid JSON', err)
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    'Response from server is not a valid JSON')
-
-            if 'success' in result and result['success'] is True:
-                status = result['message']
-                action_result.append_to_message(
-                    IPQUALITYSCORE_SERVICE_SUCC_MSG)
-            else:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED)
-            try:
-                status_summary = {}
-                if result['success'] is True:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = 200
-                    status = result.copy()
-                else:
-                    status_summary['Message'] = result["message"]
-                    status_summary['Status_Code'] = 500
-                summary.update(status_summary)
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                return action_result.set_status(
-                    phantom.APP_ERROR, 'Error populating summary {}'.format(err))
-
-            action_result.add_data(status)
-            return action_result.set_status(phantom.APP_SUCCESS)
+        action_result.add_data(status)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
 
 if __name__ == '__main__':
