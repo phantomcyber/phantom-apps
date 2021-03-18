@@ -1,7 +1,7 @@
 {
     "appid": "8530c7b3-8a0a-4688-ac14-e8e357f06642",
     "name": "Redmine",
-    "description": "This app integrates with Redmine to perform several ticket management actions.",
+    "description": "This app integrates with Redmine to perform several ticket management actions",
     "type": "ticketing",
     "product_vendor": "Redmine",
     "logo": "redmine.svg",
@@ -10,7 +10,7 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "license": "Copyright (c) Splunk Community, 2021",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2021-02-25T10:35:44.521521Z",
     "package_name": "phantom_redmine",
@@ -67,7 +67,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -115,7 +114,6 @@
             "action": "create ticket",
             "identifier": "create_ticket",
             "description": "Create a ticket (issue)",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -256,7 +254,6 @@
             "action": "update ticket",
             "identifier": "update_ticket",
             "description": "Update ticket (issue)",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -373,7 +370,6 @@
             "action": "add comment",
             "identifier": "add_comment",
             "description": "Add a comment to a ticket",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -473,7 +469,6 @@
             "action": "list tickets",
             "identifier": "list_tickets",
             "description": "Get a list of tickets (issues) in a project",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -585,7 +580,6 @@
             "action": "get ticket",
             "identifier": "get_ticket",
             "description": "Get ticket (issue) information",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -668,7 +662,6 @@
             "action": "delete ticket",
             "identifier": "delete_ticket",
             "description": "Delete ticket (issue)",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -715,7 +708,6 @@
             "action": "set status",
             "identifier": "set_status",
             "description": "Set ticket (issue) status",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {

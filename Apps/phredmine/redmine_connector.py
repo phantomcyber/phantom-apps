@@ -11,7 +11,6 @@ from __future__ import print_function, unicode_literals
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom import vault
 import phantom.rules as Rules
 
 # Usage of the consts file is recommended
@@ -21,7 +20,6 @@ import json
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import dateutil.parser
-from urllib.parse import urlencode, quote_plus
 
 
 class RetVal(tuple):
@@ -241,10 +239,10 @@ class RedmineConnector(BaseConnector):
         url = "{0}rest/container/{1}".format(self.get_phantom_base_url(), container_id)
 
         try:
-            r = requests.post(url, data=(json.dumps(updated_container)), verify=False)
-
+            requests.post(url, data=(json.dumps(updated_container)), verify=False)
         except Exception as e:
-            self.debug_print("Error while updating the container")
+            err = self._get_error_message_from_exception(e)
+            self.debug_print(f"Error while updating the container: {err}")
 
     def _search_ticket_container(self, ticket):
         "Find the phantom container corresponding to the redmine ticket"
