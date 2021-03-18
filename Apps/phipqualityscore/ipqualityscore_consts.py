@@ -13,8 +13,8 @@ IPQUALITYSCORE_APP_KEY = 'app_key'
 IPQUALITYSCORE_MSG_QUERY_URL = 'Querying URL: {query_url}'
 IPQUALITYSCORE_MSG_CONNECTING = 'Polling IPQualityScore site ...'
 IPQUALITYSCORE_SERVICE_SUCC_MSG = 'IPQualityScore Service successfully executed.'
-IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST = 'Connectivity test passed'
-IPQUALITYSCORE_ERR_CONNECTIVITY_TEST = 'Connectivity test failed'
+IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST = 'Test Connectivity passed'
+IPQUALITYSCORE_ERR_CONNECTIVITY_TEST = 'Test Connectivity failed'
 IPQUALITYSCORE_MSG_GOT_RESP = 'Got response from IPQualityScore'
 IPQUALITYSCORE_NO_RESPONSE = 'Server did not return a response \
                          for the object queried'
@@ -26,6 +26,10 @@ IPQUALITYSCORE_ERR_MSG_OBJECT_QUERIED = "IPQualityScore response didn't \
 IPQUALITYSCORE_ERR_MSG_ACTION_PARAM = 'Mandatory action parameter missing'
 IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT = 'Query is being rate limited. \
                                      Server returned 509'
+
+ACTION_ID_URL_CHECKER = 'check_url'
+ACTION_ID_IP_REPUTATION = 'ip_reputation'
+ACTION_ID_EMAIL_VALIDATION = 'email_validation'
 
 # Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
