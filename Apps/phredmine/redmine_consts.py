@@ -3,8 +3,6 @@
 REDMINE_BACKFILL_DAYS = 7
 REDMINE_TICKET_ARTIFACT_LABEL = "redmine_ticket"
 
-
-
 REDMINE_TICKET_JSON_ID = "id"
 
 REDMINE_TICKET_JSON_PROJECT_ID = "project_id"
@@ -31,7 +29,6 @@ REDMINE_TICKET_JSON_CLOSED_ON = "closed_on"
 
 REDMINE_TICKET_STATUSES_KEY = "issue_statuses"
 REDMINE_TICKET_STATUSES_ENDPONT = "/issue_statuses.json"
-
 
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
