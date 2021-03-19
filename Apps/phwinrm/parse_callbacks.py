@@ -92,6 +92,18 @@ def ensure_no_errors(action_result, response):
     return phantom.APP_SUCCESS
 
 
+def get_column_header_indexes(column_headers):
+    column_headers_list = column_headers.split()
+    column_indexes = []
+    previous_searched_index = 0
+    for word in column_headers_list:
+        word_start_index = column_headers.index(word, previous_searched_index)
+        word_end_index = word_start_index + len(word) - 1
+        previous_searched_index = word_end_index
+        column_indexes.append((word_start_index, word_end_index))
+    return column_indexes
+
+
 def list_processes(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
@@ -100,27 +112,36 @@ def list_processes(action_result, response):
         )
 
     output = response.std_out
-    lines = list(filter(lambda x: not x.startswith('-----'), filter(lambda x:x, map(lambda x:x.decode('utf8').strip(), output.splitlines()))))
-    header = list(map(lambda x:x.lower(), lines[0].split() + [f"unknown_column_{x}" for x in range(0, 10)]))
+    lines = [y for y in [i for i in output.splitlines() if i] if not y.startswith('-----')]
+    column_headers = lines[0]
+    column_headers_list = column_headers.split()
+    column_indexes = get_column_header_indexes(column_headers)
+
+    header = [y.lower() for y in (column_headers_list + [f"unknown_column_{x}" for x in range(10)])]
     processes = lines[1:]
     result = []
     for line in processes:
         columns = line.split()
         process_dict = dict()
+        if len(columns) != len(column_headers_list):
+            for index, (start, end) in enumerate(column_indexes):
+                if not line[start: end + 1].strip():
+                    columns.insert(index, None)
         for i, x in enumerate(columns):
             process_dict[header[i]] = x
+
         result += [process_dict]
 
-    column_mapping  = {
-            'handles': 'handles',
-            'npm(k)': 'non_paged_memory_(K)',
-            'pm(k)': 'paged_memory_(K)',
-            'ws(k)': 'working_set_(K)',
-            'vm(m)': 'virtual_memory_(M)',
-            'cpu(s)': 'processor_time_(s)',
-            'id': 'pid',
-            'si': 'session_id',
-            'processname': 'name',
+    column_mapping = {
+        'handles': 'handles',
+        'npm(k)': 'non_paged_memory_(K)',
+        'pm(k)': 'paged_memory_(K)',
+        'ws(k)': 'working_set_(K)',
+        'vm(m)': 'virtual_memory_(M)',
+        'cpu(s)': 'processor_time_(s)',
+        'id': 'pid',
+        'si': 'session_id',
+        'processname': 'name',
     }
 
     for line in result:
