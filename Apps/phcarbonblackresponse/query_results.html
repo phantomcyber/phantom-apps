@@ -22,7 +22,7 @@
   <thead>
   <tr>
     {% for header in table.headers %}
-      <th class="widget-th" style="border: none; font-weight: normal; max-width:600px;">{{ header|upper }}</th>
+      <th class="widget-th" style="border: none; font-weight: normal; max-width:auto;">{{ header|upper }}</th>
     {% endfor %}
   </tr>
   </thead>
@@ -30,7 +30,7 @@
   {% for row in table.rows %}
     <tr>
       {% for cell in row %}
-        <td class="widget-td" style="border-bottom: 1px solid; white-space: {% if cell.value|length and value|length > 100 %}normal{% else %}nowrap{% endif %}; max-width:600px;">
+        <td class="widget-td" style="border-bottom: 1px solid; white-space: {% if cell.value|length and value|length > 100 %}normal{% else %}nowrap{% endif %}; max-width:auto;">
           {% if cell.contains and cell.value and cell.value != None %}
             <a href="javascript:;" onclick="context_menu(this, {{ cell.id }}, {{ container.id }}, '{{ cell.data_path|escapejs }}', {{ cell.contains|jslist }}, {{ cell.offset|default:0 }}, boundry);">
                {{ cell.value }}

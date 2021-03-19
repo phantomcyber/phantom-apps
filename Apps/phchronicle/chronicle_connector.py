@@ -1,7 +1,7 @@
 # --
 # File: chronicle_connector.py
 #
-# Copyright (c) 2020 Google LLC.
+# Copyright (c) 2020-2021 Google LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import httplib2
 from bs4 import BeautifulSoup
 from collections import defaultdict
 from datetime import datetime, timedelta
+from hashlib import sha256
 
 # Usage of the consts file is recommended
 from chronicle_consts import *      # noqa
@@ -75,15 +76,22 @@ class ChronicleConnector(BaseConnector):
         self._is_poll_now = None
         self._max_results = None
         self._max_artifacts = None
-        self._is_first_run_ioc = False
-        self._is_first_run_alert = False
         self._alerts_severity = None
         self._run_automation = False
 
-        # Ingestion time variable initialization
-        self._start_ioc_time = None
-        self._start_alert_time = None
-        self._end_alert_time = None
+        # First Run Dictionary of the form {'run_mode': False}
+        self._is_first_run = {
+            GC_RM_IOC_DOMAINS: False,
+            GC_RM_ASSET_ALERTS: False,
+            GC_RM_USER_ALERTS: False,
+            GC_RM_ALERTING_DETECTIONS: False,
+            GC_RM_NOT_ALERTING_DETECTIONS: False
+        }
+
+        # Use this dictionary to maintain the hash for the fetched results
+        self._last_run_hash_digests = dict()
+        # Ingestion time dictionary initialization
+        self._time_dict = dict()
 
     def _process_empty_response(self, response, action_result):
         """Process empty response.
@@ -212,6 +220,7 @@ class ChronicleConnector(BaseConnector):
         """
         # Create a URL to connect to Chronicle
         url = f"{self._base_url}{endpoint}"
+        action_identifier = self.get_action_identifier()
 
         self.debug_print("Making a REST call with provided request parameters")
         self.debug_print(f"Request URL: {url}")
@@ -242,8 +251,10 @@ class ChronicleConnector(BaseConnector):
 
             if response[0].status == 429:
                 # Retrying REST call in case of RESOURCE_EXHAUSTED Error
-                self.save_progress(f"Received RESOURCE_EXHAUSTED (Status code: 429) Error. Retrying API call after {self._wait_timeout_period} seconds")
-                self.debug_print(f"Received RESOURCE_EXHAUSTED (Status code: 429) Error. Retrying API call after {self._wait_timeout_period} seconds")
+                self.save_progress(f"Received RESOURCE_EXHAUSTED (Status code: 429) Error for the {action_identifier} action.")
+                self.debug_print(f"Received RESOURCE_EXHAUSTED (Status code: 429) Error for the {action_identifier} action.")
+                self.save_progress(f"Retrying API call after {self._wait_timeout_period} seconds")
+                self.debug_print(f"Retrying API call after {self._wait_timeout_period} seconds")
 
                 # add time sleep
                 time.sleep(self._wait_timeout_period)
@@ -911,13 +922,32 @@ class ChronicleConnector(BaseConnector):
             alerts_assets_association_list.append({"alert_name": alert_name, "affected_assets": affected_assets, "asset_count": cnt})
         return alerts_assets_association_list
 
-    def _generate_alert_summary(self, response):
-        """Generate alert summary and alert assets association for the alerts response.
+    def _generate_alert_users_association(self, alerts_users_association):
+        """Generate alert users association.
 
         Parameters:
-            :param response : dictionary of response
+            :param alerts_users_association : dictionary of alerts users response created from alerts response
         Returns:
-            :return: response
+            :return: alerts users association list
+        """
+        alerts_users_association_list = list()
+        for alert_name, alert_user_detail in list(alerts_users_association.items()):
+            affected_users = dict()
+            cnt = 0
+            for key, value in list(alert_user_detail.items()):
+                affected_users[key] = list(value)
+                cnt += len(list(value))
+
+            alerts_users_association_list.append({"alert_name": alert_name, "affected_users": affected_users, "user_count": cnt})
+        return alerts_users_association_list
+
+    def _generate_alert_summary(self, response):
+        """Generate asset alert summary and alert assets association for the asset alerts response.
+
+        Parameters:
+            :param response: dictionary of response
+        Returns:
+            :return: asset alerts response with summary
         """
         alerts_assets_association = defaultdict(lambda: {"hostname": set(), "assetIpAddress": set(), "mac": set(), "productId": set()})
         response_with_summary = dict()
@@ -954,6 +984,49 @@ class ChronicleConnector(BaseConnector):
 
         return response_with_summary
 
+    def _generate_user_alerts_summary(self, response):
+        """Generate user alerts summary and alert users association for the user alerts response.
+
+        Parameters:
+            :param response: dictionary of response
+        Returns:
+            :return: user alerts response with summary
+        """
+        alerts_users_association = defaultdict(lambda: {"email": set(), "username": set()})
+        response_with_summary = dict()
+        user_alerts = list()
+
+        for user in response.get("userAlerts", []):
+            alert_summary_user = defaultdict(list)
+            alert_summary_list = list()
+            user_key = None
+            user_value = None
+
+            for key, value in list(user.get("user", {}).items()):
+                user_key = key
+                user_value = value
+
+            for alert_info in user.get("alertInfos", []):
+                timestamp = alert_info.get("timestamp")
+                timestamp_list = [timestamp] if timestamp else []
+                alert_summary_user[alert_info.get("name")].extend(timestamp_list)
+
+                if alerts_users_association[alert_info.get("name")].get(user_key):
+                    alerts_users_association[alert_info.get("name")][user_key].add(user_value)
+                else:
+                    alerts_users_association[alert_info.get("name")][user_key] = set({user_value})
+
+            for key, value in list(alert_summary_user.items()):
+                alert_summary_list.append({"name": key, "occurrences": value, "count": len(value)})
+
+            user["userAlertSummary"] = alert_summary_list
+            user_alerts.append(user)
+
+        response_with_summary["userAlerts"] = user_alerts
+        response_with_summary["alerts_users_association"] = self._generate_alert_users_association(alerts_users_association)
+
+        return response_with_summary
+
     def _paginator(self, action_result, client, endpoint, end_time, limit=None):
         """Fetch results from multiple API calls using pagination for given endpoint.
 
@@ -974,8 +1047,13 @@ class ChronicleConnector(BaseConnector):
 
         fixed_endpoint = endpoint
 
+        action_identifier = self.get_action_identifier()
+        index = 1
+
         while True:
             endpoint = f"{fixed_endpoint}&end_time={end_time}"
+
+            self.debug_print(f"Making {index} REST call for the {action_identifier} action")
 
             # Make REST call
             ret_val, response = self._make_rest_call(action_result, client, endpoint)
@@ -1007,6 +1085,7 @@ class ChronicleConnector(BaseConnector):
 
             # Mark first as False
             first = False
+            index += 1
 
         return phantom.APP_SUCCESS, results, uri
 
@@ -1019,7 +1098,7 @@ class ChronicleConnector(BaseConnector):
             :param param: Dictionary of input parameters
             :param time_param: time parameters dictionary which consists of time period details
         Returns:
-            :return: response
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), response
         """
         # Fetch action parameters
         asset_indicator = param['asset_indicator']
@@ -1084,7 +1163,7 @@ class ChronicleConnector(BaseConnector):
             parameters for optimum performance and they are only validated in their respective actions.")
         self.save_progress("Making REST call to Chronicle for fetching the list of IoCs...")
 
-        endpoint = "/ioc/listiocs?start_time=1970-01-01T00:00:00Z&page_size=1"
+        endpoint = "/v1/ioc/listiocs?start_time=1970-01-01T00:00:00Z&page_size=1"
 
         ret_val, _ = self._make_rest_call(action_result, client, endpoint)
 
@@ -1518,31 +1597,290 @@ class ChronicleConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        alert_type = param.get(GC_ALERT_TYPE_KEY, 'All')
+
         # Generate summary for alerts response
         try:
-            if response.get('alerts', []):
-                response = self._generate_alert_summary(response)
+            response_data = dict()
+            if alert_type in GC_ASSET_ALERTS_MODE and response.get('alerts', []):
+                response_data.update(self._generate_alert_summary(response))
+            if alert_type in GC_USER_ALERTS_MODE and response.get('userAlerts', []):
+                response_data.update(self._generate_user_alerts_summary(response))
         except Exception as e:
             self.debug_print(f"Error occurred while generating alerts summary. Error: {str(e)}")
 
         # Add fetched data to action result object
-        action_result.add_data(response)
+        action_result.add_data(response_data)
 
         # try to fetch the fetched alerts
         try:
-            alerts = response.get("alerts", [])
+            asset_alerts = response_data.get("alerts", [])
+            user_alerts = response_data.get("userAlerts", [])
         except Exception as e:
             self.debug_print(f"Error occurred while fetching alerts from the response. Error: {str(e)}")
-            alerts = None
+            asset_alerts = []
 
-        alert_count = 0
-        for alert in alerts:
-            alert_count += len(alert.get('alertInfos', []))
+        asset_alert_count = 0
+        for alert in asset_alerts:
+            asset_alert_count += len(alert.get('alertInfos', []))
+
+        user_alert_count = 0
+        for alert in user_alerts:
+            user_alert_count += len(alert.get('alertInfos', []))
 
         # Create summary
         summary = action_result.update_summary({})
-        summary['total_assets_with_alerts'] = len(alerts) if alerts else 0
-        summary['total_alerts'] = alert_count
+        if alert_type in GC_ASSET_ALERTS_MODE:
+            summary['total_assets_with_alerts'] = len(asset_alerts)
+            summary['total_asset_alerts'] = asset_alert_count
+        if alert_type in GC_USER_ALERTS_MODE:
+            summary['total_users_with_alerts'] = len(user_alerts)
+            summary['total_user_alerts'] = user_alert_count
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _paginator_for_v2_apis(self, action_result, client, endpoint, data_subject, limit=None):
+        """Fetch results using multiple API calls for v2 API endpoints.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param client: object of HTTP client
+            :param endpoint: REST endpoint that needs to appended to the service address
+            :param data_subject: key to be fetched from the JSON response
+            :param limit: maximum number of results to fetch
+
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), response
+        """
+        fixed_endpoint = endpoint
+        page_token = ''
+        results = list()
+
+        action_identifier = self.get_action_identifier()
+        index = 1
+
+        while True:
+            endpoint = f"{fixed_endpoint}&pageToken={page_token}"
+
+            self.debug_print(f"Making {index} REST call for the {action_identifier} action")
+
+            # Make REST call
+            ret_val, response = self._make_rest_call(action_result, client, endpoint)
+
+            if phantom.is_fail(ret_val):
+                return ret_val, results
+
+            if not response:
+                return phantom.APP_SUCCESS, results
+
+            results.extend(response.get(data_subject, []))
+            if limit and len(results) >= limit:
+                return phantom.APP_SUCCESS, results[:limit]
+
+            if response.get('nextPageToken'):
+                page_token = response['nextPageToken']
+            else:
+                break
+            index += 1
+
+        return phantom.APP_SUCCESS, results
+
+    def _fetch_rules(self, action_result, client, limit=None):
+        """Fetch a list of all the rules discovered within your enterprise.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param client: object of HTTP client
+            :param limit: total rules to fetch
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), response
+        """
+        # Create list rules endpoint
+
+        endpoint = f'{GC_LIST_RULES_ENDPOINT}?pageSize=1000'
+
+        # Call Paginator for v2 APIs
+        ret_val, rules = self._paginator_for_v2_apis(action_result, client, endpoint, data_subject='rules', limit=limit)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        return phantom.APP_SUCCESS, rules
+
+    def _handle_list_rules(self, param):
+        """Get a list of all the rules discovered within your enterprise.
+
+        Parameters:
+            :param param: Dictionary of input parameters
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, client = self._create_client(action_result)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print(GC_UNABLE_CREATE_CLIENT_ERR)
+            return action_result.get_status()
+
+        # Validate the 'limit' action parameter
+        limit = self._validate_integers(action_result, param.get(GC_LIMIT_KEY, 1000), GC_LIMIT_KEY)
+        if limit is None:
+            return action_result.get_status()
+
+        # Fetch alerts
+        ret_val, rules = self._fetch_rules(action_result, client, limit)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(
+            {
+                "rules": rules
+            }
+        )
+
+        # Create summary
+        summary = action_result.update_summary({})
+        summary['total_rules'] = len(rules)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _fetch_detections(self, action_result, client, rule_ids, alert_state, time_param, limit=None):
+        """Fetch a list of detections for the specified version of the given rule that is created in the Chronicle Detection Engine.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param client: object of HTTP client
+            :param rule_ids: rule_ids for which the detections need to be fetched
+            :param alert_state: fetch ALERTING|NOT_ALERTING|ALL detections
+            :param time_param: dictionary containing start_time and end_time
+            :param limit: total detections to fetch
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), detections_data
+        """
+        start_time = time_param[GC_START_TIME_KEY]
+        end_time = time_param[GC_END_TIME_KEY]
+
+        # Create list rules endpoint
+        fixed_endpoint = f'{GC_LIST_DETECTIONS_ENDPOINT}?pageSize=1000&detectionStartTime={start_time}&detectionEndTime={end_time}'
+
+        if alert_state != 'ALL':
+            fixed_endpoint += f'&alert_state={alert_state}'
+
+        detections_data = {
+            "detections_summary": list(),
+            "detections": list(),
+            "invalid_rule_ids": list(),
+            "rule_ids_with_partial_detections": list()
+        }
+
+        all_invalid_rule_ids = True
+
+        for rule_id in rule_ids:
+            endpoint = fixed_endpoint.format(rule_id=rule_id)
+
+            self.debug_print(f"Detections endpoint query for search: {endpoint}")
+            self.save_progress(f"Detections endpoint query for search: {endpoint}")
+
+            # Call Paginator for v2 APIs
+            ret_val, detections = self._paginator_for_v2_apis(action_result, client, endpoint, data_subject='detections', limit=limit)
+
+            if phantom.is_success(ret_val):
+                all_invalid_rule_ids = False
+                detections_data['detections'].extend(detections)
+                detections_data['detections_summary'].append(
+                    {
+                        'rule_id': rule_id,
+                        'detections_count': len(detections)
+                    }
+                )
+                self.debug_print(f"{alert_state} detections fetched for the {rule_id} rule ID: {len(detections)}")
+            elif GC_RATE_LIMIT_EXCEEDED in action_result.get_message():
+                all_invalid_rule_ids = False
+                detections_data['detections'].extend(detections)
+                detections_data['detections_summary'].append(
+                    {
+                        'rule_id': rule_id,
+                        'detections_count': len(detections)
+                    }
+                )
+                self.debug_print(f"{alert_state} detections fetched for the {rule_id} rule ID: {len(detections)}")
+                detections_data['rule_ids_with_partial_detections'].append(
+                    {
+                        'rule_id': rule_id
+                    }
+                )
+            else:
+                detections_data['invalid_rule_ids'].append(
+                    {
+                        'rule_id': rule_id
+                    }
+                )
+
+        if all_invalid_rule_ids:
+            self.debug_print("Provided Rule ID(s) are invalid")
+            return action_result.set_status(phantom.APP_ERROR, GC_INVALID_RULE_IDS_MSG), None
+
+        return action_result.set_status(phantom.APP_SUCCESS), detections_data
+
+    def _handle_list_detections(self, param):
+        """List the detections for the specified version of the given rule that is created in the Chronicle Detection Engine.
+
+        Parameters:
+            :param param: Dictionary of input parameters
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ret_val, client = self._create_client(action_result)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print(GC_UNABLE_CREATE_CLIENT_ERR)
+            return ret_val
+
+        # Validate the 'limit' action parameter
+        limit = self._validate_integers(action_result, param.get(GC_LIMIT_KEY, 10000), GC_LIMIT_KEY)
+
+        if limit is None:
+            return action_result.get_status()
+
+        # Time period calculation
+        ret_val, time_param = self._validate_time_related_params(action_result, param)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print(GC_PARSE_TIME_PARAM_ERROR)
+            return action_result.get_status()
+
+        # Generate list of Rule IDs from the comma-separated string of rule_ids
+        rule_ids = [rule_id.strip() for rule_id in param[GC_RULE_IDS_KEY].split(',')]
+        rule_ids = set(filter(None, rule_ids))
+
+        # Check for the scenario where only commas and|or spaces are provided in the rule_ids
+        if not rule_ids:
+            return action_result.set_status(phantom.APP_ERROR, GC_INVALID_RULE_IDS_MSG)
+
+        alert_state = param.get(GC_ALERT_STATE_KEY, 'ALL')
+
+        # Fetch detections
+        ret_val, detections_data = self._fetch_detections(action_result, client, rule_ids, alert_state, time_param, limit)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add fetched data to action result object
+        action_result.add_data(detections_data)
+
+        # Create summary
+        summary = action_result.update_summary({})
+        summary['total_detections'] = len(detections_data["detections"])
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1556,7 +1894,7 @@ class ChronicleConnector(BaseConnector):
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Fetch alert severity
-        if self._run_mode in GC_ALERT_RUN_MODE:
+        if GC_RM_ASSET_ALERTS in self._run_mode:
             ret_val, self._alerts_severity = self._validate_json(action_result, config.get("alerts_severity"), GC_CONFIG_ALERT_SEVERITY)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
@@ -1579,15 +1917,10 @@ class ChronicleConnector(BaseConnector):
             if self._max_results is None:
                 return action_result.get_status()
 
-        # Fetch time period
-        ret_val, time_dict = self._derive_on_poll_time_period(action_result, config)
+        # Fetch and update the ingestion time period
+        ret_val = self._derive_on_poll_time_period(action_result, config)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        # Update the ingestion time variables
-        self._start_ioc_time = time_dict["start_ioc_time"]
-        self._start_alert_time = time_dict["start_alert_time"]
-        self._end_alert_time = time_dict["end_alert_time"]
 
         return phantom.APP_SUCCESS
 
@@ -1673,6 +2006,30 @@ class ChronicleConnector(BaseConnector):
                 return action_result.get_status(), None, None
             return phantom.APP_SUCCESS, time[0], time[1]
 
+    def _backdate_start_time(self, start_time, backdate_time):
+        """Backdate the start_time as selected by the user.
+
+        Parameters:
+            :param start_time: Start Time calculated for a given run_mode
+            :param backdate_time: Backdate Time provided by the user (in <digit>m format)
+        Returns:
+            :return: start_time or updated start_time
+        """
+        if self._check_timerange(backdate_time.lower()):
+            try:
+                digit = int(backdate_time[:-1])
+                # Currently backdate_time is only supported in minutes
+                self.debug_print(f"Backdating start time by {digit} minutes")
+                start_time = datetime.strptime(start_time, GC_DATE_FORMAT)
+                start_time = start_time - timedelta(minutes=digit)
+                start_time = start_time.strftime(GC_DATE_FORMAT)
+                self.debug_print(f"Backdated the start_time to {start_time}")
+            except Exception as e:
+                self.debug_print(f"Failed to parse the backdate_time asset configuration parameter. Error: {str(e)}")
+                self.debug_print(f"Skipping backdate_time and using the last_run_time. Error: {str(e)}")
+                return start_time
+        return start_time
+
     def _derive_on_poll_time_period(self, action_result, config):
         """Derive the time period using given asset configuration parameters.
 
@@ -1683,91 +2040,99 @@ class ChronicleConnector(BaseConnector):
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), dictionary with time details of on poll
         """
         # Initialize variable
-        time_dict = dict()
-        time_dict.update({
-            "start_ioc_time": None,
-            "start_alert_time": None,
-            "end_alert_time": None
-        })
+        self._time_dict.update(
+            {
+                GC_RM_IOC_DOMAINS: dict(),
+                GC_RM_ASSET_ALERTS: dict(),
+                GC_RM_USER_ALERTS: dict(),
+                GC_RM_ALERTING_DETECTIONS: dict(),
+                GC_RM_NOT_ALERTING_DETECTIONS: dict(),
+            }
+        )
 
         # If manual poll check only for given time range and return with calculated time range as per given asset params
         if self._is_poll_now:
             # Fetch time period
             ret_val, start_time, end_time = self._validate_time_range_poll_now(action_result, config.get("time_range_poll_now", "3d"))
             if phantom.is_fail(ret_val):
-                return action_result.get_status(), None
-            # Update time dictionary of on poll
-            time_dict.update({
-                "start_ioc_time": start_time,
-                "start_alert_time": start_time,
-                "end_alert_time": end_time
-            })
-            return phantom.APP_SUCCESS, time_dict
+                return action_result.get_status()
+            start_time_end_time_to_update = {
+                GC_START_TIME_KEY: start_time,
+                GC_END_TIME_KEY: end_time
+            }
+            self._time_dict = dict.fromkeys(self._time_dict, start_time_end_time_to_update)
+            return phantom.APP_SUCCESS
 
         # Fetch start time for the scheduled run and
         # Check date format for '<digit><d/h/m/s>' or 'start_time' format for given 'start_time_scheduled_poll' asset config
         # It will return list of start time and end time
         # And this time list will use whenever we have to consider run as first run
         ret_val, time = self._validate_time_other_format(action_result, config.get("start_time_scheduled_poll", "1970-01-01T00:00:00Z"))
+
         if phantom.is_fail(ret_val):
-            return action_result.get_status(), None
+            return action_result.get_status()
 
         # For scheduled or interval
-        last_run_ioc_time = self._state.get("last_run_ioc_time")
-        last_run_alert_time = self._state.get("last_run_alert_time")
+        # Format for the last run keys should be consistent and should be for the form 'last_run_<run_mode>_time' (For run_mode refer chronicle_consts file)
+        last_run_keys = ["last_run_ioc_time", "last_run_alert_time", "last_run_user_alert_time", "last_run_alerting_detection_time", "last_run_not_alerting_detection_time"]
 
         # Check for first run
-        if not any([last_run_ioc_time, last_run_alert_time]):
+        if not list(filter(lambda x: self._state.get(x) is not None, last_run_keys)):
             # First time scheduled/interval poll
             # Update time dictionary of on poll
             self.debug_print("Scheduled run for first time for any of the provided ingestion run")
             # Set first_run as True
-            self._is_first_run_ioc = True
-            self._is_first_run_alert = True
+            self._is_first_run = dict.fromkeys(self._is_first_run, True)
             # Set time parameter for the API call
-            time_dict.update({
-                "start_ioc_time": time[0],
-                "start_alert_time": time[0],
-                "end_alert_time": time[1]
-            })
-            return phantom.APP_SUCCESS, time_dict
+            start_time_end_time_to_update = {
+                GC_START_TIME_KEY: time[0],
+                GC_END_TIME_KEY: time[1]
+            }
+            self._time_dict = dict.fromkeys(self._time_dict, start_time_end_time_to_update)
+            return phantom.APP_SUCCESS
 
         # This part will use only when different ingestion run mode used in consecutive scheduled run
-        if last_run_ioc_time:
-            start_time = self._check_last_run_context(last_run_ioc_time, time[0], is_iocs=True)
-            time_dict.update({"start_ioc_time": start_time})
-        else:
-            self.debug_print("Scheduled run for first time for IoCs ingestion run mode")
-            time_dict.update({"start_ioc_time": time[0]})
-            if self._run_mode in GC_IOC_RUN_MODE:
-                # Set first_run as True
-                self._is_first_run_ioc = True
+        for last_run_key in last_run_keys:
+            # Set run_mode as per the last_run_key. Use string slicing for obtaining the run_mode
+            # As len("last_run_") = 9, starting index should be 9 and as len("_time") = 5, stopping index should be -5
+            run_mode = last_run_key[9:-5]
+            last_run_value = self._state.get(last_run_key)
 
-        if last_run_alert_time:
-            # Checking date format of retrieved date string from the state file
-            start_time = self._check_last_run_context(last_run_alert_time, time[0])
-            time_dict.update({"start_alert_time": start_time})
-        else:
-            self.debug_print("Scheduled run for first time for alerts ingestion run mode")
-            time_dict.update({"start_alert_time": time[0]})
-            if self._run_mode in GC_ALERT_RUN_MODE:
-                # Set first_run as True
-                self._is_first_run_alert = True
+            if last_run_value:
+                backdate_time = config.get("backdate_time", "15m")
+                start_time = self._check_last_run_context(last_run_value, time[0], backdate_time, run_mode=run_mode)
+                self._time_dict.update(
+                    {
+                        run_mode: {
+                            GC_START_TIME_KEY: start_time,
+                            GC_END_TIME_KEY: time[1]
+                        }
+                    }
+                )
+            else:
+                self.debug_print(f"Scheduled run for first time for {run_mode.replace('_', ' ').title()} ingestion run mode")
+                self._time_dict.update(
+                    {
+                        run_mode: {
+                            GC_START_TIME_KEY: time[0],
+                            GC_END_TIME_KEY: time[1]
+                        }
+                    }
+                )
+                if run_mode in self._run_mode:
+                    # Set first_run as True
+                    self._is_first_run[run_mode] = True
 
-        # Update time dictionary of on poll for end time
-        time_dict.update({
-            "end_alert_time": datetime.utcnow().strftime(GC_DATE_FORMAT)
-        })
+        return phantom.APP_SUCCESS
 
-        return phantom.APP_SUCCESS, time_dict
-
-    def _check_last_run_context(self, last_run_time, first_run_time, is_iocs=False):
+    def _check_last_run_context(self, last_run_time, first_run_time, backdate_time, run_mode=None):
         """Check the last run context is in the correct format or not and set the start time and first run flag accordingly.
 
         Parameters:
             :param last_run_time: object of ActionResult class
-            :param first_run_time: Dictionary of asset configuration parameters
-            :param is_iocs: boolean value which indicates check is for IoCs or alerts
+            :param first_run_time: first run time for the on poll run mode
+            :param backdate_time: Backdate time provided by the user to update the start_time of given run_mode
+            :param run_mode: indicates the on poll run mode
         Returns:
             :return: start time of the search
         """
@@ -1776,30 +2141,132 @@ class ChronicleConnector(BaseConnector):
         first_run = False
 
         # Checking date format of retrieved date string from the state file
-        self.debug_print(f"Check for {'IoCs' if is_iocs else 'Alerts'}")
+        self.debug_print(f"Check for '{run_mode.replace('_', ' ').title()}s'")
         self.debug_print(f"Check that string date value {last_run_time} fetched from the state file is in the correct format {GC_DATE_FORMAT} or not")
         # Check for date string format
         check, _ = self._check_date_format(last_run_time)
         if not check:
-            self.debug_print("Considering as first run as retireved time value from the state file is in incorrect format")
+            self.debug_print("Considering as first run as retrieved time value from the state file is in incorrect format")
             first_run = True
             start_time = first_run_time
         else:
+            self.debug_print("Considering the retrieved last_run_time value from the state file as the start_time for the next scheduled/interval poll")
+            self.debug_print(f"Retrieved start_time for the {run_mode} run mode: {last_run_time}")
             # Next run for the scheduled/interval poll
             start_time = last_run_time
+            # Backdate start_time to avoid late breaking in detections and alerts
+            if run_mode != GC_RM_IOC_DOMAINS:
+                start_time = self._backdate_start_time(last_run_time, backdate_time)
 
         # Set the flag for first run
-        if first_run:
-            if is_iocs:
-                if self._run_mode in GC_IOC_RUN_MODE:
-                    # Set first_run as True
-                    self._is_first_run_ioc = True
-            else:
-                if self._run_mode in GC_ALERT_RUN_MODE:
-                    # Set first_run as True
-                    self._is_first_run_alert = True
+        if first_run and run_mode in self._run_mode:
+            self._is_first_run[run_mode] = True
 
         return start_time
+
+    def _check_last_run_hash(self, last_run_hash, current_hash_to_update, response):
+        """Generate the hash digest for the provided response and add it to the current hash digest list.
+
+        Parameters:
+            :param last_run_hash: List of last run hash digests
+            :param current_hash_to_update: Current hash digest list to which the calculated list will be appended
+            :param response: JSON response for which hash needs to be calculated
+        Returns:
+            :return: Status(True/False)
+        """
+        if not isinstance(response, dict):
+            return False
+
+        sha256_hex_digest = sha256(json.dumps(response).encode("utf-8")).hexdigest()
+        current_hash_to_update.append(sha256_hex_digest)
+
+        # If the calculated value is present in the last run hash digest, ignore it.
+        if sha256_hex_digest in last_run_hash:
+            self.debug_print("Response had already been ingested in the previous run")
+            return True
+
+        return False
+
+    def _parse_user_alert_info(self, alert_infos, user):
+        """Parse user_alert infos for particular user with alerts.
+
+        Parameters:
+            :param alert_infos: alert_infos list for particular user
+            :param user: user details format is list type: [(<userIndicator>, <userValue>)]
+        Returns:
+            :return: parsed alerts
+        """
+        # Initialize user_alerts list
+        user_alerts = list()
+
+        last_run_user_alert_hash_digest = self._last_run_hash_digests.get(GC_RM_USER_ALERTS, list())
+        curr_run_user_alert_hash_digest = list()
+
+        for alert_info in alert_infos:
+            # Create 'cef' type artifact for individual user alert by adding corresponding user infos with alert infos
+            user_alert = {
+                "userIndicator": user[0][0],
+                "userValue": user[0][1],
+                "alertName": alert_info.get("name", ""),
+                "sourceProduct": alert_info.get("sourceProduct", ""),
+                "timestamp": alert_info.get("timestamp", ""),
+                "rawLog": alert_info.get("rawLog", ""),
+                "uri": alert_info.get("uri", [""])[0],
+                "udmEvent": alert_info.get("udmEvent")
+            }
+            # Check if the user_alert was already fetched and ingested in the previous run
+            if not self._check_last_run_hash(last_run_user_alert_hash_digest, curr_run_user_alert_hash_digest, user_alert):
+                user_alerts.append(user_alert)
+
+        self._last_run_hash_digests[GC_RM_USER_ALERTS] = curr_run_user_alert_hash_digest
+
+        return user_alerts
+
+    def _parse_user_alerts_response(self, response):
+        """Parse response of alerts with given ingestion asset configuration parameters.
+
+        Parameters:
+            :param response: object of alerts API call
+        Returns:
+            :return: parsed user alerts results
+        """
+        # Initialize alerts results
+        user_alerts_results = list()
+
+        # If response is not dictionary type
+        if not isinstance(response, dict):
+            return user_alerts_results
+
+        # Fetch user_alerts from the response
+        user_alerts = response.get('userAlerts', [])
+        if not user_alerts:
+            return user_alerts_results
+
+        self.debug_print(f"Total user alerts fetched: {len(user_alerts)}")
+
+        for user_alert in user_alerts:
+
+            # Initialize results list
+            results = list()
+            # Fetch user information
+            user = list(user_alert.get('user', {}).items())
+            if not user:
+                # Not received any kind of user details in the user with user_alerts dictionary
+                # Hence marking userIndicator and userValue as empty string
+                user = [("", "")]
+            try:
+                # Parse user_alerts infos for particular user
+                results = self._parse_user_alert_info(user_alert.get('alertInfos', []), user)
+            except Exception as e:
+                self.debug_print(f"Exception occurred while parsing user_alerts response. Error: {str(e)}")
+                self.debug_print(f"Ignoring user_alert infos for userIndicator: '{user[0][0]}' and userValue: '{user[0][1]}'")
+
+            # Add user_alerts into final results
+            user_alerts_results.extend(results)
+
+        self.debug_print(f"Total parsed user alerts after deduplication: {len(user_alerts_results)}")
+
+        return user_alerts_results
 
     def _parse_alert_info(self, alert_infos, asset):
         """Parse alert infos for particular asset with alerts.
@@ -1812,6 +2279,10 @@ class ChronicleConnector(BaseConnector):
         """
         # Initialize alerts list
         alerts = list()
+
+        last_run_alert_hash_digest = self._last_run_hash_digests.get(GC_RM_ASSET_ALERTS, list())
+        curr_run_alert_hash_digest = list()
+
         for alert_info in alert_infos:
             # Ignore alerts which alert has configured severity to ingest
             if self._alerts_severity and alert_info.get('severity', '').lower() not in self._alerts_severity:
@@ -1827,9 +2298,15 @@ class ChronicleConnector(BaseConnector):
                 "severity": alert_info.get("severity", ""),
                 "timestamp": alert_info.get("timestamp", ""),
                 "rawLog": alert_info.get("rawLog", ""),
-                "uri": alert_info.get("uri", [''])[0]
+                "uri": alert_info.get("uri", [""])[0],
+                "udmEvent": alert_info.get("udmEvent")
             }
-            alerts.append(alert)
+
+            # Check if the alert was already fetched and ingested in the previous run
+            if not self._check_last_run_hash(last_run_alert_hash_digest, curr_run_alert_hash_digest, alert):
+                alerts.append(alert)
+
+        self._last_run_hash_digests[GC_RM_ASSET_ALERTS] = curr_run_alert_hash_digest
 
         return alerts
 
@@ -1839,7 +2316,7 @@ class ChronicleConnector(BaseConnector):
         Parameters:
             :param response: object of alerts API call
         Returns:
-            :return: parsed alerts results
+            :return: parsed asset alerts results
         """
         # Initialize alerts results
         alerts_results = list()
@@ -1853,7 +2330,10 @@ class ChronicleConnector(BaseConnector):
         if not alerts:
             return alerts_results
 
+        self.debug_print(f"Total asset alerts fetched: {len(alerts)}")
+
         for alert in alerts:
+
             # Initialize results list
             results = list()
             # Fetch asset information
@@ -1871,6 +2351,8 @@ class ChronicleConnector(BaseConnector):
 
             # Add alerts into final results
             alerts_results.extend(results)
+
+        self.debug_print(f"Total parsed asset alerts after deduplication: {len(alerts_results)}")
 
         return alerts_results
 
@@ -1953,6 +2435,8 @@ class ChronicleConnector(BaseConnector):
         if not iocs:
             return iocs_results
 
+        self.debug_print(f"Total IoCs fetched: {len(iocs)}")
+
         for ioc in iocs:
             # Initialize result variable
             result = None
@@ -1978,7 +2462,151 @@ class ChronicleConnector(BaseConnector):
             if result:
                 iocs_results.append(result)
 
+        self.debug_print(f"Total IoC domain matches parsed: {len(iocs_results)}")
+
         return iocs_results
+
+    def _parse_collection_elements(self, collection_elements):
+        """Parse Collection Elements to fetch the detections.
+
+        Parameters:
+            :param collection_elements: a list of dictionaries obtained from the detections response
+        Returns:
+            :return: parsed list of events
+        """
+        parsed_events = list()
+
+        try:
+            for element in collection_elements:
+                label = element.get("label")
+                refs = element.get("references")
+                for ref in refs:
+                    event = dict()
+                    event.update(ref)
+                    event['label'] = label
+                    parsed_events.append(event)
+        except Exception as e:
+            self.debug_print(f"Error occurred while parsing the collectionEvents. Error: {str(e)}")
+            self.debug_print("Returning the partially parsed events")
+            return parsed_events
+
+        return parsed_events
+
+    def _parse_detections_response(self, response, run_mode):
+        """Parse response of detections with given ingestion asset configuration parameters.
+
+        Parameters:
+            :param response: response dictionary of Detections API call
+            :param run_mode: run_mode to differentiate ALERTING and NOT_ALERTING detections
+        Returns:
+            :return: parsed detections results
+        """
+        # Initialize alerts results
+        parsed_detections = list()
+
+        # If response is not dictionary type
+        if not isinstance(response, dict):
+            return parsed_detections
+
+        # Fetch alerts from the response
+        detections = response.get('detections', [])
+        if not detections:
+            return parsed_detections
+
+        self.debug_print(f"Total {run_mode} detections fetched: {len(detections)}")
+
+        invalid_rule_ids = response.get('invalid_rule_ids', [])
+        rule_ids_with_partial_detections = response.get('rule_ids_with_partial_detections', [])
+
+        if invalid_rule_ids:
+            invalid_rule_ids_str = list(map(lambda invalid_rule: invalid_rule['rule_id'], invalid_rule_ids))
+            invalid_rule_ids_str = ', '.join(invalid_rule_ids_str)
+            self.debug_print(f"Following Rule ID(s) are not valid:\n{invalid_rule_ids_str}")
+            self.debug_print("No detections were fetched for them")
+            self.save_progress(f"Following Rule ID(s) are not valid:\n{invalid_rule_ids_str}")
+            self.save_progress("No detections were fetched for them")
+
+        if rule_ids_with_partial_detections:
+            rule_ids_with_partial_detections_str = list(map(lambda rule_ids_with_partial_detection: rule_ids_with_partial_detection['rule_id'], rule_ids_with_partial_detections))
+            rule_ids_with_partial_detections_str = ', '.join(rule_ids_with_partial_detections_str)
+            self.debug_print(f"Detections maybe missing for the following Rule ID(s):\n{rule_ids_with_partial_detections_str}")
+            self.debug_print(GC_RATE_LIMIT_EXCEEDED)
+            self.save_progress(f"Detections maybe missing for the following Rule ID(s):\n{rule_ids_with_partial_detections_str}")
+            self.save_progress(GC_RATE_LIMIT_EXCEEDED)
+
+        last_run_detections_hash_digest = self._last_run_hash_digests.get(run_mode, list())
+        curr_run_detections_hash_digest = list()
+
+        for detection_info in detections:
+            # Check if the detection was already fetched and ingested in the previous run
+            if self._check_last_run_hash(last_run_detections_hash_digest, curr_run_detections_hash_digest, detection_info):
+                continue
+            collection_elements = detection_info.get("collectionElements", [])
+
+            # Fetch asset information
+            detection_details = detection_info.get('detection', [{}])[0]
+            detection = {
+                "detectionId": detection_info.get("id", ""),
+                "detectionType": detection_info.get("type", GC_DEFAULT_DETECTION_TYPE),
+                "ruleId": detection_details.get("ruleId", ""),
+                "ruleName": detection_details.get("ruleName", ""),
+                "versionId": detection_details.get("ruleVersion", ""),
+                "alertState": detection_details.get("alertState", "").replace("_", " ").title(),
+                "ruleType": detection_details.get("ruleType", ""),
+                "detectionTime": detection_info.get("detectionTime", ""),
+                "createdTime": detection_info.get("createdTime", ""),
+                "events": self._parse_collection_elements(collection_elements),
+                "uri": detection_details.get("urlBackToProduct", ""),
+                "data": detection_info
+            }
+
+            # Add detections into parsed detections
+            parsed_detections.append(detection)
+
+        self._last_run_hash_digests[run_mode] = curr_run_detections_hash_digest
+
+        self.debug_print(f"Total parsed {run_mode} detections after deduplication: {len(parsed_detections)}")
+
+        return parsed_detections
+
+    def _fetch_rules_and_detections(self, action_result, client, rule_ids, alert_state, time_param, limit):
+        """Fetch a list of detections for the specified version of the given rule that is created in the Chronicle Detection Engine. This method will be used for On Poll action.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param client: object of HTTP client
+            :param rule_ids: rule_ids for which the detections need to be fetched
+            :param alert_state: fetch ALERTING|NOT_ALERTING|ALL detections
+            :param time_param: dictionary containing start_time and end_time
+            :param limit: number of detections to fetch
+        Returns:
+            :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), response, rule_ids
+        """
+        config = self.get_config()
+        fetch_live_rules = config.get("fetch_live_rules", True)
+
+        # If rule_ids is an instance of set, then the rule_ids would already have been parsed
+        if not isinstance(rule_ids, set):
+            if fetch_live_rules:
+                # fetch all rules and filter the live rules
+                ret_val, response = self._fetch_rules(action_result, client)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status(), None, None
+                filtered_rules = list(filter(lambda rule: rule.get("liveRuleEnabled") is True, response))
+                rule_ids = set(map(lambda rule: rule.get("ruleId"), filtered_rules))
+            else:
+                # Generate list of Rule IDs from the comma-separated string of rule_ids
+                rule_ids = [rule_id.strip() for rule_id in config.get("rule_ids", "").split(',')]
+                rule_ids = set(filter(None, rule_ids))
+
+        self.debug_print(f"Total rule ID(s) for which detections will be fetched: {len(rule_ids)}")
+
+        ret_val, detections = self._fetch_detections(action_result, client, rule_ids, alert_state, time_param, limit)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None, None
+
+        return phantom.APP_SUCCESS, detections, rule_ids
 
     def _fetch_results(self, action_result, client):
         """Fetch results of IoCs and alerts based on given ingestion asset configuration parameters.
@@ -1993,54 +2621,98 @@ class ChronicleConnector(BaseConnector):
         results = dict()
 
         results.update({
-            "iocs": list(),
-            "alerts": list()
+            GC_RM_IOC_DOMAINS: list(),
+            GC_RM_ASSET_ALERTS: list(),
+            GC_RM_USER_ALERTS: list(),
+            GC_RM_ALERTING_DETECTIONS: list(),
+            GC_RM_NOT_ALERTING_DETECTIONS: list()
         })
 
-        # Fetch alerts data
-        if self._run_mode in GC_ALERT_RUN_MODE:
-            ret_val, response = self._fetch_alerts(action_result, client, self._start_alert_time, self._end_alert_time, self._max_results)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status(), None
+        self._last_run_hash_digests = self._state.get("last_run_hash_digests", dict())
 
-            # Parse alerts response
-            results.update({"alerts": self._parse_alerts_response(response)})
+        ret_val = phantom.APP_SUCCESS
+        response = dict()
+
+        # Fetch alerts data
+        if GC_RM_ASSET_ALERTS in self._run_mode:
+            start_time = self._time_dict[GC_RM_ASSET_ALERTS][GC_START_TIME_KEY]
+            end_time = self._time_dict[GC_RM_ASSET_ALERTS][GC_END_TIME_KEY]
+            ret_val, response = self._fetch_alerts(action_result, client, start_time, end_time, self._max_results)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        # Parse alerts response
+        results.update({GC_RM_ASSET_ALERTS: self._parse_alerts_response(response)})
+        response = dict()
+
+        # Fetch user_alerts data
+        if GC_RM_USER_ALERTS in self._run_mode:
+            start_time = self._time_dict[GC_RM_ASSET_ALERTS][GC_START_TIME_KEY]
+            end_time = self._time_dict[GC_RM_ASSET_ALERTS][GC_END_TIME_KEY]
+            ret_val, response = self._fetch_alerts(action_result, client, start_time, end_time, self._max_results)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        # Parse IoCs response
+        results.update({GC_RM_USER_ALERTS: self._parse_user_alerts_response(response)})
+        response = dict()
 
         # Fetch IoCs data
-        if self._run_mode in GC_IOC_RUN_MODE:
-            ret_val, response = self._fetch_iocs(action_result, client, self._start_ioc_time, self._max_results)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status(), None
+        if GC_RM_IOC_DOMAINS in self._run_mode:
+            start_time = self._time_dict[GC_RM_IOC_DOMAINS][GC_START_TIME_KEY]
+            ret_val, response = self._fetch_iocs(action_result, client, start_time, self._max_results)
 
-            # Parse IoCs response
-            results.update({"iocs": self._parse_iocs_response(response)})
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        # Parse IoCs response
+        results.update({GC_RM_IOC_DOMAINS: self._parse_iocs_response(response)})
+        response = dict()
+
+        rule_ids = None
+
+        # Fetch Alerting Detections data
+        if GC_RM_ALERTING_DETECTIONS in self._run_mode:
+            alert_state = "ALERTING"
+            time_param = self._time_dict[GC_RM_ALERTING_DETECTIONS]
+            ret_val, response, rule_ids = self._fetch_rules_and_detections(action_result, client, rule_ids, alert_state, time_param, self._max_results)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        # Parse Alerting Detections response
+        results.update({GC_RM_ALERTING_DETECTIONS: self._parse_detections_response(response, run_mode=GC_RM_ALERTING_DETECTIONS)})
+        response = dict()
+
+        # Fetch Not-Alerting Detections data
+        if GC_RM_NOT_ALERTING_DETECTIONS in self._run_mode:
+            alert_state = "NOT_ALERTING"
+            time_param = self._time_dict[GC_RM_NOT_ALERTING_DETECTIONS]
+            ret_val, response, _ = self._fetch_rules_and_detections(action_result, client, rule_ids, alert_state, time_param, self._max_results)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        # Parse Not-Alerting Detections response
+        results.update({GC_RM_NOT_ALERTING_DETECTIONS: self._parse_detections_response(response, run_mode=GC_RM_NOT_ALERTING_DETECTIONS)})
 
         return phantom.APP_SUCCESS, results
 
-    def _check_for_existing_container(self, action_result, is_iocs=False):
+    def _check_for_existing_container(self, action_result, name):
         """Check for existing container and return container ID and and remaining margin count.
 
         Parameters:
             :param action_result: object of ActionResult class
-            :param is_iocs: boolean value which indicates check is for IoCs or alerts
+            :param name: Name of the container to check
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), cid(container_id), count(remaining margin calculated with given _max_artifacts)
         """
         cid = None
         count = None
-        name = str()
 
-        if is_iocs and not self._is_first_run_ioc:
-            self.debug_print("Check for existing container of IoC Domain Matches")
-            name = GC_IOC_RUN_MODE_KEY
-        elif not is_iocs and not self._is_first_run_alert:
-            self.debug_print("Check for existing container of Assets with Alerts")
-            name = GC_ALERT_RUN_MODE_KEY
-        else:
-            # Scheduled/Interval poll for first time
-            return phantom.APP_SUCCESS, cid, count
-
-        url = f'{self.get_phantom_base_url()}rest/container?_filter_name__icontains="{name}"&sort=start_time&order=desc'
+        url = f'{self.get_phantom_base_url()}rest/container?_filter_name__contains="{name}"&sort=start_time&order=desc'
 
         try:
             r = requests.get(url, verify=False)
@@ -2090,53 +2762,172 @@ class ChronicleConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, cid, count
 
-    def _create_artifacts(self, action_result, results, is_iocs=False):
-        """Create artifacts from the given results which fetched from the API response.
+    def _create_detection_artifacts(self, action_result, alerting_detections, not_alerting_detections):
+        """Create Detections artifacts from the fetched Detections.
 
         Parameters:
             :param action_result: object of ActionResult class
-            :param results: list of IoCs or alerts results
-            :param is_iocs: boolean value which indicates results is IoCs or alerts
+            :param alerting_detections: list of Alerting Detections
+            :param not_alerting_detections: list of Not Alerting Detections
+        Returns:
+            :return: list of alerting_detection artifacts, not_alerting_detection artifacts
+        """
+        # Initialize artifacts list
+        alerting_detection_artifacts = list()
+        not_alerting_detection_artifacts = list()
+
+        for detection in alerting_detections:
+            artifact = dict()
+            artifact.update({
+                "name": f"Alerting Detection for Rule: {detection.get('ruleName')}",
+                "label": "Alerting Detection Artifact",
+                "cef_types": {
+                    "ruleId": GC_RULE_ID_CONTAINS,
+                    "versionId": GC_RULE_ID_CONTAINS,
+                    "detectionTime": GC_TIME_VALUE_CONTAINS,
+                    "createdTime": GC_TIME_VALUE_CONTAINS,
+                    "uri": GC_URL_CONTAINS
+                },
+                "data": detection.pop("data"),
+                "source_data_identifier": f"{detection.get('detectionId')}_{detection.get('detectionTime')}"
+            })
+
+            # Set run_automation flag
+            artifact.update({"run_automation": False})
+            # Set cef for the artifact
+            artifact.update({"cef": detection})
+            # Append to the artifacts list
+            alerting_detection_artifacts.append(artifact)
+
+        for detection in not_alerting_detections:
+            artifact = dict()
+            artifact.update({
+                "name": f"Not Alerting Detection for Rule: {detection.get('ruleName')}",
+                "label": "Not Alerting Detection Artifact",
+                "cef_types": {
+                    "ruleId": GC_RULE_ID_CONTAINS,
+                    "versionId": GC_RULE_ID_CONTAINS,
+                    "detectionTime": GC_TIME_VALUE_CONTAINS,
+                    "createdTime": GC_TIME_VALUE_CONTAINS,
+                    "uri": GC_URL_CONTAINS
+                },
+                "data": detection.pop("data"),
+                "source_data_identifier": f"{detection.get('detectionId')}_{detection.get('detectionTime')}"
+            })
+
+            # Set run_automation flag
+            artifact.update({"run_automation": False})
+            # Set cef for the artifact
+            artifact.update({"cef": detection})
+            # Append to the artifacts list
+            not_alerting_detection_artifacts.append(artifact)
+
+        return alerting_detection_artifacts, not_alerting_detection_artifacts
+
+    def _create_user_alert_artifacts(self, action_result, user_alerts):
+        """Create User Alerts artifacts from the fetched User Alerts.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param user_alerts: list of User Alerts
         Returns:
             :return: list of artifacts
         """
         # Initialize artifacts list
         artifacts = list()
 
-        for result in results:
+        for alert in user_alerts:
             artifact = dict()
             # Set contains(cef_types), label and name for the artifact
-            # NOTE: What a value to be added for the default here for result.get('key', 'default')
-            if is_iocs:
-                artifact.update({
-                    "name": f"Domain: {result.get('artifactValue')}",
-                    "label": "IoC Domain Artifact",
-                    "cef_types": {
-                        "artifactValue": GC_ARTIFACT_VALUE_CONTAINS,
-                        "iocIngestTime": GC_TIME_VALUE_CONTAINS,
-                        "firstSeenTime": GC_TIME_VALUE_CONTAINS,
-                        "lastSeenTime": GC_TIME_VALUE_CONTAINS,
-                        "uri": GC_URL_CONTAINS
-                    },
-                    "data": result.pop("data", {}),
-                    "source_data_identifier": f"{result.get('artifactValue')}_{result.get('iocIngestTime')}"
-                })
-            else:
-                artifact.update({
-                    "name": f"{result.get('alertName')} for asset {result.get('assetValue')}",
-                    "label": "Alert Artifact",
-                    "cef_types": {
-                        "assetValue": GC_ASSET_VALUE_CONTAINS,
-                        "uri": GC_URL_CONTAINS
-                    },
-                    "data": result,
-                    "source_data_identifier": f"{result.get('alertName')}_{result.get('timestamp')}"
-                })
+            artifact.update({
+                "name": f"{alert.get('alertName')} for user {alert.get('userValue')}",
+                "label": "User Alert Artifact",
+                "cef_types": {
+                    "userValue": GC_USER_VALUE_CONTAINS,
+                    "uri": GC_URL_CONTAINS
+                },
+                "data": alert,
+                "source_data_identifier": f"{alert.get('alertName')}_{alert.get('timestamp')}"
+            })
 
             # Set run_automation flag
             artifact.update({"run_automation": False})
             # Set cef for the artifact
-            artifact.update({"cef": result})
+            artifact.update({"cef": alert})
+            # Append to the artifacts list
+            artifacts.append(artifact)
+
+        return artifacts
+
+    def _create_alert_artifacts(self, action_result, alerts):
+        """Create Alert artifacts from the fetched Alerts.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param alerts: list of Alerts
+        Returns:
+            :return: list of artifacts
+        """
+        # Initialize artifacts list
+        artifacts = list()
+
+        for alert in alerts:
+            artifact = dict()
+            # Set contains(cef_types), label and name for the artifact
+            artifact.update({
+                "name": f"{alert.get('alertName')} for asset {alert.get('assetValue')}",
+                "label": "Alert Artifact",
+                "cef_types": {
+                    "assetValue": GC_ASSET_VALUE_CONTAINS,
+                    "uri": GC_URL_CONTAINS
+                },
+                "data": alert,
+                "source_data_identifier": f"{alert.get('alertName')}_{alert.get('timestamp')}"
+            })
+
+            # Set run_automation flag
+            artifact.update({"run_automation": False})
+            # Set cef for the artifact
+            artifact.update({"cef": alert})
+            # Append to the artifacts list
+            artifacts.append(artifact)
+
+        return artifacts
+
+    def _create_ioc_artifacts(self, action_result, iocs):
+        """Create IoC artifacts from the fetched IoCs.
+
+        Parameters:
+            :param action_result: object of ActionResult class
+            :param iocs: list of IoCs
+        Returns:
+            :return: list of artifacts
+        """
+        # Initialize artifacts list
+        artifacts = list()
+
+        for ioc in iocs:
+            artifact = dict()
+            # Set contains(cef_types), label and name for the artifact
+            # NOTE: What a value to be added for the default here for result.get('key', 'default')
+            artifact.update({
+                "name": f"Domain: {ioc.get('artifactValue')}",
+                "label": "IoC Domain Artifact",
+                "cef_types": {
+                    "artifactValue": GC_ARTIFACT_VALUE_CONTAINS,
+                    "iocIngestTime": GC_TIME_VALUE_CONTAINS,
+                    "firstSeenTime": GC_TIME_VALUE_CONTAINS,
+                    "lastSeenTime": GC_TIME_VALUE_CONTAINS,
+                    "uri": GC_URL_CONTAINS
+                },
+                "data": ioc.pop("data", {}),
+                "source_data_identifier": f"{ioc.get('artifactValue')}_{ioc.get('iocIngestTime')}"
+            })
+
+            # Set run_automation flag
+            artifact.update({"run_automation": False})
+            # Set cef for the artifact
+            artifact.update({"cef": ioc})
             # Append to the artifacts list
             artifacts.append(artifact)
 
@@ -2148,6 +2939,7 @@ class ChronicleConnector(BaseConnector):
         Parameters:
             :param action_result: object of ActionResult class
             :param artifacts: list of artifacts of IoCs or alerts results
+            :param key: name of the container in which data will be ingested
             :param cid: value of container ID
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), message, cid(container_id)
@@ -2168,15 +2960,16 @@ class ChronicleConnector(BaseConnector):
 
         return ret_val, message, cid
 
-    def _save_artifacts(self, action_result, results, is_iocs=False):
+    def _save_artifacts(self, action_result, results, run_mode, key):
         """Ingest all the given artifacts accordingly into the new or existing container.
 
         Parameters:
             :param action_result: object of ActionResult class
             :param results: list of artifacts of IoCs or alerts results
-            :param is_iocs: boolean value which indicates results is IoCs or alerts
+            :param run_mode: current run_mode for which artifacts will be saved
+            :param key: name of the container in which data will be ingested
         Returns:
-            :return:
+            :return: None
         """
         # Initialize
         cid = None
@@ -2188,17 +2981,17 @@ class ChronicleConnector(BaseConnector):
             return
 
         # mark the last artifact such that active playbooks get executed
-        if (is_iocs and self._run_mode == GC_IOC_RUN_MODE_KEY) or (not is_iocs):
+        if run_mode == self._run_mode[-1]:
             results[-1]["run_automation"] = self._run_automation
 
         # Check for existing container only if it's a scheduled/interval poll and not first run
-        if not self._is_poll_now:
-            ret_val, cid, count = self._check_for_existing_container(action_result, is_iocs)
+        if not (self._is_poll_now or self._is_first_run[run_mode]):
+            ret_val, cid, count = self._check_for_existing_container(action_result, key)
             if phantom.is_fail(ret_val):
                 self.debug_print("Failed to check for existing container")
 
         if cid and count:
-            ret_val = self._ingest_artifacts(action_result, results[:count], is_iocs, cid=cid)
+            ret_val = self._ingest_artifacts(action_result, results[:count], key, cid=cid)
             if phantom.is_fail(ret_val):
                 self.debug_print("Failed to save ingested artifacts in the existing container")
                 return
@@ -2209,29 +3002,24 @@ class ChronicleConnector(BaseConnector):
         artifacts = [results[i:i + self._max_artifacts] for i in range(start, len(results), self._max_artifacts)]
 
         for artifacts_list in artifacts:
-            ret_val = self._ingest_artifacts(action_result, artifacts_list, is_iocs)
+            ret_val = self._ingest_artifacts(action_result, artifacts_list, key)
             if phantom.is_fail(ret_val):
                 self.debug_print("Failed to save ingested artifacts in the new container")
                 return
 
-    def _ingest_artifacts(self, action_result, artifacts, is_iocs=False, cid=None):
+    def _ingest_artifacts(self, action_result, artifacts, key, cid=None):
         """Ingest artifacts into the Phantom server.
 
         Parameters:
             :param action_result: object of ActionResult class
             :param artifacts: list of artifacts
-            :param is_iocs: boolean value which indicates check is for IoCs or alerts
+            :param key: name of the container in which data will be ingested
             :param cid: value of container ID
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
-        # Check the results is for IoCs or alerts
-        if is_iocs:
-            self.debug_print(f"Ingesting IoC domain results into the {'existing' if cid else 'new'} container")
-            ret_val, message, cid = self._save_ingested(action_result, artifacts, GC_IOC_RUN_MODE_KEY, cid=cid)
-        else:
-            self.debug_print(f"Ingesting alerts results into the {'existing' if cid else 'new'} container")
-            ret_val, message, cid = self._save_ingested(action_result, artifacts, GC_ALERT_RUN_MODE_KEY, cid=cid)
+        self.debug_print(f"Ingesting {len(artifacts)} artifacts for {key} results into the {'existing' if cid else 'new'} container")
+        ret_val, message, cid = self._save_ingested(action_result, artifacts, key, cid=cid)
 
         if phantom.is_fail(ret_val):
             self.debug_print(f"Failed to save ingested artifacts, error msg: {message}")
@@ -2249,13 +3037,17 @@ class ChronicleConnector(BaseConnector):
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Initialize IoCs and alerts results
-        iocs = results.get('iocs', [])
-        alerts = results.get('alerts', [])
+        iocs = results.get(GC_RM_IOC_DOMAINS, [])
+        alerts = results.get(GC_RM_ASSET_ALERTS, [])
+        user_alerts = results.get(GC_RM_USER_ALERTS, [])
+        alerting_detections = results.get(GC_RM_ALERTING_DETECTIONS, [])
+        not_alerting_detections = results.get(GC_RM_NOT_ALERTING_DETECTIONS, [])
 
         # Create artifacts from the IoCs results
         try:
             self.debug_print("Try to create artifacts for the IoC domain matches")
-            iocs = self._create_artifacts(action_result, iocs, is_iocs=True)
+            iocs = self._create_ioc_artifacts(action_result, iocs)
+            self.debug_print(f"Total IoC artifacts created: {len(iocs)}")
         except Exception as e:
             self.debug_print(f"Error occurred while creating artifacts for IoCs. Error: {str(e)}")
             self.save_progress(f"Error occurred while creating artifacts for IoCs. Error: {str(e)}")
@@ -2265,26 +3057,71 @@ class ChronicleConnector(BaseConnector):
         # Create artifacts from the alerts results
         try:
             self.debug_print("Try to create artifacts for the alerts")
-            alerts = self._create_artifacts(action_result, alerts)
+            alerts = self._create_alert_artifacts(action_result, alerts)
+            self.debug_print(f"Total Alert artifacts created: {len(alerts)}")
         except Exception as e:
             self.debug_print(f"Error occurred while creating artifacts for alerts. Error: {str(e)}")
             self.save_progress(f"Error occurred while creating artifacts for alerts. Error: {str(e)}")
             # Make alerts as empty list
             alerts = list()
 
+        # Create artifacts from the user alerts results
+        try:
+            self.debug_print("Try to create artifacts for the user alerts")
+            user_alerts = self._create_user_alert_artifacts(action_result, user_alerts)
+            self.debug_print(f"Total User Alerts artifacts created: {len(user_alerts)}")
+        except Exception as e:
+            self.debug_print(f"Error occurred while creating artifacts for user alerts. Error: {str(e)}")
+            self.save_progress(f"Error occurred while creating artifacts for user alerts. Error: {str(e)}")
+            # Make alerts as empty list
+            user_alerts = list()
+
+        # Create artifacts from the alerting detections results
+        try:
+            self.debug_print("Try to create artifacts for the detections")
+            alerting_detections, not_alerting_detections = self._create_detection_artifacts(action_result, alerting_detections, not_alerting_detections)
+            self.debug_print(f"Total Alerting detection artifacts created: {len(alerting_detections)}")
+            self.debug_print(f"Total Not-alerting detection artifacts created: {len(not_alerting_detections)}")
+        except Exception as e:
+            self.debug_print(f"Error occurred while creating artifacts for detections. Error: {str(e)}")
+            self.save_progress(f"Error occurred while creating artifacts for detections. Error: {str(e)}")
+            # Make alerts as empty list
+            alerts = list()
+
         # Save artifacts for IoCs
         try:
             self.debug_print("Try to ingest artifacts for the IoC domain matches")
-            self._save_artifacts(action_result, iocs, is_iocs=True)
+            self._save_artifacts(action_result, iocs, run_mode=GC_RM_IOC_DOMAINS, key=GC_IOC_RUN_MODE_KEY)
         except Exception as e:
             self.debug_print(f"Error occurred while saving artifacts for IoCs. Error: {str(e)}")
 
         # Save artifacts for alerts
         try:
             self.debug_print("Try to ingest artifacts for the alerts")
-            self._save_artifacts(action_result, alerts)
+            self._save_artifacts(action_result, alerts, run_mode=GC_RM_ASSET_ALERTS, key=GC_ALERT_RUN_MODE_KEY)
         except Exception as e:
             self.debug_print(f"Error occurred while saving artifacts for alerts. Error: {str(e)}")
+
+        # Save artifacts for user alerts
+        try:
+            self.debug_print("Try to ingest artifacts for the user alerts")
+            self._save_artifacts(action_result, user_alerts, run_mode=GC_RM_USER_ALERTS, key=GC_USER_ALERT_RUN_MODE_KEY)
+        except Exception as e:
+            self.debug_print(f"Error occurred while saving artifacts for user alerts. Error: {str(e)}")
+
+        # Save artifacts for alerting detections
+        try:
+            self.debug_print("Try to ingest artifacts for the alerting detections")
+            self._save_artifacts(action_result, alerting_detections, run_mode=GC_RM_ALERTING_DETECTIONS, key=GC_ALERTING_DETECTION_RUN_MODE_KEY)
+        except Exception as e:
+            self.debug_print(f"Error occurred while saving artifacts for alerting detections. Error: {str(e)}")
+
+        # Save artifacts for not alerting detections
+        try:
+            self.debug_print("Try to ingest artifacts for the not alerting detections")
+            self._save_artifacts(action_result, not_alerting_detections, run_mode=GC_RM_NOT_ALERTING_DETECTIONS, key=GC_NOT_ALERTING_DETECTION_RUN_MODE_KEY)
+        except Exception as e:
+            self.debug_print(f"Error occurred while saving artifacts for not alerting detections. Error: {str(e)}")
 
         return phantom.APP_SUCCESS
 
@@ -2296,16 +3133,16 @@ class ChronicleConnector(BaseConnector):
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
+        # Updating the last run hash digest for scheduled/interval or manual polling
+        self._state["last_run_hash_digests"] = self._last_run_hash_digests
+
         # Check for manual poll or not
         if self._is_poll_now:
             return phantom.APP_SUCCESS
 
         # As end_alert_time has current time, we are saving current time as last run time for both alert and IoCs.
-        if self._run_mode in GC_ALERT_RUN_MODE:
-            self._state["last_run_alert_time"] = self._end_alert_time
-
-        if self._run_mode in GC_IOC_RUN_MODE:
-            self._state["last_run_ioc_time"] = self._end_alert_time
+        for run_mode in self._run_mode:
+            self._state[f"last_run_{run_mode}_time"] = self._time_dict.get(run_mode, {}).get(GC_END_TIME_KEY)
 
         return phantom.APP_SUCCESS
 
@@ -2320,7 +3157,7 @@ class ChronicleConnector(BaseConnector):
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Fetch ingestion run mode
-        self._run_mode = config.get("run_mode", "Both")
+        self._run_mode = GC_RM_ON_POLL_DICT[config.get("run_mode", "All")]
 
         # Fetch run_automation flag
         self._run_automation = config.get("run_automation", False)
@@ -2425,6 +3262,8 @@ class ChronicleConnector(BaseConnector):
             "domain_reputation": self._handle_domain_reputation,
             "ip_reputation": self._handle_ip_reputation,
             "list_alerts": self._handle_list_alerts,
+            "list_rules": self._handle_list_rules,
+            "list_detections": self._handle_list_detections,
             "on_poll": self._handle_on_poll
         }
 
@@ -2463,7 +3302,8 @@ class ChronicleConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return self.get_status()
 
-        self._base_url = config[GC_BASE_URL_KEY]
+        # Remove API version from Base URL, e.g., /v1
+        self._base_url = re.sub('/v\\d', '', config[GC_BASE_URL_KEY], count=1)
 
         # Scope for Google Chronicle search API
         ret_val, self._scopes = self._validate_json(self, config[GC_SCOPE_KEY], GC_CONFIG_SCOPE_KEY, is_lower=False)
@@ -2491,6 +3331,7 @@ class ChronicleConnector(BaseConnector):
             :return: status success
         """
         # Save the state, this data is saved across actions and app upgrades
+        self.debug_print(f"Latest context stored in the state file: {self._state}")
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 

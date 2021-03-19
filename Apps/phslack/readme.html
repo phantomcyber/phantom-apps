@@ -4,17 +4,32 @@
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
+<h2>Playbook Backward Compatibility</h2>
+<p>
+  <ul>
+    <li>The existing action parameters have been modified for the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+    <ul>
+      <li>Upload File - 4 new action parameters 'filename', 'content', 'parent_message_ts' and 'filetype' are added which helps to add the file without specifying vault ID in 'file' parameter. The 'parent_message_ts' can be used to reply in the thread based on the timestamp of the parent message.</li>
+    </ul>
+    <ul>
+      <li>Send Message - 2 new action parameters 'reply_broadcast' and 'parent_message_ts' are added which can be used to reply in the thread based on the timestamp of the parent message.</li>
+    </ul>
+    <li> New action 'Add Reaction' has been added. Hence, it is requested to the end-user to please update their existing playbooks by inserting the corresponding action blocks for this action on the earlier versions of the app.</li>
+  </ul>
+</p>
+
+
 <h2>Authentication</h2>
 <p>
 Phantom's Slack App needs a bot token to read messages from and post messages to slack channels. The app also needs a verification token to verify POST requests received from Slack.
 <h3>Create a Slack App</h3>
-Creating a Slack App is required to get the proper bot token for authenticating the Phantom Slack App. To do this, go to https://api.slack.com/apps in a browser, and select <b>Create New App</b>.
+Creating a Slack App is required to get the proper bot token for authenticating the Phantom Slack App. To do this, go to <a href="https://api.slack.com/apps">https://api.slack.com/apps</a> in a browser, and select <b>Create New App</b>.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_your_apps.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_your_apps.png">
 </a>
 <br><br>
-In the window that pops up, give the app a name and associate it with a Slack team, then click <b>Create App</b>.
+In the pop up window, give the app name and associate it with a Slack team/your Workspace, then click <b>Create App</b>.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_create_an_app.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_create_an_app.png">
@@ -26,37 +41,25 @@ On the next page, there is a <b>Verification Token</b>. This token will be neede
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_basic_info.png">
 </a>
 <br><br>
-In the menu bar on the left, select <b>Bot Users</b>. On that page, click <b>Add a Bot User</b>.
+In the menu bar on the left, select <b>OAuth & Permissions</b>. On that page, Scroll down to the <b>Scopes</b> section and click <b>Add an OAuth Scope</b> to add scopes to your <b>Bot Token</b> and <b>User Token</b>.
 <br><br>
-<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_bot_user.png">
-    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_bot_user.png">
+<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_add_scopes.png">
+    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_add_scopes.png">
 </a>
 <br><br>
-On the next page, give the bot a name, then click <b>Add Bot User</b>.
-<br><br>
-<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_create_bot.png">
-    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_create_bot.png">
-</a>
-<br><br>
-In the menu bar on the left, select <b>OAuth & Permissions</b>. On that page, in the <b>Permission Scopes</b> section, add the permission to <b>Add a bot user</b>, and click <b>Save Changes</b>.
-<br><br>
-<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_permissions.png">
-    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_permissions.png">
-</a>
-<br><br>
-Next, click on <b>Install App</b> in the menu bar. On that page, click <b>Install App to Team</b>.
+Next, click on <b>Install App</b> in the side bar. On that page, click <b>Install to Workspace</b>.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_install_app.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_install_app.png">
 </a>
 <br><br>
-On the next page, click <b>Authorize</b>.
+On the next page, click <b>Allow</b>.
 <br><br>
-<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_authorize_app.png">
-    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_authorize_app.png">
+<a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_allow_app.png">
+    <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_allow_app.png">
 </a>
 <br><br>
-After authorizing the app, the next window will show the app's authorization tokens. The <b>Bot User OAuth Access Token</b> will be needed during asset configuration.
+After authorizing the app, the next window will show the app's authorization tokens. The <b>Bot User OAuth Access Token</b> and <b>OAuth Access Token</b> will be required during asset configuration.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_auth_tokens.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_auth_tokens.png">
@@ -74,7 +77,7 @@ Fill out the required values in the <b>Asset Definition</b> tab.
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_asset_info.png">
 </a>
 <br><br>
-Fill out the <b>Bot User OAuth Access Token</b> and <b>Verification Token</b> in the <b>Asset Settings</b> tab.
+Fill out the <b>Bot User OAuth Access Token</b>, <b>OAuth Access Token</b> and <b>Verification Token</b> in the <b>Asset Settings</b> tab.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_asset_settings.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_asset_settings.png">
@@ -102,7 +105,7 @@ The Slack app needs a Phantom authentication token to perform some tasks on the 
         <li>Give the user a <b>Username</b> like &quot;Slack Automation&quot;</li>
         <li>Set <b>Allowed IPs</b> to <b>127.0.0.1</b></li>
         <li>Set the <b>Default Label</b> to the label seen in the Slack asset's <b>Ingest Settings</b></li>
-        <li>Under <b>Roles</b>, in addition to <b>Automation</b>, which should be there by default, add the <b>Observer</b> role</li>
+        <li>Under <b>Roles</b>, in addition to the default <b>Automation</b> role, add the <b>Observer</b> role</li>
         <li>Click <b>CREATE</b>
     </ul>
     <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_automation_user.png">
@@ -132,13 +135,13 @@ Navigate back to the <b>Users</b> tab in <b>Administration</b>, and click on <b>
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_users.png">
 </a>
 <br><br>
-In the pop-up window, add a new Phantom user. Only a username and password are necessary. For security reasons DO NOT give the user any roles. This user should only be used to authenticate POST requests from Slack to Phantom.
+In the pop-up window, select the User Type <b>Local</b>. Fill out the required username and password fields. For security reasons DO NOT give the user any roles. This user should only be used to authenticate POST requests from Slack to Phantom.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_add_user.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_add_user.png">
 </a>
-<br><br>
-It is now time to set up the <b>Interactive Messages</b> functionality. To do this, return to the Slack app configuration window, and select <b>Interactive Messages</b> in the menu.
+<h2>Set up Interactivity in Slack</h2>
+Go to the <b>Your apps</b> option in Slack. From the menu on the left select the <b>Interactivity & Shortcuts</b> option.
 <br><br>
 NOTE: Slack will only send POST requests to endpoints that have an SSL certificate signed by a certificate authority.
 <br><br>
@@ -146,7 +149,7 @@ NOTE: Slack will only send POST requests to endpoints that have an SSL certifica
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_interactive_messages.png">
 </a>
 <br><br>
-Once on this page, click <b>Enable Interactive Messages</b>.
+Once on this page, toggle on <b>Interactivity</b>.
 <br><br>
 <a href="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_enable_interactive_messages.png">
     <img src="/app_resource/slack_3ac26c7f-baa4-4583-86ff-5aac82778a86/img/slack_enable_interactive_messages.png">
@@ -215,7 +218,7 @@ examples:
     @phantombot act "whois ip" --container 123 --parameters ip:1.1.1.1 --name "All WhoIs"
 </pre>
 <br>
-After receiving an <b>act</b> command, SlackBot will kick off the action and send a link to the action page to Slack. When the action is complete, SlackBot will send a summary of the actions results to Slack. If multiple actions are run at once, SlackBot will send action results for each action separately as each action completes.
+After receiving an <b>act</b> command, SlackBot will kick off the action and send a link to the action page to Slack. When the action is complete, SlackBot will send a summary of the action results to Slack. If multiple actions are run at once, SlackBot will send action results for each action separately as each action completes.
 <br>
 <h3>Running Playbooks</h3>
 To run a playbook on Phantom from Slack, use the <b>run_playbook</b> command. The syntax of which is:
@@ -225,11 +228,11 @@ To run a playbook on Phantom from Slack, use the <b>run_playbook</b> command. Th
 
 required parameters:
   PLAYBOOK          Name or ID of the playbook to run
-  CONTAINER_ID      ID of container to run playbook on
+  CONTAINER_ID      ID of container to run the playbook on
 
 optional parameters:
-  --repo REPO       Name of the repo the playbook is in (required if playbook
-                    argument is a name and not an ID)"
+  --repo REPO       Name of the repo the playbook is in (required if the
+                    playbook argument is a name and not an ID)"
 
 examples:
   To run the playbook "investigate" which is in the "community" repo, on container 123
@@ -278,7 +281,7 @@ To get a list of actions or containers, use the <b>list</b> command. The syntax 
 @BOT_NAME list [actions|containers]
 
 parameters:
-  object        name of object to list, can be 'actions' or 'containers'
+  object        name of an object to list can be 'actions' or 'containers'
 
 WARNING: If there are many containers on the system, the 'list containers' command can take a long time and can result in a lot of data being dumped on Slack
 

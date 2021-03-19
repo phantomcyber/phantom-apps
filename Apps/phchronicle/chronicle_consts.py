@@ -1,7 +1,7 @@
 # --
 # File: chronicle_consts.py
 #
-# Copyright (c) 2020 Google LLC.
+# Copyright (c) 2020-2021 Google LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,28 +18,57 @@
 # --
 
 # Chronicle search endpoints
-GC_LIST_IOC_DETAILS_ENDPOINT = '/artifact/listiocdetails'
-GC_LIST_ASSETS_ENDPOINT = '/artifact/listassets'
-GC_LIST_EVENTS_ENDPOINT = '/asset/listevents'
-GC_LIST_IOCS_ENDPOINT = '/ioc/listiocs'
-GC_LIST_ALERTS_ENDPOINT = '/alert/listalerts'
+GC_LIST_IOC_DETAILS_ENDPOINT = '/v1/artifact/listiocdetails'
+GC_LIST_ASSETS_ENDPOINT = '/v1/artifact/listassets'
+GC_LIST_EVENTS_ENDPOINT = '/v1/asset/listevents'
+GC_LIST_IOCS_ENDPOINT = '/v1/ioc/listiocs'
+GC_LIST_ALERTS_ENDPOINT = '/v1/alert/listalerts'
+
+# Chronicle Detection Engine endpoints
+GC_LIST_RULES_ENDPOINT = '/v2/detect/rules'
+GC_LIST_DETECTIONS_ENDPOINT = '/v2/detect/rules/{rule_id}/detections'
 
 # Regex pattern
 GC_TIME_RANGE_PATTERN = r"^[1-9]\d*(d|h|m|s)$"
 GC_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
 # Ingestion run mode constants
-GC_IOC_RUN_MODE = ["Both", "IoC Domain Matches"]
-GC_ALERT_RUN_MODE = ["Both", "Assets with Alerts"]
-GC_IOC_RUN_MODE_KEY = "IoC domain matches"
+GC_IOC_RUN_MODE_KEY = "IoC Domain Matches"
 GC_ALERT_RUN_MODE_KEY = "Assets with Alerts"
+GC_USER_ALERT_RUN_MODE_KEY = "User Alerts"
+GC_ALERTING_DETECTION_RUN_MODE_KEY = "Alerting Detections"
+GC_NOT_ALERTING_DETECTION_RUN_MODE_KEY = "Not-alerting Detections"
 
 # Contains for the different artifact keys
 GC_URL_CONTAINS = ["url"]
 GC_TIME_VALUE_CONTAINS = ["gc time"]
 GC_ARTIFACT_VALUE_CONTAINS = ["domain"]
 GC_ASSET_VALUE_CONTAINS = ["gc mac", "gc product id", "hostname", "ip"]
+GC_USER_VALUE_CONTAINS = ["gc username", "email"]
+GC_RULE_ID_CONTAINS = ["gc rule id"]
 
+# Constants for Alert Type Action Parameter
+GC_ASSET_ALERTS_MODE = ["Asset Alerts", "All"]
+GC_USER_ALERTS_MODE = ["User Alerts", "All"]
+
+# Run Mode constants for the On-Poll action
+GC_RM_IOC_DOMAINS = "ioc"
+GC_RM_ASSET_ALERTS = "alert"
+GC_RM_USER_ALERTS = "user_alert"
+GC_RM_ALERTING_DETECTIONS = "alerting_detection"
+GC_RM_NOT_ALERTING_DETECTIONS = "not_alerting_detection"
+# Time related constant for the On Poll action
+
+GC_RM_ON_POLL_DICT = {
+    GC_IOC_RUN_MODE_KEY: [GC_RM_IOC_DOMAINS],
+    GC_ALERT_RUN_MODE_KEY: [GC_RM_ASSET_ALERTS],
+    GC_USER_ALERT_RUN_MODE_KEY: [GC_RM_USER_ALERTS],
+    "All Alerts": [GC_RM_ASSET_ALERTS, GC_RM_USER_ALERTS],
+    GC_ALERTING_DETECTION_RUN_MODE_KEY: [GC_RM_ALERTING_DETECTIONS],
+    GC_NOT_ALERTING_DETECTION_RUN_MODE_KEY: [GC_RM_NOT_ALERTING_DETECTIONS],
+    "All Detections": [GC_RM_ALERTING_DETECTIONS, GC_RM_NOT_ALERTING_DETECTIONS],
+    "All": [GC_RM_IOC_DOMAINS, GC_RM_ASSET_ALERTS, GC_RM_USER_ALERTS, GC_RM_ALERTING_DETECTIONS, GC_RM_NOT_ALERTING_DETECTIONS]
+}
 # Define your constants here
 GC_SCOPE_KEY = 'scopes'
 GC_LIMIT_KEY = 'limit'
@@ -50,7 +79,11 @@ GC_NO_OF_RETRIES_KEY = 'no_of_retries'
 GC_START_TIME_KEY = 'start_time'
 GC_END_TIME_KEY = 'end_time'
 GC_REFERENCE_TIME_KEY = 'reference_time'
+GC_RULE_IDS_KEY = 'rule_ids'
 GC_TIME_RANGE_KEY = 'time_range'
+GC_ALERT_STATE_KEY = 'alert_state'
+GC_ALERT_TYPE_KEY = 'alert_type'
+GC_DEFAULT_DETECTION_TYPE = 'RULE_DETECTION'
 GC_CONFIG_WAIT_TIMEOUT_PERIOD_KEY = "'Retry Wait Period(in seconds)' asset configuration"
 GC_CONFIG_NO_OF_RETRIES_KEY = "'Number Of Retries' asset configuration"
 GC_CONFIG_KEY_DICT_KEY = "'Contents of service account JSON file' asset configuration"
@@ -101,3 +134,4 @@ GC_INT_RANGE_CONFIDENCE_ERROR = "Please provide exactly 2 positive integer value
 GC_ON_POLL_INVALID_TIME_ERROR = "Please provide valid time related parameters "
 GC_ON_POLL_INVALID_TIME_ERROR += "('Time range for POLL NOW' or 'Start time for the scheduled/interval POLL') for the ingestion action."
 GC_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again."
+GC_INVALID_RULE_IDS_MSG = "Provided Rule ID(s) are invalid. Please provide valid Rule ID(s)"
