@@ -9,7 +9,7 @@
     "product_name": "Cloudflare",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
+    "publisher": "Splunk Community",
     "license": "Copyright (c) 2021 Splunk Inc.",
     "contributors": "Erica Pescio",
     "app_version": "1.0.0",
@@ -39,7 +39,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -50,7 +49,6 @@
             "action": "block ip",
             "identifier": "block_ip",
             "description": "Block an IP",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -121,7 +119,6 @@
             "action": "update rule",
             "identifier": "update_rule",
             "description": "Update a firewall rule",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -196,7 +193,6 @@
             "action": "block useragent",
             "identifier": "block_useragent",
             "description": "Deny access to reported UserAgent",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
