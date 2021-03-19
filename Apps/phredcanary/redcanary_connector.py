@@ -309,7 +309,7 @@ class RedCanaryConnector(BaseConnector):
 
         self.save_progress("Test Connectivity Passed")
 
-        return action_result.get_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _on_poll(self, param):
         """
