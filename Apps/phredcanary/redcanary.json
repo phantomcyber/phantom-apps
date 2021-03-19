@@ -4,8 +4,8 @@
     "description": "Integrates with Red Canary's MDR platform",
     "type": "investigative",
     "product_vendor": "Red Canary",
-    "logo": "redcanary.svg",
-    "logo_dark": "redcanary_dark.svg",
+    "logo": "logo_redcanary.svg",
+    "logo_dark": "logo_redcanary_dark.svg",
     "product_name": "Red Canary",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -15,15 +15,13 @@
     "utctime_updated": "2021-01-26T00:55:42.236259Z",
     "package_name": "phantom_redcanary",
     "main_module": "redcanary_connector.py",
-    "min_phantom_version": "4.10.0",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "URL": {
             "description": "Red Canary instance URL (ex. https://domain.my.redcanary.co)",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "API Key": {
@@ -36,9 +34,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -46,13 +44,13 @@
         },
         {
             "action": "on poll",
-            "identifier": "on_poll",
-            "type": "ingest",
-            "read_only": true,
             "description": "Subscribe to Red Canary detections",
-            "versions": "EQ(*)",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
             "parameters": {},
-            "output": []
+            "output": [],
+            "versions": "EQ(*)"
         }
     ]
 }

@@ -1,24 +1,22 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Red Canary Phantom App
-# -----------------------------------------
+# File: redcanary_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
 
 # Phantom App imports
-import phantom.app as phantom  # pylint: disable=import-error
-from phantom.base_connector import BaseConnector  # pylint: disable=import-error
-from phantom.action_result import ActionResult  # pylint: disable=import-error
+import phantom.app as phantom
+from phantom.base_connector import BaseConnector
+from phantom.action_result import ActionResult
 
-from RedCanary.detections import RCDetections  # pylint: disable=import-error
+from RedCanary.detections import RCDetections
 
-import redcanary_consts
+from redcanary_consts import *
 from datetime import datetime
 import requests
 import json
-from bs4 import BeautifulSoup  # pylint: disable=import-error
+from bs4 import BeautifulSoup
 
 
 class RetVal(tuple):
@@ -41,24 +39,57 @@ class RedCanaryConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing the error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
         status_code = response.status_code
-        if status_code != 200:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, response), None)
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -68,7 +99,10 @@ class RedCanaryConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
+
+        if status_code != 200:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS, message), None)
 
@@ -77,9 +111,10 @@ class RedCanaryConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)
                 ), None
             )
 
@@ -90,7 +125,7 @@ class RedCanaryConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -133,8 +168,6 @@ class RedCanaryConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
-        config = self.get_config()
-
         resp_json = None
 
         try:
@@ -148,14 +181,14 @@ class RedCanaryConnector(BaseConnector):
         try:
             r = request_func(
                 endpoint,
-                # auth=(username, password),  # basic authentication
-                verify=config.get('verify_server_cert', False),
+                verify=self.config.get('verify_server_cert', False),
                 **kwargs
             )
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)
                 ), resp_json
             )
 
@@ -168,7 +201,7 @@ class RedCanaryConnector(BaseConnector):
 
         self.debug_print("Config: {}".format(self.config))
 
-        return self.config.get('URL').rstrip("/") + "/openapi/v3/" + string
+        return "{}/openapi/v3/{}".format(self.config.get('URL').rstrip("/"), string)
 
     def _build_url_list(self, base_url):
         """
@@ -183,20 +216,20 @@ class RedCanaryConnector(BaseConnector):
         count = 1
         urls_list = []
 
-        while ((count - 1) * redcanary_consts.MAX_PER_PAGE) <= self._detection_count:
+        while ((count - 1) * MAX_PER_PAGE) <= self._detection_count:
 
             # If first time running don't pass since param
             if self._first_run:
                 params = [
-                    (redcanary_consts.STR_PER_PAGE, str(redcanary_consts.MAX_PER_PAGE)),
-                    (redcanary_consts.STR_PAGE, str(count))
+                    (STR_PER_PAGE, str(MAX_PER_PAGE)),
+                    (STR_PAGE, str(count))
                 ]
             # Not first run and need to incldue since param
             else:
                 params = [
-                    (redcanary_consts.STR_PER_PAGE, str(redcanary_consts.MAX_PER_PAGE)),
-                    (redcanary_consts.STR_PAGE, str(count)),
-                    (redcanary_consts.STR_SINCE, self._state.get(redcanary_consts.STR_LAST_RUN))
+                    (STR_PER_PAGE, str(MAX_PER_PAGE)),
+                    (STR_PAGE, str(count)),
+                    (STR_SINCE, self._state.get(STR_LAST_RUN))
                 ]
 
             urls_list.append(
@@ -219,8 +252,7 @@ class RedCanaryConnector(BaseConnector):
         full_url = base_url
         self.debug_print("Arguments passed: {}".format(param_list))
         for variable, value in param_list:
-
-            full_url = full_url + "&" + variable + value
+            full_url = "{}&{}{}".format(full_url, variable, value)
 
         return full_url
 
@@ -239,14 +271,12 @@ class RedCanaryConnector(BaseConnector):
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), int(count of detections)
         """
-        self.debug_print("Inside find detection count funciton")
+        self.debug_print("Inside find detection count function")
 
-        self._detection_count = json_response.get(
-                                redcanary_consts.STR_META, redcanary_consts.STR_NOT_FOUND).get(
-                                    redcanary_consts.STR_TOTAL_ITEMS, redcanary_consts.STR_NOT_FOUND)
+        self._detection_count = json_response.get(STR_META, {}).get(STR_TOTAL_ITEMS, STR_NOT_FOUND)
 
         # If we failed to find the count
-        if self._detection_count == redcanary_consts.STR_NOT_FOUND:
+        if self._detection_count == STR_NOT_FOUND:
 
             return phantom.APP_ERROR, "Failed to find detection count"
 
@@ -273,11 +303,11 @@ class RedCanaryConnector(BaseConnector):
         self.debug_print("Return value: {}".format(ret_val))
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
 
             return action_result.get_status()
 
-        self.save_progress("Test connectivity passed")
+        self.save_progress("Test Connectivity Passed")
 
         return action_result.get_status(phantom.APP_SUCCESS)
 
@@ -296,7 +326,7 @@ class RedCanaryConnector(BaseConnector):
         # Create global dictionary of users
         self._global_user_dict = dict()
 
-        self._poll_action_start = datetime.now().strftime(redcanary_consts.RC_DATE_TIME_FORMAT)
+        self._poll_action_start = datetime.now().strftime(RC_DATE_TIME_FORMAT)
         # Base API URL
         base_url = self._generate_base_api_url("detections?")
 
@@ -305,7 +335,7 @@ class RedCanaryConnector(BaseConnector):
             self.debug_print("Did not find last run sate, pulling all detections")
 
             params = [
-                (redcanary_consts.STR_PER_PAGE, str(redcanary_consts.MAX_PER_PAGE))
+                (STR_PER_PAGE, str(MAX_PER_PAGE))
             ]
             full_url = self._generate_full_url(base_url, params)
         # This is not the first run
@@ -317,8 +347,8 @@ class RedCanaryConnector(BaseConnector):
             ))
 
             params = [
-                (redcanary_consts.STR_PER_PAGE, str(redcanary_consts.MAX_PER_PAGE)),
-                (redcanary_consts.STR_SINCE, self._last_run)
+                (STR_PER_PAGE, str(MAX_PER_PAGE)),
+                (STR_SINCE, self._last_run)
             ]
 
             full_url = self._generate_full_url(base_url, params)
@@ -327,6 +357,9 @@ class RedCanaryConnector(BaseConnector):
         ret_val, response = self._make_rest_call(
             full_url, action_result, params=None, headers=self._generate_headers()
         )
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         ret_val, count = self._find_detection_count(response)
 
@@ -351,7 +384,7 @@ class RedCanaryConnector(BaseConnector):
         # Build initial container
         container = dict()
         container.update({
-            "name": "RC Poll: {}".format(datetime.utcnow().strftime(redcanary_consts.RC_DATE_TIME_FORMAT)),
+            "name": "RC Poll: {}".format(datetime.utcnow().strftime(RC_DATE_TIME_FORMAT)),
             "artifacts": []
         })
         ret_val, message, cid = self.save_container(container)
@@ -415,7 +448,7 @@ class RedCanaryConnector(BaseConnector):
         artifacts = []
         # Add container id to detection
         artifact = {
-            'name': detection.get('attributes').get('headline'),
+            'name': detection.get('attributes', {}).get('headline'),
             'container_id': cid,
             'label': "Red Canary Detection",
             'type': "host",
@@ -453,12 +486,11 @@ class RedCanaryConnector(BaseConnector):
         self.debug_print("state file path {0}".format(self.get_state_file_path()))
 
         # Check if the app ran before
-        if not self._state.get(redcanary_consts.STR_LAST_RUN):
-
+        if not self._state.get(STR_LAST_RUN):
             self._first_run = True
         else:
             self._first_run = False
-            self._last_run = self._state.get(redcanary_consts.STR_LAST_RUN)
+            self._last_run = self._state.get(STR_LAST_RUN)
 
         # get the asset config
         self.config = self.get_config()
@@ -478,7 +510,7 @@ class RedCanaryConnector(BaseConnector):
 
         # If polling action was run save start time to the state file if no errors were encountered
         if self.get_action_identifier() == "on_poll" and self.get_status() != phantom.APP_ERROR:
-            self._state[redcanary_consts.STR_LAST_RUN] = self._poll_action_start
+            self._state[STR_LAST_RUN] = self._poll_action_start
 
         self.save_state(self._state)
         # self.save_progress("Final State: {0}".format(self._state))
