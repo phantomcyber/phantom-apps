@@ -1,5 +1,5 @@
 
-The app pulls cloudaudit and access log data once configured and parses the specified DLP patterns from the asset configuration page
+The app pulls cloudaudit and access Bitglass log data filtered down to the specified DLP patterns. It also provides actions for access to Bitglass REST APIs for group and user manipulation. A sample playbook is included.
 
 Troubleshooting tips, known issues and miscellaneous notes:
 
