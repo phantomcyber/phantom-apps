@@ -12,12 +12,13 @@ import simplejson as json
 import six
 
 from argparse import ArgumentParser
+from websocket import create_connection
 
 app_dir = os.path.dirname(os.path.abspath(__file__))  # noqa
 if (os.path.exists('{}/dependencies'.format(app_dir))):  # noqa
     os.sys.path.insert(0, '{}/dependencies/websocket-client'.format(app_dir))  # noqa
     os.sys.path.insert(0, '{}/dependencies'.format(app_dir))  # noqa
-from websocket import create_connection  # pylint: disable=E0401
+
 
 SLACK_JSON_MESSAGE_LIMIT = 4000
 SLACK_JSON_API_URL = 'https://slack.com/api/'
