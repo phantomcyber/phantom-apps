@@ -7,6 +7,19 @@
 -->
 
 <p>
-For "domain reputation" and "ip reputation" actions unique and passive fields of output display data according to the heatmap 
-available on <a href="https://community.riskiq.com">https://community.riskiq.com</a>
+    For 'domain reputation' and 'ip reputation' actions unique and passive fields of output display data according to the heatmap 
+    available on <a href="https://community.riskiq.com">https://community.riskiq.com</a>
 </p>
+<h2>Playbook Backward Compatibility</h2>
+<p>
+  <ul>
+    <li>Four new actions 'lookup certificate', 'lookup certificate hash', 'get host pairs', and 'get host components' have been added. Hence, it is requested to the end-user to please update their existing playbooks by inserting the corresponding action blocks for this action on the earlier versions of the app.</li>
+  </ul>
+</p>
+<h2>Known Issue</h2>
+<p>
+  <ul>
+    <li>In the 'lookup certificate' action when we pass 'serialNumber' in the field and a valid value in the query(field value), it returns an empty result array which should not be the case as we can see the results for the same on the UI. Reported issue <a href="https://github.com/passivetotal/python_api/issues/23">here</a></li>
+  </ul>
+</p>
+

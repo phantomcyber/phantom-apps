@@ -183,7 +183,7 @@ class AdLdapConnector(BaseConnector):
         groups = [i.strip() for i in param['groups'].split(';')]
 
         # resolve samaccountname -> distinguishedname if option selected
-        if param.get('use_samaccountname', False):
+        if param['use_samaccountname']:
             n_members = []  # new list of users
             n_groups = []   # new list of groups
             member_nf = []  # not found users
@@ -240,11 +240,16 @@ class AdLdapConnector(BaseConnector):
                     raise_error=True
                 )
         except Exception as e:
-            return RetVal(action_result.set_status(
-                phantom.APP_ERROR,
-                "",
-                exception=e
-            ))
+            if type(e).__name__ == "LDAPInvalidDnError":
+                error_msg = "LDAPInvalidDnError: If 'use samaccountname' is unchecked, member(s) and group(s) values must be in distinguishedName format"
+            else:
+                error_msg = str(e)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    "{}".format(error_msg),
+                    None)
+            )
 
         # add action data results
         for i in members:
@@ -279,9 +284,9 @@ class AdLdapConnector(BaseConnector):
                 return RetVal(action_result.set_status(
                     phantom.APP_ERROR
                 ))
-            user = user_dn[user]
             ar_data["user_dn"] = user_dn[user]
             ar_data["samaccountname"] = user
+            user = user_dn[user]
         else:
             ar_data["user_dn"] = user
 
@@ -449,7 +454,15 @@ class AdLdapConnector(BaseConnector):
             query += "(userprincipalname={0})(samaccountname={0})(distinguishedname={0})".format(i)
         query += ")"
 
-        resp = self._query({"filter": query, "attributes": param['attributes']})
+        try:
+            resp = self._query({"filter": query, "attributes": param['attributes']})
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    str(e),
+                    None)
+            )
 
         action_result.add_data(json.loads(resp))
         summary['total_objects'] = len(self._get_filtered_response())
@@ -507,7 +520,7 @@ class AdLdapConnector(BaseConnector):
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    e.description,
+                    str(e),
                     None)
             )
 
@@ -572,7 +585,7 @@ class AdLdapConnector(BaseConnector):
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    e.args,
+                    str(e),
                     None)
             )
 
