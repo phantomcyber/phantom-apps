@@ -44,6 +44,7 @@
           <li>Tenant ID - It is the Directory ID of the Microsoft Azure Active Directory on the Microsoft Azure portal.</li>
           <li>Client ID - It is the Application ID of an application configured in the Microsoft Azure Active Directory.</li>
           <li>Client Secret - It is the secret string used by the application to prove its identity when requesting a token. It can be generated for the configured application on the Microsoft Azure Active Directory.</li>
+          <li>Non Interactive Auth - It is used to determine the authentication method. If it is checked then non-interactive auth will be used otherwise interactive auth will be used. Whenever this checkbox is toggled then test-connectivity action must be run again.</li>
         </ul>
       </p>
 
@@ -136,6 +137,7 @@
       <p>
         When creating an asset for the app,
         <ul>
+          <li>Check the checkbox if you want to use Non Interactive authentication mechanism otherwise Interactive auth mechanism will be used.</li>
           <li>Provide the client ID of the app created during the previous step of SIEM Integration in the 'Client ID' field.</li>
           <li>Provide the client secret of the app created during the previous step of SIEM Integration in the 'Client Secret' field. If the client secret is not generated during the SIEM step, follow the below steps to generate the new client secret.
             <ul>
@@ -159,6 +161,7 @@
           </pre>
           <li>Add the URL created in the earlier step into the 'Redirect URIs' section of the 'Authentication' menu for the registered app 'WindowsDefenderATPSiemConnector' on the Microsoft Azure portal. For the 'Redirect URIs' section, follow the below steps.</li>
             <ol>
+              <li>Below steps are required only in case of Interactive auth (i.e. If checkbox is unchecked)</li>
               <li>Navigate to the 'Azure Active Directory' on the Microsoft Azure portal.</li>
               <li>Click on the 'App registrations' menu from the left-side panel.</li>
               <li>Click on the earlier created 'WindowsDefenderATPSiemConnector' app.</li>
@@ -170,7 +173,7 @@
         </ul>
       </p>
 
-    <h2>Method to run Test Connectivity</h2>
+    <h2>Interactive Method to run Test Connectivity</h2>
       <p>
         <ul>
           <li>After setting up the asset and user, click the 'TEST CONNECTIVITY' button. A pop-up window will be displayed with appropriate test connectivity logs. It will also display a specific URL on that pop-up window.</li>
@@ -180,21 +183,38 @@
           <li>Finally, close the browser tab and come back to the 'Test Connectivity' browser tab. The pop-up window should display a 'Test Connectivity Passed' message.</li>
         </ul>
       </p>
-
-    <h2>Explanation of Test Connectivity Workflow</h2>
+      <h2>Non-interactive Method to run Test Connectivity</h2>
       <p>
         <ul>
-          <li>This app uses (version 1.0) OAUTH 2.0 authorization code workflow APIs for generating the [access_token] and [refresh_token] pairs to be used for all the API calls to the Defender ATP instance.</li>
-          <li>This authentication mechanism is a user-context based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated tokens. For more information visit the link mentioned here for the <a href="https://docs.microsoft.com/en-gb/azure/active-directory/azuread-dev/v1-protocols-oauth-code" target="_blank">OAUTH 2.0 AUTH CODE</a>.</li>
+          <li>Here make sure that the 'Non Interactive Auth' checkbox is checked in asset configuration.</li>
+          <li>Click on the 'TEST CONNECTIVITY' button, it should run the test connectivity action without any user interaction.</li>
+        </ul>
+      </p>
+
+    <h2>Explanation of Test Connectivity Workflow for Interactive auth and Non Interactive auth</h2>
+      <p>
+        <ul>
+          <li>This app uses (version 1.0) OAUTH 2.0 authorization code workflow APIs for generating the [access_token] and [refresh_token] pairs if the authentication method is interactive else [access_token] if authentication method is non interactive is used for all the API calls to the Defender ATP instance.</li>
+          <li>Interactive authentication mechanism is a user-context based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated tokens. For more information visit the link mentioned here for the <a href="https://docs.microsoft.com/en-gb/azure/active-directory/azuread-dev/v1-protocols-oauth-code" target="_blank">OAUTH 2.0 AUTH CODE</a>.</li>
+          <li>Non Interactive authentication mechanism is a user-context based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated token. For more information visit the link mentioned here for the <a href="https://docs.microsoft.com/en-gb/azure/active-directory/azuread-dev/v1-oauth2-client-creds-grant-flow" target="_blank">OAUTH 2.0 CLIENT CREDENTIALS</a>.</li>
           <li>The step-by-step process for the entire authentication mechanism is explained below.</li>
             <ul>
               <li>The first step is to get an application created in a specific tenant on the Microsoft Azure Active Directory. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
               <li>Configure the Windows Defender ATP app's asset with appropriate values for [tenant_id], [client_id], and [client_secret] configuration parameters.</li>
-              <li>Run the Test Connectivity action.</li>
-              <li>Internally, the connectivity creates a URL for hitting the /authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
-              <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and refersh_token pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
-              <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] gets expired then, the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] gets expired, the user will have to run the Test Connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
-              <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Defender ATP instance.</li>
+              <li>Run the Test Connectivity action for Interactive method.</li>
+              <ul>
+                <li>Internally, the connectivity creates a URL for hitting the /authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
+                <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and [refresh_token] pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
+                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the Test Connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
+                <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Defender ATP instance.</li>
+              </ul>
+              <li>Run the Test Connectivity action for Non Interactive method.</li>
+              <ul>
+                <li>Internally, the application authenticates to Azure AD token issuance endpoint and requests an [access_token] then it will generate the [access_token].</li>
+                <li>The [access_token] generated in the above step is used by the test connectivity to make the next API call to verify the [access_token]. The generated [access_token] is stored in the state file of the app on the Phantom server.</li>
+                <li>If the [access_token] expires, then application will automatically re-generate the [access_token] by making the corresponding API call.</li>
+                <li>The successful run of the Test Connectivity ensures that a valid [access_token] has been generated and stored in the app's state file. This token will be used in all the actions execution flow to authorize their API calls to the Defender ATP instance.</li>
+              </ul>
             </ul>
         </ul>
       </p>

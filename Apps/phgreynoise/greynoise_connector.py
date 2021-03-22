@@ -2,329 +2,503 @@
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
+# Python 3 Compatibility imports
+from __future__ import print_function, unicode_literals
+
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-# Usage of the consts file is recommended
-# from greynoise_consts import *
+from greynoise_consts import *
 import requests
 import json
-import ipaddress
-from bs4 import BeautifulSoup
+from requests.utils import requote_uri
+from six.moves.urllib.parse import urljoin as _urljoin
+import urllib.parse
 
 
-class RetVal(tuple):
-    def __new__(cls, val1, val2=None):
-        return tuple.__new__(RetVal, (val1, val2))
+def urljoin(base, url):
+    return _urljoin("%s/" % base.rstrip("/"), url.lstrip("/"))
 
 
-class GreynoiseConnector(BaseConnector):
+class GreyNoiseConnector(BaseConnector):
+    """Connector for GreyNoise App."""
 
     def __init__(self):
+        """GreyNoise App Constructor."""
+        super(GreyNoiseConnector, self).__init__()
+        self._session = None
+        self._app_version = None
+        self._api_key = None
 
-        # Call the BaseConnectors init first
-        super(GreynoiseConnector, self).__init__()
+    def validate_parameters(self, param):
+        # Disable BaseConnector's validate functionality, since this App supports unicode domains and the
+        # validation routines don't
+        return phantom.APP_SUCCESS
 
-        self._state = None
-
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
-        self._base_url = None
-
-    def _is_ip(self, input_ip_address):
-        """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
-
-        :param input_ip_address: IP address
-        :return: status (success/failure)
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
         """
 
-        ip_address_input = input_ip_address
-
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            return False
-
-        return True
-
-    def _process_empty_reponse(self, response, action_result):
-
-        if response.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, {})
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
-
-    def _process_html_response(self, response, action_result):
-
-        # An html response, treat it like an error
-        status_code = response.status_code
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text
-            split_lines = error_text.split('\n')
-            split_lines = [x.strip() for x in split_lines if x.strip()]
-            error_text = '\n'.join(split_lines)
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
         except:
-            error_text = "Cannot parse error details"
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                error_text)
+        return error_text
 
-        message = message.replace('{', '{{').replace('}', '}}')
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
 
-    def _process_json_response(self, r, action_result):
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
 
-        # Try a json parse
+        return phantom.APP_SUCCESS, parameter
+
+    def get_session(self):
+        if self._session is None:
+            self._session = requests.Session()
+            self._session.params.update({
+                "api-key": self._api_key
+            })
+        return self._session
+
+    def _make_rest_call(self, action_result, method, *args, error_on_404=True, **kwargs):
+        session = self.get_session()
+
+        response_json = None
+        status_code = None
         try:
-            resp_json = r.json()
+            r = session.request(method, *args, **kwargs)
+            if r.status_code != 404 or error_on_404:
+                r.raise_for_status()
+            status_code = r.status_code
+        except requests.exceptions.HTTPError as e:
+            err_msg = self._get_error_message_from_exception(e)
+            err_msg = urllib.parse.unquote(err_msg)
+            ret_val = action_result.set_status(phantom.APP_ERROR,
+                                               "HTTP error occurred while making REST call: {0}".format(err_msg))
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
-
-        # Please specify the status codes here
-        if 200 <= r.status_code < 399:
-            return RetVal(phantom.APP_SUCCESS, resp_json)
-
-        if resp_json.get('error'):
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, resp_json.get('error'))
+            err_msg = self._get_error_message_from_exception(e)
+            ret_val = action_result.set_status(phantom.APP_ERROR,
+                                               "General error occurred while making REST call: {0}".format(err_msg))
         else:
-            # You should process the error returned in the json
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                    r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+            try:
+                response_json = r.json()
+                ret_val = phantom.APP_SUCCESS
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                ret_val = action_result.set_status(phantom.APP_ERROR,
+                                                   "Unable to parse JSON response. Error: {0}".format(err_msg))
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+        return (ret_val, response_json, status_code)
 
-    def _process_response(self, r, action_result):
+    def _check_apikey(self, action_result):
+        self.save_progress("Testing API key")
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            API_KEY_CHECK_URL,
+            headers=self._headers
+        )
+        if phantom.is_fail(ret_val):
+            self.save_progress("API key check Failed")
+            return ret_val
 
-        # store the r_text in debug data, it will get dumped in the logs if the action fails
-        if hasattr(action_result, 'add_debug_data'):
-            action_result.add_debug_data({'r_status_code': r.status_code})
-            action_result.add_debug_data({'r_text': r.text})
-            action_result.add_debug_data({'r_headers': r.headers})
+        if response_json is None:
+            self.save_progress("No response from API")
+            return action_result.set_status(phantom.APP_ERROR, "No response from API")
+        elif response_json.get("message") == "pong":
+            self.save_progress("Validated API Key")
+            self.debug_print("Validated API Key")
+            return phantom.APP_SUCCESS
+        else:
+            self.save_progress("Invalid response from API")
+            try:
+                response_json = json.dumps(response_json)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Invalid response from API")
+            return action_result.set_status(phantom.APP_ERROR, "Invalid response from API: %s" % response_json)
 
-        # Process each 'Content-Type' of response separately
-
-        # Process a json response
-        if 'json' in r.headers.get('Content-Type', ''):
-            return self._process_json_response(r, action_result)
-
-        # Process an HTML resonse, Do this no matter what the api talks.
-        # There is a high chance of a PROXY in between phantom and the rest of
-        # world, in case of errors, PROXY's return HTML, this function parses
-        # the error and adds it to the action_result.
-        if 'html' in r.headers.get('Content-Type', ''):
-            return self._process_html_response(r, action_result)
-
-        # it's not content-type that is to be parsed, handle an empty response
-        if not r.text:
-            return self._process_empty_reponse(r, action_result)
-
-        # everything else is actually an error at this point
-        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
-
-        return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
-
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get"):
-
-        config = self.get_config()
-
-        resp_json = None
-
-        try:
-            request_func = getattr(requests, method)
-        except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
-
-        # Create a URL to connect to
-        url = endpoint
-
-        try:
-            r = request_func(
-                            url,
-                            # auth=(username, password),  # basic authentication
-                            data=data,
-                            headers=headers,
-                            verify=config.get('verify_server_cert', False),
-                            params=params)
-        except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-
-        return self._process_response(r, action_result)
-
-    def _handle_code_convert(self, code):
-        return {
-            "0x00": "The IP has never been observed scanning the Internet",
-            "0x01": "The IP has been observed by the GreyNoise sensor network",
-            "0x02": "The IP has been observed scanning the GreyNoise sensor network, but has not completed a full connection, meaning this can be spoofed",
-            "0x03": "The IP is adjacent to another host that has been directly observed by the GreyNoise sensor network",
-            "0x04": "Reserved",
-            "0x05": "This IP is commonly spoofed in Internet-scan activity",
-            "0x06": "This IP has been observed as noise, but this host belongs to a cloud provider where IPs can be cycled frequently"
-        }[code]
-
-    def _handle_test_connectivity(self, param):
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
+    def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            self.save_progress("Test Connectivity Failed")
+            return ret_val
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
-
-        # Place api key in own self variable.
-        api_key = config.get('apiKey').encode('utf-8')
-
-        header = {'key': api_key}
-
-        endpoint = 'https://enterprise.api.greynoise.io/v2/meta/ping'
-
-        # Create a new Greynoise Python Object
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=header)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.get_status()
-
-        # Return success
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_lookup_ip(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
+    def _lookup_ip(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            LOOKUP_IP_URL.format(ip=param["ip"]),
+            headers=self._headers
+        )
+        if phantom.is_fail(ret_val):
+            return ret_val
 
-        # Place api key in own self variable.
-        api_key = config.get('apiKey')
+        result_data = {}
+        action_result.add_data(result_data)
 
-        header = {'key': api_key}
+        result_data.update(response_json)
 
-        ip = param['ip']
-
-        endpoint = 'https://enterprise.api.greynoise.io/v2/noise/quick/{}'.format(ip)
-
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=header)
-
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
-        self.save_progress("response = {}".format(response))
-
-        response['code_meaning'] = self._handle_code_convert(response['code'])
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['ip'] = ip
-        summary['code_meaning'] = response['code_meaning']
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+            if result_data["code"] in CODES:
+                result_data["code_meaning"] = CODES[result_data["code"]]
+            else:
+                result_data["code_meaning"] = "This code is unmapped"
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_ip_reputation(self, param):
-
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
+    def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
 
-        # Add config to init variable to get root API Key
-        config = self.get_config()
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            IP_REPUTATION_URL.format(ip=param["ip"]),
+            headers=self._headers
+        )
+        if phantom.is_fail(ret_val):
+            return ret_val
 
-        # Place api key in own self variable.
-        api_key = config.get('apiKey')
+        result_data = {}
+        action_result.add_data(result_data)
 
-        header = {'key': api_key}
-
-        ip = param['ip']
-
-        endpoint = 'https://enterprise.api.greynoise.io/v2/noise/context/{}'.format(ip)
-
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=header)
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
-
-        # Add the response into the data section
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['ip'] = ip
+        result_data.update(response_json)
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
 
         return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _gnql_query(self, param, is_poll=False, action_result=None):
+        if not is_poll:
+            action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            if is_poll:
+                return ret_val, None
+            else:
+                return ret_val
+
+        first_flag = True
+        remaining_results_flag = True
+        scroll_token = ""
+        full_response = {}
+        size = param["size"]
+        # Validate 'size' action parameter
+        ret_val, size = self._validate_integer(action_result, size, SIZE_ACTION_PARAM)
+        if phantom.is_fail(ret_val):
+            if is_poll:
+                return action_result.get_status(), None
+            else:
+                return action_result.get_status()
+
+        while remaining_results_flag:
+            if first_flag:
+                ret_val, response_json, status_code = self._make_rest_call(
+                    action_result,
+                    "get",
+                    GNQL_QUERY_URl,
+                    headers=self._headers,
+                    params=(('query', param["query"]),
+                            ('size', size))
+                )
+                full_response.update(response_json)
+
+            if "scroll" in full_response:
+                scroll_token = full_response["scroll"]
+            if "complete" in full_response or len(full_response["data"]) >= size:
+                remaining_results_flag = False
+            elif "message" in full_response:
+                if full_response["message"] == "no results":
+                    remaining_results_flag = False
+
+            first_flag = False
+
+            if remaining_results_flag:
+                ret_val, response_json, status_code = self._make_rest_call(
+                    action_result,
+                    "get",
+                    GNQL_QUERY_URl,
+                    headers=self._headers,
+                    params=(('query', param["query"]),
+                            ('size', size),
+                            ('scroll', scroll_token))
+                )
+                full_response["complete"] = response_json["complete"]
+                if "scroll" in response_json:
+                    full_response["scroll"] = response_json["scroll"]
+                for item in response_json["data"]:
+                    full_response["data"].append(item)
+
+            if "scroll" in full_response:
+                scroll_token = full_response["scroll"]
+            if "complete" in full_response or len(full_response["data"]) >= size:
+                remaining_results_flag = False
+            elif "message" in full_response:
+                if full_response["message"] == "no results":
+                    remaining_results_flag = False
+            else:
+                remaining_results_flag = True
+
+        if phantom.is_fail(ret_val):
+            if is_poll:
+                return ret_val, None
+            else:
+                return ret_val
+
+        result_data = {}
+        action_result.add_data(result_data)
+        try:
+            for entry in full_response["data"]:
+                entry["visualization"] = VISUALIZATION_URL.format(ip=entry["ip"])
+        except KeyError:
+            error_msg = "Error occurred while processing API response"
+            if is_poll:
+                return action_result.set_status(phantom.APP_ERROR, error_msg), None
+            else:
+                return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        result_data.update(full_response)
+
+        if is_poll:
+            return ret_val, result_data
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _lookup_ips(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        try:
+            ips = [x.strip() for x in param["ips"].split(",")]
+            ips = list(filter(None, ips))
+            if not ips:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_VALUE_ERR_MSG.format(key='ips'))
+            ips = ",".join(ips)
+            ips_string = requote_uri(ips)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing 'ips' action parameter. {0}".format(err)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
+
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            LOOKUP_IPS_URL.format(ips=ips_string),
+            headers=self._headers
+        )
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        result_data = []
+        action_result.add_data(result_data)
+        try:
+            for result in response_json:
+                if result["code"] in CODES:
+                    result["code_meaning"] = CODES[result["code"]]
+                else:
+                    result["code_meaning"] = "This code is unmapped"
+
+                result["visualization"] = VISUALIZATION_URL.format(ip=result["ip"])
+                result_data.append(result)
+
+            return action_result.set_status(phantom.APP_SUCCESS)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing results: {0}".format(err)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
+
+    def _process_query(self, data):
+        # spawn container for every item returned
+        if data["count"] > 0:
+            try:
+                for entry in data["data"]:
+                    ip = entry["ip"]
+                    self.save_progress("Processing IP address {}".format(ip))
+                    container = {
+                        "custom_fields": {},
+                        "data": {},
+                        "name": "",
+                        "description": "Container added by GreyNoise",
+                        "label": self.get_config().get("ingest", {}).get("container_label"),
+                        "sensitivity": "amber",
+                        "source_data_identifier": "",
+                        "tags": entry["tags"],
+                    }
+                    if entry["classification"] == "malicious":
+                        container["severity"] = "high"
+                    else:
+                        container["severity"] = "low"
+                    artifact_cef = {
+                        'ip': entry['ip'],
+                        'classification': entry['classification'],
+                        'first_seen': entry['first_seen'],
+                        'last_seen': entry['last_seen'],
+                        'actor': entry['actor'],
+                        'organization': entry['metadata']['organization'],
+                        'asn': entry['metadata']['asn']
+                    }
+                    if entry['metadata']['country']:
+                        artifact_cef['country'] = entry['metadata']['country']
+                    if entry['metadata']['city']:
+                        artifact_cef['city'] = entry['metadata']['city']
+                    container["artifacts"] = [{
+                        "cef": artifact_cef,
+                        "description": "Artifact added by GreyNoise",
+                        "label": container["label"],
+                        "name": "GreyNoise Query Language Entry",
+                        "source_data_identifier": container["source_data_identifier"],
+                        "severity": container["severity"]
+                    }]
+                    container["name"] = "GreyNoise Query Language Entry"
+
+                    ret_val, container_creation_msg, container_id = self.save_container(container)
+                    if phantom.is_fail(ret_val):
+                        self.save_progress("Error occurred while saving the container")
+                        self.debug_print(container_creation_msg)
+                        continue
+                    self.save_progress("Created %s" % container_id)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                err_msg = "Error occurred while processing query data. {}".format(err)
+                self.debug_print(err_msg)
+                return phantom.APP_ERROR
+            return phantom.APP_SUCCESS
+        else:
+            self.save_progress("No results matching your GNQL query were found")
+            return phantom.APP_SUCCESS
+
+    def _on_poll(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        if self.is_poll_now():
+            self.save_progress('Due to the nature of the API, the '
+                               'artifact limits imposed by POLL NOW are '
+                               'ignored. As a result POLL NOW will simply '
+                               'create a container for each artifact.')
+
+        config = self.get_config()
+        param["query"] = config.get("on_poll_query")
+
+        if self.is_poll_now():
+            param["size"] = param.get(phantom.APP_JSON_CONTAINER_COUNT, 25)
+        else:
+            on_poll_size = config.get("on_poll_size", 25)
+            # Validate 'on_poll_size' config parameter
+            ret_val, on_poll_size = self._validate_integer(action_result, on_poll_size, ONPOLL_SIZE_CONFIG_PARAM)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            param["size"] = on_poll_size
+
+        if param["query"] == "Please refer to the documentation":
+            self.save_progress("Default on poll query unchanged, please enter a valid GNQL query")
+            return action_result.set_status(phantom.APP_ERROR, "Default on poll query unchanged")
+
+        ret_val, data = self._gnql_query(param, is_poll=True, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        ret_val = self._process_query(data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, "Failed to process the query")
+        else:
+            return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
-
         ret_val = phantom.APP_SUCCESS
 
-        # Get the action that we are supposed to execute for this App Run
-        action_id = self.get_action_identifier()
+        action = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
-
-        if action_id == 'test_connectivity':
-            ret_val = self._handle_test_connectivity(param)
-
-        elif action_id == 'ip_reputation':
-            ret_val = self._handle_ip_reputation(param)
-
-        elif action_id == 'lookup_ip':
-            ret_val = self._handle_lookup_ip(param)
+        if action == "test_connectivity":
+            ret_val = self._test_connectivity(param)
+        elif action == "lookup_ip":
+            ret_val = self._lookup_ip(param)
+        elif action == "ip_reputation":
+            ret_val = self._ip_reputation(param)
+        elif action == "gnql_query":
+            ret_val = self._gnql_query(param)
+        elif action == "lookup_ips":
+            ret_val = self._lookup_ips(param)
+        elif action == "on_poll":
+            ret_val = self._on_poll(param)
 
         return ret_val
 
     def initialize(self):
-
-        # Load the state in initialize, use it to store data
-        # that needs to be accessed across actions
+        """Initialize the Phantom integration."""
         self._state = self.load_state()
-
-        # get the asset config
         config = self.get_config()
 
-        """
-        # Access values in asset config by the name
+        self._api_key = config['api_key']
+        app_json = self.get_app_json()
+        self._app_version = app_json["app_version"]
 
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
-        self.set_validator('ipv6', self._is_ip)
+        self._headers = {
+            "Accept": "application/json",
+            "key": self._api_key,
+            "User-Agent": "greynoise-phantom-integration-v{0}".format(self._app_version)
+        }
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
-
-        # Save the state, this data is saved accross actions and app upgrades
+        """Finalize the Phantom integration."""
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import pudb
     import argparse
@@ -333,9 +507,9 @@ if __name__ == '__main__':
 
     argparser = argparse.ArgumentParser()
 
-    argparser.add_argument('input_test_json', help='Input Test JSON file')
-    argparser.add_argument('-u', '--username', help='username', required=False)
-    argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
 
     args = argparser.parse_args()
     session_id = None
@@ -343,33 +517,33 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
-
+    if username is not None and password is None:
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
-            csrftoken = r.cookies['csrftoken']
+            csrftoken = r.cookies["csrftoken"]
 
             data = dict()
-            data['username'] = username
-            data['password'] = password
-            data['csrfmiddlewaretoken'] = csrftoken
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = login_url
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
-            session_id = r2.cookies['sessionid']
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -377,14 +551,14 @@ if __name__ == '__main__':
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
-        connector = GreynoiseConnector()
+        connector = GreyNoiseConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
-            in_json['user_session_token'] = session_id
-            connector._set_csrf_info(csrftoken, headers['Referer'])
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
+            connector._set_csrf_info(csrftoken, headers["Referer"])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
