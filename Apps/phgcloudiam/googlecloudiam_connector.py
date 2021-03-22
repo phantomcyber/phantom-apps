@@ -296,7 +296,6 @@ class GoogleCloudIamConnector(BaseConnector):
         elif action_id == 'enable_serviceaccount':
             ret_val = self._handle_enable_serviceaccount(param)
 
-
         return ret_val
 
     def initialize(self):

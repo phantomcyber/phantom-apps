@@ -46,7 +46,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -217,7 +216,6 @@
             "action": "list serviceaccountkey",
             "identifier": "list_serviceaccountkey",
             "description": "Lists every ServiceAccountKey for a service account",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -292,7 +290,6 @@
             "action": "get serviceaccountkey",
             "identifier": "get_serviceaccountkey",
             "description": "Gets a ServiceAccountKey",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -380,7 +377,6 @@
             "action": "delete serviceaccountkey",
             "identifier": "delete_serviceaccountkey",
             "description": "Deletes a ServiceAccountKey",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -440,7 +436,6 @@
             "action": "create serviceaccountkey",
             "identifier": "create_serviceaccountkey",
             "description": "Creates a ServiceAccountKey",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -458,7 +453,7 @@
                     "description": "Whether or not to save the key to vault",
                     "data_type": "boolean",
                     "default": true,
-                    "order": 2
+                    "order": 1
                 }
             },
             "output": [
