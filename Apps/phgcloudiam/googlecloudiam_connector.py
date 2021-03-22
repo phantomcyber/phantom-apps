@@ -195,6 +195,75 @@ class GoogleCloudIamConnector(BaseConnector):
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS, "Success")
 
+    def _handle_get_serviceaccount(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not self._create_client(action_result):
+            self.save_progress("Could not create API client.", e)
+            return action_result.get_status()
+
+        # Required values can be accessed directly
+        project = self.get_config()['project']
+        account = param['account']
+
+        name = f"projects/{project}/serviceAccounts/{account}"
+
+        request = self._client.projects().serviceAccounts().get(name=name)
+        ret_val, response = self._send_request(request, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return ret_val
+
+        action_result.add_data(response)
+        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+
+    def _handle_disable_serviceaccount(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not self._create_client(action_result):
+            self.save_progress("Could not create API client.", e)
+            return action_result.get_status()
+
+        # Required values can be accessed directly
+        project = self.get_config()['project']
+        account = param['account']
+
+        name = f"projects/{project}/serviceAccounts/{account}"
+
+        request = self._client.projects().serviceAccounts().disable(name=name)
+        ret_val, response = self._send_request(request, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return ret_val
+
+        action_result.add_data(response)
+        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+
+    def _handle_enable_serviceaccount(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not self._create_client(action_result):
+            self.save_progress("Could not create API client.", e)
+            return action_result.get_status()
+
+        # Required values can be accessed directly
+        project = self.get_config()['project']
+        account = param['account']
+
+        name = f"projects/{project}/serviceAccounts/{account}"
+
+        request = self._client.projects().serviceAccounts().enable(name=name)
+        ret_val, response = self._send_request(request, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            return ret_val
+
+        action_result.add_data(response)
+        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -217,6 +286,16 @@ class GoogleCloudIamConnector(BaseConnector):
 
         elif action_id == 'create_serviceaccountkey':
             ret_val = self._handle_create_serviceaccountkey(param)
+
+        elif action_id == 'get_serviceaccount':
+            ret_val = self._handle_get_serviceaccount(param)
+
+        elif action_id == 'disable_serviceaccount':
+            ret_val = self._handle_disable_serviceaccount(param)
+
+        elif action_id == 'enable_serviceaccount':
+            ret_val = self._handle_enable_serviceaccount(param)
+
 
         return ret_val
 

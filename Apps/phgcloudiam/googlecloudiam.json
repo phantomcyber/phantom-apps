@@ -35,11 +35,12 @@
     },
     "pip_dependencies": {
         "pypi": [
-            {"module": "google-api-python-client"}
+            {
+                "module": "google-api-python-client"
+            }
         ],
-        "wheel": [
-        ]
-     },
+        "wheel": []
+    },
     "actions": [
         {
             "action": "test connectivity",
@@ -53,21 +54,18 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "list serviceaccountkey",
-            "identifier": "list_serviceaccountkey",
-            "description": "Lists every ServiceAccountKey for a service account.",
-            "verbose": "",
+            "action": "enable serviceaccount",
+            "identifier": "enable_serviceaccount",
+            "description": "Enables a ServiceAccount that was disabled previously",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
+            "undo": "disable serviceaccount",
             "parameters": {
                 "account": {
                     "description": "Email address or the uniqueId of the service account",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -75,7 +73,99 @@
                 {
                     "data_path": "action_result.parameter.account",
                     "data_type": "string",
-                    "contains": [],
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "disable serviceaccount",
+            "identifier": "disable_serviceaccount",
+            "description": "Disables a ServiceAccount immediately",
+            "type": "generic",
+            "read_only": false,
+            "undo": "enable serviceaccount",
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get serviceaccount",
+            "identifier": "get_serviceaccount",
+            "description": "Gets a ServiceAccount",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
                     "column_name": "account",
                     "column_order": 0
                 },
@@ -87,6 +177,77 @@
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.uniqueId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.projectId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list serviceaccountkey",
+            "identifier": "list_serviceaccountkey",
+            "description": "Lists every ServiceAccountKey for a service account",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "account": {
+                    "description": "Email address or the uniqueId of the service account",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account",
+                    "data_type": "string",
+                    "column_name": "account",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -140,9 +301,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "key": {
@@ -150,9 +308,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
@@ -160,14 +315,12 @@
                 {
                     "data_path": "action_result.parameter.account",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "account",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.key",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "key",
                     "column_order": 1
                 },
@@ -176,6 +329,10 @@
                     "data_type": "string",
                     "column_name": "status",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.0.keyOrigin",
@@ -232,9 +389,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "key": {
@@ -242,9 +396,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
@@ -252,14 +403,12 @@
                 {
                     "data_path": "action_result.parameter.account",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "account",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.key",
                     "data_type": "string",
-                    "contains": [],
                     "column_name": "key",
                     "column_order": 1
                 },
@@ -274,12 +423,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 }
             ],
             "render": {
@@ -303,8 +452,6 @@
                     "contains": [
                         "email"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "save_key_to_vault": {
@@ -325,10 +472,20 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.parameter.save_key_to_vault",
+                    "data_type": "boolean",
+                    "column_name": "save_key_to_vault",
+                    "column_order": 1
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.0.keyOrigin",
