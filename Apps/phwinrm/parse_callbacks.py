@@ -1,5 +1,5 @@
 # File: parse_callbacks.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -113,24 +113,34 @@ def list_processes(action_result, response):
 
     output = response.std_out
     lines = [y for y in [i for i in output.splitlines() if i] if not y.startswith('-----')]
+    if not lines:
+        summary = action_result.update_summary({})
+        summary['num_processes'] = 0
+        action_result.set_status(phantom.APP_ERROR, "No processes found")
+        return phantom.APP_ERROR
+
     column_headers = lines[0]
     column_headers_list = column_headers.split()
     column_indexes = get_column_header_indexes(column_headers)
 
-    header = [y.lower() for y in (column_headers_list + [f"unknown_column_{x}" for x in range(10)])]
+    header = [y.lower() for y in column_headers_list]
     processes = lines[1:]
     result = []
     for line in processes:
         columns = line.split()
         process_dict = dict()
+        unknown_column = 0
         if len(columns) != len(column_headers_list):
             for index, (start, end) in enumerate(column_indexes):
                 if not line[start: end + 1].strip():
                     columns.insert(index, None)
-        for i, x in enumerate(columns):
-            process_dict[header[i]] = x
-
-        result += [process_dict]
+        for i, column in enumerate(columns):
+            if i >= len(header):
+                process_dict[f"unknown_column_{unknown_column}"] = column
+                unknown_column = unknown_column + 1
+            else:
+                process_dict[header[i]] = column
+        result.append(process_dict)
 
     column_mapping = {
         'handles': 'handles',
