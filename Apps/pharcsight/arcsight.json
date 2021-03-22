@@ -1,0 +1,1184 @@
+{
+    "appid": "049ce250-202a-4760-a9fc-fd40c8046954",
+    "name": "ArcSight ESM",
+    "description": "This app implements creating and updating cases on ArcSight",
+    "type": "siem",
+    "publisher": "Splunk Community",
+    "package_name": "phantom_arcsight",
+    "main_module": "arcsight_connector.pyc",
+    "app_version": "1.2.36",
+    "utctime_updated": "2019-03-04T22:02:20.000000Z",
+    "product_vendor": "HPE",
+    "product_name": "ArcSight ESM",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "2.7",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "logo": "logo_hewlettpackardenterprise.svg",
+    "logo_dark": "logo_hewlettpackardenterprise_dark.svg",
+    "configuration": {
+        "base_url": {
+            "data_type": "string",
+            "description": "Device Base URL",
+            "required": true,
+            "default": "https://arcsight.mycorp.com:8443",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
+            "order": 1,
+            "default": false
+        },
+        "username": {
+            "data_type": "string",
+            "description": "Username",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "data_type": "password",
+            "description": "Password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action runs a quick query on the server to check the connection and credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create ticket",
+            "description": "Create a case",
+            "verbose": "If the <b>parent_group</b> parameter is not specified, the action defaults to <i>/All Cases/All Cases</i>. ArcSight does not allow multiple cases with the same name to exist within the same group. This action will succeed if a case with the same name already exists within the given <b>parent_group</b>, however the data path <b>action_result.summary.case_created</b> will be set to <i>False</i> to denote that a case was not created.",
+            "type": "generic",
+            "identifier": "create_ticket",
+            "read_only": false,
+            "parameters": {
+                "parent_group": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Group",
+                    "primary": true,
+                    "default": "All Cases/All Cases",
+                    "contains": [
+                        "arcsight group"
+                    ]
+                },
+                "name": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Name",
+                    "required": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Create Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.parent_group",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.URI",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "URI"
+                },
+                {
+                    "data_path": "action_result.data.*.attributeInitializationInProgress",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.creatorName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deprecated",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.disabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.displayID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.inCache",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.inactive",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.initialized",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.isAdditionalLoaded",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.localID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modificationCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifierName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Name"
+                },
+                {
+                    "data_path": "action_result.data.*.numberOfOccurences",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reference.isModifiable",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.managerID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceType",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reportingLevel",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resourceid",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ],
+                    "column_order": 1,
+                    "column_name": "ID"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.typeName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.case_created",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.case_id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Message"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update ticket",
+            "description": "Update a case on ArcSight",
+            "verbose": "ArcSight uses a Resource ID (for example <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item, use a case's Resource ID as the <b>id</b> parameter value.<br>The <b>update_fields</b> parameter should be a valid JSON, the keys of which should contain the fields that need to be updated for the particular case. Note that the keys displayed in the ArcSight UI are different from the key names that should be specified in the <b>update_fields</b> parameters.<br>For example the <i>External ID</i> field is represented in the ArcSight system by the <i>externalID</i> key value. One way to figure the mapping is to connect to https://[arcsight_device]:8443/www/manager-service/services/CaseService?wsdl and look at the <i>Resource</i> and <i>Case</i> complexType values.<br>As an example, to set the <i>External ID</i> value of a case, use the <b>update_fields</b> parameter as <b>{\"externalID\": \"INC1231413\"}</b><br>The ArcSight API will not throw an error in case an invalid field is used in the <b>update_fields</b> JSON.",
+            "type": "generic",
+            "identifier": "update_ticket",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Case ID",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                "update_fields": {
+                    "description": "JSON containing field values",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Update Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ],
+                    "column_order": 1,
+                    "column_name": "ID"
+                },
+                {
+                    "data_path": "action_result.parameter.update_fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URI",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "URI"
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.actionsTaken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alias",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.associatedImpact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attackAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attackMechanism",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributeInitializationInProgress",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.consequenceSeverity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.creatorName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deprecated",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.disabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.displayID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.externalID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.frequency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.inCache",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.inactive",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.incidentSource1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.initialized",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.isAdditionalLoaded",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.localID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modificationCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifierName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Name"
+                },
+                {
+                    "data_path": "action_result.data.*.numberOfOccurences",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.operationalImpact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reference.isModifiable",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.managerID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceType",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reportingLevel",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resistance",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resourceid",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.securityClassification",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.securityClassificationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sensitivity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.stage",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "numeric",
+                    "column_order": 3,
+                    "column_name": "State"
+                },
+                {
+                    "data_path": "action_result.data.*.ticketType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.typeName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerability",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilityType1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilityType2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.case_id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ticket",
+            "description": "Get case information",
+            "verbose": "ArcSight uses a Resource ID (for example <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item, use a case's Resource ID as the <b>id</b> parameter value.",
+            "type": "investigate",
+            "identifier": "get_ticket",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Case ID",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ],
+                    "column_order": 1,
+                    "column_name": "ID"
+                },
+                {
+                    "data_path": "action_result.data.*.URI",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "URI"
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.actionsTaken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alias",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.associatedImpact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attackAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attackMechanism",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributeInitializationInProgress",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.consequenceSeverity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.createdTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.creatorName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deprecated",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.disabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.displayID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.externalID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.frequency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.inCache",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.inactive",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.incidentSource1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.initialized",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.isAdditionalLoaded",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.localID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modificationCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.hour",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.milliSecond",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.minute",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.month",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.second",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.timezoneID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTime.year",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifiedTimestamp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.modifierName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Name"
+                },
+                {
+                    "data_path": "action_result.data.*.numberOfOccurences",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.operationalImpact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reference.isModifiable",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.managerID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.referenceType",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reference.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reportingLevel",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.resistance",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resourceid",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.securityClassification",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.securityClassificationCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sensitivity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.stage",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "numeric",
+                    "column_order": 3,
+                    "column_name": "State"
+                },
+                {
+                    "data_path": "action_result.data.*.ticketType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.typeName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerability",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilityType1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerabilityType2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.case_id",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight case id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "Search for a text in resources",
+            "verbose": "This action implements the ArcSight console's search feature. It searches for the presence of text specified in the <b>query</b> parameter anywhere in the specified resource <b>type</b>.<br>Multiple search strings can be separated by spaces. Enclose the string in quotes to search for the exact string containing spaces. For example to search for resources containing <i>foo</i> <b>or</b> <i>bar</i>, use <b>foo bar</b>.<br>To search for the word foo followed by bar and separated by space, use the string <b>\"foo bar\"</b>.<br>ArcSight does searches on the <i>stem</i> of each word, for example, if the word searched is <i>going</i>, ArcSight will actually search for <i>go</i>. Same rules apply for phrases that are quoted, so if the <b>query</b> parameter is <b>\"going description\"</b>, the actual query executed will be <b>\"go descript\"</b>.<br>The action's widget displays the <b>Internal Query String</b> that ArcSight ends up using. Use this string to verify the text being searched. Using quotes around the query string makes the search more deterministic.<br>The Action Run dialog displays a drop-down list of possible values for the <b>type</b> parameter, however playbooks allow a user to specify values other than the one listed in the Action Run dialog.",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "type": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Resource type",
+                    "value_list": [
+                        "All",
+                        "ActiveChannel",
+                        "ActiveList",
+                        "Actor",
+                        "Agent",
+                        "Asset",
+                        "AssetRange",
+                        "Case",
+                        "CategoryModel",
+                        "Customer",
+                        "Dashboard",
+                        "DataMonitor",
+                        "Destination",
+                        "Field",
+                        "FieldSet",
+                        "File",
+                        "Filter",
+                        "KBase",
+                        "Network",
+                        "Rule",
+                        "SessionList",
+                        "UseCase",
+                        "User",
+                        "Vulnerability",
+                        "Zone"
+                    ],
+                    "default": "All"
+                },
+                "query": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Query Text",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "arcsight search string"
+                    ]
+                },
+                "range": {
+                    "description": "Items range to return (min_offset-max_offset)",
+                    "data_type": "string",
+                    "order": 2,
+                    "default": "0-10"
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Run Query",
+                "type": "custom",
+                "view": "arcsight_view.display_results",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "contains": [
+                        "arcsight search string"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.range",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.elapsed",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.hitCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.rewrittenQueryString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.searchHits.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.searchHits.*.score",
+                    "data_type": "numeric",
+                    "column_name": "URI",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.searchHits.*.uri",
+                    "data_type": "string",
+                    "column_name": "URI",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.searchHits.*.uuid",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 1,
+                    "contains": [
+                        "arcsight resource id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.statusString",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_items",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_items_returned",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
