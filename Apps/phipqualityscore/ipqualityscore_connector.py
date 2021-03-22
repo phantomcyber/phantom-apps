@@ -86,20 +86,38 @@ class IpqualityscoreConnector(BaseConnector):
         app_key = config['apikey']
         self.save_progress(IPQUALITYSCORE_MSG_CONNECTING)
         try:
-            response_code = requests.get(
-                IPQUALITYSCORE_API_TEST.format(apikey=app_key)).status_code
+            response = requests.get(
+                IPQUALITYSCORE_API_TEST.format(apikey=app_key))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print('test_asset_connectivity: {}'.format(err))
             err_msg = '{}. {}. Error Occurred: {}'.format(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST, IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY, err)
             return self.set_status(phantom.APP_ERROR, err_msg)
 
-        if response_code == 200:
+        if response.status_code == 509:
+            self.save_progress(IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+            self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
+            return self.set_status(phantom.APP_ERROR)
+        if response.status_code != 200:
+            self.save_progress('{}. {}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                        format(code=response.status_code), IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY))
+            self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
+            return self.set_status(phantom.APP_ERROR)
+
+        try:
+            result = response.json()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Response from server is not a valid JSON {}'.format(err))
+            self.save_progress('Response from server is not a valid JSON')
+            self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
+            return self.set_status(phantom.APP_ERROR)
+
+        if 'success' in result and result['success'] is True:
             self.save_progress(IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST)
             return self.set_status(phantom.APP_SUCCESS)
 
-        self.save_progress('{}. {}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
-                            format(code=response_code), IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY))
+        self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
         return self.set_status(phantom.APP_ERROR)
 
     def create_req_url(self, urltype, param, app_key):
