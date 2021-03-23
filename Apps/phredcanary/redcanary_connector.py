@@ -235,7 +235,7 @@ class RedCanaryConnector(BaseConnector):
             urls_list.append(
                 self._generate_full_url(base_url, params)
             )
-            count = count + 1
+            count += 1
 
         return urls_list
 
