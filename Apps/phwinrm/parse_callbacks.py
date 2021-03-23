@@ -116,8 +116,7 @@ def list_processes(action_result, response):
     if not lines:
         summary = action_result.update_summary({})
         summary['num_processes'] = 0
-        action_result.set_status(phantom.APP_ERROR, "No processes found")
-        return phantom.APP_ERROR
+        return action_result.set_status(phantom.APP_ERROR, "No processes found")
 
     column_headers = lines[0]
     column_headers_list = column_headers.split()
@@ -129,15 +128,13 @@ def list_processes(action_result, response):
     for line in processes:
         columns = line.split()
         process_dict = dict()
-        unknown_column = 0
         if len(columns) != len(column_headers_list):
             for index, (start, end) in enumerate(column_indexes):
                 if not line[start: end + 1].strip():
                     columns.insert(index, None)
         for i, column in enumerate(columns):
             if i >= len(header):
-                process_dict[f"unknown_column_{unknown_column}"] = column
-                unknown_column = unknown_column + 1
+                process_dict[f"unknown_column_{i - len(header)}"] = column
             else:
                 process_dict[header[i]] = column
         result.append(process_dict)
