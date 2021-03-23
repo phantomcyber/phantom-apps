@@ -95,11 +95,11 @@ class IpqualityscoreConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, err_msg)
 
         if response.status_code == 509:
-            self.save_progress(IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+            self.save_progress(IPQUALITYSCORE_SERVER_ERR_RATE_LIMIT)
             self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
             return self.set_status(phantom.APP_ERROR)
         if response.status_code != 200:
-            self.save_progress('{}. {}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+            self.save_progress('{}. {}'.format(IPQUALITYSCORE_SERVER_RETURNED_ERR_CODE.
                         format(code=response.status_code), IPQUALITYSCORE_MSG_CHECK_CONNECTIVITY))
             self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
             return self.set_status(phantom.APP_ERROR)
@@ -113,7 +113,7 @@ class IpqualityscoreConnector(BaseConnector):
             self.save_progress(IPQUALITYSCORE_ERR_CONNECTIVITY_TEST)
             return self.set_status(phantom.APP_ERROR)
 
-        if 'success' in result and result['success'] is True:
+        if result.get('success'):
             self.save_progress(IPQUALITYSCORE_SUCC_CONNECTIVITY_TEST)
             return self.set_status(phantom.APP_SUCCESS)
 
@@ -126,38 +126,29 @@ class IpqualityscoreConnector(BaseConnector):
                 apikey=app_key, url=urllib.parse.quote_plus(param['url']))
         elif urltype == "ip":
             req_url = IPQUALITYSCORE_API_IP_REPUTATION.format(
-                apikey=app_key, ip=(param['ip']))
+                apikey=app_key, ip=param['ip'])
         elif urltype == "email":
             req_url = IPQUALITYSCORE_API_EMAIL_VALIDATION.format(
                 apikey=app_key, email=param['email'])
         else:
             req_url = ''
         # optional parameters
-        optional_param = ''
-        if param.get('strictness') is not None:
-            optional_param = "{}&strictness={}".format(optional_param, param.get('strictness'))
-        if param.get('user_agent') is not None:
-            optional_param = "{}&user_agent={}".format(optional_param, param.get('user_agent'))
-        if param.get('user_language') is not None:
-            optional_param = "{}&user_language={}".format(optional_param, param.get('user_language'))
-        if param.get('fast') is not None:
-            optional_param = "{}&fast={}".format(optional_param, param.get('fast'))
-        if param.get('mobile') is not None:
-            optional_param = "{}&mobile={}".format(optional_param, param.get('mobile'))
-        if param.get('allow_public_access_points') is not None:
-            optional_param = "{}&allow_public_access_points={}".format(optional_param, param.get('allow_public_access_points'))
-        if param.get('lighter_penalties') is not None:
-            optional_param = "{}&lighter_penalties={}".format(optional_param, param.get('lighter_penalties'))
-        if param.get('transaction_strictness') is not None:
-            optional_param = "{}&transaction_strictness={}".format(optional_param, param.get('transaction_strictness'))
-        if param.get('timeout') is not None:
-            optional_param = "{}&timeout={}".format(optional_param, param.get('timeout'))
-        if param.get('suggest_domain') is not None:
-            optional_param = "{}&suggest_domain={}".format(optional_param, param.get('suggest_domain'))
-        if param.get('abuse_strictness') is not None:
-            optional_param = "{}&abuse_strictness={}".format(optional_param, param.get('abuse_strictness'))
-        if optional_param != '':
-            req_url = "{}?{}".format(req_url, optional_param[1:])
+        optional_params = {
+            'strictness': param.get('strictness'),
+            'user_agent': param.get('user_agent'),
+            'user_language': param.get('user_language'),
+            'fast': param.get('fast'),
+            'mobile': param.get('mobile'),
+            'allow_public_access_points': param.get('allow_public_access_points'),
+            'lighter_penalties': param.get('lighter_penalties'),
+            'transaction_strictness': param.get('transaction_strictness'),
+            'timeout': param.get('timeout'),
+            'suggest_domain': param.get('suggest_domain'),
+            'abuse_strictness': param.get('abuse_strictness'),
+        }
+        query_string = '&'.join(f'{k}={v}' for k, v in optional_params.items() if v is not None)
+        if query_string:
+            req_url = "{}?{}".format(req_url, query_string)
         self.debug_print('req_url {}'.format(req_url))
         return req_url
 
@@ -179,7 +170,7 @@ class IpqualityscoreConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print('check_url: {}'.format(err))
-            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERR, err))
 
         action_result.add_debug_data({'response_text': query_res.text
                                         if query_res else ''})
@@ -187,11 +178,11 @@ class IpqualityscoreConnector(BaseConnector):
         if query_res.status_code == 509:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+                IPQUALITYSCORE_SERVER_ERR_RATE_LIMIT)
         if query_res.status_code != 200:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                IPQUALITYSCORE_SERVER_RETURNED_ERR_CODE.
                 format(code=query_res.status_code))
         try:
             result = query_res.json()
@@ -253,17 +244,17 @@ class IpqualityscoreConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print('ip_reputation: {}'.format(err))
-            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERR, err))
 
         action_result.add_debug_data({'response_text': query_res.text
                                         if query_res else ''})
         self.debug_print('status_code {}'.format(query_res.status_code))
         if query_res.status_code == 509:
             return action_result.set_status(
-                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_ERR_RATE_LIMIT)
         if query_res.status_code != 200:
             return action_result.set_status(
-                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                phantom.APP_ERROR, IPQUALITYSCORE_SERVER_RETURNED_ERR_CODE.
                 format(code=query_res.status_code))
         try:
             result = query_res.json()
@@ -274,7 +265,7 @@ class IpqualityscoreConnector(BaseConnector):
                 phantom.APP_ERROR,
                 'Response from server is not a valid JSON')
 
-        if 'success' in result and result['success'] is True:
+        if result.get('success'):
             status = result['message']
             action_result.append_to_message(
                 IPQUALITYSCORE_SERVICE_SUCC_MSG)
@@ -329,7 +320,7 @@ class IpqualityscoreConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.debug_print('ip_reputation: {}'.format(err))
-            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERROR, err))
+            return action_result.set_status(phantom.APP_ERROR, '{}{}'.format(IPQUALITYSCORE_SERVER_CONNECTION_ERR, err))
 
         action_result.add_debug_data({'response_text': query_res.text
                                         if query_res else ''})
@@ -337,11 +328,11 @@ class IpqualityscoreConnector(BaseConnector):
         if query_res.status_code == 509:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                IPQUALITYSCORE_SERVER_ERROR_RATE_LIMIT)
+                IPQUALITYSCORE_SERVER_ERR_RATE_LIMIT)
         if query_res.status_code != 200:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                IPQUALITYSCORE_SERVER_RETURNED_ERROR_CODE.
+                IPQUALITYSCORE_SERVER_RETURNED_ERR_CODE.
                 format(code=query_res.status_code))
         try:
             result = query_res.json()
@@ -352,7 +343,7 @@ class IpqualityscoreConnector(BaseConnector):
                 phantom.APP_ERROR,
                 'Response from server is not a valid JSON')
 
-        if 'success' in result and result['success'] is True:
+        if result.get('success'):
             status = result['message']
             action_result.append_to_message(
                 IPQUALITYSCORE_SERVICE_SUCC_MSG)
