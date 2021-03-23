@@ -4,8 +4,8 @@
     "description": "This app integrates with Redmine to perform several ticket management actions",
     "type": "ticketing",
     "product_vendor": "Redmine",
-    "logo": "redmine.svg",
-    "logo_dark": "redmine_dark.svg",
+    "logo": "logo_redmine.svg",
+    "logo_dark": "logo_redmine_dark.svg",
     "product_name": "Redmine",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2021-02-25T10:35:44.521521Z",
     "package_name": "phantom_redmine",
-    "main_module": "redmine_connector.pyc",
+    "main_module": "redmine_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -56,7 +56,7 @@
             "order": 4
         },
         "custom_fields": {
-            "description": "Comma-separated list of custom Fields to extract from tickets",
+            "description": "Comma-separated list of custom fields to extract from tickets",
             "data_type": "string",
             "required": false,
             "order": 5
@@ -485,7 +485,7 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "default": "0",
+                    "default": 0,
                     "order": 1
                 },
                 "max_results": {
@@ -493,7 +493,7 @@
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "default": "50",
+                    "default": 50,
                     "order": 2
                 }
             },

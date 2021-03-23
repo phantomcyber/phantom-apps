@@ -13,7 +13,6 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 import phantom.rules as Rules
 
-# Usage of the consts file is recommended
 from redmine_consts import *
 import requests
 import json
@@ -44,6 +43,7 @@ class RedmineConnector(BaseConnector):
         self._password = None
         self._project_id = None
         self._custom_fields_list = None
+        self._verify_server_cert = None
 
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
@@ -77,6 +77,32 @@ class RedmineConnector(BaseConnector):
 
         return error_text
 
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, REDMINE_VALID_INT_MSG.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, REDMINE_VALID_INT_MSG.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, REDMINE_NON_NEG_INT_MSG.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, REDMINE_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     # HTTP Utility Methods
 
     def _process_empty_response(self, response, action_result):
@@ -85,7 +111,7 @@ class RedmineConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, REDMINE_ERR_EMPTY_RESPONSE.format(code=response.status_code)
             ),
             None,
         )
@@ -96,12 +122,15 @@ class RedmineConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = "\n".join(split_lines)
         except:
-            error_text = "Cannot parse error details"
+            error_text = REDMINE_UNABLE_TO_PARSE_ERR_DETAILS
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(
             status_code, error_text
@@ -111,17 +140,17 @@ class RedmineConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
-        # Try a json parse
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
             try:
                 resp_json = r.json()
             except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
                 return RetVal(
                     action_result.set_status(
                         phantom.APP_ERROR,
-                        "Unable to parse JSON response. Error: {0}".format(str(e)),
+                        REDMINE_ERR_UNABLE_TO_PARSE_JSON_RESPONSE.format(error=error_msg),
                     ),
                     None,
                 )
@@ -169,8 +198,6 @@ class RedmineConnector(BaseConnector):
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
-        config = self.get_config()
-
         resp_json = None
 
         try:
@@ -184,20 +211,31 @@ class RedmineConnector(BaseConnector):
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = f"{self._base_url}{endpoint}"
 
         try:
             r = request_func(
                 url,
                 auth=(self._username, self._password),
-                verify=config.get("verify_server_cert", False),
+                verify=self._verify_server_cert,
                 **kwargs,
             )
+        except requests.exceptions.InvalidURL as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_INVALID_URL), resp_json)
+        except requests.exceptions.ConnectionError as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_CONNECTION_REFUSED), resp_json)
+        except requests.exceptions.InvalidSchema as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_INVALID_SCHEMA), resp_json)
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(self._get_error_message_from_exception(e))
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(str(e)),
+                    "Error Connecting to server. Details: {0}".format(error_msg),
                 ),
                 resp_json,
             )
@@ -208,7 +246,7 @@ class RedmineConnector(BaseConnector):
 
     def _save_ticket_container(self, action_result, ticket):
         """
-        Save a ticket retrieved from redmine to a corresponding phantom container.
+        Save a ticket retrieved from Redmine to a corresponding phantom container.
         If a container already exists, it is updated.
         """
 
@@ -256,7 +294,8 @@ class RedmineConnector(BaseConnector):
             r = requests.get(url, verify=False)
             resp_json = r.json()
         except Exception as e:
-            self.debug_print("Unable to query Phantom for containers: ", e)
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(f"Unable to query Phantom for containers: {error_msg}")
             return
 
         if resp_json.get("count", 0) <= 0:
@@ -265,9 +304,10 @@ class RedmineConnector(BaseConnector):
         else:
             try:
                 container_id = resp_json.get("data", [])[0]["id"]
-                self.debug_print(f"Found container id:{container_id}")
+                self.debug_print(f"Found container id: {container_id}")
             except Exception as e:
-                self.debug_print("Container results are not proper", e)
+                error_msg = self._get_error_message_from_exception(e)
+                self.debug_print(f"Container results are not proper: {error_msg}")
                 return
 
             return container_id
@@ -350,18 +390,16 @@ class RedmineConnector(BaseConnector):
         qs = {"updated_on": f">={date}", "limit": limit, "include": "attachments"}
 
         ret_val, response = self._make_rest_call(
-            "/issues.json", action_result, method="get", params=qs
+            "/issues.json", action_result, params=qs
         )
 
         if phantom.is_fail(ret_val):
             message = action_result.get_message()
-            return (
-                RetVal(
-                    action_result.set_status(phantom.APP_ERROR),
-                    f"Could not retrieve tickets: {message}",
-                ),
-                None,
-            )
+            return RetVal(
+                    action_result.set_status(phantom.APP_ERROR,
+                    REDMINE_ERR_RETRIEVE_TICKETS.format(message=message)),
+                    None
+                )
 
         return ret_val, response["issues"]
 
@@ -373,7 +411,7 @@ class RedmineConnector(BaseConnector):
         )
         if phantom.is_fail(ret_val):
             return action_result.set_status(
-                phantom.APP_ERROR, "Could not retrieve ticket"
+                phantom.APP_ERROR, REDMINE_ERR_RETRIEVE_TICKET
             )
         return ret_val, response
 
@@ -386,18 +424,24 @@ class RedmineConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
-                phantom.APP_ERROR, f"Could not retrieve definitions on {endpoint}"
+                phantom.APP_ERROR, REDMINE_ERR_RETRIEVE_DEFINITIONS.format(endpoint=endpoint)
             )
 
-        enum_values = response[enum_key]
-        enum_obj = next(
-            (s for s in enum_values if s["name"].lower() == enum.lower()), None
-        )
+        try:
+            enum_values = response[enum_key]
+            enum_obj = next(
+                (s for s in enum_values if s["name"].lower() == enum.lower()), None
+            )
+        except Exception as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return action_result.set_status(
+                phantom.APP_ERROR, REDMINE_ERR_PROCESSING_RESPONSE
+            )
 
         if not enum_obj:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                f"Could not find mapping for provided value on {endpoint}",
+                REDMINE_ERR_MAPPING_NOT_FOUND.format(endpoint=endpoint),
             )
 
         return enum_obj["id"]
@@ -414,22 +458,21 @@ class RedmineConnector(BaseConnector):
                 )
             )
         except requests.exceptions.HTTPError:
-            error_message = "Invalid Vault ID: %s" % (vault_id)
-            return action_result.set_status(phantom.APP_ERROR, error_message)
+            return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_INVALID_VAULT_ID.format(vault_id=vault_id))
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, "Error opening file. {}".format(err)
+                phantom.APP_ERROR, REDMINE_ERR_OPENING_FILE.format(error=error_msg)
             )
 
         try:
             vault_info = list(vault_info)
             file_info = vault_info[0]
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while getting 'File Info'. {}".format(err),
+                REDMINE_ERR_GETTING_FILE_INFO.format(error=error_msg),
             )
 
         file_path = file_info["path"]
@@ -448,7 +491,7 @@ class RedmineConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
-                phantom.APP_ERROR, "Could not upload attachment"
+                phantom.APP_ERROR, REDMINE_ERR_UPLOAD_ATTACHMENT
             )
 
         upload = {
@@ -462,27 +505,17 @@ class RedmineConnector(BaseConnector):
     # Action Handlers
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
+
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to endpoint")
-        # make rest call
-        ret_val, response = self._make_rest_call(
+        ret_val, _ = self._make_rest_call(
             "/my/account.json", action_result, params=None, headers=None
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.set_status(phantom.APP_ERROR, "Could not connect")
+            self.save_progress("Test Connectivity Failed")
+            return action_result.get_status()
 
-        # Return success
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -500,7 +533,12 @@ class RedmineConnector(BaseConnector):
 
         if self.is_poll_now():
             self.debug_print("Run Mode: Poll Now")
+
+            # Integer validation for 'maximum containers' configuration parameter
             max_tickets = param[phantom.APP_JSON_CONTAINER_COUNT]
+            ret_val, max_tickets = self._validate_integer(action_result, max_tickets, REDMINE_CONTAINER_COUNT_KEY)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             last_run = backfill
         else:
             if not last_run:
@@ -517,14 +555,16 @@ class RedmineConnector(BaseConnector):
             ret_val, tickets = self._retrieve_tickets(
                 action_result, last_run, max_tickets
             )
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             action_result.set_status(
-                phantom.APP_ERROR, "Error while fetching tickets: {}".format(str(e))
+                phantom.APP_ERROR, REDMINE_ERR_FETCHING_TICKETS.format(error=error_msg)
             )
 
         self.debug_print(f"Total tickets fetched: {len(tickets)}")
         self.save_progress(f"Total tickets fetched: {len(tickets)}")
-
         for ticket in tickets:
             self._save_ticket_container(action_result, ticket)
 
@@ -540,8 +580,8 @@ class RedmineConnector(BaseConnector):
         # Parameters
         subject = param["subject"]
         description = param["description"]
-        priority = param.get("priority", None)
-        tracker = param.get("tracker", None)
+        priority = param.get("priority")
+        tracker = param.get("tracker")
         custom_fields = param.get("custom_fields", "{}")
 
         payload = {
@@ -555,9 +595,9 @@ class RedmineConnector(BaseConnector):
         try:
             parsed_custom_fields = json.loads(custom_fields)
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, f"Could not parse custom fields: {err}"
+                phantom.APP_ERROR, REDMINE_ERR_PARSING_CUSTOM_FIELDS.format(error=error_msg)
             )
 
         payload["issue"]["custom_fields"] = parsed_custom_fields
@@ -585,13 +625,13 @@ class RedmineConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            return action_result.get_status(
-                phantom.APP_ERROR, "Could not create ticket"
+            return action_result.set_status(
+                phantom.APP_ERROR, REDMINE_ERR_CREATE_TICKET
             )
 
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_CREATE_TICKET)
 
     def _handle_update_ticket(self, param):
         """Updates a ticket bases on a provided JSON dictionary. Also allows attaching files from vault"""
@@ -608,9 +648,9 @@ class RedmineConnector(BaseConnector):
         try:
             update_fields = json.loads(update_fields)
         except Exception as e:
-            err = self._get_error_message_from_exception(e)
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(
-                phantom.APP_ERROR, f"Could not parse update_fields into JSON: {err}"
+                phantom.APP_ERROR, REDMINE_ERR_PARSE_UPDATE_FIELDS.format(error=error_msg)
             )
 
         payload = {"issue": {}}
@@ -632,7 +672,7 @@ class RedmineConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to update ticket")
+            return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_UPDATE_TICKET)
 
         ret_val, response = self._retrieve_ticket(action_result, id)
         if phantom.is_fail(ret_val):
@@ -641,7 +681,7 @@ class RedmineConnector(BaseConnector):
         # Action Result
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_UPDATE_TICKET)
 
     def _handle_add_comment(self, param):
         """Creates a comment on an existing ticket"""
@@ -666,7 +706,7 @@ class RedmineConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, f"Could not add comment to ticket {id}")
+            return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_ADD_COMMENT.format(id=id))
 
         ret_val, response = self._retrieve_ticket(action_result, id)
         if phantom.is_fail(ret_val):
@@ -675,7 +715,7 @@ class RedmineConnector(BaseConnector):
         # Action Result
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_ADD_COMMENT)
 
     def _handle_list_tickets(self, param):
         """Retrieves a list of tickets"""
@@ -686,8 +726,18 @@ class RedmineConnector(BaseConnector):
 
         # Parameters
         query = param.get("query", "")
+
+        # Integer validation for 'start_index' action parameter
         start_index = param.get("start_index", 0)
+        ret_val, start_index = self._validate_integer(action_result, start_index, REDMINE_START_INDEX_KEY, allow_zero=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Integer validation for 'max_results' action parameter
         max_results = param.get("max_results", 100)
+        ret_val, max_results = self._validate_integer(action_result, max_results, REDMINE_MAX_RESULTS_KEY, allow_zero=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         params = {
             "offset": start_index,
@@ -725,13 +775,13 @@ class RedmineConnector(BaseConnector):
         ret_val, response = self._retrieve_ticket(action_result, id)
         if phantom.is_fail(ret_val):
             return action_result.set_status(
-                phantom.APP_ERROR, f"Could not get ticket {id}"
+                phantom.APP_ERROR, REDMINE_ERR_GET_TICKET.format(id=id)
             )
 
         # Action Result
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_GET_TICKET)
 
     def _handle_delete_ticket(self, param):
         """Deletes a ticket in Redmine"""
@@ -753,16 +803,16 @@ class RedmineConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
-                phantom.APP_ERROR, f"Could not delete ticket {id}"
+                phantom.APP_ERROR, REDMINE_ERR_DELETE_TICKET.format(id=id)
             )
 
         # Action Result
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_DELETE_TICKET)
 
     def _handle_set_status(self, param):
-        """Updates a tickets status in Redmin"""
+        """Updates a ticket's status in Redmine"""
         self.save_progress(
             "In action handler for: {0}".format(self.get_action_identifier())
         )
@@ -803,7 +853,7 @@ class RedmineConnector(BaseConnector):
         # Action Result
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, REDMINE_SUCC_SET_STATUS)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -811,7 +861,7 @@ class RedmineConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print(f"action_id: {action_id}")
 
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
@@ -849,29 +899,23 @@ class RedmineConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
 
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get("base_url")
+        self._base_url = config["base_url"].strip('/')
         self._username = config.get("username")
         self._password = config.get("password")
-        self._project_id = config.get("project_id")
+        self._project_id = config["project_id"]
+        self._verify_server_cert = config.get('verify_server_cert', False)
+        custom_fields = config.get("custom_fields")
 
-        if config.get("custom_fields"):
-            self._custom_fields_list = config.get("custom_fields").split(",")
+        if custom_fields:
+            self._custom_fields_list = [field.strip() for field in custom_fields.split(',') if field.strip()]
+            if not self._custom_fields_list:
+                return self.set_status(phantom.APP_ERROR, REDMINE_ERR_INVALID_CUSTOM_FIELDS)
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
-        #
         new_state = {"last_run": datetime.now().isoformat()}
         self.save_state(new_state)
         return phantom.APP_SUCCESS
