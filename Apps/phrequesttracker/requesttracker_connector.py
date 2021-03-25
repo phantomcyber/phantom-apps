@@ -14,14 +14,9 @@ from phantom.vault import Vault
 # THIS Connector imports
 from requesttracker_consts import *
 
-from urllib.parse import quote_plus
 import requests
 import json
 import re
-
-# from rtkit.errors import RTResourceError
-
-import tempfile
 
 
 class RetVal(tuple):
@@ -46,12 +41,11 @@ class RTConnector(BaseConnector):
         # Call the BaseConnectors init first
         super(RTConnector, self).__init__()
 
-        self._host =  None
+        self._host = None
         self._session = None
         self._base_url = None
         self._username = None
         self._password = None
-
 
     def initialize(self):
 
@@ -83,7 +77,7 @@ class RTConnector(BaseConnector):
 
         # A text reponse is expected for every action
         response_text = response.text
-        status_code = int(re.findall('\d{3}', response_text[:response_text.index('\n')])[0])
+        status_code = int(re.findall(r'\d{3}', response_text[:response_text.index('\n')])[0])
 
         self.debug_print(status_code)
         self.debug_print(response_text)
@@ -266,7 +260,7 @@ class RTConnector(BaseConnector):
             try:
                 fields = json.loads(str(fields))
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Fields paramter is not valid JSON')
+                return action_result.set_status(phantom.APP_ERROR, 'Fields paramter is not valid JSON', e)
         else:
             fields = {}
 
@@ -326,7 +320,7 @@ class RTConnector(BaseConnector):
         content = {'content':
             'Queue: {0}\nSubject: {1}\nText: {2} \n \n ---- \n {3}{4}\nPriority: {5}\nOwner: {6}'.format(
                 queue, subject, text, RT_TICKET_FOOTNOTE, self.get_container_id(), priority, owner)
-            }
+        }
 
         ret_val, resp_text = self._make_rest_call('ticket/new', action_result, data=content, method='post')
 
@@ -345,7 +339,7 @@ class RTConnector(BaseConnector):
                 if 'Unknown field' in line:
                     self.debug_print('WARNING: {0} is an unknown field and was not included in ticket creation'.format(line.split(':')[0][2:]))
                 else:
-                    ticket_id = re.findall('\d+', line)[0]
+                    ticket_id = re.findall(r'\d+', line)[0]
 
         if not ticket_id:
             return action_result.set_status(phantom.APP_ERROR, "Ticket creation failed")
@@ -523,7 +517,7 @@ class RTConnector(BaseConnector):
             data = {}
 
             data['ticket_id'] = ticket_id
-            data['attachment_id'] = re.findall('\d+:', attachment)[0][:-1]
+            data['attachment_id'] = re.findall(r'\d+:', attachment)[0][:-1]
 
             start_path = attachment.find(':') + 2
             end_path = len(attachment) - attachment[::-1].find('(') - 2
@@ -571,13 +565,12 @@ class RTConnector(BaseConnector):
         filename_index = resp_text.find('filename')
 
         if filename_index == -1:
-            filename = "noname"
+            file_name = "noname"
             self.debug_print("Filename not found in header, setting to noname")
-
-        start_filename = resp_text.find('=', filename_index) + 2
-        end_filename = resp_text.find('\n', filename_index) - 1
-
-        file_name = resp_text[start_filename: end_filename]
+        else:
+            start_filename = resp_text.find('=', filename_index) + 2
+            end_filename = resp_text.find('\n', filename_index) - 1
+            file_name = resp_text[start_filename: end_filename]
 
         if not file_name:
             file_name = "noname"
@@ -623,7 +616,7 @@ class RTConnector(BaseConnector):
         _, _, file_info = vault_info(vault_id=vault_id, container_id=self.get_container_id())
 
         if len(file_info) == 0:
-            return action_result.set_status(phantom.APP_ERROR, "File not found in vault after adding".format(vault_id))
+            return action_result.set_status(phantom.APP_ERROR, "File not found in vault after adding")
 
         file_info = file_info[0]
 
@@ -659,7 +652,7 @@ class RTConnector(BaseConnector):
         _, _, file_info = vault_info(vault_id=vault_id, container_id=self.get_container_id())
 
         if not file_info:
-            return action_result.set_status(phantom.APP_ERROR, "Vault ID is invalid. Vault file not found".format(vault_id))
+            return action_result.set_status(phantom.APP_ERROR, "Vault ID is invalid. Vault file not found")
 
         file_info = file_info[0]
 

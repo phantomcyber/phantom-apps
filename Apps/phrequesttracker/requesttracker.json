@@ -542,6 +542,7 @@
                     "contains": [
                         "rt ticket id"
                     ],
+                    "required": true,
                     "primary": true
                 }
             },
@@ -972,6 +973,10 @@
                     "contains": [
                         "vault id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data",
