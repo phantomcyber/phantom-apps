@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2021-02-25T10:35:44.521521Z",
     "package_name": "phantom_redmine",
-    "main_module": "redmine_connector.py",
+    "main_module": "redmine_connector.pyc",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -139,14 +139,14 @@
                     "order": 2
                 },
                 "tracker": {
-                    "description": "Priority of the ticket",
+                    "description": "Tracker type the ticket",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
                     "order": 3
                 },
                 "custom_fields": {
-                    "description": "JSON containing field values",
+                    "description": "JSON array containing custom field objects containing custom field id and value to set",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
