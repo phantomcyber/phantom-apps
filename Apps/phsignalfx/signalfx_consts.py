@@ -12,7 +12,8 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 
 # Integer validation constants
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
-NON_NEGATIVE_INTEGER_MSG = "Please provide a valid positive integer value in the {key}"
+POSITIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {key}"
+NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
 
 # page size
 PAGE_SIZE = 100

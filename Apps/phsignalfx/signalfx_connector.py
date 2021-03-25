@@ -82,7 +82,7 @@ class SignalfxConnector(BaseConnector):
                 if parameter < 0:
                     return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
             else:
-                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+                return action_result.set_status(phantom.APP_ERROR, POSITIVE_INTEGER_MSG.format(key=key)), None
 
         return phantom.APP_SUCCESS, parameter
 
@@ -92,7 +92,7 @@ class SignalfxConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Status code: {}.Empty response and no information in the header".format(response.status_code)
+                phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -200,6 +200,9 @@ class SignalfxConnector(BaseConnector):
         except requests.exceptions.InvalidURL:
             error_message = 'Error connecting to server. Invalid URL %s' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection refused from the server for URL: %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             error_message = "Error Connecting to server. {0}".format(err)
@@ -211,11 +214,6 @@ class SignalfxConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to endpoint")
 
         # make rest call
@@ -224,8 +222,6 @@ class SignalfxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
@@ -247,7 +243,7 @@ class SignalfxConnector(BaseConnector):
         }
 
         ret_val, response = self._make_rest_call(
-            '/v2/dimension', action_result, method="get", params=params, headers=self._headers
+            '/v2/dimension', action_result, params=params, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
@@ -255,10 +251,6 @@ class SignalfxConnector(BaseConnector):
 
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
 
         return action_result.set_status(phantom.APP_SUCCESS, "Run Query action executed successfully")
 
@@ -288,7 +280,7 @@ class SignalfxConnector(BaseConnector):
 
         endpoint = "{0}{1}".format('/v2/incident/', param['incidentid'])
         ret_val, response = self._make_rest_call(
-            endpoint, action_result, method="get", headers=self._headers
+            endpoint, action_result, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
@@ -306,7 +298,7 @@ class SignalfxConnector(BaseConnector):
             params['offset'] = offset
 
             ret_val, response = self._make_rest_call(
-                '/v2/incident', action_result, method="get", headers=self._headers, params=params
+                '/v2/incident', action_result, headers=self._headers, params=params
             )
             if phantom.is_fail(ret_val):
                 return RetVal(action_result.get_status(), None)
@@ -337,8 +329,7 @@ class SignalfxConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         params = {}
-        includeResolved = param.get('include_resolved', False)
-        params["includeResolved"] = includeResolved
+        params["includeResolved"] = param.get('include_resolved', False)
         limit = param.get('limit', PAGE_SIZE)
 
         # Validate 'limit' action parameter
@@ -368,7 +359,7 @@ class SignalfxConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", action_id)
+        self.debug_print("action_id: {}".format(action_id))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -394,22 +385,12 @@ class SignalfxConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
 
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url').strip("/")  # myNote: get from siglalfx.json
-        self._token = config.get('token')
+        self._base_url = config['base_url'].strip("/")  # myNote: get from siglalfx.json
+        self._token = config['token']
         self._headers = {
             'X-SF-TOKEN': self._token
         }
-
         return phantom.APP_SUCCESS
 
     def finalize(self):

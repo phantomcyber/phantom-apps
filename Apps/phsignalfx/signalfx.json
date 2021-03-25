@@ -4,8 +4,8 @@
     "description": "This App uses the Splunk Infrastructure Monitoring (SignalFx) API to retrieve and send data",
     "type": "endpoint",
     "product_vendor": "Splunk",
-    "logo": "logo_signalfx.svg",
-    "logo_dark": "logo_signalfx_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "product_name": "SignalFx",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -455,7 +455,7 @@
                     "contains": [
                         "signalfx incidentid"
                     ],
-                    "column_name": "Incidentid",
+                    "column_name": "Incident ID",
                     "column_order": 0
                 },
                 {
@@ -543,7 +543,7 @@
                     "contains": [
                         "signalfx incidentid"
                     ],
-                    "column_name": "Incidentid",
+                    "column_name": "Incident ID",
                     "column_order": 0
                 },
                 {
