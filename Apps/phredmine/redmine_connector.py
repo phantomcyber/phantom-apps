@@ -235,7 +235,7 @@ class RedmineConnector(BaseConnector):
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(error_msg),
+                    REDMINE_ERR_CONNECTING_TO_SERVER.format(error=error_msg),
                 ),
                 resp_json,
             )
