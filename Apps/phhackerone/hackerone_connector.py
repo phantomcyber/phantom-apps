@@ -31,8 +31,9 @@ class HackerOneConnector(BaseConnector):
 
         if self.is_polling_action:
             self.debug_print('HackerOne', message)
+            self.save_progress( message )
         else:
-            self.debug_print(message)
+            self.save_progress( message )
 
     def _validate_integer(self, action_result, parameter, key):
         if parameter is not None:
@@ -59,6 +60,7 @@ class HackerOneConnector(BaseConnector):
         try:
             if input_str:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+                input_str = input_str.decode('utf-8')
         except:
             self.debug_print("Error occurred while encoding input string")
 
@@ -516,11 +518,10 @@ class HackerOneConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
 
     def _test(self, action_result, param):
-        self.__print('_test()')
         try:
             config = self.get_config()
             url_params = {'filter[program][]': self._handle_unicode_for_input_str(config['program_name']), 'page[size]': 1}
-            reports, _ = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
+            reports = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
             if reports:
                 self.__print('Successfully connected to HackerOne')
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully connected to HackerOne')
@@ -676,14 +677,14 @@ if __name__ == '__main__':
     import pudb
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print( 'No test json specified as input' )
         exit(0)
     with open(sys.argv[1]) as (f):
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print( json.dumps(in_json, indent=4) )
         connector = HackerOneConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print( json.dumps(json.loads(ret_val), indent=4) )
     exit(0)

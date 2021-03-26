@@ -1,5 +1,4 @@
 {
-
     "id": "id",
     "attributes": {
         "title": "title",
@@ -112,6 +111,34 @@
                         "file_size": "file_size",
                         "created_at": "created_at",
                         "expiring_url": "expiring_url"
+                    }
+                }
+            ]
+        },
+        "custom_field_values": {
+            "data": [
+                "custom_fields",
+                {
+                    "id": "id",
+                    "attributes": {
+                        "value": "value",
+                        "created_at": "created_at",
+                        "updated_at": "updated_at"
+                    },
+                    "relationships": {
+                        "custom_field_attribute": {
+                            "data": {
+                                "attributes": {
+                                    "field_type": "type",
+                                    "label": "label",
+                                    "internal": "is_internal",
+                                    "required": "is_required",
+                                    "regex": "regex",
+                                    "helper_text": "helper_text",
+                                    "checkbox_text": "checkbox_text"
+                                }
+                            }
+                        }
                     }
                 }
             ]
