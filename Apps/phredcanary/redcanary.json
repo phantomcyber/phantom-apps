@@ -1,0 +1,56 @@
+{
+    "appid": "02fcd21a-6c1e-4bd5-9126-dad78a6a4218",
+    "name": "Red Canary",
+    "description": "Integrates with Red Canary's MDR platform",
+    "type": "investigative",
+    "product_vendor": "Red Canary",
+    "logo": "logo_redcanary.svg",
+    "logo_dark": "logo_redcanary_dark.svg",
+    "product_name": "Red Canary",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Red Canary",
+    "license": "Copyright (c) Red Canary, 2021",
+    "app_version": "1.0.3",
+    "utctime_updated": "2021-03-25T10:13:38.000000Z",
+    "package_name": "phantom_redcanary",
+    "main_module": "redcanary_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "URL": {
+            "description": "Red Canary instance URL (ex. https://domain.my.redcanary.co)",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "API Key": {
+            "description": "Red Canary API authentication key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Subscribe to Red Canary detections",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
