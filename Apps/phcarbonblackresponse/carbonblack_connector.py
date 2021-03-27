@@ -528,6 +528,8 @@ class CarbonblackConnector(BaseConnector):
                 msg = CARBONBLACK_ERR_FILE_EXISTS + msg
             if result_code == 2147942403:
                 msg = "Windows cannot find specified path " + msg
+            if result_code == 2147942417:
+                msg = "Invalid destination file path " + msg
             return (action_result.set_status(phantom.APP_ERROR, msg), resp)
 
         return (phantom.APP_SUCCESS, resp)
@@ -1182,10 +1184,13 @@ class CarbonblackConnector(BaseConnector):
 
             zip_file_path = "{0}/{1}.zip".format(local_dir, file_source)
 
-            # open and download the file
-            with open(zip_file_path, 'wb') as fd:
-                for chunk in response.iter_content(chunk_size=128):
-                    fd.write(chunk)
+            try:
+                # open and download the file
+                with open(zip_file_path, 'wb') as fd:
+                    for chunk in response.iter_content(chunk_size=128):
+                        fd.write(chunk)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Invalid file source")
 
             file_name = file_source.replace('\\\\', '\\')
 
