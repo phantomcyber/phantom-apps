@@ -11,6 +11,7 @@ import datetime
 import requests
 import json
 import os
+import re
 from bs4 import UnicodeDammit
 
 
@@ -517,7 +518,32 @@ class HackerOneConnector(BaseConnector):
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
 
-    def _test(self, action_result, param):
+    def _extract_urls( self, source ):
+        artifacts = []
+        url_pattern = re.compile( r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' )
+        domain_pattern = re.compile( r'^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)' )
+        invalid_pattern = re.compile( r'[^a-zA-Z0-9\.\-]' )
+        for value in re.finditer( url_pattern, source):
+            url = value.group( 0 )
+            domain = None
+            for match in re.finditer( domain_pattern, url ):
+                domain = match.group( 1 )
+                break
+            if domain and len( re.findall( invalid_pattern, domain ) ) == 0:
+                artifact = {}
+                artifact['label'] = 'extracted url'
+                artifact['name'] = 'extracted url'
+                artifact['source_data_identifier'] = 'Hacker1 url - {0}'.format( url[:60] )
+                artifact['severity'] = 'medium'
+                cef = {}
+                cef['requestURL'] = url
+                cef['domain'] = domain
+                artifact['cef'] = cef
+                artifacts.append( artifact )
+        return artifacts
+
+    def _test( self, action_result, param ):
+        self.__print( '_test()' )
         try:
             config = self.get_config()
             url_params = {'filter[program][]': self._handle_unicode_for_input_str(config['program_name']), 'page[size]': 1}
@@ -534,9 +560,18 @@ class HackerOneConnector(BaseConnector):
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to connect to HackerOne')
 
-    def _on_poll(self, param):
-        self.__print('_on_poll()')
-        login_url = BaseConnector._get_phantom_base_url()
+    def _on_poll( self, param ):
+        self.__print( '_on_poll()' )
+        current_time_marker = datetime.datetime.now()
+        previous_time_marker = None
+        self.load_state()
+        current_state = self.get_state()
+        try:
+            previous_time_marker = current_state['time_marker']
+        except:
+            current_state['time_marker'] = current_time_marker.strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
+
+        login_url = self._get_phantom_base_url()
         config = self.get_config()
         # Integer Validation for 'container_count' parameter
         hours = param.get('container_count')
@@ -549,9 +584,7 @@ class HackerOneConnector(BaseConnector):
             self.debug_print("There might be timezone variance. Please check for the timezone variance.")
             date = (datetime.datetime.now() - datetime.timedelta(hours=hours)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         else:
-            m = param.get('start_time')
-            s = m / 1000
-            date = datetime.datetime.fromtimestamp(s).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            date = previous_time_marker
         program = config['program_name']
         try:
             state = config['state_filter']
@@ -565,10 +598,9 @@ class HackerOneConnector(BaseConnector):
         reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
         if reports is not None:
             self.__print('{0} reports were returned'.format(len(reports)))
-            self.save_progress('{0} reports were returned'.format(len(reports)))
             for report in reports:
                 existing_container = None
-                container_name = 'H1 {0}: {1}'.format(report['id'], report['title'])
+                container_name = 'H1 {0}: {1}'.format( report['id'], re.sub(r'[^\x00-\x7f]', r'', report['title']) )
                 endpoint = login_url + '/rest/container?_filter_name__startswith="H1 {0}"'.format(report['id'])
                 containers = self._get_phantom_data(endpoint)
                 if containers['count'] > 0:
@@ -606,6 +638,12 @@ class HackerOneConnector(BaseConnector):
                         artifacts.append(artifact)
                 except:
                     pass
+                try:
+                    url_artifacts = self._extract_urls( report['vulnerability_information'] )
+                    for artifact in url_artifacts:
+                        artifacts.append( artifact )
+                except:
+                    pass
                 if not existing_container:
                     container['artifacts'] = artifacts
                     self.save_container(container)
@@ -613,27 +651,34 @@ class HackerOneConnector(BaseConnector):
                     endpoint = login_url + '/rest/container/{0}/artifacts?page_size=0'.format(existing_container)
                     container_artifacts = self._get_phantom_data(endpoint)['data']
                     duplicates = {}
+                    updated_report = False
                     for container_artifact in container_artifacts:
-                        duplicates[container_artifact['name']] = container_artifact['id']
+                        if 'report' == container_artifact['label']:
+                            endpoint = 'https://127.0.0.1/rest/artifact/{0}'.format( container_artifact['id'] )
+                            self._delete_phantom_data( endpoint )
+                            updated_report = True
+                        else:
+                            duplicates[container_artifact['name']] = container_artifact['id']
+                    added_report = False
                     for artifact in artifacts:
                         if 'report' == artifact['label']:
-                            if artifact['name'] in duplicates:
-                                artifact['cef']['updated'] = True
+                            if not added_report:
+                                artifact['cef']['updated'] = updated_report
                                 artifact['container_id'] = existing_container
                                 artifact['run_automation'] = True
-                                self.debug_print("There might be timezone variance. Please check for the timezone variance.")
-                                artifact['source_data_identifier'] = '{0}-{1}'.format(report['id'], datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S'))
-                                endpoint = login_url + '/rest/artifact/{0}'.format(duplicates[artifact['name']])
-                                self._delete_phantom_data(endpoint)
-                                status, message, artid = self.save_artifact(artifact)
-                                self.__print(status)
-                                self.__print(message)
-                                self.__print(artid)
+                                artifact['source_data_identifier'] = '{0}-HackerOne-Report'.format( report['id'] )
+                                status, message, artid = self.save_artifact( artifact )
+                                self.__print( status )
+                                self.__print( message )
+                                self.__print( artid )
+                                added_report = True
                         if artifact['name'] not in duplicates:
                             artifact['container_id'] = existing_container
-                            self.save_artifact(artifact)
-                self.__print('Successfully stored report container')
-                self.save_progress('Successfully stored report container')
+                            self.save_artifact( artifact )
+                self.__print( 'Successfully stored report container' )
+
+            current_state['time_marker'] = current_time_marker.strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
+            self.save_state( current_state )
             return self.set_status(phantom.APP_SUCCESS, 'Successfully stored report data')
         else:
             self.__print('Failed to connect to HackerOne')
