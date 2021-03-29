@@ -1092,15 +1092,25 @@
                 },
                 {
                     "data_path": "action_result.summary.meeting_updated",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.password",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "xFghbsuHndTYGF"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.waiting_room",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1125,7 +1135,7 @@
         {
             "action": "delete meeting",
             "description": "Deletes zoom meeting",
-            "verbose": "Deletes previous and future zoom meeting.",
+            "verbose": "Deletes previous and future zoom meetings.",
             "type": "generic",
             "identifier": "delete_meeting",
             "read_only": false,
@@ -1171,7 +1181,11 @@
                 },
                 {
                     "data_path": "action_result.summary.meeting_deleted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1321,23 +1335,38 @@
                 },
                 {
                     "data_path": "action_result.summary.pmi_password",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.require_password_for_instant_meetings",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.require_password_for_personal_meeting_instance",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.require_password_for_scheduling_new_meetings",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.waiting_room",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
