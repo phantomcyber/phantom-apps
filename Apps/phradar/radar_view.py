@@ -34,5 +34,8 @@ def process_results(result):
     if not data:
         result_data["data"] = {}
         return result_data
-    result_data["data"] = data[0]
+    if len(data) == 1:
+        result_data["data"] = data[0]
+    if len(data) > 1:
+        result_data["data_list"] = data
     return result_data
