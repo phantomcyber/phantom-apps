@@ -1,0 +1,172 @@
+{
+    "appid": "1a35aab7-0b8e-477d-8453-8a52f17f548c",
+    "name": "AnyRun",
+    "description": "This App implements investigative actions on Any.Run, interactive malware hunting service.",
+    "type": "sandbox",
+    "product_vendor": "Any.Run",
+    "logo": "anyrun.svg",
+    "logo_dark": "anyrun_dark.svg",
+    "product_name": "Any.Run",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "contributors": "Erica Pescio",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-03-19T10:46:08.767570Z",
+    "package_name": "phantom_anyrun",
+    "main_module": "anyrun_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Any.Run base URL (e.g. https://myservice/)",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "https://api.any.run/v1/",
+            "order": 0
+        },
+        "API_key": {
+            "description": "Token used for API authentication",
+            "data_type": "password",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "description": "Query for results of an already completed detonation",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Detonation ID to get the report of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.scores.verdict.threatLevelText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.scores.verdict.threatLevel",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.scores.verdict.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.info.file",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.hashes.sha256",
+                    "data_type": "string",
+                    "contains": ["hash", "sha256"]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.hashes.sha1",
+                    "data_type": "string",
+                    "contains": ["hash", "sha1"]
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.hashes.md5",
+                    "data_type": "string",
+                    "contains": ["hash", "md5"]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate file",
+            "identifier": "detonate_file",
+            "description": "Run the file in the sandbox and retrieve the analysis results",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "vault_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.taskid",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
