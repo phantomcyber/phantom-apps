@@ -412,7 +412,7 @@ class RedmineConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.set_status(
                 phantom.APP_ERROR, REDMINE_ERR_RETRIEVE_TICKET
-            )
+            ), None
         return ret_val, response
 
     def _retrieve_enumeration_id(self, action_result, enum, enum_key, endpoint):
@@ -513,10 +513,11 @@ class RedmineConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed")
-            return action_result.get_status()
+            self.debug_print(action_result.get_message())
+            self.save_progress(REDMINE_ERR_TEST_CONN_FAILED)
+            return action_result.set_status(phantom.APP_ERROR)
 
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(REDMINE_SUCC_TEST_CONN_PASSED)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _on_poll(self, param):
@@ -749,8 +750,11 @@ class RedmineConnector(BaseConnector):
             f"/issues.json{query}", action_result, params=params, headers=None
         )
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+        if phantom.is_fail(ret_val) or "issues" not in response:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                REDMINE_ERR_LIST_TICKETS
+            )
 
         # Action Result
         action_result.add_data(response)
