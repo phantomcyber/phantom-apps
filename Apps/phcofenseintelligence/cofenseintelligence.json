@@ -17,7 +17,7 @@
     "logo_dark": "logo_cofenseintelligence_dark.svg",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API"
+        "Cloud API v1 tested on 30/03/2021"
     ],
     "configuration": {
         "username": {
@@ -1006,6 +1006,7 @@
                     ],
                     "description": "Threat ID",
                     "data_type": "numeric",
+                    "order": 0,
                     "primary": true
                 }
             },
@@ -1496,7 +1497,7 @@
             "type": "ingest",
             "read_only": true,
             "description": "Action to ingest threats",
-            "verbose": "<p>For the first poll, ingest all the threats during past number of days set in <b>first_scheduled_ingestion_span</b>. Subsequent polls ingest new or updated threats. The threats are ordered in ascending order based on occurrence time.<br>Only create CEFs for following types:<br>. executableSet<br>. blockSet with impact of major or moderate</p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>destinationAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha384, fileHashSha512, fileHashSha224, fileHashSha256, fileName, fileType, fileModificationTime</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>destinationDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><tr><td>Threat Details</td><td>Threat Artifact</td><td>phishmeThreatId, threatType</td></tr></tbody></table>",
+            "verbose": "<p>For the first poll, ingest all the threats during past number of days set in <b>first_scheduled_ingestion_span</b>. Subsequent polls ingest new or updated threats. The threats are ordered in ascending order based on occurrence time.<br>Only create CEFs for following types:<br>. executableSet<br>. blockSet with impact of major or moderate</p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>destinationAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha384, fileHashSha512, fileHashSha224, fileHashSha256, fileName, fileType, fileModificationTime</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>destinationDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><tr><td>Threat Details</td><td>Threat Artifact</td><td>phishmeThreatId, threatType</td></tr></tbody></table>.",
             "parameters": {
                 "container_count": {
                     "description": "Maximum number of containers to ingest",
