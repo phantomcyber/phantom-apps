@@ -34,14 +34,12 @@
         },
         "poll_now_ingestion_span": {
             "value": "15",
-            "required": false,
             "data_type": "numeric",
             "description": "Poll last n days for 'Poll Now'",
             "order": 2
         },
         "first_scheduled_ingestion_span": {
             "value": "10",
-            "required": false,
             "data_type": "numeric",
             "description": "Poll last n days for first scheduled polling",
             "order": 3
@@ -77,10 +75,8 @@
                     "order": 0
                 },
                 "max_threat_count": {
-                    "required": false,
                     "description": "Maximum threats to fetch",
                     "data_type": "numeric",
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -95,7 +91,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_threat_count",
@@ -287,10 +287,8 @@
                     "order": 0
                 },
                 "max_threat_count": {
-                    "required": false,
                     "description": "Maximum threats to fetch",
                     "data_type": "numeric",
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -305,7 +303,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.hash",
@@ -520,10 +522,8 @@
                     "order": 0
                 },
                 "max_threat_count": {
-                    "required": false,
                     "description": "Maximum threats to fetch",
                     "data_type": "numeric",
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -538,7 +538,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip",
@@ -805,10 +809,8 @@
                     "order": 0
                 },
                 "max_threat_count": {
-                    "required": false,
                     "description": "Maximum threats to fetch",
                     "data_type": "numeric",
-                    "primary": false,
                     "order": 1
                 }
             },
@@ -823,7 +825,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.domain",
@@ -1021,7 +1027,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.threat_id",
@@ -1512,8 +1522,7 @@
                 "start_time": {
                     "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "artifact_count": {
                     "description": "Parameter ignored in this app",
@@ -1523,8 +1532,7 @@
                 "end_time": {
                     "description": "Parameter ignored in this app",
                     "data_type": "numeric",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 }
             },
             "versions": "EQ(*)",
