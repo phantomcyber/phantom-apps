@@ -7,6 +7,12 @@
     "logo": "logo_digitalguardianarc.svg",
     "logo_dark": "logo_digitalguardianarc_dark.svg",
     "product_name": "Digital Guardian",
+    "contributors": [
+      {
+        "name": "Chris King"
+      }
+    ],
+    "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Digital Guardian",
     "license": "Copyright (c) Digital Guardian, 2020",
@@ -15,7 +21,7 @@
     "package_name": "phantom_digitalguardianarc",
     "main_module": "digitalguardianarc_connector.pyc",
     "min_phantom_version": "4.8.24304",
-    "app_wizard_version": "1.0.0",
+    "app_wizard_version": "1.0.2",
     "configuration": {
         "auth_url": {
             "description": "Authorization Server",
