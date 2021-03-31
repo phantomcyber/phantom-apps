@@ -41,7 +41,7 @@
         {
             "action": "email validation",
             "description": "Queries IPQualityScore's Email Validation API",
-            "verbose": "If email information is unavailable in IPQualityScore, only 'email' and 'message' property would be populated.",
+            "verbose": "If email information is unavailable in IPQualityScore, only 'email' and 'message' property would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "email_validation",
             "read_only": true,
@@ -72,7 +72,7 @@
                     "order": 3
                 },
                 "strictness": {
-                    "description": "Sets how strictly spam traps and honeypots are detected by system",
+                    "description": "Sets how strictly spam traps and honeypots are detected by system (Possible Values: 0, 1 and 2)",
                     "data_type": "numeric",
                     "order": 4
                 },
@@ -411,7 +411,7 @@
         {
             "action": "url checker",
             "description": "Queries IPQualityScore's malicious URL scanner API",
-            "verbose": "If URL information is unavailable in IPQualityScore, only 'url' and 'in_database' property would be populated.",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'url' and 'in_database' property would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "check_url",
             "read_only": true,
@@ -427,7 +427,7 @@
                     "order": 0
                 },
                 "strictness": {
-                    "description": "How strict should we scan this URL?",
+                    "description": "How strict should we scan this URL? (Possible Values: 0, 1 and 2)",
                     "data_type": "numeric",
                     "order": 1
                 }
@@ -682,7 +682,7 @@
         {
             "action": "ip reputation",
             "description": "Queries IPQualityScore's Proxy and VPN detection API",
-            "verbose": "If URL information is unavailable in IPQualityScore, only 'message' and 'status_code' properties would be populated.",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'message' and 'status_code' properties would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
@@ -698,7 +698,7 @@
                     "order": 0
                 },
                 "strictness": {
-                    "description": "How in depth (strict) do you want this query to be?",
+                    "description": "How in depth (strict) do you want this query to be? (Possible Values: 0, 1 and 2)",
                     "data_type": "numeric",
                     "order": 1
                 },
