@@ -33,13 +33,13 @@
             "order": 1
         },
         "poll_now_ingestion_span": {
-            "value": "15",
+            "default": 15,
             "data_type": "numeric",
             "description": "Poll last n days for 'Poll Now'",
             "order": 2
         },
         "first_scheduled_ingestion_span": {
-            "value": "10",
+            "default": 10,
             "data_type": "numeric",
             "description": "Poll last n days for first scheduled polling",
             "order": 3
