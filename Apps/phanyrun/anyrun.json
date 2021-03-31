@@ -1,7 +1,7 @@
 {
     "appid": "1a35aab7-0b8e-477d-8453-8a52f17f548c",
     "name": "AnyRun",
-    "description": "This App implements investigative actions on Any.Run, interactive malware hunting service.",
+    "description": "This App implements investigative actions on Any.Run, interactive malware hunting service",
     "type": "sandbox",
     "product_vendor": "Any.Run",
     "logo": "anyrun.svg",
@@ -35,8 +35,6 @@
             "description": "Token used for API authentication",
             "data_type": "password",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         }
     },
@@ -176,7 +174,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
