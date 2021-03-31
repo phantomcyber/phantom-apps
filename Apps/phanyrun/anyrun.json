@@ -10,7 +10,11 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "contributors": "Erica Pescio",
+    "contributors": [
+        {
+            "name": "Erica Pescio"
+        }
+    ],
     "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2020-03-19T10:46:08.767570Z",
