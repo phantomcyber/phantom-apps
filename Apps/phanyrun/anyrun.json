@@ -82,8 +82,16 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "analysis status",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.data.*.analysis.scores.verdict.threatLevelText",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "threat level",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scores.verdict.threatLevel",
@@ -94,8 +102,20 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.filename",
+                    "data_type": "string",
+                    "column_name": "filename",
+                    "column_order": 4
+                },
+                {
                     "data_path": "action_result.data.*.analysis.content.mainObject.info.file",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.content.mainObject.info.mime",
+                    "data_type": "string",
+                    "column_name": "mime",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.hashes.sha256",
@@ -121,7 +141,7 @@
         {
             "action": "detonate file",
             "identifier": "detonate_file",
-            "description": "Run the file in the sandbox and retrieve the analysis results",
+            "description": "Run the file in the sandbox and returns the ID of created task",
             "type": "investigate",
             "read_only": true,
             "parameters": {
