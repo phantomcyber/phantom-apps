@@ -5,8 +5,8 @@
     "publisher": "Splunk",
     "type": "ticketing",
     "main_module": "jira_connector.py",
-    "app_version": "3.0.1",
-    "utctime_updated": "2021-02-03T05:40:49.000000Z",
+    "app_version": "3.0.3",
+    "utctime_updated": "2021-03-31T06:16:19.000000Z",
     "package_name": "phantom_jira",
     "product_vendor": "Atlassian",
     "product_name": "Jira",
@@ -36,7 +36,7 @@
             },
             {
                 "module": "PyJWT",
-                "input_file": "wheels/PyJWT-1.7.1-py2.py3-none-any.whl"
+                "input_file": "wheels/PyJWT-2.0.1-py3-none-any.whl"
             },
             {
                 "module": "requests_oauthlib",
@@ -57,9 +57,8 @@
         },
         "verify_server_cert": {
             "data_type": "boolean",
-            "description": "Verify server certificate",
-            "required": true,
             "order": 1,
+            "description": "Verify server certificate",
             "default": false
         },
         "username": {
@@ -80,9 +79,9 @@
             "description": "Project key to ingest tickets (issues) from"
         },
         "query": {
-            "description": "Additional parameters to query for during ingestion in JQL",
             "data_type": "string",
-            "order": 5
+            "order": 5,
+            "description": "Additional parameters to query for during ingestion in JQL"
         },
         "first_run_max_tickets": {
             "data_type": "numeric",
@@ -123,20 +122,20 @@
         {
             "action": "create ticket",
             "description": "Create a ticket (issue)",
-            "verbose": "The <b>fields</b> parameter is provided for an advanced use of the JIRA API. It is passed directly to the &quot;fields&quot; attribute in the JIRA API call. Values in the <b>fields</b> parameter will take precedence over the individual parameters such as <b>summary</b>, <b>description</b>, <b>project_key</b>, <b>issue_type</b> etc.<br><br>When using the <b>fields</b> parameter, you are required to know how a particular field is inputted. To give a few examples (might differ in your JIRA environment):<ul><li>The <b>description</b> of a ticket can be added as the first level key with a value like { \"description\": \"ticket description\" }</li><li><b>issuetype</b> needs to be set as a dictionary like { \"issuetype\": { \"name\": \"Task\" } }</li><li><b>priority</b> is set as { \"priority\": { \"name\": \"Medium\" } }</li><li>The <b>project</b> key is set like { \"project\": { \"key\": \"SPLUNK_APP\" } }</li></ul><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><b>Assignee</b> and attachments by <b>vault_id</b> are addressed in a separate call to JIRA made after ticket creation.<br><br>The <b>project_key</b> parameter is case sensitive.<h3>Default Values</h3>Previous versions of the app set default values for <b>priority</b> and <b>issue_type</b>. This caused issues in situations where the default values used by the app were incompatible with the configured values. The app does not set default values anymore. If an optional field below is required by the JIRA environment and it is not provided, JIRA will give an error causing the action to fail.<br><br>This action will pass if a ticket is successfully created, even if it fails to assign the ticket, add an attachment to the ticket, or fill out the custom fields. These failures will be indicated in the result message.<h3>Creating a subtask</h3>The following <b>fields</b> parameter value can be used to create a sub-task, the key is to use the correct <b>issuetype</b>.<pre>{\"fields\":{\"project\":{\"key\":\"AP\"},\"parent\":{\"key\":\"AP-231\"},\"summary\":\"Sub-taskofAP-231\",\"description\":\"Don'tforgettodothistoo.\",\"issuetype\":{\"name\":\"Sub-Task\"}}}</pre><h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to add assignee to the Jira ticket using username for Jira cloud, we will use user's account_id to add assignee. Use 'lookup users' action to find out user's account_id. You can use [assignee_account_id] action parameter to add assignne to the Jira ticket for Jira cloud, and, [assignee] action parameter will be use to add assignee to the Jira ticket for Jira on-prem.",
+            "verbose": "The <b>fields</b> parameter is provided for advanced use of the JIRA API. It is passed directly to the &quot;fields&quot; attribute in the JIRA API call. Values in the <b>fields</b> parameter will take precedence over the individual parameters such as <b>summary</b>, <b>description</b>, <b>project_key</b>, <b>issue_type</b>, etc.<br><br>When using the <b>fields</b> parameter, you are required to know how a particular field is inputted. To give a few examples (might differ in your JIRA environment):<ul><li>The <b>description</b> of a ticket can be added as the first level key with a value like { \"description\": \"ticket description\" }</li><li><b>issuetype</b> needs to be set as a dictionary like { \"issuetype\": { \"name\": \"Task\" } }</li><li><b>priority</b> is set as { \"priority\": { \"name\": \"Medium\" } }</li><li>The <b>project</b> key is set like { \"project\": { \"key\": \"SPLUNK_APP\" } }</li></ul><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><b>Assignee</b> and attachments by <b>vault_id</b> are addressed in a separate call to JIRA made after ticket creation.<br><br>The <b>project_key</b> parameter is case sensitive.<h3>Default Values</h3>Previous versions of the app set default values for <b>priority</b> and <b>issue_type</b>. This caused issues in situations where the default values used by the app were incompatible with the configured values. The app does not set default values anymore. If an optional field below is required by the JIRA environment and it is not provided, JIRA will give an error causing the action to fail.<br><br>This action will pass if a ticket is successfully created, even if it fails to assign the ticket, add an attachment to the ticket, or fill out the custom fields. These failures will be indicated in the result message.<h3>Creating a subtask</h3>The following <b>fields</b> parameter value can be used to create a sub-task, the key is to use the correct <b>issuetype</b>.<pre>{\"fields\":{\"project\":{\"key\":\"AP\"},\"parent\":{\"key\":\"AP-231\"},\"summary\":\"Sub-taskofAP-231\",\"description\":\"Don'tforgettodothistoo.\",\"issuetype\":{\"name\":\"Sub-Task\"}}}</pre><h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product APIs for Jira Cloud. Since it is not possible to add an assignee to the Jira ticket using a username for the Jira cloud, we will use the user's account_id to add the assignee. Use 'lookup users' action to find out a user's account_id. You can use the [assignee_account_id] action parameter to add an assignee to the Jira ticket for the Jira cloud, and, [assignee] action parameter will be used to add an assignee to the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "create_ticket",
             "read_only": false,
             "parameters": {
                 "project_key": {
+                    "description": "Project key to add the issue to (case-sensitive)",
                     "data_type": "string",
                     "order": 0,
-                    "description": "Project key to add the issue to (case-sensitive)",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira project key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "summary": {
                     "description": "Summary of the issue",
@@ -152,12 +151,12 @@
                 "issue_type": {
                     "description": "Type of the issue (case-sensitive)",
                     "data_type": "string",
-                    "contains": [
-                        "jira issue type"
-                    ],
                     "order": 3,
                     "required": true,
-                    "primary": true
+                    "primary": true,
+                    "contains": [
+                        "jira issue type"
+                    ]
                 },
                 "priority": {
                     "description": "Priority of the issue",
@@ -208,14 +207,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.assignee",
                     "data_type": "string",
@@ -1360,8 +1351,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1370,6 +1365,10 @@
                         "Created ticket with id: 11850, key: MAN-240",
                         "Created ticket with id: 11911, key: PHANINCIDE-370"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1397,31 +1396,31 @@
             "read_only": true,
             "parameters": {
                 "id": {
+                    "description": "The key of the Jira issue",
                     "data_type": "string",
                     "order": 0,
-                    "description": "The key of the Jira issue",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "retrieve_all": {
+                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is not provided, it will internally be treated as 'false')",
                     "data_type": "boolean",
                     "order": 1,
-                    "description": "If this is set to true all attachments will be retrieved from the issue (if the value is not provided, it will internally be treated as 'false')",
                     "default": true
                 },
                 "container_id": {
+                    "description": "The Container ID to associate the file with",
                     "data_type": "string",
                     "order": 2,
-                    "description": "The Container ID to associate the file with",
                     "required": true
                 },
                 "extension_filter": {
+                    "description": "Comma-separated list of file extensions to be returned from the issue",
                     "data_type": "string",
-                    "order": 3,
-                    "description": "Comma-separated list of file extensions to be returned from the issue"
+                    "order": 3
                 }
             },
             "render": {
@@ -1431,16 +1430,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.container_id",
                     "data_type": "string",
@@ -1479,7 +1468,7 @@
                     "data_path": "action_result.data.*.container",
                     "data_type": "numeric",
                     "example_values": [
-                        "2446"
+                        2446
                     ]
                 },
                 {
@@ -1510,7 +1499,7 @@
                     "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "example_values": [
-                        "231003"
+                        231003
                     ]
                 },
                 {
@@ -1534,8 +1523,14 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
@@ -1543,6 +1538,10 @@
                     "example_values": [
                         "Successfully retrieved attachments from Jira ticket"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1564,6 +1563,7 @@
         {
             "action": "update ticket",
             "description": "Update ticket (issue)",
+            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/#editing-an-issue-examples\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product APIs for Jira Cloud. Since it is not possible to update fields related to user resources in the Jira ticket using username for Jira cloud, we will use the user's account_id to update fields related to user resources. Use 'lookup users' action to find out user's account_id. Use 'get ticket' action results to obtain the [update_fields] parameters. Please find out below-mentioned examples for the [update_fields] parameter which is related to user resources.<ul><li>Add assignee to the Jira ticket for Jira on-prem:<br>{\"fields\":{\"assignee\" : {\"name\": \"username\"}}}</li><li>Add assignee to the Jira ticket for Jira cloud:<br>{\"fields\":{\"assignee\" : {\"accountId\": \"6d1ef6xy52z7360c267f27bb\"}}}</li></ul>",
             "type": "generic",
             "identifier": "update_ticket",
             "read_only": false,
@@ -1571,12 +1571,12 @@
                 "id": {
                     "description": "Issue ID",
                     "data_type": "string",
-                    "required": true,
                     "order": 0,
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "update_fields": {
                     "description": "JSON containing field values",
@@ -1593,20 +1593,11 @@
                     ]
                 }
             },
-            "verbose": "Update an existing issue with the values specified in the <b>update_fields</b> parameter.<br>The results of the <b>get ticket</b> action may be used to obtain the <b>update_fields</b> parameters, including any custom fields present in the JIRA.</br>The JSON specified in the <b>update_fields</b> parameter requires the keys and the values specified in case-sensitive and double-quotes string format, except in the case of boolean values, which should be either <i>true</i> or <i>false</i> for example:</br>{\"summary\": \"Zeus, multiple action need to be taken\", \"description\": \"A new summary was added\"}</br></br>The App supports multiple methods for specifying the input dictionary. Please see <a href=\"https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/#editing-an-issue-examples\"><b>the Atlassian documentation for the JIRA REST <i>update issue</i> API</b></a> for more information.<br>The following formats can be passed as input: <ul><li>Simple format; Create a dictionary with all the fields that need to be set:<br>{\"summary\": \"Zeus detected on endpoint\", \"description\": \"Investigate further\"}</li><li>Using the <i>update</i> key; Some issue fields support operations like <i>remove</i> and <i>add</i>, these operations can be combined to update a ticket: <br>{\"<b>update</b>\": {\"components\" : [{\"remove\" : {\"name\" : \"secondcomponent\"}}, {\"add\" : {\"name\" : \"firstcomponent\"}}]}}<br>{\"<b>update</b>\": {\"comment\": [{\"add\": {\"body\": \"test comment update\"}}]}} </li><li>Using the <i>fields</i> key;</br>{\"<b>fields</b>\":{\"labels\" : [\"FIRSTLABEL\"]}}</li></ul></br>The app supports updating custom fields; depending on the custom field type, some operations might not be available. Review the <b>jira_app</b> playbook for examples.<br><br>The <b>vault_id</b> parameter takes the vault ID of a file in the vault and attaches the file to the JIRA ticket.<br><br>This action requires that either the <b>update_fields</b> parameter or the <b>vault_id</b> parameter is filled out. The action will fail if it either unsuccessfully attempts to add the attachment to the ticket or update the fields on the ticket.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to update fields related with user resources in the Jira ticket using username for Jira cloud, we will use user's account_id to update fields related with user resources. Use 'lookup users' action to find out user's account_id. Use 'get ticket' action results to obtain the [update_fields] parameters. Please find out below mentioned examples for the [update_fields] parameter which related with user resources.<ul><li>Add assignee to the Jira ticket for Jira on-prem:<br>{\"fields\":{\"assignee\" : {\"name\": \"username\"}}}</li><li>Add assignee to the Jira ticket for Jira cloud:<br>{\"fields\":{\"assignee\" : {\"accountId\": \"6d1ef6xy52z7360c267f27bb\"}}}</li></ul>",
             "render": {
                 "type": "custom",
                 "view": "jira_view.display_view"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -3527,8 +3518,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3536,6 +3531,10 @@
                     "example_values": [
                         "Successfully updated ticket"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3564,12 +3563,12 @@
                 "id": {
                     "description": "Issue ID",
                     "data_type": "string",
-                    "required": true,
                     "order": 0,
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "comment": {
                     "description": "Comment to add",
@@ -3591,16 +3590,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -3635,8 +3624,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -3644,6 +3639,10 @@
                     "example_values": [
                         "Successfully added comment"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3673,11 +3672,11 @@
                     "description": "Issue ID",
                     "data_type": "string",
                     "order": 0,
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "primary": true,
-                    "required": true
+                    ]
                 }
             },
             "render": {
@@ -3687,16 +3686,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 1
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -3714,8 +3703,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -3723,6 +3718,10 @@
                     "example_values": [
                         "Successfully deleted ticket"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3756,14 +3755,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "column_name": "Project ID",
@@ -3794,10 +3785,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_projects",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        16
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3805,6 +3797,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total projects: 16"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_projects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16
                     ]
                 },
                 {
@@ -3826,21 +3825,21 @@
         },
         {
             "action": "list tickets",
-            "description": "Get a list of tickets (issues) in the project",
+            "description": "Get a list of tickets (issues) in a specified project",
             "type": "investigate",
             "identifier": "list_tickets",
             "read_only": true,
             "verbose": "The default value for the parameter <b>'start_index'</b> is <b>0</b> and for <b>'max_results'</b> is <b>1000</b>. The maximum number of tickets as specified by the parameter <b>'max_results'</b> will be fetched starting from the index specified by the parameter <b>'start_index'</b>.",
             "parameters": {
                 "project_key": {
+                    "description": "Project key to list the tickets (issues) of",
                     "data_type": "string",
                     "order": 0,
-                    "description": "Project key to list the tickets (issues) of",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira project key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "query": {
                     "description": "Additional parameters to query for in JQL",
@@ -3865,14 +3864,6 @@
                 "view": "jira_view.display_view"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
@@ -3901,8 +3892,6 @@
                 {
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 1,
                     "example_values": [
                         "This is a sample testing description"
                     ],
@@ -5592,8 +5581,6 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "ID",
-                    "column_order": 2,
                     "example_values": [
                         "11840"
                     ]
@@ -5604,8 +5591,6 @@
                     "contains": [
                         "jira issue type"
                     ],
-                    "column_name": "Type",
-                    "column_order": 3,
                     "example_values": [
                         "Sub-Task"
                     ]
@@ -5613,11 +5598,9 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "column_name": "Key",
                     "contains": [
                         "jira ticket key"
                     ],
-                    "column_order": 4,
                     "example_values": [
                         "PHANINCIDE-317"
                     ]
@@ -5625,8 +5608,6 @@
                 {
                     "data_path": "action_result.data.*.priority",
                     "data_type": "string",
-                    "column_name": "Priority",
-                    "column_order": 6,
                     "example_values": [
                         "Medium"
                     ],
@@ -5647,8 +5628,6 @@
                 {
                     "data_path": "action_result.data.*.reporter",
                     "data_type": "string",
-                    "column_name": "Reporter",
-                    "column_order": 8,
                     "example_values": [
                         "Test Admin"
                     ],
@@ -5659,8 +5638,6 @@
                 {
                     "data_path": "action_result.data.*.resolution",
                     "data_type": "string",
-                    "column_name": "Resolution",
-                    "column_order": 7,
                     "example_values": [
                         "Unresolved"
                     ],
@@ -5671,8 +5648,6 @@
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 5,
                     "example_values": [
                         "To Do"
                     ]
@@ -5680,17 +5655,16 @@
                 {
                     "data_path": "action_result.data.*.summary",
                     "data_type": "string",
-                    "column_name": "Summary",
-                    "column_order": 0,
                     "example_values": [
                         "Sub-taskofBigTask"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_issues",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        50
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -5698,6 +5672,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total issues: 50"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_issues",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
                     ]
                 },
                 {
@@ -5723,25 +5704,25 @@
             "type": "investigate",
             "identifier": "search_users",
             "read_only": true,
-            "verbose": "This action will be used to fetch username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for [max_results] action parameter is <b>1000</b>. The maximum number of users as specified by the parameter [max_results] will be fetched starting from the first.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to search users using username for Jira cloud, we will use user's display name to search users. You can use [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be use to search users for Jira on-prem.",
+            "verbose": "This action will be used to fetch the username of user resources for Jira on-prem and account_id of user resources for Jira cloud. The default value for [max_results] action parameter is <b>1000</b>. The maximum number of users as specified by the parameter [max_results] will be fetched starting from the first.<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product APIs for Jira Cloud. Since it is not possible to search users using username for Jira cloud, we will use the user's display name to search users. You can use the [display_name] action parameter to search users for Jira cloud, and, [username] action parameter will be used to search users for Jira on-prem.",
             "parameters": {
                 "username": {
+                    "description": "A string to match with usernames, name, or email against for JIRA on-prem (required for Jira on-prem)",
                     "data_type": "string",
                     "order": 0,
-                    "description": "A string to match with usernames, name or email against for JIRA on-prem (required for Jira on-prem)",
+                    "primary": true,
                     "contains": [
                         "user name"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "display_name": {
+                    "description": "A string to match with display name for JIRA cloud (required for Jira cloud)",
                     "data_type": "string",
                     "order": 1,
-                    "description": "A string to match with display name for JIRA cloud (required for Jira cloud)",
+                    "primary": true,
                     "contains": [
                         "jira user display name"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "max_results": {
                     "description": "Maximum number of users to return",
@@ -5755,14 +5736,6 @@
                 "view": "jira_view.display_view"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.display_name",
                     "data_type": "string",
@@ -5918,11 +5891,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_users",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1,
-                        4
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -5930,6 +5903,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Total users: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        4
                     ]
                 },
                 {
@@ -5958,14 +5939,14 @@
             "verbose": "The keys in the <b>action_result.data.*.fields</b> output section of the results can differ based on the JIRA server configuration.",
             "parameters": {
                 "id": {
+                    "description": "Ticket (issue) key",
                     "data_type": "string",
                     "order": 0,
-                    "description": "Ticket (issue) key",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 }
             },
             "render": {
@@ -5973,14 +5954,6 @@
                 "view": "jira_view.display_view"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -7851,15 +7824,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -7887,38 +7865,38 @@
             "verbose": "In JIRA, the status transition of an issue is determined by the workflow defined for the project. The app will return an error if an un-allowed status transition is attempted. In such cases, the possible statuses are returned based on the issue's current status value.<br>The same is the case for invalid resolutions. Do note that some combinations of status and resolution values might be invalid, even if they are allowed individually.<br>To get valid values to use as input for the parameters:<ul><li>For valid <b>status</b> values:<ul><li>Log in to the JIRA server from the UI</li><li>Go to http://my_jira_ip/rest/api/2/issue/<i>[jira_issue_key]</i>/transitions</li><li>The returned JSON should contain a list of transitions</li><li>The name field denotes the status that can be set using this action</li></ul></li><li>For valid <b>resolution</b> values: <ul><li>Log in to the JIRA server from the UI</li><li>Go to http://my_jira_ip/rest/api/2/resolution</li><li>The returned JSON should contain a list of resolutions</li><li>The name field in each resolution denotes the value to be used</li></ul></li></ul>",
             "parameters": {
                 "id": {
+                    "description": "Ticket (issue) key",
                     "data_type": "string",
                     "order": 0,
-                    "description": "Ticket (issue) key",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "status": {
+                    "description": "Status to set",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Status to set",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket status"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "resolution": {
+                    "description": "Resolution to set",
                     "data_type": "string",
                     "order": 2,
-                    "description": "Resolution to set",
                     "primary": true,
                     "contains": [
                         "jira ticket resolution"
                     ]
                 },
                 "comment": {
+                    "description": "Comment to set",
                     "data_type": "string",
-                    "order": 3,
-                    "description": "Comment to set"
+                    "order": 3
                 }
             },
             "render": {
@@ -7926,14 +7904,6 @@
                 "view": "jira_view.display_view"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -9438,15 +9408,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -9474,50 +9449,50 @@
             "read_only": false,
             "parameters": {
                 "from_id": {
+                    "description": "First ticket (issue) key",
                     "data_type": "string",
                     "order": 0,
-                    "description": "First ticket (issue) key",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "to_id": {
+                    "description": "Second ticket (issue) key",
                     "data_type": "string",
                     "order": 1,
-                    "description": "Second ticket (issue) key",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "required": true,
-                    "primary": true
+                    ]
                 },
                 "link_type": {
+                    "description": "Type of link to create",
                     "data_type": "string",
                     "order": 2,
-                    "description": "Type of link to create",
                     "default": "Duplicate",
                     "required": true
                 },
                 "comment": {
+                    "description": "Comment to add",
                     "data_type": "string",
-                    "order": 3,
-                    "description": "Comment to add"
+                    "order": 3
                 },
                 "comment_visibility_type": {
+                    "description": "How to limit the comment visibility",
                     "data_type": "string",
                     "order": 4,
                     "value_list": [
                         "group",
                         "role"
-                    ],
-                    "description": "How to limit the comment visibility"
+                    ]
                 },
                 "comment_visibility_name": {
+                    "description": "Name of group/role able to see the comment",
                     "data_type": "string",
-                    "order": 5,
-                    "description": "Name of group/role able to see the comment"
+                    "order": 5
                 }
             },
             "render": {
@@ -9527,14 +9502,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -9556,16 +9523,6 @@
                     "example_values": [
                         "group",
                         "role"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.from_id",
-                    "data_type": "string",
-                    "contains": [
-                        "jira ticket key"
-                    ],
-                    "example_values": [
-                        "MAN-1"
                     ]
                 },
                 {
@@ -9610,11 +9567,19 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -9637,7 +9602,7 @@
         {
             "action": "add watcher",
             "description": "Add a user to an issue's watchers list",
-            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to add watcher using username for Jira cloud, we will use user's account_id to add watcher for Jira cloud. Use 'lookup users' action to find out user's account_id. You can use [user_account_id] action parameter to add watcher to the Jira ticket for Jira cloud, and, [username] action parameter will be use to add watcher to the Jira ticket for Jira on-prem.",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product APIs for Jira Cloud. Since it is not possible to add a watcher using username for Jira cloud, we will use a user's account_id to add a watcher for Jira cloud. Use 'lookup users' action to find out a user's account_id. You can use the [user_account_id] action parameter to add a watcher to the Jira ticket for Jira cloud, and, [username] action parameter will be used to add a watcher to the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "add_watcher",
             "read_only": false,
@@ -9646,43 +9611,33 @@
                 "id": {
                     "description": "Issue ID",
                     "data_type": "string",
-                    "required": true,
                     "order": 0,
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "username": {
                     "description": "Username of the user to add to the watchers list (required for Jira on-prem)",
                     "data_type": "string",
+                    "order": 1,
+                    "primary": true,
                     "contains": [
                         "user name"
-                    ],
-                    "order": 1,
-                    "primary": true
+                    ]
                 },
                 "user_account_id": {
                     "description": "Account ID of the user to add to the watchers list (required for Jira cloud)",
                     "data_type": "string",
+                    "order": 2,
+                    "primary": true,
                     "contains": [
                         "jira user account id"
-                    ],
-                    "order": 2,
-                    "primary": true
+                    ]
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 3
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -9724,8 +9679,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -9733,6 +9694,10 @@
                     "example_values": [
                         "Successfully added the user to the watchers list of the issue ID: CJ-3"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -9760,7 +9725,7 @@
         {
             "action": "remove watcher",
             "description": "Remove a user from an issue's watchers list",
-            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product API's for Jira Cloud. Since is not possible to remove watcher using username for Jira cloud, we will use user's account_id to remove watcher for Jira cloud. Use 'lookup users' action to find out user's account_id. You can use [user_account_id] action parameter to remove watcher from the Jira ticket for Jira cloud, and, [username] action parameter will be use to remove watcher from the Jira ticket for Jira on-prem.",
+            "verbose": "<h3>Caveats</h3>Jira Cloud is removing the username field from user profiles in Atlassian Cloud sites. They are also removing username support from their product APIs for Jira Cloud. Since it is not possible to remove a watcher using username for Jira cloud, we will use a user's account_id to remove a watcher for Jira cloud. Use 'lookup users' action to find out a user's account_id. You can use the [user_account_id] action parameter to remove a watcher from the Jira ticket for Jira cloud, and, [username] action parameter will be used to remove a watcher from the Jira ticket for Jira on-prem.",
             "type": "generic",
             "identifier": "remove_watcher",
             "read_only": false,
@@ -9769,43 +9734,33 @@
                 "id": {
                     "description": "Issue ID",
                     "data_type": "string",
-                    "required": true,
                     "order": 0,
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "jira ticket key"
-                    ],
-                    "primary": true
+                    ]
                 },
                 "username": {
                     "description": "Username of the user to remove from watchers list (required for Jira on-prem)",
                     "data_type": "string",
+                    "order": 1,
+                    "primary": true,
                     "contains": [
                         "user name"
-                    ],
-                    "order": 1,
-                    "primary": true
+                    ]
                 },
                 "user_account_id": {
                     "description": "Account ID of the user to remove from the watchers list (required for Jira cloud)",
                     "data_type": "string",
+                    "order": 2,
+                    "primary": true,
                     "contains": [
                         "jira user account id"
-                    ],
-                    "order": 2,
-                    "primary": true
+                    ]
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 3
-                },
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
@@ -9847,8 +9802,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.message",
@@ -9856,6 +9817,10 @@
                     "example_values": [
                         "Successfully removed the user from the watchers list of the issue ID: CJ-3"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -9889,29 +9854,29 @@
             "read_only": true,
             "parameters": {
                 "start_time": {
-                    "data_type": "numeric",
                     "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
                     "order": 0
                 },
                 "end_time": {
-                    "data_type": "numeric",
                     "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
                     "order": 1
                 },
                 "container_id": {
-                    "data_type": "string",
                     "description": "Parameter ignored in this app",
+                    "data_type": "string",
                     "order": 2
                 },
                 "container_count": {
-                    "data_type": "numeric",
                     "description": "Maximum number of tickets to be ingested during poll now",
-                    "default": 1,
-                    "order": 3
+                    "data_type": "numeric",
+                    "order": 3,
+                    "default": 1
                 },
                 "artifact_count": {
-                    "data_type": "numeric",
                     "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
                     "order": 4
                 }
             },
