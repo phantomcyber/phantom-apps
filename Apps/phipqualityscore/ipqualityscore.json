@@ -41,7 +41,7 @@
         {
             "action": "email validation",
             "description": "Queries IPQualityScore's Email Validation API",
-            "verbose": "If email information is unavailable in IPQualityScore, only 'email' and 'message' property would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "verbose": "If email information is unavailable in IPQualityScore, only 'email' and 'message' property would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "email_validation",
             "read_only": true,
@@ -411,7 +411,7 @@
         {
             "action": "url checker",
             "description": "Queries IPQualityScore's malicious URL scanner API",
-            "verbose": "If URL information is unavailable in IPQualityScore, only 'url' and 'in_database' property would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'url' and 'in_database' property would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "check_url",
             "read_only": true,
@@ -682,7 +682,7 @@
         {
             "action": "ip reputation",
             "description": "Queries IPQualityScore's Proxy and VPN detection API",
-            "verbose": "If URL information is unavailable in IPQualityScore, only 'message' and 'status_code' properties would be populated. 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'message' and 'status_code' properties would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
             "type": "investigate",
             "identifier": "ip_reputation",
             "read_only": true,
