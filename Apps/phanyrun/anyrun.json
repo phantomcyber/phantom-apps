@@ -54,7 +54,7 @@
         {
             "action": "get report",
             "identifier": "get_report",
-            "description": "Query for results of an already completed detonation",
+            "description": "Query for results of a detonation",
             "type": "investigate",
             "read_only": true,
             "parameters": {
