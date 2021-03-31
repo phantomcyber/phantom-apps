@@ -623,9 +623,9 @@ class PhishMeConnector(BaseConnector):
                     continue
 
         # Adding threat details as artifact
-        cef = {"phishmeThreatId": threat_id, "threatType": response_data.get("threatType")}
+        cef = {"CofenseIntelligenceThreatId": threat_id, "threatType": response_data.get("threatType")}
 
-        cef_types = {"phishmeThreatId": ["phishme threat id"]}
+        cef_types = {"CofenseIntelligenceThreatId": ["cofense intelligence threat id"]}
 
         return_value, artifact = self._create_artifact("Threat Artifact", cef, cef_types, container_id)
 

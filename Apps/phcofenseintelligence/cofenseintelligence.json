@@ -212,7 +212,7 @@
                     "data_path": "action_result.data.*.data.threats.*.id",
                     "data_type": "numeric",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -448,7 +448,7 @@
                     "data_path": "action_result.data.*.data.threats.*.id",
                     "data_type": "numeric",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -734,7 +734,7 @@
                     "data_path": "action_result.data.*.data.threats.*.id",
                     "data_type": "numeric",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -943,7 +943,7 @@
                     "data_path": "action_result.data.*.data.threats.*.id",
                     "data_type": "numeric",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -1008,7 +1008,7 @@
                 "threat_id": {
                     "required": true,
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ],
                     "description": "Threat ID",
                     "data_type": "numeric",
@@ -1037,7 +1037,7 @@
                     "data_path": "action_result.parameter.threat_id",
                     "data_type": "string",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -1367,7 +1367,7 @@
                     "data_path": "action_result.data.*.data.id",
                     "data_type": "numeric",
                     "contains": [
-                        "phishme threat id"
+                        "cofense intelligence threat id"
                     ]
                 },
                 {
@@ -1507,7 +1507,7 @@
             "type": "ingest",
             "read_only": true,
             "description": "Action to ingest threats",
-            "verbose": "<p>For the first poll, ingest all the threats during past number of days set in <b>first_scheduled_ingestion_span</b>. Subsequent polls ingest new or updated threats. The threats are ordered in ascending order based on occurrence time.<br>Only create CEFs for following types:<br>. executableSet<br>. blockSet with impact of major or moderate</p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>destinationAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha384, fileHashSha512, fileHashSha224, fileHashSha256, fileName, fileType, fileModificationTime</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>destinationDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><tr><td>Threat Details</td><td>Threat Artifact</td><td>phishmeThreatId, threatType</td></tr></tbody></table>.",
+            "verbose": "<p>For the first poll, ingest all the threats during past number of days set in <b>first_scheduled_ingestion_span</b>. Subsequent polls ingest new or updated threats. The threats are ordered in ascending order based on occurrence time.<br>Only create CEFs for following types:<br>. executableSet<br>. blockSet with impact of major or moderate</p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>destinationAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha384, fileHashSha512, fileHashSha224, fileHashSha256, fileName, fileType, fileModificationTime</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>destinationDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><tr><td>Threat Details</td><td>Threat Artifact</td><td>CofenseIntelligenceThreatId, threatType</td></tr></tbody></table>.",
             "parameters": {
                 "container_count": {
                     "description": "Maximum number of containers to ingest",
