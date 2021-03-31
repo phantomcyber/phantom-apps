@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 # File: anyrun_connector.py
 #
 # Copyright (c) 2021 Splunk Inc.
