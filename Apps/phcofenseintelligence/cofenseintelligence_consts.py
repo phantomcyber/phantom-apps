@@ -11,8 +11,8 @@ PHISHME_ENDPOINT_GET_REPORT_MALWARE = '/threat/malware/'
 PHISHME_ERR_API_UNSUPPORTED_METHOD = "Unsupported method {method}"
 PHISHME_CONNECTION_TEST_MSG = "Querying endpoint to verify the credentials \
 provided"
-PHISHME_CONNECTION_TEST_ERR_MSG = "Connectivity test failed"
-PHISHME_CONNECTION_TEST_SUCC_MSG = "Connectivity test succeeded"
+PHISHME_CONNECTION_TEST_ERR_MSG = "Test Connectivity Failed"
+PHISHME_CONNECTION_TEST_SUCC_MSG = "Test Connectivity Passed"
 PHISHME_ERR_SERVER_CONNECTION = "Connection failed"
 PHISHME_LOGIN_ERROR = "API Username or API Password not configured"
 PHISHME_ERR_JSON_PARSE = 'Unable to parse the fields parameter into a \
