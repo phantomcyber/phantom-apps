@@ -212,10 +212,6 @@ class DigitalGuardianArcConnector(BaseConnector):
 
         self.save_progress('Connecting to DG ARC')
         ret_val, message = self.requestApiToken()
-        if phantom.is_fail(ret_val):
-            self.save_progress('Test Connectivity Failed')
-            return action_result.set_status(phantom.APP_ERROR, message)
-
         if not self._client_headers['Authorization']:
             self.save_progress('Test Connectivity Failed')
             return action_result.get_status()
@@ -544,14 +540,14 @@ class DigitalGuardianArcConnector(BaseConnector):
                     if self._handle_py_ver_compat_for_input_str(jText['display_name']).lower() == watchListName.lower():
                         list_id = jText['name']
                         return RetVal(action_result.set_status(phantom.APP_SUCCESS), list_id)
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find watch list {}".format(watchListName)), None)
+                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find watch list {}".format(watchListName)), list_id)
             else:
                 data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
                 message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
-                return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, message), list_id)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to process response from the server. {0}'.format(err)), list_id)
 
     def _check_watchlist_id(self, watch_list_id, watchlist_entry, action_result):
         full_url = '{0}/watchlists/'.format(self._arc_url.strip("/"))
