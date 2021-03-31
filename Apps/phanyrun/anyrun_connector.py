@@ -87,10 +87,12 @@ class AnyrunConnector(BaseConnector):
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
+        error_msg = resp_json.get('message', 'Unknown error')
+        
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            error_msg
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
