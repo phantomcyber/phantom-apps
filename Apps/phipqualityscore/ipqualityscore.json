@@ -1,0 +1,1139 @@
+{
+    "appid": "64aa6709-2bc0-4525-9260-2bb2b3d3ac2d",
+    "name": "IPQualityScore",
+    "description": "This app implements IP, URL and Email investigative capabilities utilizing IPQualityScore",
+    "publisher": "IPQualityScore",
+    "package_name": "phantom_ipqualityscore",
+    "type": "investigative",
+    "license": "Copyright (c) 2021 IPQualityScore.com",
+    "main_module": "ipqualityscore_connector.py",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-02-26T01:17:12Z",
+    "product_vendor": "IPQualityScore",
+    "product_name": "IPQualityScore",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, API: ipqualityscore.com, February 25 2021"
+    ],
+    "logo": "logo_ipqualityscore.svg",
+    "logo_dark": "logo_ipqualityscore_dark.svg",
+    "configuration": {
+        "apikey": {
+            "data_type": "password",
+            "description": "API key",
+            "order": 0,
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validates the connectivity by querying IPQualityScore",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "email validation",
+            "description": "Queries IPQualityScore's Email Validation API",
+            "verbose": "If email information is unavailable in IPQualityScore, only 'email' and 'message' property would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "type": "investigate",
+            "identifier": "email_validation",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "required": true,
+                    "description": "Email to query for reputation information",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 0
+                },
+                "fast": {
+                    "description": "Enables or disables SMTP check with the mail service provider",
+                    "data_type": "boolean",
+                    "order": 1
+                },
+                "suggest_domain": {
+                    "description": "Force analyze if the email address's domain has a typo and should be corrected to a popular mail service",
+                    "data_type": "boolean",
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Maximum number of seconds to wait for a reply from a mail service provider",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "strictness": {
+                    "description": "Sets how strictly spam traps and honeypots are detected by system (Possible Values: 0, 1 and 2)",
+                    "data_type": "numeric",
+                    "order": 4
+                },
+                "abuse_strictness": {
+                    "description": "Set the strictness level for machine learning pattern recognition of abusive email addresses",
+                    "data_type": "numeric",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "someone@domain.com"
+                    ],
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.fast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.suggest_domain",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.strictness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.abuse_strictness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "column_order": 8
+                },
+                {
+                    "column_name": "Valid",
+                    "data_path": "action_result.data.*.valid",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 9
+                },
+                {
+                    "column_name": "Timeout",
+                    "data_path": "action_result.data.*.timeout",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 10
+                },
+                {
+                    "column_name": "Disposable",
+                    "data_path": "action_result.data.*.disposable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 11
+                },
+                {
+                    "column_name": "First Name",
+                    "data_path": "action_result.data.*.first_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ],
+                    "column_order": 12
+                },
+                {
+                    "column_name": "Deliverability",
+                    "data_path": "action_result.data.*.deliverability",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "column_order": 13
+                },
+                {
+                    "column_name": "SMTP Score",
+                    "data_path": "action_result.data.*.smtp_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "column_order": 14
+                },
+                {
+                    "column_name": "Overall Score",
+                    "data_path": "action_result.data.*.overall_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "column_order": 15
+                },
+                {
+                    "column_name": "Catch All",
+                    "data_path": "action_result.data.*.catch_all",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 16
+                },
+                {
+                    "column_name": "Generic",
+                    "data_path": "action_result.data.*.generic",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 17
+                },
+                {
+                    "column_name": "Common",
+                    "data_path": "action_result.data.*.common",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 18
+                },
+                {
+                    "column_name": "DNS Valid",
+                    "data_path": "action_result.data.*.dns_valid",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 19
+                },
+                {
+                    "column_name": "Honeypot",
+                    "data_path": "action_result.data.*.honeypot",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 20
+                },
+                {
+                    "column_name": "Frequent Complainer",
+                    "data_path": "action_result.data.*.frequent_complainer",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 21
+                },
+                {
+                    "column_name": "Suspect",
+                    "data_path": "action_result.data.*.suspect",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 22
+                },
+                {
+                    "column_name": "Recent Abuse",
+                    "data_path": "action_result.data.*.recent_abuse",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 23
+                },
+                {
+                    "column_name": "Fraud Score",
+                    "data_path": "action_result.data.*.fraud_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        34
+                    ],
+                    "column_order": 24
+                },
+                {
+                    "column_name": "Leaked",
+                    "data_path": "action_result.data.*.leaked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 25
+                },
+                {
+                    "column_name": "Suggested Domain",
+                    "data_path": "action_result.data.*.suggested_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ],
+                    "column_order": 26
+                },
+                {
+                    "column_name": "First Seen",
+                    "data_path": "action_result.data.*.first_seen.human",
+                    "data_type": "string",
+                    "example_values": [
+                        "1 month ago"
+                    ],
+                    "column_order": 27
+                },
+                {
+                    "column_name": "Domain Age",
+                    "data_path": "action_result.data.*.domain_age.human",
+                    "data_type": "string",
+                    "example_values": [
+                        "1 month ago"
+                    ],
+                    "column_order": 28
+                },
+                {
+                    "column_name": "Spam Trap Score",
+                    "data_path": "action_result.data.*.spam_trap_score",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ],
+                    "column_order": 29
+                },
+                {
+                    "column_name": "Sanitized Email",
+                    "data_path": "action_result.data.*.sanitized_email",
+                    "data_type": "string",
+                    "example_values": [
+                        "someone@domain.com"
+                    ],
+                    "column_order": 30
+                },
+                {
+                    "column_name": "Request ID",
+                    "data_path": "action_result.data.*.request_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc123"
+                    ],
+                    "column_order": 31
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "api request completed"
+                    ],
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.Message",
+                    "data_type": "string",
+                    "example_values": [
+                        "failure"
+                    ],
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.Status_Code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        400
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+					"data_type": "numeric",
+					"example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "title": "Email Validation",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url checker",
+            "description": "Queries IPQualityScore's malicious URL scanner API",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'url' and 'in_database' property would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "type": "investigate",
+            "identifier": "check_url",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to query for reputation information",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "strictness": {
+                    "description": "How strict should we scan this URL? (Possible Values: 0, 1 and 2)",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.strictness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ],
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://www.splunk.com"
+                    ],
+                    "column_order": 5
+                },
+                {
+                    "column_name": "Message",
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Failure."
+                    ],
+                    "column_order": 6
+                },
+                {
+                    "column_name": "Success",
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ],
+                    "column_order": 7
+                },
+                {
+                    "column_name": "Unsafe",
+                    "data_path": "action_result.data.*.unsafe",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 8
+                },
+                {
+                    "column_name": "Domain",
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "column_order": 9
+                },
+                {
+                    "column_name": "IP Address",
+                    "data_path": "action_result.data.*.ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 10
+                },
+                {
+                    "column_name": "Server",
+                    "data_path": "action_result.data.*.server",
+                    "data_type": "string",
+                    "example_values": [
+                        "gws"
+                    ],
+                    "column_order": 11
+                },
+                {
+                    "column_name": "Content Type",
+                    "data_path": "action_result.data.*.content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "text/html"
+                    ],
+                    "column_order": 12
+                },
+                {
+                    "column_name": "Html Status Code",
+                    "data_path": "action_result.data.*.status_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ],
+                    "column_order": 13
+                },
+                {
+                    "column_name": "Page Size",
+                    "data_path": "action_result.data.*.page_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ],
+                    "column_order": 14
+                },
+                {
+                    "column_name": "Domain Rank",
+                    "data_path": "action_result.data.*.domain_rank",
+                    "data_type": "numeric",
+                    "example_values": [
+                        245
+                    ],
+                    "column_order": 15
+                },
+                {
+                    "column_name": "DNS Valid",
+                    "data_path": "action_result.data.*.dns_valid",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 16
+                },
+                {
+                    "column_name": "Parking",
+                    "data_path": "action_result.data.*.parking",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 17
+                },
+                {
+                    "column_name": "Spamming",
+                    "data_path": "action_result.data.*.spamming",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 18
+                },
+                {
+                    "column_name": "Malware",
+                    "data_path": "action_result.data.*.malware",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 19
+                },
+                {
+                    "column_name": "Phishing",
+                    "data_path": "action_result.data.*.phishing",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 20
+                },
+                {
+                    "column_name": "Suspicious",
+                    "data_path": "action_result.data.*.suspicious",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 21
+                },
+                {
+                    "column_name": "Risk Score",
+                    "data_path": "action_result.data.*.risk_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "column_order": 22
+                },
+                {
+                    "column_name": "Request ID",
+                    "data_path": "action_result.data.*.request_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc123"
+                    ],
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 2
+                },
+				{
+                    "data_path": "action_result.summary.Message",
+                    "data_type": "string",
+                    "example_values": [
+                        "failure"
+                    ],
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.Status_Code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        400
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "api request completed"
+                    ],
+                    "column_order": 3
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "title": "URL Reputation",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "Queries IPQualityScore's Proxy and VPN detection API",
+            "verbose": "If URL information is unavailable in IPQualityScore, only 'message' and 'status_code' properties would be populated. The 'strictness' is an optional parameter to perform (higher number) or ignore (lower number) of additional intelligence checks. The possible values for 'strictness' are 0,1 and 2.",
+            "type": "investigate",
+            "identifier": "ip_reputation",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "description": "IP to query for reputation information",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "strictness": {
+                    "description": "How in depth (strict) do you want this query to be? (Possible Values: 0, 1 and 2)",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "user_agent": {
+                    "description": "Additional checks against bots",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "user_language": {
+                    "description": "Additional risk evaluation",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "fast": {
+                    "description": "Certain forensic checks are skipped",
+                    "data_type": "boolean",
+                    "order": 4
+                },
+                "mobile": {
+                    "description": "Specifies if this lookup should be treated as a mobile device",
+                    "data_type": "boolean",
+                    "order": 5
+                },
+                "allow_public_access_points": {
+                    "description": "Specifies if this lookup should be treated as a mobile device",
+                    "data_type": "boolean",
+                    "order": 6
+                },
+                "lighter_penalties": {
+                    "description": "Enable this setting to lower detection rates and Fraud Scores for mixed quality IP addresses",
+                    "data_type": "boolean",
+                    "order": 7
+                },
+                "transaction_strictness": {
+                    "description": "Adjusts the weights for penalties applied due to irregularities",
+                    "data_type": "numeric",
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.strictness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ],
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.user_agent",
+                    "data_type": "string",
+                    "example_values": [
+                        "mozilla"
+                    ],
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.user_language",
+                    "data_type": "string",
+                    "example_values": [
+                        "en"
+                    ],
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.fast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.mobile",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.allow_public_access_points",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.lighter_penalties",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.parameter.transaction_strictness",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "column_order": 12
+                },
+                {
+                    "column_name": "Message",
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Failure."
+                    ],
+                    "column_order": 13
+                },
+                {
+                    "column_name": "Success",
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ],
+                    "column_order": 14
+                },
+                {
+                    "column_name": "Fraud Score",
+                    "data_path": "action_result.data.*.fraud_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1213
+                    ],
+                    "column_order": 15
+                },
+                {
+                    "column_name": "Country Code",
+                    "data_path": "action_result.data.*.country_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ],
+                    "column_order": 16
+                },
+                {
+                    "column_name": "City",
+                    "data_path": "action_result.data.*.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "atlanta"
+                    ],
+                    "column_order": 17
+                },
+                {
+                    "column_name": "Region",
+                    "data_path": "action_result.data.*.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "northwest"
+                    ],
+                    "column_order": 18
+                },
+                {
+                    "column_name": "ISP",
+                    "data_path": "action_result.data.*.ISP",
+                    "data_type": "string",
+                    "example_values": [
+                        "comcast"
+                    ],
+                    "column_order": 19
+                },
+                {
+                    "column_name": "Organization",
+                    "data_path": "action_result.data.*.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "column_order": 20
+                },
+                {
+                    "column_name": "ASN",
+                    "data_path": "action_result.data.*.ASN",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1231
+                    ],
+                    "column_order": 21
+                },
+                {
+                    "column_name": "Latitude",
+                    "data_path": "action_result.data.*.latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        245
+                    ],
+                    "column_order": 22
+                },
+                {
+                    "column_name": "Longitude",
+                    "data_path": "action_result.data.*.longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1213
+                    ],
+                    "column_order": 23
+                },
+                {
+                    "column_name": "Is Crawler",
+                    "data_path": "action_result.data.*.is_crawler",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 24
+                },
+                {
+                    "column_name": "Timezone",
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "est"
+                    ],
+                    "column_order": 25
+                },
+                {
+                    "column_name": "Host",
+                    "data_path": "action_result.data.*.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "hostname.com"
+                    ],
+                    "column_order": 26
+                },
+                {
+                    "column_name": "Proxy",
+                    "data_path": "action_result.data.*.proxy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ],
+                    "column_order": 27
+                },
+                {
+                    "column_name": "VPN",
+                    "data_path": "action_result.data.*.vpn",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 28
+                },
+                {
+                    "column_name": "TOR",
+                    "data_path": "action_result.data.*.tor",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 29
+                },
+                {
+                    "column_name": "Active VPN",
+                    "data_path": "action_result.data.*.active_vpn",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 30
+                },
+                {
+                    "column_name": "Active TOR",
+                    "data_path": "action_result.data.*.active_tor",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 31
+                },
+                {
+                    "column_name": "Connection Type",
+                    "data_path": "action_result.data.*.connection_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "data center"
+                    ],
+                    "column_order": 32
+                },
+                {
+                    "column_name": "Recent Abuse",
+                    "data_path": "action_result.data.*.recent_abuse",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 33
+                },
+                {
+                    "column_name": "Abuse Velocity",
+                    "data_path": "action_result.data.*.abuse_velocity",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ],
+                    "column_order": 34
+                },
+                {
+                    "column_name": "BOT Status",
+                    "data_path": "action_result.data.*.bot_status",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 35
+                },
+                {
+                    "column_name": "Mobile",
+                    "data_path": "action_result.data.*.mobile",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_order": 36
+                },
+                {
+                    "column_name": "Country Code",
+                    "data_path": "action_result.data.*.country_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ],
+                    "column_order": 37
+                },
+                {
+                    "column_name": "Fraud Score",
+                    "data_path": "action_result.data.*.fraud_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1213
+                    ],
+                    "column_order": 38
+                },
+                {
+                    "column_name": "Request ID",
+                    "data_path": "action_result.data.*.request_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ],
+                    "column_order": 39
+                },
+                {
+                    "column_name": "Operating System",
+                    "data_path": "action_result.data.*.operating_system",
+                    "data_type": "string",
+                    "example_values": [
+                        "linux"
+                    ],
+                    "column_order": 40
+				},
+				{
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_order": 2
+                },
+				{
+                    "data_path": "action_result.summary.Message",
+                    "data_type": "string",
+                    "example_values": [
+                        "failure"
+                    ],
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.Status_Code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        400
+                    ],
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "api request completed"
+                    ],
+                    "column_order": 3
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "title": "IP Reputation",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
