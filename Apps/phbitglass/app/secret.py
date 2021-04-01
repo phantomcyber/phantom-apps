@@ -1,3 +1,6 @@
+# File: secret.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 class Secret(object):
     """ For the sake of 'extra' security echo a dummy string back from the server.

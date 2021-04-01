@@ -1,5 +1,9 @@
+# File: bg.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 """
-(C) Copyright Bitglass Inc. 2020. All Rights Reserved.
+(C) Copyright Bitglass Inc. 2021. All Rights Reserved.
 Author: eng@bitglass.com
 """
 

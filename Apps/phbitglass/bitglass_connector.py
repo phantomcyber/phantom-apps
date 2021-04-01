@@ -1,8 +1,6 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: bitglass_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -25,34 +23,16 @@ from datetime import datetime
 import re
 from bs4 import BeautifulSoup
 
-
 from app.bg import bitglassapi as bgapi
 
-
-# TODO ?? Usage of the consts file is recommended
-# from bitglass_consts import *
-
-# Regex and datetime patterns
-GC_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
-
-# Ingestion run mode constants
-GC_ALERT_USER_MATCH_KEY = 'User Alert Matches (by Asset Patterns)'
-
-# Contains for the different artifact keys
-GC_BG_USERNAME_CONTAINS = ['user name']
-
-# Other constants
-# ..
-
-# Errors
-# ..
+from bitglass_consts import *
 
 
 conf = None
 
 
 def find_char_nth(string, char, n):
-    """Find the n'th occurence of a character within a string."""
+    """Find the n'th occurrence of a character within a string."""
     return [i for i, c in enumerate(string) if c == char][n - 1]
 
 
@@ -107,9 +87,42 @@ class BitglassConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing the error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
@@ -117,6 +130,9 @@ class BitglassConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -126,11 +142,12 @@ class BitglassConnector(BaseConnector):
             if 200 <= status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, error_text)
         except Exception as ex:
-            error_text = "Cannot parse error details: {0}".format(str(ex))
+            err_msg = self._get_error_message_from_exception(ex)
+            error_text = "Cannot parse error details: {0}".format(err_msg)
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -138,9 +155,10 @@ class BitglassConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as ex:
+            err_msg = self._get_error_message_from_exception(ex)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(ex))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err_msg)
                 ), None
             )
 
@@ -151,7 +169,7 @@ class BitglassConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -195,19 +213,20 @@ class BitglassConnector(BaseConnector):
 
         try:
             resp_json, r = bgapi().RestCall(endpoint, kwargs['params'])
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as ex:
+            err_msg = self._get_error_message_from_exception(ex)
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(ex))
-                ), None
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err_msg)
+                ), resp_json
             )
 
         return self._process_response(r, action_result)
 
-    def _callBitglassApi(self, _type, action, param, params):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
+    def _callBitglassApi(self, action_result, _type, action, param, params):
         if params:
             # Make rest call
             url, endpoint = bgapi().RestParamsConfig(None, '1', _type, action)
@@ -234,17 +253,21 @@ class BitglassConnector(BaseConnector):
         # This code is similar to on_poll() with overriding logtypes with cloudsummary and all the data descarded
 
         # HACK Skip the actual API call to poll by setting APP_SUCCESS if needed
-        ret_val, response = RetVal(action_result.set_status(phantom.APP_ERROR), {})
+        ret_val, _ = RetVal(action_result.set_status(phantom.APP_ERROR), {})
         if phantom.is_fail(ret_val):
             # Multiple rest requests below, each one containing multiple log events
-            status = bgapi(self).PollLogs(conf, [u'cloudsummary'])
-            ret_val, response = RetVal(
-                action_result.set_status(
-                    phantom.APP_SUCCESS if status['last'].ok() else phantom.APP_ERROR),
-                status['last'].lastRes.json() if status['last'].ok() else None)
+            try:
+                status = bgapi(self).PollLogs(conf, [u'cloudsummary'])
+                ret_val, _ = RetVal(
+                    action_result.set_status(
+                        phantom.APP_SUCCESS if status['last'].ok() else phantom.APP_ERROR),
+                    status['last'].lastRes.json() if status['last'].ok() else None)
+            except Exception as ex:
+                err_msg = self._get_error_message_from_exception(ex)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
@@ -303,7 +326,7 @@ class BitglassConnector(BaseConnector):
 
         # Don't add empty containers
         res, msg, cid = (phantom.APP_SUCCESS, 'No new artifacts found.', 0)
-        if (len(container['artifacts']) > 0):
+        if len(container['artifacts']) > 0:
             res, msg, cid = self.save_container(container)
             self.debug_print(
                 "Save_container (with artifacts) returns, value: {0}, reason: {1}, id: {2}".format(res, msg, cid))
@@ -339,11 +362,11 @@ class BitglassConnector(BaseConnector):
         # param['xyz']
 
         # HACK Skip the actual API call to poll by setting APP_SUCCESS if needed
-        ret_val, response = RetVal(action_result.set_status(phantom.APP_ERROR), {})
+        ret_val, _ = RetVal(action_result.set_status(phantom.APP_ERROR), {})
         if phantom.is_fail(ret_val):
             # Multiple rest requests below, each one containing multiple log events
             status = bgapi(self).PollLogs(conf)
-            ret_val, response = RetVal(
+            ret_val, _ = RetVal(
                 action_result.set_status(
                     phantom.APP_SUCCESS if status['last'].ok() else phantom.APP_ERROR),
                 # NOTE An empty data set is returned (drained). Also see comments below
@@ -352,13 +375,13 @@ class BitglassConnector(BaseConnector):
         # Even if an error returned, treat it as successful as long as at least one rest call was successful
         # (as would be reflected in lastlog.json) to avoid losing any data
         res, msg, cid = self._save_new_container(action_result, self.newMatches)
-        self.save_progress("S4ve_container (with artifacts) returns, value: {0}, reason: {1}, id: {2}".format(res, msg, cid))
+        self.save_progress("Save_container (with artifacts) returns, value: {0}, reason: {1}, id: {2}".format(res, msg, cid))
 
         if phantom.is_fail(ret_val):
             if cid == 0:
                 return action_result.get_status()
             else:
-                # Some (one or more requests) data was recieved but it failed in a subsequent request
+                # Some (one or more requests) data was received but it failed in a subsequent request
                 # Return success for consistency. The data failed being retrieved will be retrieved later
                 return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -385,14 +408,13 @@ class BitglassConnector(BaseConnector):
             r = requests.get(url, verify=conf.verify_local)
             cef = r.json()['cef']
         except Exception as ex:
-            self.debug_print("Unable to query Bitglass artifact: ", str(ex))
+            err_msg = self._get_error_message_from_exception(ex)
+            self.debug_print("Unable to query Bitglass artifact: {}".format(err_msg))
             return None
 
         return cef
 
     def _handle_filter_by_dlp_pattern(self, param):
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Get data
@@ -401,87 +423,109 @@ class BitglassConnector(BaseConnector):
 
         cef = self._get_artifact_cef(aid)
         if cef:
-            if re.fullmatch(matchRe, cef['dataPatterns']):
-                self.debug_print('dataPatterns matched', cef['dataPatterns'])
-                action_result.add_data(cef)
-            else:
-                # To avoid the error message, have to return non-empty set of data.
-                # This will be ignored as the user name is empty
-                cef['userName'] = '_'
-                action_result.add_data(cef)
+            try:
+                if re.fullmatch(matchRe, cef['dataPatterns']):
+                    self.debug_print('dataPatterns matched', cef['dataPatterns'])
+                    action_result.add_data(cef)
+                else:
+                    # To avoid the error message, have to return non-empty set of data.
+                    # This will be ignored as the user name is empty
+                    cef['userName'] = '_'
+                    action_result.add_data(cef)
+            except Exception:
+                self.debug_print("dataPatterns not found")
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully completed the action")
 
     def _handle_create_update_group(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         groupName = param['bg_group_name']
         newGroupName = param.get('bg_new_group_name', '')
         # Workaround W503
-        params = json.loads(''.join([
-            '{',
-            '"groupname": "{0}"'.format(groupName),
-            ', "newgroupname": [{0}]'.format(newGroupName) if newGroupName != '' else '',
-            '}',
-        ]))
+        try:
+            params = json.loads(''.join([
+                '{',
+                '"groupname": "{0}"'.format(groupName),
+                ', "newgroupname": [{0}]'.format(newGroupName) if newGroupName != '' else '',
+                '}',
+            ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
 
-        return self._callBitglassApi('group', 'createupdate', param, params)
+        return self._callBitglassApi(action_result, 'group', 'createupdate', param, params)
 
     def _handle_delete_group(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         groupName = param['bg_group_name']
-        params = json.loads(''.join([
-            '{',
-            '"groupname": "{0}"'.format(groupName),
-            '}',
-        ]))
+        try:
+            params = json.loads(''.join([
+                '{',
+                '"groupname": "{0}"'.format(groupName),
+                '}',
+            ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
 
-        return self._callBitglassApi('group', 'delete', param, params)
+        return self._callBitglassApi(action_result, 'group', 'delete', param, params)
 
     def _handle_add_user_to_group(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         groupName = param['bg_group_name']
+        userName = param['bg_user_name']
 
         haveUserName = True
         if underphantom:
             # newUsers is preserved between actions ONLY in testing (separate app instances in the former)
-            if param['bg_user_name'] != '' and param['bg_user_name'] != '_':
-                self.newUsers = [param['bg_user_name']]
+            if userName != '' and userName != '_':
+                self.newUsers = [userName]
             else:
                 haveUserName = False
 
         params = None
-        if haveUserName:
-            params = json.loads(''.join([
-                '{',
-                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
-                                                                   ','.join(['"' + u + '"'
+        try:
+            if haveUserName:
+                params = json.loads(''.join([
+                    '{',
+                    '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
+                                                                    ','.join(['"' + u + '"'
                                                                             for u in self.newUsers])),
-                '}',
-            ]))
+                    '}',
+                ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
 
-        return self._callBitglassApi('group', 'addmembers', param, params)
+        return self._callBitglassApi(action_result, 'group', 'addmembers', param, params)
 
-    def _handle_remove_from_group(self, param):
+    def _handle_remove_user_from_group(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         groupName = param['bg_group_name']
+        userName = param['bg_user_name']
 
         haveUserName = True
         if underphantom:
             # newUsers is preserved between actions ONLY in testing (separate app instances in the former)
-            if param['bg_user_name'] == '':
+            if userName == '':
                 haveUserName = False
 
         params = None
         if haveUserName:
-            params = json.loads(''.join([
-                '{',
-                '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
-                                                                   ','.join(['"' + u + '"'
-                                                                            for u in [param['bg_user_name']]])),
-                '}',
-            ]))
+            try:
+                params = json.loads(''.join([
+                    '{',
+                    '"groupname": "{0}", "companyemail": [{1}]'.format(groupName,
+                                                                    ','.join(['"' + u + '"'
+                                                                                for u in [userName]])),
+                    '}',
+                ]))
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
 
-        return self._callBitglassApi('group', 'removemembers', param, params)
+        return self._callBitglassApi(action_result, 'group', 'removemembers', param, params)
 
     def _handle_create_update_user(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         userName = param['bg_user_name']
 
         firstName = param.get('bg_first_name', '')
@@ -496,45 +540,58 @@ class BitglassConnector(BaseConnector):
         adminRole = param.get('bg_admin_role', '')
         groupMembership = param.get('bg_group_membership', '')
 
-        params = json.loads(''.join([
-            '{',
-            '"companyemail": "{0}"'.format(userName),
-            ', "firstname": [{0}]'.format(firstName) if firstName != '' else '',
-            ', "lastname": "{0}"'.format(lastName) if lastName != '' else '',
-            ', "secondaryemail": "{0}"'.format(secondaryEmail) if secondaryEmail != '' else '',
-            ', "netbiosdomain": "{0}"'.format(netbiosDomain) if netbiosDomain != '' else '',
-            ', "samaccountname": "{0}"'.format(samAccountName) if samAccountName != '' else '',
-            ', "userprincipalname": "{0}"'.format(userPrincipalName) if userPrincipalName != '' else '',
-            ', "objectguid": "{0}"'.format(objectGuid) if objectGuid != '' else '',
-            ', "countrycode": "{0}"'.format(countryCode) if countryCode != '' else '',
-            ', "mobilenumber": "{0}"'.format(mobileNumber) if mobileNumber != '' else '',
-            ', "adminrole": "{0}"'.format(adminRole) if adminRole != '' else '',
-            # Support just one group for now
-            ', "groupmembership": ["{0}"]'.format(groupMembership) if groupMembership != '' else '',
-            '}',
-        ]))
+        try:
+            params = json.loads(''.join([
+                '{',
+                '"companyemail": "{0}"'.format(userName),
+                ', "firstname": [{0}]'.format(firstName) if firstName != '' else '',
+                ', "lastname": "{0}"'.format(lastName) if lastName != '' else '',
+                ', "secondaryemail": "{0}"'.format(secondaryEmail) if secondaryEmail != '' else '',
+                ', "netbiosdomain": "{0}"'.format(netbiosDomain) if netbiosDomain != '' else '',
+                ', "samaccountname": "{0}"'.format(samAccountName) if samAccountName != '' else '',
+                ', "userprincipalname": "{0}"'.format(userPrincipalName) if userPrincipalName != '' else '',
+                ', "objectguid": "{0}"'.format(objectGuid) if objectGuid != '' else '',
+                ', "countrycode": "{0}"'.format(countryCode) if countryCode != '' else '',
+                ', "mobilenumber": "{0}"'.format(mobileNumber) if mobileNumber != '' else '',
+                ', "adminrole": "{0}"'.format(adminRole) if adminRole != '' else '',
+                # Support just one group for now
+                ', "groupmembership": ["{0}"]'.format(groupMembership) if groupMembership != '' else '',
+                '}',
+            ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter value")
 
-        return self._callBitglassApi('user', 'createupdate', param, params)
+        return self._callBitglassApi(action_result, 'user', 'createupdate', param, params)
 
     def _handle_deactivate_user(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         userName = param['bg_user_name']
-        params = json.loads(''.join([
-            '{',
-            '"companyemail": "{0}"'.format(userName),
-            '}',
-        ]))
 
-        return self._callBitglassApi('user', 'deactivate', param, params)
+        try:
+            params = json.loads(''.join([
+                '{',
+                '"companyemail": "{0}"'.format(userName),
+                '}',
+            ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
+
+        return self._callBitglassApi(action_result, 'user', 'deactivate', param, params)
 
     def _handle_reactivate_user(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
         userName = param['bg_user_name']
-        params = json.loads(''.join([
-            '{',
-            '"companyemail": "{0}"'.format(userName),
-            '}',
-        ]))
 
-        return self._callBitglassApi('user', 'reactivate', param, params)
+        try:
+            params = json.loads(''.join([
+                '{',
+                '"companyemail": "{0}"'.format(userName),
+                '}',
+            ]))
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
+
+        return self._callBitglassApi(action_result, 'user', 'reactivate', param, params)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -566,13 +623,13 @@ class BitglassConnector(BaseConnector):
         elif 'remove_user_from_group' in action_id:
             ret_val = self._handle_remove_user_from_group(param)
 
-        elif 'handle_create_update_user' in action_id:
+        elif 'create_update_user' in action_id:
             ret_val = self._handle_create_update_user(param)
 
-        elif 'handle_deactivate_user' in action_id:
+        elif 'deactivate_user' in action_id:
             ret_val = self._handle_deactivate_user(param)
 
-        elif 'handle_reactivate_user' in action_id:
+        elif 'reactivate_user' in action_id:
             ret_val = self._handle_reactivate_user(param)
 
         return ret_val
@@ -597,12 +654,13 @@ class BitglassConnector(BaseConnector):
         # TODO Don't know how to custom validate asset fields so have to do it here
         try:
             conf.proxies = conf._getProxies(config.get('proxies', ''))
-        except BaseException as e:
-            self.debug_print('Bad proxy param while getting configuration params', str(e))
+        except BaseException as ex:
+            err_msg = self._get_error_message_from_exception(ex)
+            self.debug_print('Bad proxy param while getting configuration params {}'.format(err_msg))
 
         # These 2 are extra
-        conf.filter_access = config['filter_access']
-        conf.filter_cloudaudit = config['filter_cloudaudit']
+        conf.filter_access = config.get('filter_access', '')
+        conf.filter_cloudaudit = config.get('filter_cloudaudit', '')
 
         # Access and CloudAudit only, if enabled and non-empty pattern expression only
         # (the latter is to avoid accidental flooding with unnecessary high frequency data)

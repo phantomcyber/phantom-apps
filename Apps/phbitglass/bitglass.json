@@ -4,13 +4,13 @@
     "description": "The app pulls Bitglass cloudaudit and access log data once configured and parses the specified DLP patterns from the asset configuration page",
     "type": "siem",
     "product_vendor": "Bitglass Inc.",
-    "logo": "bitglass.png",
-    "logo_dark": "bitglass_dark.png",
+    "logo": "logo_bitglass.svg",
+    "logo_dark": "logo_bitglass_dark.svg",
     "product_name": "Bitglass Phantom App",
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Bitglass Inc.",
-    "license": "Copyright (c) 2020-2021 Bitglass App Inc.",
+    "license": "Copyright (c) 2021 Bitglass App Inc.",
     "app_version": "1.0.9",
     "utctime_updated": "2020-12-02T14:21:45.475883Z",
     "package_name": "phantom_bitglass",
@@ -27,64 +27,49 @@
         "username": {
             "description": "Username (Basic Authentication)",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "api_url": {
             "description": "Bitglass API URL",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 2
         },
         "password": {
             "description": "Password (Basic Authentication)",
             "data_type": "password",
-            "required": false,
             "order": 3
         },
         "proxies": {
             "description": "Proxy settings for Bitglass API, format: https=https://usr:pswd@1.2.3.4:999",
             "data_type": "password",
-            "required": false,
             "order": 4
         },
-        "​": {
-            "description": "​",
+        "ph": {
             "data_type": "ph",
-            "required": false,
-            "value_list": [],
-            "default": "​",
             "order": 5
         },
         "enable_access": {
             "description": "Pull Bitglass Access logs :",
             "data_type": "boolean",
-            "required": true,
             "default": true,
             "order": 6
         },
         "filter_access": {
             "description": "DLP Pattern for Access",
             "data_type": "string",
-            "required": false,
             "default": "Malware.*|PCI.*",
             "order": 7
         },
         "enable_cloudaudit": {
             "description": "Pull Bitglass CloudAudit logs :",
             "data_type": "boolean",
-            "required": true,
             "default": true,
             "order": 8
         },
         "filter_cloudaudit": {
             "description": "DLP Pattern for CloudAudit",
             "data_type": "string",
-            "required": false,
             "default": "^PCI.*",
             "order": 9
         }
@@ -123,8 +108,6 @@
                     "description": "Python regex expression to match the patterns",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
                     "default": "Malware.*",
                     "order": 0
                 },
@@ -132,20 +115,19 @@
                     "description": "Phantom artifact ID",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "phantom artifact id"
                     ],
-                    "value_list": [],
                     "default": "artifact:*.id",
-                    "order": 1
+                    "order": 1,
+                    "primary": true
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.bg_match_expression",
                     "data_type": "string",
-                    "column_name": "bg_match_expression",
+                    "column_name": "Bg Match Expression",
                     "column_order": 0
                 },
                 {
@@ -154,19 +136,13 @@
                     "contains": [
                         "phantom artifact id"
                     ],
-                    "column_name": "bg_log_event",
+                    "column_name": "Bg Log Event",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.userName",
                     "data_type": "string",
-                    "column_name": "userName",
+                    "column_name": "Username",
                     "column_order": 3,
                     "example_values": [
                         "joedoe@whitehat.com"
@@ -176,7 +152,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -205,17 +195,12 @@
                     "description": "Name of the group to create or update",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
                 },
                 "bg_new_group_name": {
                     "description": "New name of the group to rename to",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
                     "default": "RiskyUsers",
                     "order": 1
                 }
@@ -224,29 +209,37 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "column_name": "bg_group_name",
+                    "column_name": "Bg Group Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.bg_new_group_name",
                     "data_type": "string",
-                    "column_name": "bg_new_group_name",
+                    "column_name": "Bg New Group Name",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -275,8 +268,6 @@
                     "description": "Name of the group to delete",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
                 }
@@ -285,23 +276,31 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "column_name": "bg_group_name",
+                    "column_name": "Bg Group Name",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -330,8 +329,6 @@
                     "description": "Name of the group to add the risky user to",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
                 },
@@ -339,20 +336,18 @@
                     "description": "User name to add",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 1
+                    "order": 1,
+                    "primary": true
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "column_name": "bg_group_name",
+                    "column_name": "Bg Group Name",
                     "column_order": 0
                 },
                 {
@@ -361,23 +356,31 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_name": "bg_user_name",
+                    "column_name": "Bg User Name",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -406,8 +409,6 @@
                     "description": "Name of the group to add the risky user to",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "value_list": [],
                     "default": "RiskyUsers",
                     "order": 0
                 },
@@ -415,20 +416,18 @@
                     "description": "User name to remove",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 1
+                    "order": 1,
+                    "primary": true
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
-                    "column_name": "bg_group_name",
+                    "column_name": "Bg Group Name",
                     "column_order": 0
                 },
                 {
@@ -437,23 +436,31 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_name": "bg_user_name",
+                    "column_name": "Bg User Name",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -482,111 +489,65 @@
                     "description": "Email of the user to create or update",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 },
                 "bg_first_name": {
                     "description": "First name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 },
                 "bg_last_name": {
                     "description": "Last name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 2
                 },
                 "bg_secondary_email": {
                     "description": "Secondary email",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 3
                 },
                 "bg_netbios_domain": {
                     "description": "NetBIOS domain",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "bg_sam_account_name": {
                     "description": "SAM account domain",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 5
                 },
                 "bg_user_principal_name": {
                     "description": "User principal name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 6
                 },
                 "bg_object_guid": {
                     "description": "Object GUID",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 7
                 },
                 "bg_country_code": {
                     "description": "Country code",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 8
                 },
                 "bg_mobile_number": {
                     "description": "Mobile number",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 9
                 },
                 "bg_admin_role": {
                     "description": "Admin role",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 10
                 },
                 "bg_group_membership": {
                     "description": "Place the user under the group",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "value_list": [],
-                    "default": "",
                     "order": 11
                 }
             },
@@ -597,89 +558,97 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_name": "bg_user_name",
+                    "column_name": "Bg User Name",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.bg_first_name",
                     "data_type": "string",
-                    "column_name": "bg_first_name",
+                    "column_name": "Bg First Name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.bg_last_name",
                     "data_type": "string",
-                    "column_name": "bg_last_name",
+                    "column_name": "Bg Last Name",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.bg_secondary_email",
                     "data_type": "string",
-                    "column_name": "bg_secondary_email",
+                    "column_name": "Bg Secondary Email",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.bg_netbios_domain",
                     "data_type": "string",
-                    "column_name": "bg_netbios_domain",
+                    "column_name": "Bg Netbios Domain",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.bg_sam_account_name",
                     "data_type": "string",
-                    "column_name": "bg_sam_account_name",
+                    "column_name": "Bg Sam Account Name",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.bg_user_principal_name",
                     "data_type": "string",
-                    "column_name": "bg_user_principal_name",
+                    "column_name": "Bg User Principal Name",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.bg_object_guid",
                     "data_type": "string",
-                    "column_name": "bg_object_guid",
+                    "column_name": "Bg Object Guid",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.parameter.bg_country_code",
                     "data_type": "string",
-                    "column_name": "bg_country_code",
+                    "column_name": "Bg Country Code",
                     "column_order": 8
                 },
                 {
                     "data_path": "action_result.parameter.bg_mobile_number",
                     "data_type": "string",
-                    "column_name": "bg_mobile_number",
+                    "column_name": "Bg Mobile Number",
                     "column_order": 9
                 },
                 {
                     "data_path": "action_result.parameter.bg_admin_role",
                     "data_type": "string",
-                    "column_name": "bg_admin_role",
+                    "column_name": "Bg Admin Role",
                     "column_order": 10
                 },
                 {
                     "data_path": "action_result.parameter.bg_group_membership",
                     "data_type": "string",
-                    "column_name": "bg_group_membership",
+                    "column_name": "Bg Group Membership",
                     "column_order": 11
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 12
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 13
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 12,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -708,13 +677,11 @@
                     "description": "Email of the user to deactivate",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 }
             },
             "output": [
@@ -724,23 +691,31 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_name": "bg_user_name",
+                    "column_name": "Bg User Name",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -769,13 +744,11 @@
                     "description": "Email of the user to reactivate",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "contains": [
                         "user name"
                     ],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 }
             },
             "output": [
@@ -785,23 +758,31 @@
                     "contains": [
                         "user name"
                     ],
-                    "column_name": "bg_user_name",
+                    "column_name": "Bg User Name",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string",
-                    "column_name": "data",
+                    "column_name": "Data",
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
