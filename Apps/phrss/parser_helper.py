@@ -69,7 +69,7 @@ def _pdf_to_text(pdf_contents):
 
 
 def parse_link_contents(base_connector, resp_content):
-    # type: (BaseConnector, str) -> bool, str, dict
+    """ type: (BaseConnector, str) -> bool, str, dict """
     magic_str = magic.from_buffer(resp_content)
     for regex, file_type in MAGIC_FORMATS:
         if regex.match(magic_str):
@@ -78,7 +78,7 @@ def parse_link_contents(base_connector, resp_content):
 
 
 def parse_file(base_connector, file_contents, file_type):
-    # type: (BaseConnector, ActionResult, str) -> bool, list
+    """ type: (BaseConnector, ActionResult, str) -> bool, list """
     if file_type == 'pdf':
         ret_val, msg, raw_text = _pdf_to_text(file_contents)
     elif file_type == 'html':
