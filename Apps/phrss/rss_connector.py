@@ -218,7 +218,7 @@ class RssConnector(BaseConnector):
         if action_id == rc.ACTION_ID_TEST_CONNECTIVITY:
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == rc.ACTION_ID_ON_POLL :
+        elif action_id == rc.ACTION_ID_ON_POLL:
             ret_val = self._handle_on_poll(param)
 
         return ret_val
