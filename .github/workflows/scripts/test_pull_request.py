@@ -14,7 +14,7 @@ API_SERVER_URL = os.environ['APPS_TEST_SERVER_URI']
 API_SERVER_KEY = os.environ['APPS_TEST_SERVER_API_KEY']
 
 DEFAULT_REQUEST_TIMEOUT = datetime.timedelta(seconds=30)
-DEFAULT_QUERY_TIMEOUT = datetime.timedelta(seconds=20)
+DEFAULT_QUERY_TIMEOUT = datetime.timedelta(seconds=60)
 
 TEST_REQUEST_URL = f'https://{API_SERVER_URL}/pull_request/'
 TEST_RESULTS_URL = f'https://{API_SERVER_URL}/pull_request/result/'
@@ -65,7 +65,7 @@ if __name__ == '__main__':
                         help='whether to post results in a comment with a Google Drive link')
     args = parser.parse_args()
 
-    print('Requesting testing of pull request number {args.pull_request_id} for "{args.requester}"')
+    print(f'Requesting testing of pull request number {args.pull_request_id} for "{args.requester}"')
     test_request_response = request_test(args.pull_request_id,
                                          requester=args.requester,
                                          publish_results=args.publish_results)
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     test_request_response_json = test_request_response.json()
     results_id = test_request_response_json['results_id']
 
-    print('Querying for results with results ID "{results_id}"')
+    print(f'Querying for results with results ID "{results_id}"')
     query_timeout = round(DEFAULT_QUERY_TIMEOUT.total_seconds())
     query_results_response = query_test_results(results_id, query_timeout=query_timeout)
     query_results_response.raise_for_status()
@@ -89,7 +89,7 @@ if __name__ == '__main__':
     if not success:
         error_message = results.get('message')
         if error_message:
-            test_failure_message = 'Tests have failed with error message: "{error_message}"'
+            test_failure_message = f'Tests have failed with error message: "{error_message}"'
         else:
             test_failure_message = 'Tests have failed. Please review the report and make corrections as needed.'
         raise Exception(test_failure_message)

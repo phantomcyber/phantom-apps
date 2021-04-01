@@ -5,5 +5,12 @@
         "JSON config param `project_key` should probably be of data_type `password` or `file`"
       ]
     }
+  },
+  "phantom_passivetotal": {
+    "Verify Password Config": {
+      "verbose": [
+        "JSON config param `key` should probably be of data_type `password` or `file`"
+      ]
+    }
   }
 }
