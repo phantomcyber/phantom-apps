@@ -4,8 +4,8 @@
     "description": "This app integrates with Cloudflare Firewall to support containment and investigative actions",
     "type": "network security",
     "product_vendor": "Cloudflare",
-    "logo": "cloudflare.svg",
-    "logo_dark": "cloudflare_dark.svg",
+    "logo": "logo_cloudflare.svg",
+    "logo_dark": "logo_cloudflare_dark.svg",
     "product_name": "Cloudflare",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -19,7 +19,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2020-03-23T09:51:22.787358Z",
     "package_name": "phantom_cloudflare",
-    "main_module": "cloudflare_connector.pyc",
+    "main_module": "cloudflare_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -27,7 +27,6 @@
             "description": "Base URL for Cloudflare API (e.g. https://api.cloudflare.com/client/v4/)",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "https://api.cloudflare.com/client/v4/",
             "order": 0
         },
@@ -41,9 +40,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -51,9 +50,9 @@
         },
         {
             "action": "block ip",
-            "identifier": "block_ip",
             "description": "Block an IP",
             "type": "contain",
+            "identifier": "block_ip",
             "read_only": false,
             "parameters": {
                 "ip": {
@@ -64,54 +63,74 @@
                     "contains": [
                         "ip"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "domain_name": {
                     "description": "Domain name (exact match)",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "rule_descr": {
                     "description": "Firewall rule name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "default": "Phantom Block IP",
                     "order": 2
                 }
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.domain_name",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "ip",
+                    "column_name": "IP",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.parameter.domain_name",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.rule_descr",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -121,56 +140,39 @@
         },
         {
             "action": "update rule",
-            "identifier": "update_rule",
             "description": "Update a firewall rule",
             "type": "contain",
+            "identifier": "update_rule",
             "read_only": false,
             "parameters": {
                 "rule_name": {
                     "description": "Firewall rule name (case-insensitive exact match)",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "domain_name": {
                     "description": "Domain name (exact match)",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "action": {
                     "description": "Action to apply",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "contains": [],
                     "value_list": [
-                      "block",
-                      "allow"
+                        "block",
+                        "allow"
                     ],
-                    "default": "",
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.rule_name",
-                    "data_type": "string",
-                    "contains": [],
-                    "column_name": "name",
-                    "column_order": 0
-                },
-                {
                     "data_path": "action_result.parameter.action",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "action",
+                    "column_name": "Action",
                     "column_order": 1
                 },
                 {
@@ -178,14 +180,46 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.parameter.rule_name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -195,46 +229,31 @@
         },
         {
             "action": "block useragent",
-            "identifier": "block_useragent",
             "description": "Deny access to reported UserAgent",
             "type": "contain",
+            "identifier": "block_useragent",
             "read_only": false,
             "parameters": {
                 "user_agent": {
                     "description": "UserAgent to block",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "domain_name": {
                     "description": "Domain name (exact match)",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "default": "",
                     "order": 1
                 },
                 "rule_descr": {
                     "description": "Firewall rule name",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "default": "Phantom Block UserAgent",
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.user_agent",
-                    "data_type": "string",
-                    "contains": [],
-                    "column_name": "user_agent",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.domain_name",
                     "data_type": "string"
@@ -244,14 +263,46 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.parameter.user_agent",
+                    "data_type": "string",
+                    "column_name": "User Agent",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

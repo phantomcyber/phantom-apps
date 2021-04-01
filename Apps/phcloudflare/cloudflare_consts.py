@@ -20,3 +20,7 @@ CLOUDFLARE_VALID_ACTIONS = {'allow': True, 'block': False}
 # Error messages
 CLOUDFLARE_INVALID_ACTION_ERR = 'Unknown action "{action}". Supported values are [' + ', '.join(
     CLOUDFLARE_VALID_ACTIONS) + ']'
+CLOUDFLARE_ERR_CODE_MSG = "Error code unavailable"
+CLOUDFLARE_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+CLOUDFLARE_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+CLOUDFLARE_PARSE_RESPONSE_ERR_MSG = "Cannot parse response from server"
