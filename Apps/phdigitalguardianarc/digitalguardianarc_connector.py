@@ -953,7 +953,7 @@ if __name__ == '__main__':
                                headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ('Unable to get session id from the platform. Error: ' + str(e))
+            print('Unable to get session id from the platform. Error: ' + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
