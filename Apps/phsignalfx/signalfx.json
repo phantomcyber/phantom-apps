@@ -18,7 +18,7 @@
             "name": "Angelo Brancato"
         }
     ],
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.3",
     "utctime_updated": "2021-02-09T13:51:01.186096Z",
     "package_name": "phantom_signalfx",
@@ -59,7 +59,7 @@
             "read_only": true,
             "parameters": {
                 "query": {
-                    "description": "Query",
+                    "description": "'Dimension name' or 'name and value' to search for (e.g: aws_region:region_name)",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -73,6 +73,9 @@
                 {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
+                    "example_values": [
+                        "aws_region:region_name"
+                    ],
                     "contains": [
                         "signalfx query"
                     ],
@@ -171,7 +174,7 @@
                     "data_path": "action_result.data.*.results.*.customProperties.aws_tag_Name",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Tag Name"
                     ]
                 },
                 {
@@ -403,11 +406,17 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total results: 1"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -542,9 +551,7 @@
                     "data_type": "string",
                     "contains": [
                         "signalfx incidentid"
-                    ],
-                    "column_name": "Incident ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -556,8 +563,6 @@
                 {
                     "data_path": "action_result.data.*.severity",
                     "data_type": "string",
-                    "column_name": "Severity",
-                    "column_order": 1,
                     "example_values": [
                         "Critical",
                         "Major"
@@ -566,8 +571,6 @@
                 {
                     "data_path": "action_result.data.*.active",
                     "data_type": "boolean",
-                    "column_name": "Active",
-                    "column_order": 2,
                     "example_values": [
                         true,
                         false
@@ -576,8 +579,6 @@
                 {
                     "data_path": "action_result.data.*.anomalyState",
                     "data_type": "string",
-                    "column_name": "Anomaly State",
-                    "column_order": 3,
                     "example_values": [
                         "MANUALLY_RESOLVED"
                     ]
@@ -585,8 +586,6 @@
                 {
                     "data_path": "action_result.data.*.detectorId",
                     "data_type": "string",
-                    "column_name": "Detector ID",
-                    "column_order": 4,
                     "example_values": [
                         "EtNvxe4AEAA"
                     ]
@@ -594,8 +593,6 @@
                 {
                     "data_path": "action_result.data.*.detectLabel",
                     "data_type": "string",
-                    "column_name": "Detector Label",
-                    "column_order": 5,
                     "example_values": [
                         "instance_state_change"
                     ]
@@ -603,8 +600,6 @@
                 {
                     "data_path": "action_result.data.*.detectorName",
                     "data_type": "string",
-                    "column_name": "Detector Name",
-                    "column_order": 6,
                     "example_values": [
                         "instance_changed"
                     ]
@@ -612,8 +607,6 @@
                 {
                     "data_path": "action_result.data.*.displayBody",
                     "data_type": "string",
-                    "column_name": "Display Body",
-                    "column_order": 7,
                     "example_values": [
                         "us-west-2a t3.xlarge 102730102752 us-west-2 743229228294 instance.state_change Linux aws started t3 Shared EC2.Instances"
                     ]
@@ -621,8 +614,6 @@
                 {
                     "data_path": "action_result.data.*.isMuted",
                     "data_type": "boolean",
-                    "column_name": "Is Muted",
-                    "column_order": 8,
                     "example_values": [
                         true,
                         false
@@ -631,8 +622,6 @@
                 {
                     "data_path": "action_result.data.*.triggeredWhileMuted",
                     "data_type": "boolean",
-                    "column_name": "Triggered While Muted",
-                    "column_order": 9,
                     "example_values": [
                         true,
                         false
@@ -641,8 +630,6 @@
                 {
                     "data_path": "action_result.data.*.triggeredNotificationSent",
                     "data_type": "boolean",
-                    "column_name": "Triggered Notification Sent",
-                    "column_order": 10,
                     "example_values": [
                         true,
                         false
@@ -658,6 +645,9 @@
                 {
                     "data_path": "action_result.data.*.incidentId",
                     "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
                     "example_values": [
                         "Et6d4doAIAg"
                     ]
@@ -798,6 +788,9 @@
                 {
                     "data_path": "action_result.data.*.events.*.incidentId",
                     "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
                     "example_values": [
                         "Et6d4doAIAg"
                     ]
@@ -855,14 +848,15 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "view": "signalfx_view.display_view"
             },
             "versions": "EQ(*)"
         },
         {
             "action": "list incidents",
             "description": "List all incidents",
-            "verbose": "This action can return alerts upto index 10000.",
+            "verbose": "This action can return incidents up to index 10000.",
             "type": "investigate",
             "identifier": "list_incidents",
             "read_only": true,
@@ -905,8 +899,6 @@
                     "contains": [
                         "signalfx incidentid"
                     ],
-                    "column_name": "Incident ID",
-                    "column_order": 0,
                     "example_values": [
                         "Et6d4doAIAg"
                     ]
@@ -914,8 +906,6 @@
                 {
                     "data_path": "action_result.data.*.severity",
                     "data_type": "string",
-                    "column_name": "Severity",
-                    "column_order": 1,
                     "example_values": [
                         "Critical",
                         "Major"
@@ -924,8 +914,6 @@
                 {
                     "data_path": "action_result.data.*.active",
                     "data_type": "boolean",
-                    "column_name": "Active",
-                    "column_order": 2,
                     "example_values": [
                         true,
                         false
@@ -934,8 +922,6 @@
                 {
                     "data_path": "action_result.data.*.anomalyState",
                     "data_type": "string",
-                    "column_name": "Anomaly State",
-                    "column_order": 3,
                     "example_values": [
                         "MANUALLY_RESOLVED"
                     ]
@@ -943,8 +929,6 @@
                 {
                     "data_path": "action_result.data.*.detectorId",
                     "data_type": "string",
-                    "column_name": "Detector ID",
-                    "column_order": 4,
                     "example_values": [
                         "EtNvxe4AEAA"
                     ]
@@ -952,8 +936,6 @@
                 {
                     "data_path": "action_result.data.*.detectLabel",
                     "data_type": "string",
-                    "column_name": "Detector Label",
-                    "column_order": 5,
                     "example_values": [
                         "instance_state_change"
                     ]
@@ -961,8 +943,6 @@
                 {
                     "data_path": "action_result.data.*.detectorName",
                     "data_type": "string",
-                    "column_name": "Detector Name",
-                    "column_order": 6,
                     "example_values": [
                         "instance_changed"
                     ]
@@ -970,8 +950,6 @@
                 {
                     "data_path": "action_result.data.*.displayBody",
                     "data_type": "string",
-                    "column_name": "Display Body",
-                    "column_order": 7,
                     "example_values": [
                         "us-west-2a t3.xlarge 102730102752 us-west-2 743229228294 instance.state_change Linux aws started t3 Shared EC2.Instances"
                     ]
@@ -979,8 +957,6 @@
                 {
                     "data_path": "action_result.data.*.isMuted",
                     "data_type": "boolean",
-                    "column_name": "Is Muted",
-                    "column_order": 8,
                     "example_values": [
                         true,
                         false
@@ -989,8 +965,6 @@
                 {
                     "data_path": "action_result.data.*.triggeredWhileMuted",
                     "data_type": "boolean",
-                    "column_name": "Triggered While Muted",
-                    "column_order": 9,
                     "example_values": [
                         true,
                         false
@@ -999,8 +973,6 @@
                 {
                     "data_path": "action_result.data.*.triggeredNotificationSent",
                     "data_type": "boolean",
-                    "column_name": "Triggered Notification Sent",
-                    "column_order": 10,
                     "example_values": [
                         true,
                         false
@@ -1142,6 +1114,9 @@
                 {
                     "data_path": "action_result.data.*.events.*.incidentId",
                     "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
                     "example_values": [
                         "Et6d4doAIAg"
                     ]
@@ -1184,11 +1159,17 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total incidents: 1"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_incidents",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1206,7 +1187,8 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "view": "signalfx_view.display_view"
             },
             "versions": "EQ(*)"
         }

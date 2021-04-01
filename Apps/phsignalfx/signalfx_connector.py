@@ -1,5 +1,5 @@
 # File: signalfx_connector.py
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -235,9 +235,6 @@ class SignalfxConnector(BaseConnector):
 
         query_string = param['query']
 
-        # make rest call
-        # myNote: Zusammenbauen!!!
-
         params = {
             'query': query_string
         }
@@ -252,7 +249,10 @@ class SignalfxConnector(BaseConnector):
         # Add the response into the data section
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Run Query action executed successfully")
+        summary = action_result.update_summary({})
+        summary['total_results'] = response.get('count', 0)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_clear_incident(self, param):
 
@@ -351,7 +351,9 @@ class SignalfxConnector(BaseConnector):
             error_msg = "Failed to parse the response data. {}".format(err)
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "{} incidents fetched successfully".format(count))
+        summary = action_result.update_summary({})
+        summary['total_incidents'] = count
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
