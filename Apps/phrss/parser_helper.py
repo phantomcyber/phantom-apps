@@ -1,7 +1,8 @@
 # File: parser_helper.py
-# Copyright (c) 2017-2019 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 from parser import TextIOCParser
 
@@ -10,7 +11,7 @@ import phantom.app as phantom
 import magic
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-from cStringIO import StringIO
+from io import StringIO
 
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
