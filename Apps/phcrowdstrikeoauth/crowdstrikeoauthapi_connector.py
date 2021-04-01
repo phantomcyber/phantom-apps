@@ -367,7 +367,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             param.update({"offset": offset})
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=param)
-
+            
             if phantom.is_fail(ret_val):
                 return None
 
@@ -2309,6 +2309,9 @@ class CrowdstrikeConnector(BaseConnector):
         msg = action_result.get_message()
         if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'authorization failed' in msg or 'access denied' in msg:
             ret_val = self._get_token(action_result)
+
+            if not phantom.is_fail(ret_val):
+                action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token") 
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._oauth_access_token)})
 
