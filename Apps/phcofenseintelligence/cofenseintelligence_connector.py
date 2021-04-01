@@ -17,6 +17,7 @@ import json
 import time
 import hashlib
 from datetime import datetime
+from bs4 import UnicodeDammit
 
 
 class PhishMeConnector(BaseConnector):
@@ -47,7 +48,7 @@ class PhishMeConnector(BaseConnector):
 
         self._state = self.load_state()
         config = self.get_config()
-        self._api_username = config[PHISHME_CONFIG_API_USERNAME]
+        self._api_username = UnicodeDammit(config[PHISHME_CONFIG_API_USERNAME]).unicode_markup.encode('utf-8')
         self._api_password = config[PHISHME_CONFIG_API_PASSWORD]
 
         num_days = config.get(PHISHME_CONFIG_POLL_NOW_DAYS, PHISHME_DEFAULT_POLL_NOW_SPAN_DAYS)
