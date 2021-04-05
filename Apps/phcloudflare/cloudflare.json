@@ -141,7 +141,7 @@
         {
             "action": "update rule",
             "description": "Update a firewall rule",
-            "type": "contain",
+            "type": "generic",
             "identifier": "update_rule",
             "read_only": false,
             "parameters": {
