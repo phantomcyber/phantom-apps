@@ -1,8 +1,9 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: googlecloudiam_connector.py
+#
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -36,9 +37,44 @@ class GoogleCloudIamConnector(BaseConnector):
         super(GoogleCloudIamConnector, self).__init__()
         self._state = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing the error message")
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _create_client(self, action_result):
-        config = self.get_config()
-        service_account_json = json.loads(config['key_json'])
+        try:
+            service_account_json = json.loads(self.key_json)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, INVALID_SERVICE_ACCOUNT_JSON)
 
         try:
             credentials = service_account.Credentials.from_service_account_info(
@@ -52,7 +88,8 @@ class GoogleCloudIamConnector(BaseConnector):
             )
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create google api client: {0}".format(e))
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Could not create google api client: {0}".format(err))
 
         return phantom.APP_SUCCESS
 
@@ -60,9 +97,11 @@ class GoogleCloudIamConnector(BaseConnector):
         try:
             response = request.execute()
         except errors.HttpError as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API HTTP Error', e), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API HTTP Error: {}'.format(err)), None)
         except errors.Error as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error', e), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error: {}'.format(err)), None)
 
         return phantom.APP_SUCCESS, response
 
@@ -71,10 +110,9 @@ class GoogleCloudIamConnector(BaseConnector):
         self.save_progress("Connecting to endpoint")
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
-
-        self.debug_print(self._client)
 
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -84,185 +122,169 @@ class GoogleCloudIamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
 
-        name = f"projects/{project}/serviceAccounts/{account}"
+        name = f"projects/{self.project}/serviceAccounts/{account}"
 
         request = self._client.projects().serviceAccounts().keys().list(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        self.debug_print(response)
-
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, LIST_SERVICE_ACCOUNT_KEY_SUCCESS_MSG)
 
     def _handle_get_serviceaccountkey(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
         key = param['key']
 
-        name = f"projects/{project}/serviceAccounts/{account}/keys/{key}"
-
+        name = f"projects/{self.project}/serviceAccounts/{account}/keys/{key}"
         request = self._client.projects().serviceAccounts().keys().get(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        self.debug_print(response)
-
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, GET_SERVICE_ACCOUNT_KEY_SUCCESS_MSG)
 
     def _handle_delete_serviceaccountkey(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
         key = param['key']
 
-        name = f"projects/{project}/serviceAccounts/{account}/keys/{key}"
-
+        name = f"projects/{self.project}/serviceAccounts/{account}/keys/{key}"
         request = self._client.projects().serviceAccounts().keys().delete(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        self.debug_print(response)
-
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, DELETE_SERVICE_ACCOUNT_KEY_SUCCESS_MSG)
 
     def _handle_create_serviceaccountkey(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
         save_key = param.get("save_key_to_vault")
 
-        name = f"projects/{project}/serviceAccounts/{account}"
-
+        name = f"projects/{self.project}/serviceAccounts/{account}"
         request = self._client.projects().serviceAccounts().keys().create(name=name)
         ret_val, response = self._send_request(request, action_result)
-
-        if save_key:
-            key_encoded = response["privateKeyData"]
-            key_name = os.path.basename(response["name"])
-            key_filename = f'{key_name}.json'
-            key = base64.b64decode(key_encoded)
-            vault_path = Vault.get_vault_tmp_dir()
-            file_desc, file_path = tempfile.mkstemp(dir=vault_path)
-
-            with open(file_path, "wb") as f:
-                f.write(key)
-            vault_ret = Vault.add_attachment(file_path, self.get_container_id(), key_filename)
-            response["vault_id"] = vault_ret[phantom.APP_JSON_HASH]
-            response["filename"] = key_filename
-            action_result.set_summary({"created_vault_id": vault_ret[phantom.APP_JSON_HASH]})
-
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
+        if save_key:
+            try:
+                key_encoded = response["privateKeyData"]
+                key_name = os.path.basename(response["name"])
+                key_filename = f'{key_name}.json'
+                key = base64.b64decode(key_encoded)
+                vault_path = Vault.get_vault_tmp_dir()
+                file_desc, file_path = tempfile.mkstemp(dir=vault_path)
+
+                with open(file_path, "wb") as f:
+                    f.write(key)
+                vault_ret = Vault.add_attachment(file_path, self.get_container_id(), key_filename)
+                response["vault_id"] = vault_ret[phantom.APP_JSON_HASH]
+                response["filename"] = key_filename
+                action_result.set_summary({"created_vault_id": vault_ret[phantom.APP_JSON_HASH]})
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VAULT_FILE_CREATION_ERR_MSG)
+
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, CREATE_SERVICE_ACCOUNT_KEY_SUCCESS_MSG)
 
     def _handle_get_serviceaccount(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
 
-        name = f"projects/{project}/serviceAccounts/{account}"
-
+        name = f"projects/{self.project}/serviceAccounts/{account}"
         request = self._client.projects().serviceAccounts().get(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, GET_SERVICE_ACCOUNT_SUCCESS_MSG)
 
     def _handle_disable_serviceaccount(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
 
-        name = f"projects/{project}/serviceAccounts/{account}"
-
+        name = f"projects/{self.project}/serviceAccounts/{account}"
         request = self._client.projects().serviceAccounts().disable(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, DISABLE_SERVICE_ACCOUNT_SUCCESS_MSG)
 
     def _handle_enable_serviceaccount(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if not self._create_client(action_result):
-            self.save_progress("Could not create API client.", e)
+            self.save_progress(API_CLIENT_ERR_MSG)
             return action_result.get_status()
 
         # Required values can be accessed directly
-        project = self.get_config()['project']
         account = param['account']
 
-        name = f"projects/{project}/serviceAccounts/{account}"
+        name = f"projects/{self.project}/serviceAccounts/{account}"
 
         request = self._client.projects().serviceAccounts().enable(name=name)
         ret_val, response = self._send_request(request, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val
 
         action_result.add_data(response)
-        return action_result.set_status(phantom.APP_SUCCESS, "Success")
+        return action_result.set_status(phantom.APP_SUCCESS, ENABLE_SERVICE_ACCOUNT_SUCCESS_MSG)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -305,6 +327,8 @@ class GoogleCloudIamConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
+        self.key_json = config["key_json"]
+        self.project = config["project"]
         """
         # Access values in asset config by the name
 
@@ -314,8 +338,6 @@ class GoogleCloudIamConnector(BaseConnector):
         # Optional values should use the .get() function
         optional_config_name = config.get('optional_config_name')
         """
-
-        self._base_url = config.get('base_url')
 
         return phantom.APP_SUCCESS
 
@@ -328,6 +350,7 @@ class GoogleCloudIamConnector(BaseConnector):
 def main():
     import pudb
     import argparse
+    import requests
 
     pudb.set_trace()
 
