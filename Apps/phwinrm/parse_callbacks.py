@@ -310,6 +310,8 @@ def list_firewall_rules(action_result, response, **kwargs):
     summary = action_result.update_summary({})
     summary['num_rules'] = size
 
+    if size == 0:
+        return action_result.set_status(phantom.APP_SUCCESS, "No firewall rule found for given parameters")
     return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved firewall rules")
 
 
