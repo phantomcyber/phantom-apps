@@ -93,10 +93,10 @@ class RssConnector(BaseConnector):
             fd, path = tempfile.mkstemp(dir='/opt/phantom/vault/tmp', text=True)
         os.write(fd, html_file)
         os.close(fd)
-        resp = ph_rules.vault_add(path, container_id, name)
-        if resp['succeeded']:
+        success, message, vault_id = ph_rules.vault_add(container_id, path, name)
+        if success:
             return phantom.APP_SUCCESS, None
-        return phantom.APP_ERROR, resp['message']
+        return phantom.APP_ERROR, message
 
     def _handle_on_poll(self, param):
         if self.is_poll_now():
