@@ -1,0 +1,1614 @@
+{
+    "appid": "60f9a9a6-6f54-4dd3-986f-9e1beb169adf",
+    "name": "Cofense Intelligence",
+    "description": "This App integrates with Cofense Intelligence to provide various hunting and reporting actions in addition to threat ingestion",
+    "publisher": "Splunk",
+    "package_name": "phantom_cofenseintelligence",
+    "type": "investigative",
+    "license": "Copyright (c) 2020-2021 Splunk Inc.",
+    "main_module": "cofenseintelligence_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2020-04-24T23:29:44.000000Z",
+    "product_vendor": "Cofense",
+    "product_name": "Cofense Intelligence",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "logo": "logo_cofenseintelligence.svg",
+    "logo_dark": "logo_cofenseintelligence_dark.svg",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API v1 tested on 30/03/2021"
+    ],
+    "configuration": {
+        "username": {
+            "required": true,
+            "description": "Username",
+            "data_type": "string",
+            "order": 0
+        },
+        "password": {
+            "required": true,
+            "description": "Password",
+            "data_type": "password",
+            "order": 1
+        },
+        "poll_now_ingestion_span": {
+            "default": 15,
+            "data_type": "numeric",
+            "description": "Poll last n days for 'Poll Now'",
+            "order": 2
+        },
+        "first_scheduled_ingestion_span": {
+            "default": 10,
+            "data_type": "numeric",
+            "description": "Poll last n days for first scheduled polling",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_asset_connectivity",
+            "type": "test",
+            "description": "Validate the asset configuration for connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt url",
+            "identifier": "hunt_url",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Look for information about a URL",
+            "verbose": "The action executes search API, that returns information about every matching report. The output data is restricted to include only report information and URL queried. <br>If <b>max_threat_count</b> parameter is not specified, the action will use 100.",
+            "parameters": {
+                "url": {
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to hunt",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "max_threat_count": {
+                    "description": "Maximum threats to fetch",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Hunt URL details",
+                "type": "custom",
+                "height": 5,
+                "view": "cofenseintelligence_view.get_reputation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_threat_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "www.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.apiReportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.blockType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.host",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.infrastructureTypeSubclass.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.role",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.roleDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executiveSummary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.firstPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.hasReport",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.lastPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.reportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatDetailURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_threats",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total threats: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "hunt file",
+            "identifier": "hunt_file",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Look for information about a file",
+            "verbose": "The action executes search API, that returns information about every matching report. The output data is restricted to include only report information and file queried. <br>If <b>max_threat_count</b> parameter is not specified, the action will use 100.",
+            "parameters": {
+                "hash": {
+                    "required": true,
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "description": "File hash to hunt (MD5)",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "max_threat_count": {
+                    "description": "Maximum threats to fetch",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Hunt file details",
+                "type": "custom",
+                "height": 5,
+                "view": "cofenseintelligence_view.get_reputation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ],
+                    "example_values": [
+                        "JFJEOSJ29V83JC02"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_threat_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.apiReportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.dateEntered",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.executableSubtype.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.fileName",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.fileNameExtension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.md5Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.severityLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Major"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.sha1Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.sha224Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha224"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.sha256Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.sha384Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.sha512Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha512"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.vendorDetections.*.detected",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executableSet.*.vendorDetections.*.threatVendorName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executiveSummary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.firstPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.hasReport",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.lastPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.reportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatDetailURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_threats",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total threats: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "hunt ip",
+            "identifier": "hunt_ip",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Look for information about an IP",
+            "verbose": "The action executes search API, that returns information about every matching report. The output data is restricted to include only report information and IP queried. <br>If <b>max_threat_count</b> parameter is not specified, the action will use 100.",
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "description": "IP to hunt",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "max_threat_count": {
+                    "description": "Maximum threats to fetch",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Hunt IP details",
+                "type": "custom",
+                "height": 5,
+                "view": "cofenseintelligence_view.get_reputation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "127.127.127.127"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_threat_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.apiReportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.blockType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.host",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.infrastructureTypeSubclass.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.asn",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.asnOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.continentCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.continentName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.countryIsoCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.countryName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.isp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.latitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.longitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.lookupOn",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.metroCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.postalCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.subdivisionIsoCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.subdivisionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.timeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.ipDetail.userType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.role",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.roleDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executiveSummary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.firstPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.hasReport",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.lastPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.reportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatDetailURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_threats",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total threats: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "hunt domain",
+            "identifier": "hunt_domain",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Look for information about a domain",
+            "verbose": "The action executes search API, that returns information about every matching report. The output data is restricted to include only report information and domain queried. <br>If <b>max_threat_count</b> parameter is not specified, the action will use 100.",
+            "parameters": {
+                "domain": {
+                    "required": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "description": "Domain to hunt",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0
+                },
+                "max_threat_count": {
+                    "description": "Maximum threats to fetch",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "cofenseintelligence_view.get_reputation"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_threat_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.apiReportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.blockType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.host",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.data_1.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.infrastructureTypeSubclass.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.role",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.blockSet.*.roleDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.brand.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.campaignBrandSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.executiveSummary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.firstPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.hasReport",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.lastPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.malwareFamilySet.*.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.reportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatDetailURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threats.*.threatType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_threats",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total threats: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "get report",
+            "identifier": "get_report",
+            "type": "investigate",
+            "read_only": true,
+            "description": "Get threat details",
+            "parameters": {
+                "threat_id": {
+                    "required": true,
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ],
+                    "description": "Threat ID",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Get Report",
+                "type": "custom",
+                "height": 5,
+                "view": "cofenseintelligence_view.get_report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.threat_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ],
+                    "example_values": [
+                        "1049210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.apiReportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.blockType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1.host",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.data_1.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.infrastructureTypeSubclass.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.asn",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.asnOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.continentCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.continentName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.countryIsoCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.countryName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.isp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.latitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.longitude",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.lookupOn",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.metroCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.postalCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.subdivisionIsoCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.subdivisionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.timeZone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.ipDetail.userType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.role",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.blockSet.*.roleDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignBrandSet.*.brand.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignBrandSet.*.brand.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignBrandSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignLanguageSet.*.languageDefinition.cultureCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x0403"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignLanguageSet.*.languageDefinition.isoCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "ca-es"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.campaignLanguageSet.*.languageDefinition.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Catalan - Catalan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.domainSet.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.domainSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.dateEntered",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.executableSubtype.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.fileName",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.fileNameExtension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.malwareFamily.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.malwareFamily.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.md5Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.severityLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Major"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.sha1Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.sha224Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha224"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.sha256Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.sha384Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha384"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.sha512Hex",
+                    "data_type": "string",
+                    "contains": [
+                        "sha512"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.vendorDetections.*.detected",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executableSet.*.vendorDetections.*.threatVendorName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.executiveSummary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.extractedStringSet.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.feeds.*.displayName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.feeds.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.feeds.*.permissions.OWNER",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.feeds.*.permissions.READ",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.feeds.*.permissions.WRITE",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.firstPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.hasReport",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.data.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "cofense intelligence threat id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.lastPublished",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.malwareFamilySet.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.malwareFamilySet.*.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.reportURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderEmailSet.*.senderEmail",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderEmailSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderIpSet.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderIpSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderNameSet.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.senderNameSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.url_1.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.url_1.host",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.url_1.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.url_1.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.spamUrlSet.*.url_1.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.subjectSet.*.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.subjectSet.*.totalCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.threatDetailURL",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.threatType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.threat_label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.threat_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Threat type: MALWARE, Threat label: Finance - FormGrabber"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "type": "ingest",
+            "read_only": true,
+            "description": "Action to ingest threats",
+            "verbose": "<p>For the first poll, ingest all the threats during past number of days set in <b>first_scheduled_ingestion_span</b>. Subsequent polls ingest new or updated threats. The threats are ordered in ascending order based on occurrence time.<br>Only create CEFs for following types:<br>. executableSet<br>. blockSet with impact of major or moderate</p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>destinationAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha1, fileHashSha384, fileHashSha512, fileHashSha224, fileHashSha256, fileName, fileType, fileModificationTime</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>destinationDnsDomain</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><tr><td>Threat Details</td><td>Threat Artifact</td><td>CofenseIntelligenceThreatId, threatType</td></tr></tbody></table>.",
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of containers to ingest",
+                    "data_type": "numeric"
+                },
+                "container_id": {
+                    "description": "Comma separated threat IDs",
+                    "data_type": "string",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "start_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "end_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 3
+                }
+            },
+            "versions": "EQ(*)",
+            "output": []
+        }
+    ]
+}

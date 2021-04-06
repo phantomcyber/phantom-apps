@@ -1,7 +1,8 @@
 # File: parser_helper.py
-# Copyright (c) 2017-2019 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 from parser import TextIOCParser
 
@@ -10,7 +11,7 @@ import phantom.app as phantom
 import magic
 from bs4 import BeautifulSoup
 from bs4.element import Comment
-from cStringIO import StringIO
+from io import StringIO
 
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
@@ -68,7 +69,7 @@ def _pdf_to_text(pdf_contents):
 
 
 def parse_link_contents(base_connector, resp_content):
-    # type: (BaseConnector, str) -> bool, str, dict
+    """ type: (BaseConnector, str) -> bool, str, dict """
     magic_str = magic.from_buffer(resp_content)
     for regex, file_type in MAGIC_FORMATS:
         if regex.match(magic_str):
@@ -77,7 +78,7 @@ def parse_link_contents(base_connector, resp_content):
 
 
 def parse_file(base_connector, file_contents, file_type):
-    # type: (BaseConnector, ActionResult, str) -> bool, list
+    """ type: (BaseConnector, ActionResult, str) -> bool, list """
     if file_type == 'pdf':
         ret_val, msg, raw_text = _pdf_to_text(file_contents)
     elif file_type == 'html':
