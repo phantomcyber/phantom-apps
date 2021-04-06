@@ -393,11 +393,14 @@ class RedmineConnector(BaseConnector):
             "/issues.json", action_result, params=qs
         )
 
-        if phantom.is_fail(ret_val):
-            message = action_result.get_message()
+        if phantom.is_fail(ret_val) or "issues" not in response:
+            action_result_message = action_result.get_message()
+            if action_result_message:
+                message = f"{REDMINE_ERR_RETRIEVE_TICKETS}. {action_result_message}"
+            else:
+                message = REDMINE_ERR_RETRIEVE_TICKETS
             return RetVal(
-                    action_result.set_status(phantom.APP_ERROR,
-                    REDMINE_ERR_RETRIEVE_TICKETS.format(message=message)),
+                    action_result.set_status(phantom.APP_ERROR, message),
                     None
                 )
 
@@ -435,7 +438,7 @@ class RedmineConnector(BaseConnector):
         except Exception as e:
             self.debug_print(self._get_error_message_from_exception(e))
             return action_result.set_status(
-                phantom.APP_ERROR, REDMINE_ERR_PROCESSING_RESPONSE
+                phantom.APP_ERROR, REDMINE_ERR_PROCESSING_ENUMERATION
             )
 
         if not enum_obj:
@@ -494,11 +497,17 @@ class RedmineConnector(BaseConnector):
                 phantom.APP_ERROR, REDMINE_ERR_UPLOAD_ATTACHMENT
             )
 
-        upload = {
-            "token": response["upload"]["token"],
-            "filename": file_info["name"],
-            "content_type": file_info["mime_type"],
-        }
+        try:
+            upload = {
+                "token": response["upload"]["token"],
+                "filename": file_info["name"],
+                "content_type": file_info["mime_type"],
+            }
+        except Exception as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return action_result.set_status(
+                phantom.APP_ERROR, REDMINE_ERR_PROCESSING_UPLOAD_DICT
+            )
 
         return upload
 
@@ -661,6 +670,8 @@ class RedmineConnector(BaseConnector):
 
         if len(vault_id) > 0:
             upload = self._upload_vault_file(action_result, vault_id)
+            if phantom.is_fail(upload):
+                return action_result.get_status()
             payload["issue"]["uploads"] = [upload]
 
         ret_val, response = self._make_rest_call(
@@ -761,8 +772,8 @@ class RedmineConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary['num_tickets'] = len(response['issues'])
-        summary['total_tickets'] = response['total_count']
-        summary['offset'] = response['offset']
+        summary['total_tickets'] = response.get('total_count', 0)
+        summary['offset'] = response.get('offset', 0)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
