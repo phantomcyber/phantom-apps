@@ -1,7 +1,8 @@
 # File: parser.py
-# Copyright (c) 2017-2019 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 import re
 import socket
@@ -110,8 +111,8 @@ class TextIOCParser():
                 {
                     'cef': 'domain',
                     'name': 'Domain Artifact',
-                    'callback': lambda(x): x[x.rfind('@') + 1:],
-                    'validator': lambda(x): not _is_ip(x)
+                    'callback': lambda x: x[x.rfind('@') + 1:],
+                    'validator': lambda x: not _is_ip(x)
                 }
             ]
         },
@@ -123,8 +124,8 @@ class TextIOCParser():
                 {
                     'cef': 'domain',
                     'name': 'Domain Artifact',
-                    'callback': lambda(x): x[x.rfind('@') + 1:],
-                    'validator': lambda(x): not _is_ip(x)
+                    'callback': lambda x: x[x.rfind('@') + 1:],
+                    'validator': lambda x: not _is_ip(x)
                 }
             ]
         }
