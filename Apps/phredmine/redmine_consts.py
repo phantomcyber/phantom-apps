@@ -77,6 +77,8 @@ REDMINE_ERR_DELETE_TICKET = "Could not delete ticket '{id}'"
 REDMINE_ERR_RETRIEVE_TICKETS = "Could not retrieve tickets"
 REDMINE_ERR_LIST_TICKETS = "Could not list tickets"
 REDMINE_ERR_FETCHING_TICKETS = "Error occurred while fetching tickets: {error}"
+REDMINE_ERR_GETTING_VAULT_INFO = "Error occurred while getting 'Vault Info'"
+REDMINE_ERR_GETTING_FILE_PATH = "Error occurred while getting 'File Path'"
 
 # Constants relating to success messages
 REDMINE_SUCC_CREATE_TICKET = "Ticket created successfully"

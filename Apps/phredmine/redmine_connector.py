@@ -455,11 +455,14 @@ class RedmineConnector(BaseConnector):
         try:
             self.debug_print("Rules.vault_info start")
             success, message, vault_info = Rules.vault_info(vault_id=vault_id)
+            vault_info = list(vault_info)
             self.debug_print(
                 "Rules.vault_info results: success: {}, message: {}, info: {}".format(
                     success, message, vault_info
                 )
             )
+            if not vault_info:
+                return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_GETTING_VAULT_INFO)
         except requests.exceptions.HTTPError:
             return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_INVALID_VAULT_ID.format(vault_id=vault_id))
         except Exception as e:
@@ -469,7 +472,6 @@ class RedmineConnector(BaseConnector):
             )
 
         try:
-            vault_info = list(vault_info)
             file_info = vault_info[0]
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
@@ -478,7 +480,10 @@ class RedmineConnector(BaseConnector):
                 REDMINE_ERR_GETTING_FILE_INFO.format(error=error_msg),
             )
 
-        file_path = file_info["path"]
+        try:
+            file_path = file_info["path"]
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, REDMINE_ERR_GETTING_FILE_PATH)
 
         with open(file_path, "rb") as f:
             file_contents = f.read()
@@ -569,7 +574,7 @@ class RedmineConnector(BaseConnector):
                 return action_result.get_status()
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            action_result.set_status(
+            return action_result.set_status(
                 phantom.APP_ERROR, REDMINE_ERR_FETCHING_TICKETS.format(error=error_msg)
             )
 
@@ -613,17 +618,23 @@ class RedmineConnector(BaseConnector):
         payload["issue"]["custom_fields"] = parsed_custom_fields
 
         if priority:
-            payload["issue"]["priority_id"] = self._retrieve_enumeration_id(
+            enum_id = self._retrieve_enumeration_id(
                 action_result,
                 priority,
                 "issue_priorities",
                 "/enumerations/issue_priorities.json",
             )
+            if phantom.is_fail(enum_id):
+                return action_result.get_status()
+            payload["issue"]["priority_id"] = enum_id
 
         if tracker:
-            payload["issue"]["tracker_id"] = self._retrieve_enumeration_id(
+            enum_id = self._retrieve_enumeration_id(
                 action_result, tracker, "trackers", "/trackers.json"
             )
+            if phantom.is_fail(enum_id):
+                return action_result.get_status()
+            payload["issue"]["tracker_id"] = enum_id
 
         ret_val, response = self._make_rest_call(
             "/issues.json",
