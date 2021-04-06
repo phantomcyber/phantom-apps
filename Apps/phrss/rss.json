@@ -1,0 +1,112 @@
+{
+    "appid": "9ef9419c-a4c0-411d-974a-af391eed6bfc",
+    "name": "RSS",
+    "description": "Ingest IOCs from an RSS Feed",
+    "type": "information",
+    "product_vendor": "Generic",
+    "logo": "logo_rssorange.svg",
+    "logo_dark": "logo_rssorange_dark.svg",
+    "product_name": "RSS",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-04-06T09:56:57.000000Z",
+    "package_name": "phantom_rss",
+    "main_module": "rss_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "feedparser-6.0.2"
+    ],
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "sgmllib",
+                "input_file": "wheels/sgmllib/sgmllib3k-1.0.0-py3-none-any.whl"
+            },
+            {
+                "module": "feedparser",
+                "input_file": "wheels/feedparser/feedparser-6.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "pdfminer",
+                "input_file": "wheels/phparser-deps/pdfminer-20191125-py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "rss_feed": {
+            "description": "RSS Feed",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "save_file": {
+            "description": "Save file to vault",
+            "data_type": "boolean",
+            "default": false,
+            "order": 1
+        },
+        "container_count": {
+            "description": "Maximum entries to parse (0 for all)",
+            "data_type": "numeric",
+            "default": 0,
+            "order": 2
+        },
+        "artifact_count": {
+            "description": "Maximum artifacts to create per entry (0 for all)",
+            "data_type": "numeric",
+            "default": 0,
+            "order": 3
+        },
+        "ignore_perrors": {
+            "description": "Ignore parsing errors",
+            "data_type": "boolean",
+            "default": false,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Ingest IOCs from an RSS Feed",
+            "verbose": "The action ingests RSS feeds where entries point to HTML or PDF documents only.",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of events to query for",
+                    "data_type": "numeric",
+                    "default": 100
+                },
+                "artifact_count": {
+                    "description": "Maximum number of artifacts per container",
+                    "data_type": "numeric"
+                },
+                "start_time": {
+                    "description": "Parameter is ignored in this app",
+                    "data_type": "string"
+                },
+                "end_time": {
+                    "description": "Parameter is ignored in this app",
+                    "data_type": "string"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
