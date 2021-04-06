@@ -171,11 +171,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -244,11 +250,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -261,7 +273,7 @@
             "identifier": "delete_group",
             "description": "Delete a group",
             "verbose": "Use this action to delete group for risky users.",
-            "type": "correct",
+            "type": "contain",
             "read_only": false,
             "parameters": {
                 "bg_group_name": {
@@ -305,11 +317,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -320,6 +338,7 @@
         {
             "action": "add user to group",
             "identifier": "add_user_to_group",
+            "undo": "remove user from group",
             "description": "Add risky user to a group",
             "verbose": "Use this action to add user determined risky to a special group.",
             "type": "correct",
@@ -385,11 +404,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -400,9 +425,10 @@
         {
             "action": "remove user from group",
             "identifier": "remove_user_from_group",
+            "undo": "add user to group",
             "description": "Remove risky user from a group",
             "verbose": "Use this action to remove user previously determined risky from the group.",
-            "type": "correct",
+            "type": "contain",
             "read_only": false,
             "parameters": {
                 "bg_group_name": {
@@ -465,11 +491,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -653,11 +685,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -668,9 +706,10 @@
         {
             "action": "deactivate user",
             "identifier": "deactivate_user",
+            "undo": "reactivate user",
             "description": "Deactivate user",
             "verbose": "Use this action to deactivate user.",
-            "type": "correct",
+            "type": "contain",
             "read_only": false,
             "parameters": {
                 "bg_user_name": {
@@ -720,11 +759,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -735,6 +780,7 @@
         {
             "action": "reactivate user",
             "identifier": "reactivate_user",
+            "undo": "deactivate user",
             "description": "Reactivate user",
             "verbose": "Use this action to reactivate user.",
             "type": "correct",
@@ -787,11 +833,17 @@
                 },
                 {
                     "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

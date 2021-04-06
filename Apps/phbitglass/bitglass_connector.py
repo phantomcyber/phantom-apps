@@ -425,7 +425,7 @@ class BitglassConnector(BaseConnector):
         if cef:
             try:
                 if re.fullmatch(matchRe, cef['dataPatterns']):
-                    self.debug_print('dataPatterns matched', cef['dataPatterns'])
+                    self.debug_print("'dataPatterns' matched", cef['dataPatterns'])
                     action_result.add_data(cef)
                 else:
                     # To avoid the error message, have to return non-empty set of data.
@@ -433,7 +433,7 @@ class BitglassConnector(BaseConnector):
                     cef['userName'] = '_'
                     action_result.add_data(cef)
             except Exception:
-                self.debug_print("dataPatterns not found")
+                self.debug_print("'dataPatterns' not found")
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -448,11 +448,11 @@ class BitglassConnector(BaseConnector):
             params = json.loads(''.join([
                 '{',
                 '"groupname": "{0}"'.format(groupName),
-                ', "newgroupname": [{0}]'.format(newGroupName) if newGroupName != '' else '',
+                ', "newgroupname": ["{0}"]'.format(newGroupName) if newGroupName != '' else '',
                 '}',
             ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAMS_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'group', 'createupdate', param, params)
 
@@ -466,7 +466,7 @@ class BitglassConnector(BaseConnector):
                 '}',
             ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAM_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'group', 'delete', param, params)
 
@@ -494,7 +494,7 @@ class BitglassConnector(BaseConnector):
                     '}',
                 ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAMS_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'group', 'addmembers', param, params)
 
@@ -520,7 +520,7 @@ class BitglassConnector(BaseConnector):
                     '}',
                 ]))
             except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter values")
+                return action_result.set_status(phantom.APP_ERROR, INVALID_PARAMS_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'group', 'removemembers', param, params)
 
@@ -544,7 +544,7 @@ class BitglassConnector(BaseConnector):
             params = json.loads(''.join([
                 '{',
                 '"companyemail": "{0}"'.format(userName),
-                ', "firstname": [{0}]'.format(firstName) if firstName != '' else '',
+                ', "firstname": ["{0}"]'.format(firstName) if firstName != '' else '',
                 ', "lastname": "{0}"'.format(lastName) if lastName != '' else '',
                 ', "secondaryemail": "{0}"'.format(secondaryEmail) if secondaryEmail != '' else '',
                 ', "netbiosdomain": "{0}"'.format(netbiosDomain) if netbiosDomain != '' else '',
@@ -559,7 +559,7 @@ class BitglassConnector(BaseConnector):
                 '}',
             ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide valid action parameter value")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAMS_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'user', 'createupdate', param, params)
 
@@ -574,7 +574,7 @@ class BitglassConnector(BaseConnector):
                 '}',
             ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAM_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'user', 'deactivate', param, params)
 
@@ -589,7 +589,7 @@ class BitglassConnector(BaseConnector):
                 '}',
             ]))
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid action parameter value")
+            return action_result.set_status(phantom.APP_ERROR, INVALID_PARAM_ERR_MSG)
 
         return self._callBitglassApi(action_result, 'user', 'reactivate', param, params)
 
@@ -667,7 +667,7 @@ class BitglassConnector(BaseConnector):
         conf.log_types = []
         if config['enable_access'] and conf.filter_access != '':
             conf.log_types += [u'access']
-        if config['filter_cloudaudit'] and conf.filter_cloudaudit != '':
+        if config['enable_cloudaudit'] and conf.filter_cloudaudit != '':
             conf.log_types += [u'cloudaudit']
 
         # Secret parameters are not loaded in either mode
@@ -688,16 +688,6 @@ class BitglassConnector(BaseConnector):
         #       the same (well-defined, without uuids) path for now.. The uuid is available in bitglass.json as appid
         # Do not parse command line params on a real Phantom instance as it has custom Python runtime (missing sys.argv)
         conf = bgapi(self).Initialize(self.datapath, skipArgs=True)
-
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         return phantom.APP_SUCCESS
 
