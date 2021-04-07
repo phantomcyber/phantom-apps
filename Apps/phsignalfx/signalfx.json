@@ -10,6 +10,9 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk",
+    "latest_tested_versions": [
+        "Cloud, API api.eu0.signalfx.com, March 25, 2021"
+    ],
     "contributors": [
         {
             "name": "Andreas Buis"
@@ -465,7 +468,10 @@
                         "signalfx incidentid"
                     ],
                     "column_name": "Incident ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -500,7 +506,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Resolved Incident successfully"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -551,6 +560,9 @@
                     "data_type": "string",
                     "contains": [
                         "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
                     ]
                 },
                 {
@@ -826,7 +838,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Incident details fetched successfully"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
