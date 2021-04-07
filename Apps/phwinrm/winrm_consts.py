@@ -98,4 +98,4 @@ DIR_VALUE_LIST = ["in", "out"]
 ACTION_VALUE_LIST = ["allow", "block", "bypass"]
 LOCATION_VALUE_LIST = ["local", "domain", "effective"]
 DENY_ALLOW_VALUE_LIST = ["deny", "allow"]
-VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in {} action parameter"
+VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

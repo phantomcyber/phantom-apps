@@ -140,7 +140,8 @@ class WindowsRemoteManagementConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, consts.WINRM_ERR_INVALID_VAULT_ID), None
 
         try:
-            return phantom.APP_SUCCESS, open(file_path, 'r').read()
+            with open(file_path, 'r') as fp:
+                return phantom.APP_SUCCESS, fp.read()
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR,
                 "Error reading vault file: {}".format(self._get_error_message_from_exception(e))), None
@@ -288,11 +289,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
         try:
             if command_id:
                 if shell_id is None:
-                    return action_result.set_status(phantom.APP_ERROR, "Please specify shell_id with command_id")
+                    return action_result.set_status(phantom.APP_ERROR, "Please specify 'shell_id' with 'command_id'")
                 try:
                     resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
                 except:
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to get command output from command_id and shell_id")
+                    return action_result.set_status(phantom.APP_ERROR, "Failed to get command output from 'command_id' and 'shell_id'")
                 self._protocol.close_shell(shell_id)
             elif async_:
                 shell_id = self._protocol.open_shell()
@@ -333,11 +334,11 @@ class WindowsRemoteManagementConnector(BaseConnector):
         try:
             if command_id:
                 if shell_id is None:
-                    return action_result.set_status(phantom.APP_ERROR, "Please specify shell_id with command_id")
+                    return action_result.set_status(phantom.APP_ERROR, "Please specify 'shell_id' with 'command_id'")
                 try:
                     resp = winrm.Response(self._protocol.get_command_output(shell_id, command_id))
                 except:
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to get script output from command_id and shell_id")
+                    return action_result.set_status(phantom.APP_ERROR, "Failed to get script output from 'command_id' and 'shell_id'")
                 self._protocol.close_shell(shell_id)
                 if len(resp.std_err):
                     resp.std_err = self._session._clean_error_msg(resp.std_err)
@@ -415,7 +416,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         name = param.get('name')
         if pid is None and name is None:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please specify at least one of pid or name"
+                phantom.APP_ERROR, "Please specify at least one of 'pid' or 'name'"
             )
 
         args = {
@@ -913,8 +914,8 @@ class WindowsRemoteManagementConnector(BaseConnector):
         destination = self._handle_py_ver_compat_for_input_str(param['destination'])
 
         try:
-            fp = open(path, 'rb')
-            encoded_file = base64.b64encode(fp.read())
+            with open(path, 'rb') as fp:
+                encoded_file = base64.b64encode(fp.read())
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR,
                 "Unable to base64 encode file", self._get_error_message_from_exception(e))
@@ -994,13 +995,13 @@ class WindowsRemoteManagementConnector(BaseConnector):
         shell_id = param.get('shell_id')
         if command_id and not shell_id or shell_id and not command_id:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please specify command_id and shell_id together"
+                phantom.APP_ERROR, "Please specify 'command_id' and 'shell_id' together"
             )
         command = self._handle_py_ver_compat_for_input_str(param.get('command'))
         arguments = self._handle_py_ver_compat_for_input_str(param.get('arguments'))
         if command is None and command_id is None:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please specify Either command or command_id + shell_id"
+                phantom.APP_ERROR, "Please specify either 'command' or 'command_id' + 'shell_id'"
             )
         async_ = param.get('async', False)
 
@@ -1034,13 +1035,13 @@ class WindowsRemoteManagementConnector(BaseConnector):
         shell_id = param.get('shell_id')
         if command_id and not shell_id or shell_id and not command_id:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please specify command_id and shell_id together"
+                phantom.APP_ERROR, "Please specify 'command_id' and 'shell_id' together"
             )
         script_file = self._handle_py_ver_compat_for_input_str(param.get('script_file'))
         script_str = param.get('script_str')
         if script_file is None and script_str is None and command_id is None:
             return action_result.set_status(
-                phantom.APP_ERROR, "Please specify either a script_file, script_str, or command_id + shell_id"
+                phantom.APP_ERROR, "Please specify either a 'script_file', 'script_str', or 'command_id' + 'shell_id'"
             )
         async_ = param.get('async', False)
 
