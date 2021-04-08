@@ -1,4 +1,5 @@
 # File: dnsdb_connector.py
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -9,6 +10,7 @@ import dnsdb2
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from datetime import datetime
 
 # Local imports
 from dnsdb_consts import *
@@ -205,7 +207,7 @@ class DnsdbConnector(BaseConnector):
                     DNSDB_ERR_INVALID_BAILIWICK % (bailiwick))
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            ret_val = action_result.set_status(phantom.APP_ERROR, err)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         # No data is considered as app success
         if len(responses) == 0:
@@ -328,7 +330,7 @@ class DnsdbConnector(BaseConnector):
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            ret_val = action_result.set_status(phantom.APP_ERROR, err)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
@@ -405,7 +407,7 @@ class DnsdbConnector(BaseConnector):
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            ret_val = action_result.set_status(phantom.APP_ERROR, err)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         # Something went wrong with the request
         if phantom.is_fail(ret_val):
@@ -601,7 +603,7 @@ class DnsdbConnector(BaseConnector):
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            ret_val = action_result.set_status(phantom.APP_ERROR, err)
+            return action_result.set_status(phantom.APP_ERROR, err)
 
         # No data is considered as app success
         if len(responses) == 0:
@@ -658,6 +660,21 @@ class DnsdbConnector(BaseConnector):
             if not self._is_valid_time(time_last_after):
                 return action_result.set_status(phantom.APP_ERROR,
                                                  (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_last_after))
+
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i in timestamps:
+            if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+                return action_result.set_status(phantom.APP_ERROR, "Invalid input: Future timestamp in action parameter value. Please enter valid time")
+
+        if time_first_after and time_last_before:
+            if time_first_after > time_last_before:
+                return action_result.set_status(phantom.APP_ERROR,
+                    ("Invalid time range. 'time first after' should not be greater than 'time last before'"))
+
+        if time_last_after and time_last_before:
+            if time_last_after > time_first_before:
+                return action_result.set_status(phantom.APP_ERROR,
+                    ("Invalid time range. 'time last after' should not be greater than 'time first before'"))
 
         if limit:
             # limit_valid = int(limit) > 0

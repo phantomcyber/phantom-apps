@@ -1,9 +1,178 @@
 <!-- File: readme.html
+  Copyright (c) 2016-2021 Splunk Inc.
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 <html>
   <body>
+    <p><h2>Explanation of DNSDB Actions' Parameters</h2>
+        <ol>
+          <h3><li>Test Connectivity (Action Workflow Details)</li></h3>
+            <ul>
+              <li> This action will test the connectivity of the Phantom server to the dnsdb by making an initial API call to the check rate limit API using the provided asset configuration parameters.</li>
+              <li> The action validates the provided asset configuration parameters. Based on the API call response, the appropriate success and failure message will be displayed when the action gets executed.</li>
+            </ul>
+            <br>
+
+          <h3><li>RDATA Name Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - name</b>
+                <ul>
+                  <li>The VALUE is a DNS domain name in presentation format, or a left-hand (“.example.com”) or right-hand (“www.example.”) wildcard domain name. Note that left-hand wildcard queries are somewhat more expensive than right-hand wildcard queries.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. There is a built-in limit to the number of results that are returned via these lookup methods. The default limit is set at 10,000.</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3><li>RDATA IP Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - ip</b>
+                <ul>
+                  <li>The VALUE is one of an IPv4 or IPv6 single address, with a prefix length, or with an address range. If a prefix is provided, the delimiter between the network address and prefix length is a single comma (“,”) character rather than the usual slash (“/”) character to avoid clashing with the HTTP URI path name separator.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. There is a built-in limit to the number of results that are returned via these lookup methods. The default limit is set at 10,000.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - network prefix</b>
+                <ul>
+                  <li>Network prefix for the IP</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3><li>RDATA Raw Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - raw rdata</b>
+                <ul>
+                  <li>The VALUE is an even number of hexadecimal digits specifying a raw octet string.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. There is a built-in limit to the number of results that are returned via these lookup methods. The default limit is set at 10,000.</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3><li>RRSET Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - owner name</b>
+                <ul>
+                  <li>The VALUE is a DNS owner name in presentation format or wildcards as described below.</li>
+                  <li>Wildcards are one of two forms: a left-hand (*.example.com) or right-hand (www.example.*) wildcard domain name. An owner name with a leading asterisk and label separator, (i.e., *.) will perform a wildcard search for any RRsets whose owner names end with the given domain name. An owner name with a trailing label separator and asterisk (i.e., .*) will perform a wildcard search for any RRsets whose owner names start with the given label(s). Note that left-hand wildcard queries are somewhat more expensive and slower than right-hand wildcard queries.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - type</b>
+                <ul>
+                  <li>A DNSDB lookup for RRtype ANY will match any RRtype except the DNSSEC-related RRtypes: DS, RRSIG, NSEC, DNSKEY, NSEC3, NSEC3PARAM, and DLV.
+                      RRtype ANY may be specified for RRTYPE in order to perform bailiwick filtering without also filtering on a particular RRtype.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - bailiwick</b>
+                <ul>
+                  <li>The “bailiwick” of an RRset in DNSDB observed via passive DNS replication is the closest enclosing zone delegated to a nameserver which served the RRset.
+                      The “bailiwick” of an RRset in DNSDB observed in a zone file is simply the name of the zone containing the RRset.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. There is a built-in limit to the number of results that are returned via these lookup methods. The default limit is set at 10,000.</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3><li>Flex Search</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - query</b>
+                <ul>
+                    <li>For <b>RRNAMES query</b>, “LHS” DNS owner name regular expression or glob</li>
+                    <li>Example: fsi\.io</li>
+                </ul>
+                <ul>
+                  <li>For <b>RRDATA query</b>, “RHS” normalized resource record value regular expression or glob</li>
+                  <li>Example: ns[1-5]</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - type</b>
+                <ul>
+                    <li><b>RRNAMES: </b>search in rrnames, supports “forward” searches based on the owner name of an RRset.</li>
+                    <li><b>RRDATA: </b>search in rdata, supports “inverse” searches based on RData record values.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - search type</b>
+                <ul>
+                  <li><b>regex: </b>regular expression search</li>
+                  <li><b>glob: </b>full wildcarding</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - exclude</b>
+                <ul>
+                  <li>The “exclude” parameter is used to exclude (i.e. filter-out) results that match it.
+                      Its value is a regular expression or glob, depending upon the search_method.</li>
+                  <li><b>Example:</b> exclude=\.(com|site|bid|net|io)\.$</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of unique rrnames or rdata value results returned via these search methods.
+                      The default limit is set at 10,000.</li>
+                  <li><b>Note:</b>
+                      There is also a maximum number of results allowed; requesting a limit greater than the maximum will only return the maximum.
+                      if there are less results for the query than the requested limit, only the actual amount can be returned.</li>
+                </ul>
+              </li>
+              <li><b><u>Note</u>​</b>
+                <ul>
+                  <li>The maximum length of the QUERY path component and the exclude parameter value are 4096 characters each before URL encoding.</li>
+                </ul>
+              </li>
+              <li>To know more about regex search,  visit: 
+                  <a href="https://docs.dnsdb.info/dnsdb-flex-reference-guide/#regex-search"><b>https://docs.dnsdb.info/dnsdb-flex-reference-guide/#regex-search</b></a>
+              </li>
+              <li>To know more about glob search, visit: 
+                <a href="https://docs.dnsdb.info/dnsdb-flex-reference-guide/#glob-search"><b>https://docs.dnsdb.info/dnsdb-flex-reference-guide/#glob-search</b></a>
+              </li>
+            </ul>
+          <br>
+          <h3>Time Fencing parameters</h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - time_first_before</b>
+                <ul>
+                  <li>Provide results before the defined timestamp for when the DNS record was first observed. For example, the URL parameter “time_first_before=1420070400” will only provide matching DNS records that were first observed before (or older than) January 1, 2015.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_first_after</b>
+                <ul>
+                  <li>Provide results after the defined timestamp for when the DNS record was first observed. For example, the URL parameter “time_first_after=-31536000” will only provide results that were first observed within the last year.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_last_before</b>
+                <ul>
+                  <li>Provide results before the defined timestamp for when the DNS record was last observed. For example, the URL parameter “time_last_before=1356998400” will only provide results for DNS records that were last observed before 2013.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_last_after</b>
+                <ul>
+                  <li>Provide results after the defined timestamp for when the DNS record was last observed. For example, the URL parameter “time_last_after=-2678400” will only provide results that were last observed after 31 days ago</li>
+                </ul>
+              </li>
+              <li><b><u>Note: </u>​</b>
+                <ul>
+                  <li>Combinations of the time parameters may be used to strictly provide or exclude results for specific time-ranges. For example, to only have results when the first observed date and the last observed date are both only in 2015, you can use “time_first_after=1420070399” combined with “time_last_before=1451606400”. As another time combination example, to get DNS records that were first observed before 2012 and last observed within the last month (recently-observed records which have not changed in a very long time), use “time_first_before=1325376000” and relative “time_last_after=-2678400”.</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+      </ol>
+    </p>
+                                
     <h2>Playbook Backward Compatibility</h2>
       <p>
         <ul>

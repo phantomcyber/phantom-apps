@@ -1,4 +1,5 @@
 # File: dnsdb_view.py
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -16,6 +17,8 @@ def _parse_data(data, param):
             res['flex'][match['rrtype']].append(match)
     # parsing data for lookup ip action
     elif 'ip' in param.keys() or 'name' in param.keys():
+        res['response'] = {}
+        res['response'] = data
         res['ip'] = {}
         res['ip']['domains'] = set()
         for rdata in data:
@@ -27,6 +30,8 @@ def _parse_data(data, param):
                 res['ip'][rt] = list(res['ip'][rt])
     # parsing data for lookup raw rdata action
     elif 'raw_rdata' in param.keys():
+        res['response'] = {}
+        res['response'] = data
         res['raw'] = {}
         res['raw']['domains'] = set()
         for rdata in data:

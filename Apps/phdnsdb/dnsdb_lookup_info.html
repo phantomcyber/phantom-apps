@@ -15,6 +15,7 @@
 
 <!-- 
 File: dnsdb/dnsdb_lookup_info.html
+Copyright (c) 2016-2021 Splunk Inc.
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -121,7 +122,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                 {% for curr_rdata in result.data.flex|by_key:curr_rrtype %}
                 <tr>
                   <td>
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['rdata'], 'value': '{{ curr_rdata.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rdata'], 'value': '{{ curr_rdata.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
                       {{ curr_rdata.rdata }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -244,11 +245,11 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
       <table id="rrname_table" class="datatable wf-table-horizontal">
         <thead>
         <tr>
-          <th>Domain</th>
+          <th>Domain <p class="lowercase" style="display:inline">(unique values only)</p></th>
         </tr>
         </thead>
         <tbody>
-        {% for curr_domain in result.data.ip.domains %}
+        {% for curr_domain in result.data.ip.domains %}        
           <tr>
             <td>
               <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
@@ -262,6 +263,46 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tbody>
       </table>
       </div>
+      
+      <div class="wf-table-div">
+      <h3 class="wf-h3-style">Detailed Information</h3>
+      <table id="rrname_table" class="datatable wf-table-horizontal">
+        <thead>
+        <tr>
+          <th>RRName</th>
+          <th>RRType</th>
+          <th>RRData</th>
+          <th>Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for data in result.data.response %}        
+          <tr>
+            <td>
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
+                {{ data.rrname }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                {{ data.rrtype }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+            <td>
+              {% for rdata in data.rdata %}
+                {{ rdata }}
+              {% endfor %}
+            </td>
+            <td>{{ data.count }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      
       {% elif result.param.raw_rdata %}
       <h3 class="wf-h3-style">Info</h3>
       <table class="wf-table-vertical">
@@ -325,7 +366,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
       <table id="rrname_table" class="datatable wf-table-horizontal">
         <thead>
         <tr>
-          <th>Result</th>
+          <th>Result <p class="lowercase" style="display:inline">(unique values only)</p></th>
         </tr>
         </thead>
         <tbody>
@@ -342,7 +383,46 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         {% endfor %}
         </tbody>
       </table>
-      </div>  
+      </div>
+      <div class="wf-table-div">
+          <h3 class="wf-h3-style">Detailed Information</h3>
+          <table id="rrname_table" class="datatable wf-table-horizontal">
+            <thead>
+            <tr>
+              <th>RRName</th>
+              <th>RRType</th>
+              <th>RRData</th>
+              <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in result.data.response %}        
+              <tr>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain.rrname }}' }], 0, {{ container.id }}, null, false);">
+                    {{ data.rrname }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                    {{ data.rrtype }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td>
+                  {% for rdata in data.rdata %}
+                    {{ rdata }}
+                  {% endfor %}
+                </td>
+                <td>{{ data.count }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
     {% elif result.data.domain %}
       <h3 class="wf-h3-style">Info</h3>
       <table class="wf-table-vertical">

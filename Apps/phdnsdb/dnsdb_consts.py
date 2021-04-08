@@ -1,4 +1,5 @@
 # File: dnsdb_consts.py
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -26,7 +27,7 @@ DNSDB_JSON_NAME = 'name'
 DNSDB_JSON_RRNAME = 'rrname'
 DNSDB_JSON_RAW_RDATA = 'raw_rdata'
 DNSDB_JSON_RESPONSE = 'json_response'
-DNSDB_BASE_URL = 'https://api.dnsdb.info/lookup'
+DNSDB_BASE_URL = 'https://api.dnsdb.info/dnsdb/v2lookup'
 DNSDB_ENDPOINT_DOMAIN = '/rrset/name/{domain}'
 DNSDB_ENDPOINT_DOMAIN_TYPE = '/rrset/name/{domain}/{type}'
 DNSDB_ENDPOINT_DOMAIN_TYPE_ZONE = '/rrset/name/{domain}/{type}/{zone}'
