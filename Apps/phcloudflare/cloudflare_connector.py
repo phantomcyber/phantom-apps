@@ -560,7 +560,7 @@ class CloudflareConnector(BaseConnector):
         optional_config_name = config.get('optional_config_name')
         """
 
-        self._base_url = config.get('base_url')
+        self._base_url = config['base_url']
 
         if not self._base_url.endswith('/'):
             self._base_url += "/"
