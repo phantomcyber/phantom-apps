@@ -8,7 +8,6 @@
 CLOUDFLARE_ZONES_ENDPOINT = 'zones'
 CLOUDFLARE_FWRULE_ENDPOINT = 'zones/{zone_id}/firewall/rules'
 CLOUDFLARE_FILTERS_ENDPOINT = 'zones/{zone_id}/filters'
-# CLOUDFLARE_SINGLE_FWRULE_ENDPOINT = 'zones/{zone_id}/firewall/rules/{rule_id}'
 
 # Other constants
 CLOUDFLARE_FILTER_RULE_IP = '(ip.src eq {ip})'
