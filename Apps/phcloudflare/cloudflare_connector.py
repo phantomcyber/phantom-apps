@@ -566,7 +566,7 @@ class CloudflareConnector(BaseConnector):
             self._base_url += "/"
 
         self._headers = {
-            "Authorization": "Bearer {}".format(config.get('api_token')),
+            "Authorization": "Bearer {}".format(config['api_token']),
             "Content-Type": "application/json"
         }
 
