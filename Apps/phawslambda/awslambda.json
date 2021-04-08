@@ -17,7 +17,7 @@
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, January 18, 2021"
+        "Cloud API, February 25, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -128,6 +128,187 @@
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "remove permission",
+            "identifier": "remove_permission",
+            "description": "Revokes function-use permission from an AWS service or another account",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "function_name": {
+                    "description": "The name of the Lambda function, version, or alias. The following name formats are accepted: function name, function ARN, and partial ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "lambda function name",
+                        "lambda function arn"
+                    ],
+                    "order": 0
+                },
+                "statement_id": {
+                    "description": "Statement identifier of the permission to remove",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "qualifier": {
+                    "description": "Specify a version or alias to remove permissions to a published version of the function",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "revision_id": {
+                    "description": "Only update the policy if the revision ID matches the ID that's specified. Use this option to avoid modifying a function policy that has changed since you last read it",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "50c47f67-ae1a-4c2a-9651-77f1ba1f3d37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fri, 26 Feb 2021 19:07:37 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
+                    "data_type": "string",
+                    "example_values": [
+                        "keep-alive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "50c47f67-ae1a-4c2a-9651-77f1ba1f3d37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        204
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully removed permission"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed permission"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.function_name",
+                    "data_type": "string",
+                    "contains": [
+                        "lambda function name",
+                        "lambda function arn"
+                    ],
+                    "example_values": [
+                        "myTestFunction1"
+                    ],
+                    "column_name": "Function Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.statement_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "statement1"
+                    ],
+                    "column_name": "Statement Id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.qualifier",
+                    "data_type": "string",
+                    "column_name": "Qualifier",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.revision_id",
+                    "data_type": "string",
+                    "column_name": "Revision Id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
         },
         {
             "action": "invoke lambda",
@@ -730,6 +911,7 @@
         {
             "action": "add permission",
             "identifier": "add_permission",
+            "undo": "remove permission",
             "description": "Grants an AWS service or another account permission to use a function",
             "type": "generic",
             "read_only": false,

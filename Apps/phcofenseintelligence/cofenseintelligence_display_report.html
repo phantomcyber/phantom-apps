@@ -1,0 +1,633 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: cofenseintelligence_display_report.html
+Copyright (c) 2020-2021 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+
+    .phishme-report a:hover {
+    text-decoration:underline;
+    }
+
+
+    .phishme-report .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .phishme-report .wf-table-vertical td {
+    padding: 5px;
+    border: 1px solid;
+    }
+
+    .phishme-report .wf-table-horizontal {
+    width: initial;
+    border: 1px solid;
+    font-size: 12px;
+    }
+
+    .phishme-report .wf-table-horizontal th {
+    text-align: center;
+    border: 1px solid;
+    text-transform: uppercase;
+    font-weight: normal;
+    padding: 5px;
+    }
+
+    .phishme-report .wf-table-horizontal td {
+    border: 1px solid;
+    padding: 5px;
+    padding-left: 4px;
+    }
+
+    .phishme-report .container {
+    padding: 0px;
+    }
+
+    .phishme-report .center {
+    text-align: center;
+    }
+
+    .phishme-report .left-align {
+    float: left;
+    width: 50%;
+    text-align: left;
+    }
+
+    .phishme-report .right-align {
+    float: right;
+    width: 50%;
+    text-align: right;
+    }
+
+    .phishme-report .table-header {
+    font-size: 18px
+    }
+
+    .phishme-report .wf-h4-style {
+    font-size: 18px;
+    }
+
+</style>
+
+<div class="phishme-report" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+
+    <!------------ loop for each result ------------>
+    {% for result in results %}
+    </br>
+    {% if not result.report %}
+    <h4 class="wf-h4-style">No report available for threat ID: {{ result.param.threat_id }}</h4>
+    {% elif result.report %}
+    <h3 class="center">Report</h3>
+    <hr>
+
+    <div class="container">
+        <div class="left-align">
+            <h4> {{ result.report.id }} </h4>
+            <span>Threat ID</span>
+        </div>
+        {% if result.report.threatType == 'MALWARE' %}
+        <div class="right-align">
+            <h4> {{ result.report.label }} </h4>
+            <span> Title </span>
+        </div>
+        {% elif result.report.threatType == 'PHISH' %}
+        <div class="right-align">
+            <h4> {{ result.report.phishingURL }} </h4>
+            <span> URL </span>
+        </div>
+        {% endif %}
+    </div>
+    </br>
+
+    <div class="container">
+        {% if result.report.threatType == 'MALWARE' %}
+        {% if result.report.hasReport%}
+        <div class="left-align">
+            <h5>
+                Active Threat Report [<a href="{{ result.report.reportURL }}"> HTML </a>]
+            </h5>
+        </div>
+        {% endif %}
+        {% if result.report.campaignBrandSet %}
+        <div class="right-align">
+            <h5><b>
+                {% for campaign in result.report.campaignBrandSet %}
+                {{ campaign.brand.text }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </b></h5>
+            <span> Brands </span>
+        </div>
+        {% endif %}
+        {% elif result.report.threatType == 'PHISH' %}
+        {% if result.report.isConfirmedPhishingWebsite %}
+        <div class="left-align">
+            <h5>
+                Phish URL: <b> {{ result.report.isConfirmedPhishingWebsite }} </b>
+            </h5>
+        </div>
+        {% endif %}
+        {% if result.report.brands %}
+        <div class="right-align">
+            <h5><b>
+                {% for campaign in result.report.brands %}
+                {{ campaign.text }}
+                {% if not forloop.last %}
+                ,
+                {% endif %}
+                {% endfor %}
+            </b></h5>
+            <span> Brands </span>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+    </br>
+
+    <div class="container">
+        {% if result.report.threatType == 'MALWARE' %}
+        <div class="left-align">
+            <h5> First seen: {{ result.report.firstPublished }} </h5>
+        </div>
+        <div class="right-align">
+            <h5> Last Date: {{ result.report.lastPublished }} </h5>
+        </div>
+        {% elif result.report.threatType == 'PHISH' %}
+        {% if result.report.screenshot %}
+        <div class="left-align">
+            <h5>
+                Screenshot [<a href="{{ result.report.screenshot.url }}"> {{ result.report.screenshot.url }} </a>]
+            </h5>
+        </div>
+        {% endif %}
+        {% if result.report.confirmedDate %}
+        <div class="right-align">
+            <h5> Confirmed Date: {{ result.report.confirmedDate }} </h5>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+
+    <div class="container">
+        <div class="left-align">
+            <h5> Threat Type: {{ result.report.threatType }} </h5>
+        </div>
+    </div>
+    </br>
+    </br>
+
+    <!-- Tables for threat type: MALWARE -->
+    {% if result.report.threatType == 'MALWARE' %}
+    {% if result.report.subjectSet %}
+    <div class="container">
+        <h4 class="table-header"> Subject(s) </h4>
+        <table id="subject-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for subset in result.report.subjectSet %}
+            <tr>
+                <td>{{ subset.subject }}</td>
+                <td>{{ subset.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.domainSet %}
+    <div class="container">
+        <h4 class="table-header"> Sender Domain(s) </h4>
+        <table id="sender-domain-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Domain</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for domainset in result.report.domainSet %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ domainset.domain }}' }], 0, {{ container.id }}, null, false);">
+                        {{ domainset.domain }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+                <td>{{ domainset.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.senderEmailSet %}
+    <div class="container">
+        <h4 class="table-header"> Sender Email(s) </h4>
+        <table id="sender-email-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Sender Email</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for mailset in result.report.senderEmailSet %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ mailset.senderEmail }}' }], 0, {{ container.id }}, null, false);">
+                        {{ mailset.senderEmail }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+                <td>{{ mailset.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.senderIpSet %}
+    <div class="container">
+        <h4 class="table-header"> Sender IP(s) </h4>
+        <table id="sender-ip-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for senderSet in result.report.senderIpSet %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ senderSet.ip }}' }], 0, {{ container.id }}, null, false);">
+                        {{ senderSet.ip }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+                <td>{{ senderSet.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.senderNameSet %}
+    <div class="container">
+        <h4 class="table-header"> Sender Name(s) </h4>
+        <table id="sender-name-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for senderset in result.report.senderNameSet %}
+            <tr>
+                <td>{{ senderset.name }}</td>
+                <td>{{ senderset.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.malwareFamilySet %}
+    <div class="container">
+        <h4 class="table-header"> Malware Description </h4>
+        <table id="malware-desc-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for familyset in result.report.malwareFamilySet %}
+            <tr>
+                <td>{{ familyset.familyName }}</td>
+                <td>{{ familyset.description }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.executableSet %}
+    <div class="container">
+        <h4 class="table-header"> Malware Artifacts </h4>
+        <table id="malware-artifacts-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Filename</th>
+                <th>MD5 Hash</th>
+                <th>Family</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Additional Characteristics</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for execset in result.report.executableSet %}
+            <tr>
+                <td>{{ execset.fileName }}</td>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ execset.md5Hex }}' }], 0, {{ container.id }}, null, false);">
+                        {{ execset.md5Hex }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+                <td>{{ execset.malwareFamily.familyName }}</td>
+                <td>{{ execset.malwareFamily.description }}</td>
+                <td>{{ execset.type }}</td>
+                <td>
+                    {% if execset.executableSubtype %}
+                    {{ execset.executableSubtype.description }}
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.blockSet %}
+    <div class="container">
+        <h4 class="table-header"> Watch List </h4>
+        <table id="watch-list-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>Watch Data</th>
+                <th>Impact</th>
+                <th>Infrastructure Type</th>
+                <th>Additional Characteristics</th>
+                <th>ASN</th>
+                <th>Organization</th>
+                <th>Country Code</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for blockset in result.report.blockSet %}
+            <tr>
+                <td>
+                    {% if blockset.blockType == 'IPv4 Address' %}
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ blockset.data }}' }], 0, {{ container.id }}, null, false);">
+                        {{ blockset.data }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                    {% elif blockset.blockType == 'URL' %}
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ blockset.data }}' }], 0, {{ container.id }}, null, false);">
+                        {{ blockset.data }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                    {% elif blockset.blockType == 'Domain Name' %}
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ blockset.data }}' }], 0, {{ container.id }}, null, false);">
+                        {{ blockset.data }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                    {% endif %}
+                </td>
+                <td>{{ blockset.impact }}</td>
+                <td>{{ blockset.roleDescription }}</td>
+                <td>
+                    {% if blockset.infrastructureTypeSubclass %}
+                    {{ blockset.infrastructureTypeSubclass.description }}
+                    {% endif %}
+                </td>
+                {% if blockset.ipDetail %}
+                <td>{{ blockset.ipDetail.asn }}</td>
+                <td>{{ blockset.ipDetail.organization }}</td>
+                <td>{{ blockset.ipDetail.countryIsoCode }}</td>
+                {% else %}
+                <td></td>
+                <td></td>
+                <td></td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.spamUrlSet %}
+    <div class="container">
+        <h4 class="table-header"> Spam URL(s) </h4>
+        <table id="spam-urls-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>URL</th>
+                <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for spamset in result.report.spamUrlSet %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ spamset.url }}' }], 0, {{ container.id }}, null, false);">
+                        {{ spamset.url }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+                <td>{{ spamset.totalCount }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.extractedStringSet %}
+    <div class="container">
+        <h4 class="table-header"> Extracted String(s) </h4>
+        <table id="extracted-string-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>String</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stringset in result.report.extractedStringSet %}
+            <tr>
+                <td>{{ stringset.data }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% elif result.report.threatType == 'PHISH' %}
+    {% if result.report.reportedURLs %}
+    <div class="container">
+        <h4 class="table-header"> Reported URL(s) </h4>
+        <table id="reported-urls-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>URL</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for curr_url in result.report.reportedURLs %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                        {{ curr_url }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.actionURLs %}
+    <div class="container">
+        <h4 class="table-header"> Action URL(s) </h4>
+        <table id="action-urls-table" class="wf-table-horizontal datatable">
+            <thead>
+            <tr>
+                <th>URL</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for curr_url in result.report.actionURLs %}
+            <tr>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                        {{ curr_url }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% if result.report.ipDetail %}
+    <div class="container">
+        <h4 class="table-header"> IP Info </h4>
+        <table id="ip-info-table" class="wf-table-vertical">
+            <tr>
+                <td>IP</td>
+                <td>
+                    <a href="javascript:;"
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ result.report.ipDetail.ip }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.report.ipDetail.ip }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>ASN</td>
+                <td>{{ result.report.ipDetail.asn }}</td>
+            </tr>
+            <tr>
+                <td>Organization</td>
+                <td>{{ result.report.ipDetail.organization }}</td>
+            </tr>
+            <tr>
+                <td>Country Code</td>
+                <td>{{ result.report.ipDetail.countryIsoCode }}</td>
+            </tr>
+        </table>
+    </div>
+    </br>
+    {% endif %}
+
+    {% endif %}
+
+    {% endif %}
+
+    {% endfor %}
+    <!------------ loop for each result end ------------>
+</div> <!-- Main Div -->
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": false,
+    "bLengthChange": false,
+    "info": false,
+    "language": {
+       "paginate": {
+         "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+         "next": "<i class='fa fa-angle-right fa-lg'></i>"
+       }
+     },
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+});
+$('.datatable').DataTable();
+
+</script>
+
+{% endblock %} <!-- Main Start Block -->
+

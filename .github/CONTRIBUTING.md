@@ -32,13 +32,13 @@ If you are not familiar with a fork-and-branch Git workflow, or just feel a bit 
 
 # High Level Contribution Overview
 ## Contributing Bug-fixes
-If you've found a bug and wish to fix it, the first thing to do is 
+If you've found a bug and wish to fix it, the first thing to do is
 
-1. If one does not already exist, create an Issue (otherwise we'll use the existing one)
 1. [Fork](https://guides.github.com/activities/forking/) the project
-1. Create a branch for the issue
+1. Create a branch
 1. Make your changes on your branch
 1. Thoroughly test your changes. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
+1. Add your name to the contributors list in the app JSON! [Example](https://github.com/phantomcyber/phantom-apps/pull/488/commits/a02e345ce48e56bcb8711d1c5c4e40dd6e62fd11?diff=split&w=1)
 1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch that gives edit access to the maintainers of the phantom-apps repo.
 
 *****Important Notes:**
@@ -55,30 +55,36 @@ If you've found a bug and wish to fix it, the first thing to do is
 
 If you've created a brand new App and wish to contribute it, the steps to do so are as follows.
 
-1. If one does not already exist, create an Issue (otherwise we'll use the existing one)
 1. [Fork](https://guides.github.com/activities/forking/) the project
-1. Create a branch for the issue (following our [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)))
+1. Create a branch (following our [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)))
 1. Create a new directory/folder for your App (again following the [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)).
 1. Add your app code to the folder. Ensure no other folders are affected.
 1. **Thoroughly** test your code for the new App. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
     <!-- 1. Ensure your new app has a [TESTING](https://about:blank) document for the community and our developers. -->
-1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch. 
+1. Add your name to the contributors list in the app JSON! [Example](https://github.com/phantomcyber/phantom-apps/pull/488/commits/a02e345ce48e56bcb8711d1c5c4e40dd6e62fd11?diff=split&w=1)
+1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch.
 
 **Note: Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
 
 **Note: A Splunk>Phantom developer may wish to create a new branch and ask you to perform your pull-request there for specific types of changes.**
 
 ## Automated Checks
-By default we provide various automated checks you can leverage to test your changes automatically.
+By default we provide various automated checks you can leverage to test your changes automatically. These checks will be run whenever you push new commits to your pull request branch. The overall pass/fail result will appear as a green checkmark or red "x" to the right of commit in the pull request page. To view the detailed report you can do **ANY** of the following:
 
-### How to Run
+- Click the checkmark or "x" and then click the "Details" link. **OR**
+- Click the "Checks" tab at the top of the pull request. **OR**
+- Click the "Details" link next to the list of checks that shows up at the bottom of the pull request. If the tests passed, this list will be hidden, so you will first need to click the "Show all checks" link.
+
+After doing any of the above, the results will be under the "Test pull request" section in the log that shows up. If the overall result was a failure this section will automatically be open and scrolled to the bottom of the report. Otherwise, clicking on "Test pull request" will open up the report.
+
+Alternatively, you can manually trigger the tests on-demand as described in the next section.
+
+### How to Manually Run
 Submit a new comment on the pull request starting with the text: **!scan**
 
 If the command was processed, an _eyes_ reaction emoji will be added by the _github-actions_ bot. Then, the _phantom-apps-bot_ will post a Google Drive link to the results once they are ready.
 
-There is a 30s rate limit for the scan command per pull request. If extra requests are sent during the rate limit window, the command will be processed (eyes emoji reaction) but there will be no results posted.
-
-**Note:** Besides manually triggered scans, there is a periodic job that checks for pull request updates and triggers a scan automatically. It is currently set to run around 5pm PDT daily.
+There is a 10s rate limit for the scan command per pull request. If extra requests are sent during the rate limit window, the command will be processed (eyes emoji reaction) but there will be no results posted.
 
 ### Tests
 The following are the current set of automated tests we run.
@@ -93,10 +99,10 @@ The following are the current set of automated tests we run.
 * The minimum phantom version is greater than or equal to a certain version. The expected minimum version is maintained as a constant in the test script and will be updated as needed in the future.
 #### License Usage
 * `license` is specified in the app JSON.
-* The license is a third-party license rather than copyrighted to Splunk.
+* The license is a third-party license rather than copyrighted to Splunk if it is an external contribution.
 #### Publisher
 * `publisher` is specified in the app JSON.
-* The publisher is either a third party or "Splunk Community", not "Splunk".
+* The publisher is either a third party or "Splunk Community", not "Splunk", if it is an external contribution.
 #### Verify Password Config
 * Fields in the app JSON that look like passwords, keys, tokens, etc. are marked with the `password` data type.
 * `password` data type files in the app JSON should not have `default` or `value_list` fields specified.
@@ -112,9 +118,11 @@ The following are the current set of automated tests we run.
   * App configuration parameters
   * Action parameters
   * Action output columns
+#### Data Path Wildcards
+* Checks that no data path contains sequential wildcards (`*.*`) since those result in incorrect reporting of result set sizes from the Phantom API.
 #### Check Grammar
 * First letter of all description and verbose fields is capitalized
-#### READme File
+#### README File
 * If a README file exists, it is not empty.
 #### Consts File
 * If a consts file exists, it is not empty.

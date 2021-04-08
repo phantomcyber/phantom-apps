@@ -1,12 +1,15 @@
 # File: rss_connector.py
-# Copyright (c) 2017-2019 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.vault import Vault
+import phantom.rules as ph_rules
+import rss_consts as rc
 
 # Local Import
 from parser_helper import parse_link_contents
@@ -16,7 +19,7 @@ from parser_helper import parse_link_contents
 import os
 import json
 import hashlib
-import urllib2
+import urllib.request
 import tempfile
 import feedparser
 from time import mktime
@@ -32,26 +35,51 @@ class RssConnector(BaseConnector):
     def __init__(self):
         super(RssConnector, self).__init__()
         self._state = None
+        self._feed = None
+        self._max_containers = None
+        self._max_artifacts = None
+        self._ignore_perrors = False
+        self._feed_url = None
+        self.save_html = False
 
     def _init_feed(self):
-        config = self.get_config()
-        feed_url = config['rss_feed']
-        ignore_perrors = config.get('ignore_perrors', False)
-        self._feed = feedparser.parse(feed_url)
+        self._feed = feedparser.parse(self._feed_url)
         if self._feed.bozo == 1:
             ex_type = type(self._feed.bozo_exception)
-            if ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
-               return phantom.APP_SUCCESS
+            if self._ignore_perrors and ex_type is feedparser.CharacterEncodingOverride:
+                return phantom.APP_SUCCESS
             error_msg = self._feed.bozo_exception
             self.save_progress("Error reading feed: {}".format(error_msg))
             self.save_progress("Is this an RSS Feed?")
-            if self.get_action_identifier() == "test_connectivity":
-                self.save_progress("Test Connectivity Failed")
+            self.is_test_connectivity()
             return phantom.APP_ERROR
+
         return phantom.APP_SUCCESS
 
+    def is_test_connectivity(self):
+        """
+
+        Check the test connectivity action and append the failed status
+        accordingly
+        :return:
+        """
+        if self.get_action_identifier() == "test_connectivity":
+            self.save_progress(rc.RSS_TEST_CONNECTIVITY_FAILED)
+
+    def is_positive_int(self, value):
+        """
+
+        :param value: any integer/non-integer value
+        :return boolean: if positive integer or not
+        """
+        try:
+            value = int(value)
+            return True if value >= 0 else False
+        except ValueError:
+            return False
+
     def _handle_test_connectivity(self, param):
-        return self.set_status_save_progress(phantom.APP_SUCCESS, "Test Connectivity Passed")
+        return self.set_status_save_progress(phantom.APP_SUCCESS, rc.RSS_TEST_CONNECTIVITY_PASSED)
 
     def _cmp_with_last_checked_entry(self, entry, last_checked_entry):
         if mktime(entry.published_parsed) <= last_checked_entry['timestamp']:
@@ -65,44 +93,36 @@ class RssConnector(BaseConnector):
             fd, path = tempfile.mkstemp(dir='/opt/phantom/vault/tmp', text=True)
         os.write(fd, html_file)
         os.close(fd)
-        resp = Vault.add_attachment(path, container_id, name)
-        if resp['succeeded']:
+        success, message, vault_id = ph_rules.vault_add(container_id, path, name)
+        if success:
             return phantom.APP_SUCCESS, None
-        return phantom.APP_ERROR, resp['message']
+        return phantom.APP_ERROR, message
 
     def _handle_on_poll(self, param):
-        config = self.get_config()
-
         if self.is_poll_now():
-            max_containers = param.get('container_count', 1)
-            max_artifacts = param.get('artifact_count', 10)
-        else:
-            max_containers = config.get('container_count', 0)
-            max_artifacts = config.get('artifact_count', 0)
+            self._max_containers = param.get('container_count', 1)
+            self._max_artifacts = param.get('artifact_count', 10)
 
-        max_containers = int(max_containers)
-        max_artifacts = int(max_artifacts)
-        save_html = config.get('save_file', False)
+            if not (self.is_positive_int(self._max_containers) and self.is_positive_int(self._max_artifacts)):
+                return self.set_status(phantom.APP_ERROR, rc.RSS_ARTIFACTS_CONTAINERS_VALIDATION_FAILED)
 
-        if max_containers < 0:
-            return self.set_status(phantom.APP_ERROR, 'max_containers must be a positive integer')
-        if max_artifacts < 0:
-            return self.set_status(phantom.APP_ERROR, 'max_artifacts must be a positive integer')
+            self._max_containers = int(self._max_containers)
+            self._max_artifacts = int(self._max_artifacts)
 
         self.save_progress(
             "Parsing {} entries from {}".format(
-                'all' if max_containers == 0 else 'latest {}'.format(max_containers),
+                'all' if self._max_containers == 0 else 'latest {}'.format(self._max_containers),
                 self._feed['feed']['title']
             )
         )
         self.save_progress(
             "Saving {} artifacts per entry".format(
-                'all' if max_artifacts == 0 else max_artifacts
+                'all' if self._max_artifacts == 0 else self._max_artifacts
             )
         )
 
-        if max_containers:
-            entries = self._feed.entries[0:max_containers]
+        if self._max_containers:
+            entries = self._feed.entries[0:self._max_containers]
         else:
             entries = self._feed.entries
 
@@ -111,14 +131,14 @@ class RssConnector(BaseConnector):
         except KeyError:
             last_checked_entry = {
                 'timestamp': 0.0,
-                'feed_url': config['rss_feed']
+                'feed_url': self._feed_url
             }
         else:
             # Feed URL has changed, reset the state
-            if last_checked_entry['feed_url'] != config['rss_feed']:
+            if last_checked_entry['feed_url'] != self._feed_url:
                 last_checked_entry = {
                     'timestamp': 0.0,
-                    'feed_url': config['rss_feed']
+                    'feed_url': self._feed_url
                 }
 
         new_entries = []
@@ -137,8 +157,8 @@ class RssConnector(BaseConnector):
 
             try:
                 # Get html page
-                request = urllib2.Request(entry.link, headers={'User-Agent': 'Chrome 41.0.2227.0'})
-                resp_content = urllib2.urlopen(request).read()
+                request = urllib.request.Request(entry.link, headers={'User-Agent': 'Chrome 41.0.2227.0'})
+                resp_content = urllib.request.urlopen(request).read()
             except Exception as e:
                 self.debug_print("Cannot read: {}".format(entry.link))
                 self.debug_print("Exception: {}".format(str(e)))
@@ -150,9 +170,9 @@ class RssConnector(BaseConnector):
                 self.save_progress("Error: {}".format(msg))
                 continue
 
-            if max_artifacts:
+            if self._max_artifacts:
                 # We are also going to add the link as an artifact
-                artifacts = artifacts[0:max_artifacts - 1]
+                artifacts = artifacts[0:self._max_artifacts - 1]
 
             artifacts.append({
                 'cef': {
@@ -163,7 +183,8 @@ class RssConnector(BaseConnector):
 
             title = entry.title[0] if type(entry.title) == list else entry.title
             title = title.encode('ascii', 'ignore')
-            source_data_identifier = hashlib.sha256(title + str(mktime(entry.published_parsed))).hexdigest()
+            source_data_identifier = hashlib.sha256(
+                title + str(mktime(entry.published_parsed)).encode('ascii')).hexdigest()
 
             container['artifacts'] = artifacts
             container['source_data_identifier'] = source_data_identifier
@@ -172,7 +193,7 @@ class RssConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return self.set_status(phantom.APP_ERROR, "Error saving container: {}".format(msg))
 
-            if save_html:
+            if self.save_html:
                 resp, msg = self._save_html(resp_content, entry.title, cid)
                 if phantom.is_fail(resp):
                     return self.set_status(
@@ -195,10 +216,10 @@ class RssConnector(BaseConnector):
 
         self.debug_print("action_id", self.get_action_identifier())
 
-        if action_id == 'test_connectivity':
+        if action_id == rc.ACTION_ID_TEST_CONNECTIVITY:
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == 'on_poll':
+        elif action_id == rc.ACTION_ID_ON_POLL:
             ret_val = self._handle_on_poll(param)
 
         return ret_val
@@ -207,7 +228,20 @@ class RssConnector(BaseConnector):
 
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
+        config = self.get_config()
         self._state = self.load_state()
+        self._feed_url = config.get("rss_feed")
+        self._max_containers = config.get('container_count', 0)
+        self._max_artifacts = config.get('artifact_count', 0)
+        self._ignore_perrors = config.get('ignore_perrors', False)
+        self.save_html = config.get("save_file", False)
+
+        if not (self.is_positive_int(self._max_containers) and self.is_positive_int(self._max_artifacts)):
+            self.is_test_connectivity()
+            return self.set_status(phantom.APP_ERROR, rc.RSS_ARTIFACTS_CONTAINERS_VALIDATION_FAILED)
+
+        self._max_containers = int(self._max_containers)
+        self._max_artifacts = int(self._max_artifacts)
 
         return self._init_feed()
 
@@ -240,14 +274,14 @@ if __name__ == '__main__':
     password = args.password
 
     if (username is not None and password is None):
-
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -260,15 +294,15 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -283,6 +317,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
