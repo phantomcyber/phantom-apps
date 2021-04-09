@@ -91,7 +91,7 @@ class DnsdbConnector(BaseConnector):
         allowed = re.compile(r"(?!-)[A-Z\\d\-_]{1,63}(?<!-')$", re.IGNORECASE)
         parts = param.split('.')
 
-        # Wildcard serch '*' is allowed in the first and
+        # Wildcard search '*' is allowed in the first and
         # last subdomain only
         for idx, x in enumerate(parts):
             if idx == 0 or idx == (len(parts) - 1):
@@ -116,20 +116,18 @@ class DnsdbConnector(BaseConnector):
         try:
             rate = self._client.rate_limit()[DNSDB_JSON_RATE]
         except dnsdb2.exceptions.AccessDenied:
-            self.debug_print(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
 
         except dnsdb2.exceptions.QuotaExceeded:
-            self.debug_print(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
 
         except:
-            self.debug_print(action_result.get_message())
+            self.debug_print(DNSDB_TEST_CONN_FAIL)
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_TEST_CONN_FAIL)
-        self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate['limit'], rate['remaining'], rate['reset']))
+        self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate.get('limit'), rate.get('remaining'), rate.get('reset')))
 
         action_result.add_data(rate)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -165,9 +163,7 @@ class DnsdbConnector(BaseConnector):
         for i, timestamp in enumerate(timestamps):
             try:
                 timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except ValueError:
-                pass
-            except TypeError:
+            except (ValueError, TypeError):
                 pass
 
         summary_data = action_result.update_summary({})
@@ -181,9 +177,6 @@ class DnsdbConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Something went wrong with the request
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
         try:
             responses = list(self._client.lookup_rrset(owner_name,
                                                     bailiwick=bailiwick,
@@ -277,21 +270,19 @@ class DnsdbConnector(BaseConnector):
         for i, timestamp in enumerate(timestamps):
             try:
                 timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except ValueError:
-                pass
-            except TypeError:
+            except (ValueError, TypeError):
                 pass
 
         summary_data = action_result.update_summary({})
 
-        if network_prefix:
+        if network_prefix is not None:
             # Validate network prefix
             # network prefix valid if between 0 and 32 for ipv4
             if phantom.is_ip(ip):
-                net_prefix_valid = 0 <= int(network_prefix) <= 32
+                net_prefix_valid = 0 <= network_prefix <= 32
             else:
                 # network prefix valid if between 0 and 128 for ipv6
-                net_prefix_valid = 0 <= int(network_prefix) <= 128
+                net_prefix_valid = 0 <= network_prefix <= 128
 
             if not net_prefix_valid:
                 self.debug_print(DNSDB_ERR_INVALID_NETWORK_PREFIX.format(prefix=network_prefix))
@@ -300,7 +291,7 @@ class DnsdbConnector(BaseConnector):
                     DNSDB_ERR_INVALID_NETWORK_PREFIX.format(prefix=network_prefix))
 
         # Endpoint as per parameter given
-        if network_prefix:
+        if network_prefix is not None:
             ip = "%s,%s" % (ip, network_prefix)
 
         # Constructing request parameters based on input
@@ -373,9 +364,7 @@ class DnsdbConnector(BaseConnector):
         for i, timestamp in enumerate(timestamps):
             try:
                 timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except ValueError:
-                pass
-            except TypeError:
+            except (ValueError, TypeError):
                 pass
 
         summary_data = action_result.update_summary({})
@@ -454,9 +443,7 @@ class DnsdbConnector(BaseConnector):
         for i, timestamp in enumerate(timestamps):
             try:
                 timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except ValueError:
-                pass
-            except TypeError:
+            except (ValueError, TypeError):
                 pass
 
         summary_data = action_result.update_summary({})
@@ -539,9 +526,7 @@ class DnsdbConnector(BaseConnector):
         for i, timestamp in enumerate(timestamps):
             try:
                 timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except ValueError:
-                pass
-            except TypeError:
+            except (ValueError, TypeError):
                 pass
 
         exclude = param.get(DNSDB_JSON_EXCLUDE)
@@ -677,11 +662,6 @@ class DnsdbConnector(BaseConnector):
                     ("Invalid time range. 'time last after' should not be greater than 'time first before'"))
 
         if limit:
-            # limit_valid = int(limit) > 0
-            # if not limit_valid:
-            #     return action_result.set_status(phantom.APP_ERROR,
-            #                                      (DNSDB_ERR_INVALID_LIMIT).format(limit=limit))
-
             ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()

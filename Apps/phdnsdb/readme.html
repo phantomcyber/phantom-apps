@@ -72,12 +72,12 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
               <li><b><u>Action Parameter</u>​ - type</b>
                 <ul>
                   <li>A DNSDB lookup for RRtype ANY will match any RRtype except the DNSSEC-related RRtypes: DS, RRSIG, NSEC, DNSKEY, NSEC3, NSEC3PARAM, and DLV.
-                      RRtype ANY may be specified for RRTYPE in order to perform bailiwick filtering without also filtering on a particular RRtype.</li>
+                      RRtype ANY may be specified for RRTYPE to perform bailiwick filtering without also filtering on a particular RRtype.</li>
                 </ul>
               </li>
               <li><b><u>Action Parameter</u>​ - bailiwick</b>
                 <ul>
-                  <li>The “bailiwick” of an RRset in DNSDB observed via passive DNS replication is the closest enclosing zone delegated to a nameserver which served the RRset.
+                  <li>The “bailiwick” of an RRset in DNSDB observed via passive DNS replication is the closest enclosing zone delegated to a nameserver that served the RRset.
                       The “bailiwick” of an RRset in DNSDB observed in a zone file is simply the name of the zone containing the RRset.</li>
                 </ul>
               </li>
@@ -180,13 +180,13 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <ul>
             <li>Lookup IP - This action has been renamed to 'RDATA IP Lookup'.</li>
             <ul>
-                <li>The paramaters 'record seen after' and 'record seen below' have been removed.</li>
-                <li>New parameters 'time first after', 'time first before', 'time last after' and 'time last before' have been added</li>
+                <li>The parameters 'record seen after' and 'record seen below' have been removed.</li>
+                <li>New parameters 'time first after', 'time first before', 'time last after', and 'time last before' have been added</li>
             </ul>
             <li>Lookup Domain - This action has been renamed to 'RDATA Name Lookup'.</li>
             <ul>
-                <li>The paramaters 'domain', 'type', 'record seen after' and 'record seen below' have been removed.</li>
-                <li>New parameters 'name', 'time first after', 'time first before', 'time last after' and 'time last before' have been added</li>
+                <li>The parameters 'domain', 'type', 'record seen after', and 'record seen below' have been removed.</li>
+                <li>New parameters 'name', 'time first after', 'time first before', 'time last after', and 'time last before' have been added</li>
             </ul>
           </ul>
           <li>New actions have been added. Hence, it is requested to the end-user to please update their existing playbooks by inserting the corresponding action blocks for this action on the earlier versions of the app.</li>

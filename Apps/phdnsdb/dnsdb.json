@@ -1098,6 +1098,11 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.raw_rdata",
+                    "data_type": "string",
+                    "example_values": "0000000001301268747470733A2F2F676F6F676C652E636F6D27215E2E2A24217369703A637573746F6D65722D73657276696365406578616D706C652E636F6D2106676F6F676C6503636F6D00"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
