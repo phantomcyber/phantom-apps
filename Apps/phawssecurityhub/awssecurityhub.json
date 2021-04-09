@@ -11,7 +11,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "app_version": "2.1.0",
-    "utctime_updated": "2020-01-29T23:47:07.000000Z",
+    "utctime_updated": "2021-04-09T10:17:56.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1789,7 +1789,7 @@
                 {
                     "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.2_/lastSeen",
                     "data_type": "string",
-                    "example_values":[
+                    "example_values": [
                         "1512692637"
                     ]
                 },
