@@ -1,92 +1,118 @@
 <!-- File: readme.html
-  Copyright (c) 2016-2020 Splunk Inc.
+  Copyright (c) 2016-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
 <p><b>Functioning of On Poll</b></p>
-	<ul>
-		<p>There are two approaches for ingesting data using the On Poll action.
-			<br>
-			<li><b>SQS Polling</b></li>
-					<p>SQS polling is the preferred ingestion technique due to limitations in the AWS SecurityHub API used to ingest findings.  Detailed instructions on configuring SQS-polling can be found below.</p>
-			<li><b>Normal Polling</b></li>
-				<br>
-					<ol>
-						<li>On Poll</li>
-							<p>This is manual On Poll. Here, the findings data of the past N days (poll_now_days configuration parameter) will be ingested.</p>
-						<li>Scheduled Polling</li>
-							<p>In the first run, the findings data of the past M days (Scheduled_poll_days configuration parameter) will be ingested and then, for the consecutive runs, only the findings which are updated after the last run's time (last_ingested_date stored in the state file) will be fetched.</p>
-						<li>Interval Polling</li>
-							<p>The logic of fetching and ingesting the findings is the same as scheduled polling.</p>
-					</ol>
-				<br>
-	</ul>
-
-	<h2>Ingesting Security Hub Findings from SQS</h2>
-    <p>This following section explains how to configure the preferred means of ingesting findings from AWS, SQS polling.  These instructions leverage a CloudFormation template to setup the forwarding of Security Hub findings into an SQS queue.  Phantom in turn ingests the findings from this queue.</p>
+<ul>
+	<p>There are two approaches for ingesting data using the On Poll action.
+		<br>
+		<li><b>SQS Polling</b></li>
+	<p>SQS polling is the preferred ingestion technique due to limitations in the AWS SecurityHub API used to ingest
+		findings. Detailed instructions on configuring SQS-polling can be found below.</p>
+	<li><b>Normal Polling</b></li>
 	<br>
-	<p>Note that SQS-based polling will ignore the <b>poll_now_days</b> and <b>scheduled_poll_days</b> asset configuration parameters.</p>
-	<h3>1 - Forward Security Hub Alerts to an SQS Queue</h3>
-	
-	<p>Start by navigating to the CloudFormation page on your AWS console and running CloudFormation template linked below.  The template will generate a new CloudWatch Event Rule which will forward all new Security Hub findings to an SQS Queue.  </p>
-	
-	<p>CloudFormation Template:  <a href="https://splunkphantom.s3.amazonaws.com/cloud-formation/phantom-sechub-to-sqs.yaml">https://splunkphantom.s3.amazonaws.com/cloud-formation/phantom-sechub-to-sqs.yaml</a></p>
-	
-	<p><img src="https://splunkphantom.s3.amazonaws.com/images/PhantomSecHubToSQSCloudFormation.png" alt="Cloud Formation - Selecting the Phantom Template"></p>
-	
-	<p>After the Cloud Formation stack has been created be sure to take note of the <em>securityHubToPhantomSQSURL</em> field in the output - you will need it later.</p>
-	
-	<p><img src="https://splunkphantom.s3.amazonaws.com/images/PhantomCloudFormationOutputHighlighted.png" alt="Cloud Formation Output"></p>
-	
-	<h3>2 - Configure your Phantom App Asset</h3>
-	
-	<p>Next, login to your Splunk Phantom instance.  If you are new to Phantom you can easily launch the Phantom Community Edition available in the AWS Marketplace.</p>
-	
-	<p>Navigate to the &quot;Apps&quot; page in Phantom.  Search for the Security Hub app - if you don&#39;t find it in your search results, you may need to select the <em>New Apps</em> and install the app before proceeding.  Select &quot;Configure New Asset&quot; for the v1.1+ Security Hub App.</p>
-	
-	<blockquote>
-	<p><strong>Important</strong> These instructions require the Phantom Security Hub app v1.1 or higher - if you are running an older version, be sure to upgraded it by selecting &quot;Upgrade Apps&quot; in your phantom instance or downloading the latest version of the app from my.phantom.us/apps and manually installing it. </p>
-	</blockquote>
-	
-	<p><img src="https://splunkphantom.s3.amazonaws.com/images/security-hub-app-asset.png" alt="Security Hub Phantom App Configure"></p>
-	
-	<h3>App Configuration Parameters</h3>
-	
-	<p>Setting up the Security Hub Phantom app requires input on 3 configuration tabs.</p>
-	
-	<h5>Asset Info</h5>
-	
-	<p>Provide a unique name asset name.  It is a good idea to use a name which reminds you which AWS environment the app connects to.</p>
-	
-	<h5>Ingest Settings</h5>
-	
-	<ul>
-	<li>Select a Label to apply to all Findings consumed from security hub, or create a new one by typing in the drop down box</li>
+	<ol>
+		<li>On Poll</li>
+		<p>This is manual On Poll. Here, the findings data of the past N days (poll_now_days configuration parameter)
+			will be ingested.</p>
+		<li>Scheduled Polling</li>
+		<p>In the first run, the findings data of the past M days (Scheduled_poll_days configuration parameter) will be
+			ingested and then, for the consecutive runs, only the findings are updated after the last run's time
+			(last_ingested_date stored in the state file) will be fetched.</p>
+		<li>Interval Polling</li>
+		<p>The logic of fetching and ingesting the findings is the same as scheduled polling.</p>
+	</ol>
+	<br>
+</ul>
+
+<h2>Ingesting Security Hub Findings from SQS</h2>
+<p>The following section explains how to configure the preferred means of ingesting findings from AWS, SQS polling.
+	These instructions leverage a CloudFormation template to set up the forwarding of Security Hub findings into an SQS
+	queue. Phantom in turn ingests the findings from this queue.</p>
+<br>
+<p>Note that SQS-based polling will ignore the <b>poll_now_days</b> and <b>scheduled_poll_days</b> asset configuration
+	parameters.</p>
+<h3>1 - Forward Security Hub Alerts to an SQS Queue</h3>
+
+<p>Start by navigating to the CloudFormation page on your AWS console and running CloudFormation template linked below.
+	The template will generate a new CloudWatch Event Rule which will forward all new Security Hub findings to an SQS
+	Queue. </p>
+
+<p>CloudFormation Template: <a
+		href="https://splunkphantom.s3.amazonaws.com/cloud-formation/phantom-sechub-to-sqs.yaml">https://splunkphantom.s3.amazonaws.com/cloud-formation/phantom-sechub-to-sqs.yaml</a>
+</p>
+
+<p><img src="https://splunkphantom.s3.amazonaws.com/images/PhantomSecHubToSQSCloudFormation.png"
+		alt="Cloud Formation - Selecting the Phantom Template"></p>
+
+<p>After the Cloud Formation stack has been created be sure to take note of the <em>securityHubToPhantomSQSURL</em>
+	field in the output - you will need it later.</p>
+
+<p><img src="https://splunkphantom.s3.amazonaws.com/images/PhantomCloudFormationOutputHighlighted.png"
+		alt="Cloud Formation Output"></p>
+
+<h3>2 - Configure your Phantom App Asset</h3>
+
+<p>Next, login to your Splunk Phantom instance. If you are new to Phantom you can easily launch the Phantom Community
+	Edition available in the AWS Marketplace.</p>
+
+<p>Navigate to the &quot;Apps&quot; page in Phantom. Search for the Security Hub app - if you don&#39;t find it in your
+	search results, you may need to select the <em>New Apps</em> and install the app before proceeding. Select
+	&quot;Configure New Asset&quot; for the v1.1+ Security Hub App.</p>
+
+<blockquote>
+	<p><strong>Important</strong> These instructions require the Phantom Security Hub app v1.1 or higher - if you are
+		running an older version, be sure to upgrade it by selecting &quot;Upgrade Apps&quot; in your phantom instance
+		or downloading the latest version of the app from my.phantom.us/apps and manually installing it. </p>
+</blockquote>
+
+<p><img src="https://splunkphantom.s3.amazonaws.com/images/security-hub-app-asset.png"
+		alt="Security Hub Phantom App Configure"></p>
+
+<h3>App Configuration Parameters</h3>
+
+<p>Setting up the Security Hub Phantom app requires input on 3 configuration tabs.</p>
+
+<h5>Asset Info</h5>
+
+<p>Provide a unique name asset name. It is a good idea to use a name that reminds you which AWS environment the app
+	connects to.</p>
+
+<h5>Ingest Settings</h5>
+
+<ul>
+	<li>Select a Label to apply to all Findings consumed from security hub, or create a new one by typing in the
+		drop-down box</li>
 	<li>Select &quot;Interval&quot; to enable periodic polling of the SQS Queue</li>
 	<li>Modify the polling interval as desired to suit your organization&#39;s needs.<br></li>
-	</ul>
-	
-	<h5>Asset Settings</h5>
-	
-	<p>Supply values for the following fields:</p>
-	
-	<ul>
+</ul>
+
+<h5>Asset Settings</h5>
+
+<p>Supply values for the following fields:</p>
+
+<ul>
 	<li> AWS Access Key - The access key associated with an IAM account</li>
 	<li> AWS Secret Key - The secret key associated with an IAM account </li>
 	<li>SQS URL - The URL provided by the Cloud Formation template from part 1 of this guide</li>
-	</ul>
-	
-	<p><img src="https://splunkphantom.s3.amazonaws.com/images/phantom-sechub-app-assetsettings.png" alt="Security Hub Phantom App - Asset Settings Tab"></p>
-	
-	<h3>Finalize the Configuration</h3>
-	
-	<p>Once you have configured the Asset Info, Ingest Settings, and Asset Settings select <em>Save</em> to finalize your app configuration.  You are now ready to start consuming Security Hub Findings in Phantom!  </p>
-	
-	<p>Any new Security Hub Findings will now appear on your Phantom &quot;Events&quot; page according to your polling interval.  Note that the integration relies on forwarding events from the Security Hub to the SQS queue, so the app will only know about any findings that were created after the Cloud Formation template was run in Step 1.  </p>
+</ul>
 
-	<hr>
-	
-	</body>
-	
-	</html>
+<p><img src="https://splunkphantom.s3.amazonaws.com/images/phantom-sechub-app-assetsettings.png"
+		alt="Security Hub Phantom App - Asset Settings Tab"></p>
+
+<h3>Finalize the Configuration</h3>
+
+<p>Once you have configured the Asset Info, Ingest Settings, and Asset Settings select <em>Save</em> to finalize your
+	app configuration. You are now ready to start consuming Security Hub Findings in Phantom! </p>
+
+<p>Any new Security Hub Findings will now appear on your Phantom &quot;Events&quot; page according to your polling
+	interval. Note that the integration relies on forwarding events from the Security Hub to the SQS queue, so the app
+	will only know about any findings that were created after the Cloud Formation template was run in Step 1. </p>
+
+<hr>
+
+</body>
+
+</html>
