@@ -1,5 +1,5 @@
 # File: awssecurityhub_connector.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -47,9 +47,19 @@ class AwsSecurityHubConnector(BaseConnector):
 
         config = self.get_config()
 
+        # integer validation for 'poll_now_days' configuration parameter
+        ret_val, self._poll_now_days = self._validate_integer(self, config['poll_now_days'], AWSSECURITYHUB_POLL_NOW_DAYS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+
+        # integer validation for 'scheduled_poll_days' configuration parameter
+        ret_val, self._scheduled_poll_days = self._validate_integer(self, config['scheduled_poll_days'], AWSSECURITYHUB_SCHEDULED_POLL_DAYS_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
+
         self._region = AWSSECURITYHUB_REGION_DICT.get(config['region'])
         if not self._region:
-            return self.set_status(phantom.APP_ERROR, "Specified region is not valid")
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_REGION_INVALID)
 
         if 'access_key' in config:
             self._access_key = config['access_key']
@@ -71,6 +81,63 @@ class AwsSecurityHubConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
+        error_msg = AWSSECURITYHUB_ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSSECURITYHUB_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            if error_code in AWSSECURITYHUB_ERR_CODE_UNAVAILABLE:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = AWSSECURITYHUB_PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+        is a non-zero positive integer and returns the integer value of the parameter itself.
+
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: integer value of the parameter or None in case of failure
+        """
+
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_VALID_INT_MSG.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_INT_MSG.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _create_client(self, action_result, service='securityhub'):
 
         boto_config = None
@@ -79,7 +146,6 @@ class AwsSecurityHubConnector(BaseConnector):
 
         try:
             if self._access_key and self._secret_key:
-
                 self.debug_print("Creating boto3 client with API keys")
                 self._client = client(
                         service,
@@ -88,7 +154,6 @@ class AwsSecurityHubConnector(BaseConnector):
                         aws_secret_access_key=self._secret_key,
                         config=boto_config)
             else:
-
                 self.debug_print("Creating boto3 client without API keys")
                 self._client = client(
                         service,
@@ -96,7 +161,8 @@ class AwsSecurityHubConnector(BaseConnector):
                         config=boto_config)
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CLIENT_NOT_CREATED.format(err=err))
 
         return phantom.APP_SUCCESS
 
@@ -105,12 +171,13 @@ class AwsSecurityHubConnector(BaseConnector):
         try:
             boto_func = getattr(self._client, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_METHOD.format(method=method)), None)
 
         try:
             resp_json = boto_func(**kwargs)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'boto3 call to Security Hub failed', e), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_BOTO3_CALL_FAILED.format(err=err)), None)
 
         return phantom.APP_SUCCESS, resp_json
 
@@ -123,13 +190,13 @@ class AwsSecurityHubConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result)):
             return action_result.get_status()
 
-        ret_val, response = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
+        ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress(AWSSECURITYHUB_ERR_TEST_CONNECTIVITY)
             return ret_val
 
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(AWSSECURITYHUB_SUCC_TEST_CONNECTIVITY)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_container(self, finding):
@@ -207,7 +274,7 @@ class AwsSecurityHubConnector(BaseConnector):
         if phantom.is_fail(self._create_client(action_result, service='sqs')):
             return None
 
-        self.debug_print("max containers to poll for: {0}".format(max_containers))
+        self.debug_print("Max containers to poll for: {0}".format(max_containers))
 
         findings = []
         while len(findings) < max_containers:
@@ -221,11 +288,16 @@ class AwsSecurityHubConnector(BaseConnector):
                 return findings
 
             for message in resp_json['Messages']:
-                message_dict = json.loads(message.get('Body', '{}'))
+                try:
+                    message_dict = json.loads(message.get('Body', '{}'))
+                except:
+                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(message.get('Body', '{}')))
+                    continue
+
                 if message_dict and message_dict.get('detail', {}).get('findings', []):
                     findings.extend(json.loads(message['Body'])['detail']['findings'])
                 else:
-                    self.debug_print("skipping the following sqs message because of failure to extract finding object: {}".format(message_dict))
+                    self.debug_print("Skipping the following sqs message because of failure to extract finding object: {}".format(message_dict))
                     continue
 
                 ret_val, resp_json = self._make_boto_call(action_result, 'delete_message', QueueUrl=url, ReceiptHandle=message['ReceiptHandle'])
@@ -239,14 +311,12 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _poll_from_security_hub(self, action_result, max_containers):
 
-        config = self.get_config()
-
         if phantom.is_fail(self._create_client(action_result)):
             return None
 
         end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         if self.is_poll_now():
-            days = int(config['poll_now_days'])
+            days = self._poll_now_days
             filters = {
                         "UpdatedAt": [{
                             "DateRange": {
@@ -256,7 +326,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         }]
                     }
         elif self._state.get('first_run', True):
-            days = int(config['scheduled_poll_days'])
+            days = self._scheduled_poll_days
             filters = {
                         "UpdatedAt": [{
                             "DateRange": {
@@ -268,7 +338,7 @@ class AwsSecurityHubConnector(BaseConnector):
         else:
             start_date = self._state.get('last_ingested_date')
             if not start_date:
-                start_date = end_date - timedelta(days=int(config['scheduled_poll_days']))
+                start_date = end_date - timedelta(days=self._scheduled_poll_days)
             filters = {
                         "UpdatedAt": [{
                             "Start": start_date,
@@ -300,20 +370,6 @@ class AwsSecurityHubConnector(BaseConnector):
 
         config = self.get_config()
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
-
-        try:
-            poll_now_days = int(config['poll_now_days'])
-            if (poll_now_days and not str(poll_now_days).isdigit()) or poll_now_days == 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='poll_now_days'))
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_DAYS.format(parameter='poll_now_days', error=str(e)))
-
-        try:
-            scheduled_poll_now_days = int(config['scheduled_poll_days'])
-            if (scheduled_poll_now_days and not str(scheduled_poll_now_days).isdigit()) or scheduled_poll_now_days == 0:
-                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='scheduled_poll_days'))
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_DAYS.format(parameter='scheduled_poll_days', error=str(e)))
 
         if 'sqs_url' in config:
             findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count)
@@ -354,8 +410,10 @@ class AwsSecurityHubConnector(BaseConnector):
 
         limit = param.get('limit')
 
-        if (limit and not str(limit).isdigit()) or limit == 0:
-            return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_INVALID_INTEGER.format(parameter='limit'))
+        # integer validation for 'limit' action parameter
+        ret_val, limit = self._validate_integer(action_result, limit, AWSSECURITYHUB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         resource_id = param.get('resource_id')
         resource_ec2_ipv4_addresses = param.get('resource_ec2_ipv4_addresses')
@@ -401,7 +459,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, 'Resource ec2 IP validation failed for all the provided IPs')
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_RESOURCE_IP_VALIDATION)
 
             filters.update({
                 "ResourceAwsEc2InstanceIpV4Addresses": ip_add_list
@@ -419,7 +477,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         self.debug_print('Resource ec2 IP validation failed for {}. Hence, skipping this IP address from being added to the filter.'.format(ip_add))
 
             if not ip_add_list:
-                return action_result.set_status(phantom.APP_ERROR, 'Network source IP validation failed validation failed for all the provided IPs')
+                return action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION)
 
             filters.update({
                 "NetworkSourceIpV4": ip_add_list
@@ -531,6 +589,8 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _validate_findings_id(self, findings_id, record_state, action_result):
 
+        valid_finding = None
+
         filters = {
                 "Id": [{
                     "Comparison": AWSSECURITYHUB_EQUALS_CONSTS,
@@ -547,14 +607,15 @@ class AwsSecurityHubConnector(BaseConnector):
         for finding in list_findings:
             if finding.get('Id') == findings_id:
                 if record_state and finding.get('RecordState') == record_state:
-                    action_result.set_status(phantom.APP_SUCCESS, 'Provided findings ID is already {}'.format(record_state))
+                    action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE.format(record_state=record_state))
                     return (True, False, finding)
+                valid_finding = finding
                 break
         else:
-            action_result.set_status(phantom.APP_ERROR, 'Please provide a valid findings ID')
+            action_result.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_INVALID_FINDING_ID)
             return (False, False, None)
 
-        return (True, True, finding)
+        return (True, True, valid_finding)
 
     def _handle_archive_findings(self, param):
 
@@ -685,7 +746,7 @@ class AwsSecurityHubConnector(BaseConnector):
                 "Comparison": AWSSECURITYHUB_EQUALS_CONSTS
             }]
         }
-
+        note = note.replace("\\", "\\\\").replace('"', '\\"')
         note1 = {
                 'Text': '(Splunk Phantom - {0}) {1}'.format(note_time, note),
                 'UpdatedBy': 'automation-splunk'
@@ -700,11 +761,11 @@ class AwsSecurityHubConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         summary['add_note'] = 'Success'
-        return action_result.set_status(phantom.APP_SUCCESS, 'Note added successfully to the provided findings ID')
+        return action_result.set_status(phantom.APP_SUCCESS, AWSSECURITYHUB_SUCC_ADD_NOTE)
 
     def handle_action(self, param):
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         # Dictionary mapping each action with its corresponding actions
         action_mapping = {
@@ -755,7 +816,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             login_url = BaseConnector._get_phantom_base_url() + '/login'
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -768,11 +829,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -788,6 +849,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
