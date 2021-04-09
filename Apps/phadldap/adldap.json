@@ -88,7 +88,7 @@
             "action": "add group members",
             "identifier": "add_group_members",
             "description": "Adds one more more AD objects to one or more groups",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -221,7 +221,7 @@
             "action": "remove group members",
             "identifier": "remove_group_members",
             "description": "Removes one more more AD objects to one or more groups",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -354,7 +354,7 @@
             "action": "unlock account",
             "identifier": "unlock_account",
             "description": "Unlocks a locked Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -465,10 +465,10 @@
             }
         },
         {
-            "action": "disable account",
+            "action": "disable acct",
             "identifier": "disable_account",
             "description": "Disables an Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "undo": "enable account",
             "versions": "EQ(*)",
@@ -572,10 +572,10 @@
             }
         },
         {
-            "action": "enable account",
+            "action": "enable acct",
             "identifier": "enable_account",
             "description": "Enables a disabled Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "undo": "disable account",
             "versions": "EQ(*)",
@@ -682,7 +682,7 @@
             "action": "reset password",
             "identifier": "reset_password",
             "description": "Reset a user's password",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -824,7 +824,7 @@
             "action": "move object",
             "identifier": "move_object",
             "description": "Moves an entry in active directory",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -1031,13 +1031,13 @@
                 "type": "custom",
                 "width": 10,
                 "height": 5,
-                "view": "query_view.display_attributes",
+                "view": "adldap_view.display_attributes",
                 "title": "AD Query"
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "get attribute",
+            "action": "get attributes",
             "identifier": "get_attributes",
             "description": "Get attributes of various principals",
             "verbose": "This action takes any number of principals (sAMAccountName, distinguishedName, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
@@ -1138,7 +1138,7 @@
                 "type": "custom",
                 "width": 10,
                 "height": 5,
-                "view": "query_view.display_attributes",
+                "view": "adldap_view.display_attributes",
                 "title": "AD Query"
             },
             "versions": "EQ(*)"
@@ -1202,7 +1202,7 @@
                     "data_path": "action_result.parameter.use_samaccountname",
                     "data_type": "boolean",
                     "example_values": [
-                        false
+                        true
                     ]
                 },
                 {
@@ -1225,7 +1225,8 @@
                     "column_name": "user",
                     "column_order": 0,
                     "example_values": [
-                        "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                        "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB",
+                        "SVC-SPLUNK"
                     ]
                 },
                 {
@@ -1241,7 +1242,10 @@
                     "data_path": "action_result.parameter.value",
                     "data_type": "string",
                     "column_name": "new value",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "svc_splunk@splunk.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.action",
@@ -1249,7 +1253,8 @@
                     "column_name": "action",
                     "column_order": 3,
                     "example_values": [
-                        "DELETE"
+                        "DELETE",
+                        "REPLACE"
                     ]
                 },
                 {
