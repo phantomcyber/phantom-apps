@@ -123,8 +123,8 @@ class DnsdbConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
 
-        except:
-            self.debug_print(DNSDB_TEST_CONN_FAIL)
+        except Exception as e:
+            self.debug_print(self._get_error_message_from_exception(e))
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_TEST_CONN_FAIL)
         self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate.get('limit'), rate.get('remaining'), rate.get('reset')))
@@ -188,11 +188,9 @@ class DnsdbConnector(BaseConnector):
                                                     time_last_after=timestamps[3],
                                                     ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except UnicodeError:
@@ -312,11 +310,9 @@ class DnsdbConnector(BaseConnector):
                                                         time_last_after=timestamps[3],
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
@@ -387,11 +383,9 @@ class DnsdbConnector(BaseConnector):
                                                         time_last_after=timestamps[3],
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
@@ -467,11 +461,9 @@ class DnsdbConnector(BaseConnector):
                                                         time_last_after=timestamps[3],
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
@@ -579,11 +571,9 @@ class DnsdbConnector(BaseConnector):
                                                         limit=limit,
                                                         ignore_limited=True))
         except dnsdb2.exceptions.AccessDenied:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_ACCESS_DENIED_MSG)
         except dnsdb2.exceptions.QuotaExceeded:
-            self.save_progress(action_result.get_message())
             return action_result.set_status(
                 phantom.APP_ERROR, DNSDB_REST_RESP_LIC_EXCEED_MSG)
         except Exception as e:
