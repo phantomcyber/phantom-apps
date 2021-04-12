@@ -9,38 +9,50 @@
     "product_name": "Security Hub",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
-    "app_version": "2.0.1",
-    "utctime_updated": "2020-01-29T23:47:07.000000Z",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-04-09T10:17:56.000000Z",
     "package_name": "phantom_awssecurityhub",
     "main_module": "awssecurityhub_connector.py",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, January 27, 2020"
+        "Cloud API, March 17, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.10.31-py2.py3-none-any.whl"
+                "input_file": "wheels/boto3-1.17.28-py2.py3-none-any.whl"
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.13.31-py2.py3-none-any.whl"
+                "input_file": "wheels/botocore-1.20.28-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+                "input_file": "wheels/s3transfer-0.3.4-py2.py3-none-any.whl"
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
-                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+                "input_file": "wheels/jmespath-0.10.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "wheels/python_dateutil-2.8.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.15.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.4-py2.py3-none-any.whl"
             }
         ]
     },
@@ -77,7 +89,7 @@
                 "EU (Ireland)",
                 "EU (London)",
                 "EU (Paris)",
-                "South Americia (Sao Paulo)"
+                "South America (Sao Paulo)"
             ],
             "order": 2
         },
@@ -123,36 +135,26 @@
                 "container_id": {
                     "description": "Container IDs to limit the ingestion to",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "start_time": {
                     "description": "Start of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "end_time": {
                     "description": "End of the time range, in epoch time (milliseconds)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 },
                 "container_count": {
                     "description": "Maximum number of container records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "artifact_count": {
                     "description": "Maximum number of artifact records to query for",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 }
             },
@@ -163,14 +165,13 @@
             "action": "get findings",
             "identifier": "get_findings",
             "description": "Lists and describes Security Hub aggregated findings that are specified by a single filter attribute",
-            "verbose": "If none of the filter parameters are provided, all the findings will be fetched controlled by the limit parameter. For the parameters resource_ec2_ipv4_addresses and network_source_ipv4, if the user provides comma-separated values and one or more values are incorrect, then those values will be simply ignored and only correct values will be used for further filtering of the findings.",
+            "verbose": "If none of the filter parameters are provided, all the findings will be fetched controlled by the limit parameter. For the parameters 'resource_ec2_ipv4_addresses' and 'network_source_ipv4', if the user provides comma-separated values and one or more values are incorrect, then those values will be simply ignored and only correct values will be used for further filtering of the findings.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "resource_id": {
                     "description": "The canonical identifier for the given resource type",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub resource id",
@@ -181,7 +182,6 @@
                 "resource_ec2_ipv4_addresses": {
                     "description": "Comma-separated IPv4 addresses associated with the instance",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub resource ip"
@@ -191,7 +191,6 @@
                 "network_source_ipv4": {
                     "description": "Comma-separated source IPv4 addresses of network-related information about a finding",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "aws security hub network source ip"
@@ -201,7 +200,6 @@
                 "network_source_mac": {
                     "description": "The source media access control (MAC) address of network-related information about a finding",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "mac address"
@@ -211,7 +209,6 @@
                 "resource_region": {
                     "description": "The canonical AWS external region name where this resource is located",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 4,
                     "contains": [
@@ -221,27 +218,15 @@
                 "limit": {
                     "description": "Maximum number of findings to be fetched",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 },
                 "is_archived": {
                     "description": "Flag to fetch the archived findings",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 6
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.is_archived",
                     "data_type": "boolean",
@@ -267,9 +252,6 @@
                 {
                     "data_path": "action_result.parameter.network_source_mac",
                     "data_type": "string",
-                    "example_values": [
-                        ""
-                    ],
                     "contains": [
                         "mac address"
                     ]
@@ -311,6 +293,27 @@
                     "data_type": "string",
                     "example_values": [
                         "ABCDEFGH123456789"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "WARNING"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.StatusReasons.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.StatusReasons.*.ReasonCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONFIG_ACCESS_DENIED"
                     ]
                 },
                 {
@@ -476,6 +479,55 @@
                     "data_type": "string",
                     "example_values": [
                         "arn:aws:securityhub:us-east-1::product/aws/guardduty"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RecommendationUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://docs.aws.amazon.com/console/securityhub/standards-cis-2.9/remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RelatedAWSResources:0/name",
+                    "data_type": "string",
+                    "example_values": [
+                        "securityhub-vpc-flow-logs-enabled-e8258e90"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RelatedAWSResources:0/type",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS::Config::ConfigRule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RuleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsControlArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:us-east-1:157568067690:control/cis-aws-foundations-benchmark/v/1.2.0/2.9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsGuideArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsGuideSubscriptionArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:us-east-1:157568067690:subscription/cis-aws-foundations-benchmark/v/1.2.0"
                     ]
                 },
                 {
@@ -953,6 +1005,97 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductFields.attributes/ACL",
+                    "data_type": "string",
+                    "example_values": [
+                        "acl-b68b09d0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/ENI",
+                    "data_type": "string",
+                    "example_values": [
+                        "eni-0e16d09e9d9720222"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/IGW",
+                    "data_type": "string",
+                    "example_values": [
+                        "igw-35109f52"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/INSTANCE_ID",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0af916767974b7daf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/PORT",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/PORT_GROUP_NAME",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/PROTOCOL",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/REACHABILITY_TYPE",
+                    "data_type": "string",
+                    "example_values": [
+                        "Internet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/RULE_TYPE",
+                    "data_type": "string",
+                    "example_values": [
+                        "RecognizedPortNoAgent"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/SECURITY_GROUP",
+                    "data_type": "string",
+                    "example_values": [
+                        "sg-082e3689120474d29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/TCP_PORTS",
+                    "data_type": "string",
+                    "example_values": [
+                        "[[22 - 22], [80 - 80], [443 - 443], [8000 - 8000], [9999 - 9999]]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/UDP_PORTS",
+                    "data_type": "string",
+                    "example_values": [
+                        "[]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.attributes/VPC",
+                    "data_type": "string",
+                    "example_values": [
+                        "vpc-b962a3df"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ProductFields.attributes:0/key",
                     "data_type": "string",
                     "example_values": [
@@ -1107,6 +1250,1037 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/actionType",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS_API_CALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::CloudTrail::Trail",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingCloudTrailName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::EC2::Instance",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-99999999"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::IAM::Role",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingIAMRole"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::IAM::User",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingIAMUser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/affectedResources/AWS::S3::Bucket",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssm-phantomapp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/api",
+                    "data_type": "string",
+                    "example_values": [
+                        "DescribeNetworkInterfaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/callerType",
+                    "data_type": "string",
+                    "example_valus": [
+                        "Remote IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/errorCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "NoSuchEntityException"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ashburn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "39.0481"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "-77.4728"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "3.238.239.205"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "14618"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "AMAZON-AES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/awsApiCallAction/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ec2.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/dnsRequestAction/blocked",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/dnsRequestAction/domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingDomainName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/dnsRequestAction/protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "UDP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/blocked",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/connectionDirection",
+                    "data_type": "string",
+                    "example_values": [
+                        "INBOUND"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/localIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.31.48.171"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/localPortDetails/port",
+                    "data_type": "string",
+                    "example_values": [
+                        "22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/localPortDetails/portName",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Montreal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Canada"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.5072"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "-73.6498"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "24.200.121.125"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "5769"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "VIDEOTRON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "Videotron Ltee"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "Videotron Ltee"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remotePortDetails/port",
+                    "data_type": "string",
+                    "example_values": [
+                        "40455"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/networkConnectionAction/remotePortDetails/portName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/blocked",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/localIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.23"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/localPortDetails/port",
+                    "data_type": "string",
+                    "example_values": [
+                        "9999"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/localPortDetails/portName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "St Petersburg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Russia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "59.909"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "30.295"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.155.205.225"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "49505"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "OOO Network of data-centers Selectel"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "3NT Solutions LLP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.0_/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "3NT Solutions LLP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/localIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.23"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/localPortDetails/port",
+                    "data_type": "string",
+                    "example_values": [
+                        "443"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/localPortDetails/portName",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTPS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/city/cityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingCityName2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/country/countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingCountryName2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/geoLocation/lat",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/geoLocation/lon",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "198.51.100.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/organization/asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "29073"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/organization/asnOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingASNOrg2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/organization/isp",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingISP2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/action/portProbeAction/portProbeDetails.1_/remoteIpDetails/organization/org",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingORG2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/additionalScannedPorts",
+                    "data_type": "string",
+                    "example_values": [
+                        "[]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.0_/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "18"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.0_/firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692639"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.0_/lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692839"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.0_/name",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAPIName1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.1_/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.1_/firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692639"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.1_/lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692837"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.1_/name",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAPIName1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.2_/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.2_/firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692637"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.2_/lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "1512692637"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/apiCalls.2_/name",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAPIName1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingThreatListName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/inBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "321987"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/localPort",
+                    "data_type": "string",
+                    "example_values": [
+                        "34875"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/allowUsersToChangePassword",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/hardExpiry",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/maxPasswordAge",
+                    "data_type": "string",
+                    "example_values": [
+                        "150"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/minimumPasswordLength",
+                    "data_type": "string",
+                    "example_values": [
+                        "6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/passwordReusePrevention",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/requireLowercaseCharacters",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/requireNumbers",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/requireSymbols",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/newPolicy/requireUppercaseCharacters",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/allowUsersToChangePassword",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/hardExpiry",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/maxPasswordAge",
+                    "data_type": "string",
+                    "example_values": [
+                        "180"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/minimumPasswordLength",
+                    "data_type": "string",
+                    "example_values": [
+                        "6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/passwordReusePrevention",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/requireLowercaseCharacters",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/requireNumbers",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/requireSymbols",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/oldPolicy/requireUppercaseCharacters",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/outBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "6841"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/policyArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::aws:policy/AdministratorAccess"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/portsScannedSample.0_",
+                    "data_type": "string",
+                    "example_values": [
+                        "855"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/portsScannedSample.10_",
+                    "data_type": "string",
+                    "example_values": [
+                        "400"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/portsScannedSample.11_",
+                    "data_type": "string",
+                    "example_values": [
+                        "813"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentApiCalls.0_/api",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAPIName1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentApiCalls.0_/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentApiCalls.1_/api",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAPIName2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentApiCalls.1_/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.0_/accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAccessKeyId1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.0_/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "198.51.100.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.0_/principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingPrincipalId1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.1_/accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAccessKeyId2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.1_/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "198.51.100.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.1_/principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingPrincipalId2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.2_/accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAccessKeyId3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.2_/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "198.51.100.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.2_/principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingPrincipalId3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.3_/accessKeyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingAccessKeyId4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.3_/ipAddressV4",
+                    "data_type": "string",
+                    "example_values": [
+                        "198.51.100.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/recentCredentials.3_/principalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingPrincipalId4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/sample",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/scannedPort",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/threatListName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ProofPoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/threatName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Scanner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual",
+                    "data_type": "string",
+                    "example_values": [
+                        "25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/countries.0_",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingUnusualCountryName1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/countries.1_",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingUnusualCountryName2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/countries.2_",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingUnusualCountryName3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/hoursOfDay.0_",
+                    "data_type": "string",
+                    "example_values": [
+                        "1513609200000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/isps",
+                    "data_type": "string",
+                    "example_values": [
+                        "amazon.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusual/userNames.0_",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingUserName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/additionalInfo/unusualProtocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "UDP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/archived",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/count",
+                    "data_type": "string",
+                    "example_values": [
+                        "108675"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "c8b6836865362e2b73f679f650bdsaddds"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventFirstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-06T13:43:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/eventLastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-03-10T23:53:31Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/evidence",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/evidence/threatIntelligenceDetails.0_/threatListName",
+                    "data_type": "string",
+                    "example_values": [
+                        "ProofPoint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/evidence/threatIntelligenceDetails.0_/threatNames",
+                    "data_type": "string",
+                    "example_values": [
+                        "[]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/evidence/threatIntelligenceDetails.0_/threatNames.0_",
+                    "data_type": "string",
+                    "example_values": [
+                        "Scanner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/resourceRole",
+                    "data_type": "string",
+                    "example_values": [
+                        "TARGET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/serviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "guardduty"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/guardduty/service/userFeedback",
+                    "data_type": "string",
+                    "example_values": [
+                        "USEFUL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/inspector/RulesPackageName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Network Reachability"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/inspector/arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:inspector:us-east-1:157568067690:target/0-6eg3IiCE/template/0-xAf9XX8I/run/0-VVOWh3IP/finding/0-2pwnXhww"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/inspector/id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Recognized port reachable from internet"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ProductFields.aws/securityhub/CompanyName",
                     "data_type": "string",
                     "example_values": [
@@ -1135,6 +2309,13 @@
                     "data_type": "string",
                     "example_values": [
                         "MEDIUM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.aws/securityhub/annotation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config."
                     ]
                 },
                 {
@@ -1262,6 +2443,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Remediation.Recommendation.Url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://docs.aws.amazon.com/console/securityhub/standards-cis-2.9/remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.IamInstanceProfileArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::157568067690:instance-profile/AmazonSSMRoleForInstancesQuickSetup"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsEc2Instance.ImageId",
                     "data_type": "string",
                     "example_values": [
@@ -1308,10 +2503,59 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalId",
+                    "data_type": "string",
+                    "example_values": [
+                        "157568067690"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.PrincipalType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Root"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resources.*.Details.AwsIamAccessKey.UserName",
                     "data_type": "string",
                     "example_values": [
                         "Root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsS3Bucket.CreatedAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-03-01T13:39:44Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsS3Bucket.OwnerId",
+                    "data_type": "string",
+                    "example_values": [
+                        "042b1aa6d5faa5cfe9d016645ce14be41235ed6f94c988c6af6550f439e3f444"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsS3Bucket.ServerSideEncryptionConfiguration.Rules.*.ApplyServerSideEncryptionByDefault.KMSMasterKeyID",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:kms:region:123456789012:key/key-id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Details.AwsS3Bucket.ServerSideEncryptionConfiguration.Rules.*.ApplyServerSideEncryptionByDefault.SSEAlgorithm",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSEAlgorithm"
                     ]
                 },
                 {
@@ -1352,10 +2596,73 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Resources.*.Tags.APP",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSM_AUTOMATION"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.ASG",
+                    "data_type": "string",
+                    "example_values": [
+                        "ASG_VALUE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.App",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS-EC2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "used for testing MC + splunk connect"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.GeneratedFindingInstaceTag1",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingInstaceValue1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.GeneratedFindingInstaceTag2",
+                    "data_type": "string",
+                    "example_values": [
+                        "GeneratedFindingInstaceTagValue2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.JIRA",
+                    "data_type": "string",
+                    "example_values": [
+                        "PINF-000"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resources.*.Tags.Name",
                     "data_type": "string",
                     "example_values": [
                         "test Enterprise Redux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.Project",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.Ticket",
+                    "data_type": "string",
+                    "example_values": [
+                        "PINF-000"
                     ]
                 },
                 {
@@ -1387,10 +2694,49 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Resources.*.Tags.btest",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.foo",
+                    "data_type": "string",
+                    "example_values": [
+                        "bar"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "PINF-000"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Resources.*.Tags.new-key",
                     "data_type": "string",
                     "example_values": [
                         "new-value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.owner",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.purpose",
+                    "data_type": "string",
+                    "example_values": [
+                        "github-opensource-phantom-apps-testing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Tags.userid",
+                    "data_type": "string",
+                    "example_values": [
+                        "testId"
                     ]
                 },
                 {
@@ -1429,6 +2775,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Severity.Label",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Severity.Normalized",
                     "data_type": "numeric",
                     "example_values": [
@@ -1436,10 +2789,24 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Severity.Original",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Severity.Product",
                     "data_type": "numeric",
                     "example_values": [
                         2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SourceUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://us-east-1.console.aws.amazon.com/guardduty/home?region=us-east-1#/findings?macros=current&fId=02b6836ac80ffa143f61fec798de288d"
                     ]
                 },
                 {
@@ -1465,10 +2832,32 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Workflow.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.WorkflowState",
                     "data_type": "string",
                     "example_values": [
                         "NEW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total findings: 2"
                     ]
                 },
                 {
@@ -1483,13 +2872,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         2
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total findings: 2"
                     ]
                 },
                 {
@@ -1537,18 +2919,9 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/1234abcd12abab1ab12123456abcdef/finding/1234abcd12abab1ab12123456abcdef"
                     ],
                     "contains": [
@@ -1561,6 +2934,27 @@
                     "data_type": "string",
                     "example_values": [
                         "01234567890"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "WARNING"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.StatusReasons.*.Description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Compliance.StatusReasons.*.ReasonCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "CONFIG_ACCESS_DENIED"
                     ]
                 },
                 {
@@ -1712,6 +3106,55 @@
                     "data_type": "string",
                     "example_values": [
                         "arn:aws:securityhub:us-east-1::product/aws/guardduty"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RecommendationUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://docs.aws.amazon.com/console/securityhub/standards-cis-2.7/remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RelatedAWSResources:0/name",
+                    "data_type": "string",
+                    "example_values": [
+                        "securityhub-cloud-trail-encryption-enabled-e8fd8829"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RelatedAWSResources:0/type",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWS::Config::ConfigRule"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.RuleId",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsControlArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:us-east-1:157568067690:control/cis-aws-foundations-benchmark/v/1.2.0/2.7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsGuideArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:::ruleset/cis-aws-foundations-benchmark/v/1.2.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ProductFields.StandardsGuideSubscriptionArn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:securityhub:us-east-1:157568067690:subscription/cis-aws-foundations-benchmark/v/1.2.0"
                     ]
                 },
                 {
@@ -1946,6 +3389,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ProductFields.aws/securityhub/annotation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unable to describe the supporting AWS Config Rule, Please verify that you have enabled AWS Config."
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ProductFields.count",
                     "data_type": "string",
                     "example_values": [
@@ -1976,6 +3426,20 @@
                     "example_values": [
                         "ARCHIVED",
                         "ACTIVE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Remediation.Recommendation.Text",
+                    "data_type": "string",
+                    "example_values": [
+                        "For directions on how to fix this issue, please consult the AWS Security Hub CIS documentation."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Remediation.Recommendation.Url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://docs.aws.amazon.com/console/securityhub/standards-cis-2.7/remediation"
                     ]
                 },
                 {
@@ -2104,10 +3568,24 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Severity.Label",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.Severity.Normalized",
                     "data_type": "numeric",
                     "example_values": [
                         40
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Severity.Original",
+                    "data_type": "string",
+                    "example_values": [
+                        "MEDIUM"
                     ]
                 },
                 {
@@ -2140,10 +3618,32 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Workflow.Status",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.WorkflowState",
                     "data_type": "string",
                     "example_values": [
                         "NEW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total findings: 1"
                     ]
                 },
                 {
@@ -2158,13 +3658,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total findings: 1"
                     ]
                 },
                 {
@@ -2213,27 +3706,15 @@
                 "note": {
                     "description": "The text of a note",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
-                    "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
+                    "description": "Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
@@ -2335,6 +3816,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive note: Added successfully, Archived status: Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.archive_note",
                     "data_type": "string",
                     "example_values": [
@@ -2354,10 +3850,6 @@
                     ],
                     "column_name": "Finding Archive Successful",
                     "column_order": 2
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2402,32 +3894,19 @@
                 "note": {
                     "description": "The text of a note",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
-                    "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
+                    "description": "Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/123456abcdef1234abcdef123456abcdef1234abcdef/finding/123456abcdef1234abcdef123456abcdef1234abcdef"
                     ],
                     "contains": [
@@ -2525,6 +4004,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unarchive note: Added successfully, Unarchived status: Successful"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.unarchive_note",
                     "data_type": "string",
                     "example_values": [
@@ -2544,10 +4038,6 @@
                     ],
                     "column_name": "Finding Unarchive Successful",
                     "column_order": 2
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2592,33 +4082,19 @@
                     "description": "The text of a note",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
                 "overwrite": {
-                    "description": "Check this box to overwrite the existing notes, otherwise notes will be appended to existing notes",
+                    "description": "Check this box to overwrite the existing notes, otherwise, notes will be appended to existing notes",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.parameter.findings_id",
                     "data_type": "string",
                     "example_values": [
-                        "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab",
                         "arn:aws:guardduty:us-east-1:123456789012:detector/123456789abcdefghi1234ab/finding/123456789abcdefghi1234ab"
                     ],
                     "contains": [
@@ -2716,17 +4192,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.add_note",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Success"
-                    ]
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Note added successfully to the provided findings ID"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.add_note",
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
                     ]
                 },
                 {
