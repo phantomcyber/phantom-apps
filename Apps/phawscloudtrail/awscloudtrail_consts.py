@@ -1,5 +1,5 @@
 # File: awscloudtrail_consts.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -32,4 +32,4 @@ AWSCLOUDTRAIL_DICT_MAP = {
             'describe_trails': 'trailList',
             'lookup_events': 'Events'
         }
-AWSCLOUDTRAIL_INVALID_LIMIT = 'Please provide non-zero positive integer in limit'
+AWSCLOUDTRAIL_INVALID_LIMIT = 'Please provide a non-zero positive integer in the max_results'

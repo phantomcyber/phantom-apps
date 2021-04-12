@@ -1,5 +1,5 @@
 # File: parse_callbacks.py
-# Copyright (c) 2018 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -14,6 +14,13 @@ import xmltodict
 import tempfile
 import base64
 from collections import OrderedDict
+
+from builtins import str
+import six
+
+
+def clean_str(input_str):
+    return input_str.replace('\r', '').replace('\n', '')
 
 
 def basic(action_result, response):
@@ -30,7 +37,8 @@ def basic(action_result, response):
 def check_exit(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     data = {}
     data['status_code'] = response.status_code
@@ -42,8 +50,14 @@ def check_exit(action_result, response):
 
 def check_exit_no_data(action_result, response):
     if response.status_code:
+        if isinstance(response.std_err, bytes):
+            try:
+                response.std_err = response.std_err.decode('UTF-8')
+            except:
+                pass
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -51,7 +65,8 @@ def check_exit_no_data(action_result, response):
 def check_exit_no_data2(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -60,13 +75,14 @@ def check_exit_no_data_stdout(action_result, response):
     # Same as above, but for when the error message appears in std_out instead of std_err
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_out))
         )
     return phantom.APP_SUCCESS
 
 
 def ensure_no_errors(action_result, response):
-    if response.status_code or response.std_err:
+    if response.status_code and response.std_err:
         return action_result.set_status(
             phantom.APP_ERROR, "Error running command: {}{}".format(
                 response.std_out,
@@ -80,7 +96,7 @@ def list_processes(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(clean_str(response.std_err))
         )
 
     output = response.std_out
@@ -114,7 +130,8 @@ def list_processes(action_result, response):
 def terminate_process(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error terminating process: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error terminating process: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -123,7 +140,7 @@ def list_connections(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(clean_str(response.std_err))
         )
 
     lines = response.std_out.splitlines()
@@ -132,14 +149,24 @@ def list_connections(action_result, response):
         columns = line.split()
         try:
             connection['protocol'] = columns[0]
-            local_address = columns[1].rsplit(':', 1)
+
+            try:
+                local_address = columns[1].rsplit(':', 1)
+            except TypeError:  # py3
+                local_address = (columns[1].decode('UTF-8')).rsplit(':', 1)
+
             connection['local_address_ip'] = local_address[0]
             connection['local_address_port'] = local_address[1]
-            foreign_address = columns[2].rsplit(':', 1)
+
+            try:
+                foreign_address = columns[2].rsplit(':', 1)
+            except TypeError:  # py3
+                foreign_address = (columns[2].decode('UTF-8')).rsplit(':', 1)
+
             connection['foreign_address_ip'] = foreign_address[0]
             connection['foreign_address_port'] = foreign_address[1]
             connection['state'] = columns[3]
-            connection['pid'] = columns[4]
+            connection['pid'] = int(columns[4])
         except:
             continue
         action_result.add_data(connection)
@@ -199,7 +226,7 @@ def filtered_rule(
         else:
             return False
 
-    for k, v in kwargs.iteritems():
+    for k, v in six.iteritems(kwargs):
         if rule.get(k, '').lower() != v.lower():
             return False
 
@@ -216,8 +243,13 @@ def list_firewall_rules(action_result, response, **kwargs):
             phantom.APP_SUCCESS,
             "No firewall rules were found"
         )
+    lines = list()
 
-    lines = response.std_out.splitlines()
+    if isinstance(response.std_out, str):
+        lines = response.std_out.splitlines()
+    else:
+        lines = response.std_out.decode('UTF-8').splitlines()
+
     rule_lines = None
     for line in lines:
         # start of a new rule
@@ -256,7 +288,7 @@ def create_firewall_rule(action_result, response):
 def delete_firewall_rule(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR, "Error running command: {}".format(clean_str(response.std_out))
         )
 
     # action_result.add_data({'message': response.std_out})
@@ -269,7 +301,11 @@ def delete_firewall_rule(action_result, response):
 
 
 def list_sessions(action_result, response):
-    lines = response.std_out.splitlines()
+    if isinstance(response.std_out, bytes):
+        lines = (response.std_out.decode('UTF-8')).splitlines()
+    else:
+        lines = response.std_out.splitlines()
+
     username_index = lines[0].find('USERNAME')
     type_index = lines[0].find('TYPE')
     device_index = lines[0].find('DEVICE')
@@ -333,7 +369,7 @@ def _parse_rule(rule):
         rule.get('Conditions', {}).pop('FilePathCondition', None)
         if len(rule.get('Conditions', {})) == 0:
             rule.pop('Conditions', None)
-    for k, v in rule.iteritems():
+    for k, v in six.iteritems(rule):
         # Add anything left over
         d[k] = v
     return d
@@ -342,11 +378,14 @@ def _parse_rule(rule):
 def list_applocker_policies(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     try:
         # Get rid of all the linebreaks to prevent errors during reading
         data = xmltodict.parse("".join(response.std_out.splitlines()))
+    except TypeError:
+        data = xmltodict.parse("".join((response.std_out.decode('utf-8')).splitlines()))
     except Exception as e:
         return action_result.set_status(
             phantom.APP_ERROR, "Error parsing XML response: {}".format(str(e))
@@ -384,15 +423,18 @@ def list_applocker_policies(action_result, response):
 
 def decodeb64_add_to_vault(action_result, response, container_id, file_name):
     if response.status_code:
+        if isinstance(response.std_err, bytes):
+            response.std_err = response.std_err.decode('UTF-8')
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
 
     b64string = response.std_out
 
     try:
         if hasattr(Vault, 'create_attachment'):
-            resp = Vault.create_attachment(base64.b64decode(b64string), container_id)
+            resp = Vault.create_attachment(base64.b64decode(b64string), container_id, file_name=file_name)
         else:
             tmp_file = tempfile.NamedTemporaryFile(mode='wb', delete=False, dir='/opt/phantom/vault/tmp')
             tmp_file.write(base64.b64decode(b64string))

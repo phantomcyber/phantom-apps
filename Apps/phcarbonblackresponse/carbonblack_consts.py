@@ -1,5 +1,5 @@
 # File: carbonblack_consts.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -31,17 +31,17 @@ CARBONBLACK_JSON_CB_ID = "carbonblack_process_id"
 CARBONBLACK_JSON_VAULT_ID = "vault_id"
 CARBONBLACK_JSON_DESTINATION_PATH = "destination"
 
-CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the input endpint ip/name."
+CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the endpint ip/name."
 CARBONBLACK_MSG_MORE_THAN_ONE += "<br>Please specify input params that matches a single ONLINE endpoint.<br>Systems Found:<br>{systems_error}"
 
-CARBONBLACK_ERR_CONNECTIVITY_TEST = "Connectivity test failed"
-CARBONBLACK_SUCC_CONNECTIVITY_TEST = "Connectivity test passed"
+CARBONBLACK_ERR_CONNECTIVITY_TEST = "Test Connectivity Failed"
+CARBONBLACK_SUCC_CONNECTIVITY_TEST = "Test Connectivity Passed"
 CARBONBLACK_ERR_PROCESS_SEARCH = "Process search failed"
 CARBONBLACK_ERR_INVALID_QUERY_TYPE = "Invalid query type, valid types are '{types}'"
 CARBONBLACK_ERR_INVALID_RANGE = "Invalid range, please specify in the format of start-end"
 CARBONBLACK_SUCC_SYNC_EVENTS = "Successfully synchronized sensor events."
-CARBONBLACK_SUCC_QUARANTINE = "Quarantine action succeeded. It might take some time for endpoint to get isolated."
-CARBONBLACK_SUCC_UNQUARANTINE = "Unquarantine action succeeded. It might take some time for endpoint to take effect."
+CARBONBLACK_SUCC_QUARANTINE = "Quarantine action succeeded. It might take some time for the endpoint to get isolated."
+CARBONBLACK_SUCC_UNQUARANTINE = "Unquarantine action succeeded. It might take some time for the endpoint to take effect."
 CARBONBLACK_SUCC_BLOCK = "Block hash action succeeded. It might take some time for blacklisting to take effect."
 CARBONBLACK_SUCC_UNBLOCK = "Unblock hash action succeeded. It might take some time for unblocking to take effect."
 CARBONBLACK_MSG_FILE_NOT_FOUND = "File Not Found"
@@ -68,7 +68,12 @@ CARBONBLACK_COMMAND_FAILED = "Command {command} failed with code: {code}, desc: 
 CARBONBLACK_ERR_POLL_TIMEOUT = 'Could not get a connection to a live active session on the endpoint after {max_tries} polls.'
 CARBONBLACK_ERR_MULTI_ENDPOINTS = "{num_endpoints} endpoints matched (see results for a list). Please specify an IP/Host Name that uniquely identifies an online endpoint."
 CARBONBLACK_ERR_FILE_EXISTS = "File id for sensor already exists. "
-CARBONBLACK_ERR_INVALID_INTEGER_VALUE = "Please provide a valid integer sensor_id"
+CARBONBLACK_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value in the "{param}"'
 MAX_POLL_TRIES = 10
 
 CARBONBLACK_FINISHED_PROCESSESING = "Finished Processing {0:.0%}"
+
+CARBONBLACK_ERR_CODE_MSG = "Error code unavailable"
+CARBONBLACK_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Carbon Black Response server."
+CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG += " Please check the asset configuration and|or the action parameters."

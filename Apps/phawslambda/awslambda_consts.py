@@ -1,5 +1,5 @@
 # File: awslambda_consts.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 # Define your constants here
@@ -30,3 +30,6 @@ LAMBDA_REGION_DICT = {
         "AWS GovCloud (US-East)": "us-gov-east-1",
         "AWS GovCloud (US)": "us-gov-west-1"
     }
+
+LAMBDA_BAD_ASSET_CONFIG_MSG = "Please provide access keys or select assume role check box in asset configuration"
+EC2_ROLE_CREDENTIALS_FAILURE_MSG = "Failed to get EC2 role credentials"

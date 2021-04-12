@@ -3,29 +3,33 @@
     "name": "PassiveTotal",
     "description": "This app implements investigative actions by integrating with the PassiveTotal cloud reputation service",
     "type": "reputation",
-    "main_module": "passivetotal_connector.pyc",
-    "app_version": "1.2.36",
-    "utctime_updated": "2019-02-05T00:26:42.000000Z",
+    "main_module": "passivetotal_connector.py",
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-03-23T07:14:08.000000Z",
     "product_vendor": "PassiveTotal",
     "product_name": "PassiveTotal",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.0.1068",
-    "publisher": "Phantom",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud v2 tested 2-21-2020"
+    ],
+    "publisher": "Splunk",
     "package_name": "phantom_passivetotal",
     "logo": "logo_passivetotal.svg",
     "logo_dark": "logo_passivetotal_dark.svg",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "configuration": {
         "key": {
             "data_type": "string",
             "order": 0,
-            "description": "API User Key (email)",
+            "description": "API user key (email)",
             "required": true
         },
         "secret": {
             "data_type": "password",
             "order": 1,
-            "description": "API Secret",
+            "description": "API secret",
             "required": true
         }
     },
@@ -42,7 +46,7 @@
         },
         {
             "action": "domain reputation",
-            "description": "Get domain info/reputation ",
+            "description": "Get domain info/reputation",
             "verbose": "Passive information about a domain could get very large, because of which the calls could timeout. Use the <b>from</b> and <b>to</b> parameters to limit the passive data to query between a time range. If <b>from</b> parameter is not specified, the action gets data for the past 30 days.",
             "type": "investigate",
             "identifier": "lookup_domain",
@@ -64,44 +68,28 @@
                     "order": 1
                 },
                 "from": {
-                    "description": "Start date for Passive data (YYYY-mm-dd)",
+                    "description": "The start date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false
+                    "order": 2
                 },
                 "to": {
-                    "description": "End date for Passive data (YYYY-mm-dd)",
+                    "description": "The end date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Domain Reputation",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.domain",
                     "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
+                    "column_name": "Domain",
+                    "column_order": 0,
                     "contains": [
                         "domain",
                         "url"
                     ],
-                    "column_order": 0,
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
-                    "column_name": "Domain",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -121,7 +109,9 @@
                 {
                     "data_path": "action_result.data.*.classification.classification",
                     "data_type": "string",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ever_compromised",
@@ -132,9 +122,36 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.autonomousSystemName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Abc Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.autonomousSystemNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "56320-57343"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.metadata.classification",
                     "data_type": "string",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.dynamic",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.metadata.dynamicDns",
@@ -160,13 +177,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "37.3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-133"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.network",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.primaryDomain",
+                    "data_type": "string",
                     "contains": [
                         "domain"
                     ],
-                    "data_path": "action_result.data.*.metadata.primaryDomain",
-                    "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -180,12 +218,16 @@
                     "data_path": "action_result.data.*.metadata.queryValue",
                     "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.sinkhole",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.subdomains",
@@ -203,7 +245,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.metadata.tags",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "alexa_top_10k"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.tld",
@@ -241,7 +286,7 @@
                     "data_path": "action_result.data.*.passive.queryValue",
                     "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -268,11 +313,11 @@
                 {
                     "data_path": "action_result.data.*.passive.results.*.recordHash",
                     "data_type": "string",
-                    "example_values": [
-                        "c37888add095d26003003939c5f6edb6d9450e296b05cfb8137f282c35b57952"
-                    ],
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "c37888add095d26003003939c5f6edb6d9450e296b05cfb8137f282c35b57952"
                     ]
                 },
                 {
@@ -287,7 +332,7 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
                     ],
                     "example_values": [
                         "199.59.100.136"
@@ -311,7 +356,7 @@
                     "data_path": "action_result.data.*.passive.results.*.value",
                     "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -323,8 +368,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.sinkhole",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.tags",
@@ -337,12 +385,32 @@
                     "data_path": "action_result.data.*.unique",
                     "data_type": "string",
                     "contains": [
-                        "domain",
-                        "ip",
-                        "ipv6"
+                        "domain"
                     ],
                     "example_values": [
                         "199.59.100.136"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total unique domains: 4, Dynamic domain: False, Classification: None, Sinkhole: None, First seen: 2018-08-08 15:47:02, Ever compromised: False, Last seen: 2018-09-01 02:49:36"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.as_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -350,7 +418,16 @@
                     "data_path": "action_result.summary.classification",
                     "data_type": "string",
                     "column_name": "Classification",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
                 },
                 {
                     "column_order": 6,
@@ -392,8 +469,11 @@
                 },
                 {
                     "data_path": "action_result.summary.sinkhole",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "column_order": 3,
@@ -402,16 +482,6 @@
                     "column_name": "Total Unique Domains",
                     "example_values": [
                         4
-                    ],
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total unique domains: 4, Dynamic domain: False, Classification: None, Sinkhole: None, First seen: 2018-08-08 15:47:02, Ever compromised: False, Last seen: 2018-09-01 02:49:36"
                     ]
                 },
                 {
@@ -429,6 +499,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -444,7 +520,7 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
                     ],
                     "primary": true,
                     "required": true,
@@ -455,33 +531,17 @@
                     "order": 1
                 },
                 "from": {
-                    "description": "Start date for Passive data (YYYY-mm-dd)",
+                    "description": "The start date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false
+                    "order": 2
                 },
                 "to": {
-                    "description": "End date for Passive data (YYYY-mm-dd)",
+                    "description": "The end date for Passive data (YYYY-MM-DD)",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Ip Reputation",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.from",
                     "data_type": "string",
@@ -492,12 +552,12 @@
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
-                    "contains": [
-                        "ip",
-                        "ipv6"
-                    ],
                     "column_name": "IP",
                     "column_order": 0,
+                    "contains": [
+                        "ip",
+                        "passivetotal ipv6"
+                    ],
                     "example_values": [
                         "1.1.1.1"
                     ]
@@ -512,7 +572,9 @@
                 {
                     "data_path": "action_result.data.*.classification.classification",
                     "data_type": "string",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ever_compromised",
@@ -526,20 +588,22 @@
                     "data_path": "action_result.data.*.metadata.autonomousSystemName",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Inc."
+                        "Abc Inc."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.autonomousSystemNumber",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "example_values": [
-                        15009
+                        "56320-57343"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.classification",
                     "data_type": "string",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.country",
@@ -550,8 +614,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.metadata.dynamic",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.metadata.dynamicDns",
@@ -573,7 +636,7 @@
                     "data_path": "action_result.data.*.metadata.global_tags",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "Abc"
                     ]
                 },
                 {
@@ -598,11 +661,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.metadata.primaryDomain",
+                    "data_type": "string",
                     "contains": [
                         "domain"
                     ],
-                    "data_path": "action_result.data.*.metadata.primaryDomain",
-                    "data_type": "string"
+                    "example_values": [
+                        "abc.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.queryType",
@@ -614,12 +680,12 @@
                 {
                     "data_path": "action_result.data.*.metadata.queryValue",
                     "data_type": "string",
-                    "example_values": [
-                        "1.1.1.1"
-                    ],
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
                     ]
                 },
                 {
@@ -639,32 +705,35 @@
                 },
                 {
                     "data_path": "action_result.data.*.metadata.tags",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "alexa_top_10k"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.tld",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        ".com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.firstSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-09-29 00:00:00",
-                        "2018-08-01 00:00:00"
+                        "2018-09-29 00:00:00"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.lastSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-10-28 23:48:00",
-                        "2018-09-30 15:41:01"
+                        "2018-10-28 23:48:00"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.pager",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.passive.queryType",
@@ -676,47 +745,43 @@
                 {
                     "data_path": "action_result.data.*.passive.queryValue",
                     "data_type": "string",
-                    "example_values": [
-                        "1.1.1.1"
-                    ],
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.results.*.collected",
                     "data_type": "string",
                     "example_values": [
-                        "2018-10-29 06:55:51",
-                        "2018-10-29 06:58:01"
+                        "2018-10-29 06:55:51"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.results.*.firstSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-09-30 14:00:00",
-                        "2018-09-25 00:45:01"
+                        "2018-09-30 14:00:00"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.results.*.lastSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-09-30 14:01:32",
-                        "2018-09-25 01:20:02"
+                        "2018-09-30 14:01:32"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.results.*.recordHash",
                     "data_type": "string",
-                    "example_values": [
-                        "72be28ddd4638821d24006c1919fe785e07107d5a6cb8b0e059fd214e0a2580f",
-                        "807bf684880658f3656001e35c4eb34308891e5ad9fee28ed470d728431dc62c"
-                    ],
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "72be28ddd4638821d24006c1919fe785e07107d5a6cb8b0e059fd214e0a2580f"
                     ]
                 },
                 {
@@ -730,8 +795,7 @@
                     "data_path": "action_result.data.*.passive.results.*.resolve",
                     "data_type": "string",
                     "example_values": [
-                        "pop.revistadecorar.com.br",
-                        "ipv6.portal79.com.br"
+                        "pop.revistadecorar.com.br"
                     ]
                 },
                 {
@@ -751,20 +815,19 @@
                 {
                     "data_path": "action_result.data.*.passive.results.*.value",
                     "data_type": "string",
-                    "example_values": [
-                        "1.1.1.1"
-                    ],
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.passive.totalRecords",
                     "data_type": "numeric",
                     "example_values": [
-                        89,
-                        123
+                        89
                     ]
                 },
                 {
@@ -779,45 +842,42 @@
                     "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-10-22",
-                        "2017-09-09"
+                        "2018-10-22"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ssl_certificates.*.ipAddresses",
                     "data_type": "string",
-                    "example_values": [
-                        "1.1.1.1"
-                    ],
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
+                    ],
+                    "example_values": [
+                        "1.1.1.1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-10-26",
-                        "2017-09-20"
+                        "2018-10-26"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ssl_certificates.*.sha1",
                     "data_type": "string",
-                    "example_values": [
-                        "66b27f920b738b8ebbb3cf509201f8a2b7d0152c",
-                        "1dd378af8e556ab058e01ef3ba8d47f3d45a8a54"
-                    ],
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "66b27f920b738b8ebbb3cf509201f8a2b7d0152c"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.tags",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk"
+                        "Abc"
                     ]
                 },
                 {
@@ -827,21 +887,37 @@
                         "domain"
                     ],
                     "example_values": [
-                        "cellinicapital.com.au",
-                        "pop.revistadecorar.com.br"
+                        "cellinicapital.com.au"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total unique domains: 123, Classification: None, Sinkhole: False, Country: US, First seen: 2018-09-29 00:00:00, Ever compromised: False, As name: Abc Inc., Last seen: 2018-10-28 23:48:35"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.as_name",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Inc."
+                        "Abc Inc."
                     ]
                 },
                 {
                     "data_path": "action_result.summary.classification",
                     "data_type": "string",
-                    "example_values": []
+                    "example_values": [
+                        "malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.country",
@@ -874,16 +950,14 @@
                     "data_path": "action_result.summary.first_seen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-09-29 00:00:00",
-                        "2018-08-01 00:00:00"
+                        "2018-09-29 00:00:00"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.last_seen",
                     "data_type": "string",
                     "example_values": [
-                        "2018-10-28 23:48:37",
-                        "2018-09-30 15:41:29"
+                        "2018-10-28 23:48:37"
                     ]
                 },
                 {
@@ -900,19 +974,7 @@
                     "data_path": "action_result.summary.total_unique_domains",
                     "data_type": "numeric",
                     "example_values": [
-                        123,
-                        118
-                    ],
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total unique domains: 123, Classification: None, Sinkhole: False, Country: US, First seen: 2018-09-29 00:00:00, Ever compromised: False, As name: Splunk Inc., Last seen: 2018-10-28 23:48:35",
-                        "Total unique domains: 118, Classification: None, Sinkhole: False, Country: US, First seen: 2018-08-01 00:00:00, Ever compromised: False, As name: Splunk Inc., Last seen: 2018-09-30 15:41:25"
+                        123
                     ]
                 },
                 {
@@ -930,6 +992,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Ip Reputation",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -945,33 +1013,19 @@
                     "order": 0,
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
                     ],
                     "primary": true,
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Whois IP",
-                "type": "table",
-                "height": 5
-            },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
                     ],
                     "example_values": [
                         "1.1.1.1"
@@ -998,7 +1052,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1019,7 +1073,7 @@
                     "data_path": "action_result.data.*.admin.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1053,30 +1107,33 @@
                 {
                     "data_path": "action_result.data.*.contactEmail",
                     "data_type": "string",
+                    "column_name": "Contact Email",
+                    "column_order": 1,
                     "contains": [
                         "email"
                     ],
-                    "column_name": "Contact Email",
-                    "column_order": 1,
                     "example_values": [
-                        "test-network@splunk.com"
+                        "test-network@abc.com"
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
                     "contains": [
                         "domain",
                         "ip",
-                        "ipv6"
+                        "passivetotal ipv6"
                     ],
-                    "data_path": "action_result.data.*.domain",
-                    "data_type": "string",
                     "example_values": [
                         "1.1.1.0"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.expiresAt",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2025-03-01T21:00:00.000-0700"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.lastLoadedAt",
@@ -1096,7 +1153,14 @@
                     "data_path": "action_result.data.*.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk Inc."
+                        "Abc Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rawText",
+                    "data_type": "string",
+                    "example_values": [
+                        "Registrar: Handle: 281209_DOMAIN_COM-VRSN LDH Name: domain.com Nameserver: LDH Name: ns1.p31.dynect.net Event: Action: last changed Date: 2013-10-10T17:33:04Z Status: active Nameserver: LDH"
                     ]
                 },
                 {
@@ -1127,7 +1191,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1148,7 +1212,7 @@
                     "data_path": "action_result.data.*.registrant.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1222,7 +1286,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1243,7 +1307,7 @@
                     "data_path": "action_result.data.*.tech.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1285,7 +1349,7 @@
                     "data_path": "action_result.data.*.text",
                     "data_type": "string",
                     "example_values": [
-                        "% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\nrefer:        whois.arin.net\n\ninetnum:      8.0.0.0 - 8.255.255.255\norganisation: Administered by ARIN\nstatus:       LEGACY\n\nwhois:        whois.arin.net\n\nchanged:      1992-12\nsource:       IANA\n\n\n\nNetRange:       1.1.1.0 - 1.1.1.255\nCIDR:           1.1.1.0/24\nNetName:        LVLT-SPL-1-1-1\nNetHandle:      NET-1-1-1-0-1\nParent:         LVLT-ORG-1-1 (NET-1-0-0-0-1)\nNetType:        Reallocated\nOriginAS:       \nOrganization:   Splunk Inc. (SPL)\nRegDate:        2014-03-01\nUpdated:        2014-03-01\nRef:            https://whois.arin.net/rest/net/NET-1-1-1-0-1\n\n\n\nOrgName:        Splunk Inc.\nOrgId:          Spl\nAddress:        270 Brannan St\nCity:           San Francisco\nStateProv:      CA\nPostalCode:     94107\nCountry:        US\nRegDate:        2000-04-30\nUpdated:        2017-12-01\nRef:            https://whois.arin.net/rest/org/SPL\n\n\nOrgTechHandle: ZG00-ARIN\nOrgTechName:   Splunk Inc.\nOrgTechPhone:  +1-650-000-0000 \nOrgTechEmail:  arin-contact@splunk.com\nOrgTechRef:    https://whois.arin.net/rest/poc/ZG00-ARIN\n\nOrgAbuseHandle: ABUSE5200-ARIN\nOrgAbuseName:   Abuse\nOrgAbusePhone:  +1-650-000-0000 \nOrgAbuseEmail:  test-network@splunk.com\nOrgAbuseRef:    https://whois.arin.net/rest/poc/ABUSE5200-ARIN\n\n"
+                        "% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\nrefer:        whois.arin.net\n\ninetnum:      8.0.0.0 - 8.255.255.255\norganisation: Administered by ARIN\nstatus:       LEGACY\n\nwhois:        whois.arin.net\n\nchanged:      1992-12\nsource:       IANA\n\n\n\nNetRange:       1.1.1.0 - 1.1.1.255\nCIDR:           1.1.1.0/24\nNetName:        LVLT-SPL-1-1-1\nNetHandle:      NET-1-1-1-0-1\nParent:         LVLT-ORG-1-1 (NET-1-0-0-0-1)\nNetType:        Reallocated\nOriginAS:       \nOrganization:   Abc Inc. (SPL)\nRegDate:        2014-03-01\nUpdated:        2014-03-01\nRef:            https://whois.arin.net/rest/net/NET-1-1-1-0-1\n\n\n\nOrgName:        Abc Inc.\nOrgId:          Spl\nAddress:        270 Brannan St\nCity:           San Francisco\nStateProv:      CA\nPostalCode:     94107\nCountry:        US\nRegDate:        2000-04-30\nUpdated:        2017-12-01\nRef:            https://whois.arin.net/rest/org/SPL\n\n\nOrgTechHandle: ZG00-ARIN\nOrgTechName:   Abc Inc.\nOrgTechPhone:  +1-650-000-0000 \nOrgTechEmail:  arin-contact@abc.com\nOrgTechRef:    https://whois.arin.net/rest/poc/ZG00-ARIN\n\nOrgAbuseHandle: ABUSE5200-ARIN\nOrgAbuseName:   Abuse\nOrgAbusePhone:  +1-650-000-0000 \nOrgAbuseEmail:  test-network@abc.com\nOrgAbuseRef:    https://whois.arin.net/rest/poc/ABUSE5200-ARIN\n\n"
                     ]
                 },
                 {
@@ -1307,11 +1371,32 @@
                 },
                 {
                     "data_path": "action_result.data.*.zone.organization",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Abc, Inc."
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.zone.telephone",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: US, Organization: Abc Inc."
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.city",
@@ -1337,14 +1422,7 @@
                     "column_name": "Organization",
                     "column_order": 0,
                     "example_values": [
-                        "Splunk Inc."
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "City: San Francisco, Country: US, Organization: Splunk Inc."
+                        "Abc Inc."
                     ]
                 },
                 {
@@ -1362,6 +1440,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Whois IP",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -1383,30 +1467,16 @@
                     "required": true
                 }
             },
-            "render": {
-                "width": 12,
-                "title": "Whois Domain",
-                "type": "table",
-                "height": 5
-            },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.domain",
                     "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "contains": [
                         "domain",
                         "url"
                     ],
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -1430,7 +1500,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1451,7 +1521,7 @@
                     "data_path": "action_result.data.*.admin.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1483,6 +1553,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.billing.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.billing.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.billing.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "ca"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.contactEmail",
                     "data_type": "string",
                     "contains": [
@@ -1491,17 +1582,17 @@
                     "column_name": "Contact Email",
                     "column_order": 1,
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
                     "contains": [
                         "domain"
                     ],
-                    "data_path": "action_result.data.*.domain",
-                    "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "abc.com"
                     ]
                 },
                 {
@@ -1532,14 +1623,21 @@
                         "domain"
                     ],
                     "example_values": [
-                        "b.ns.splunk.com"
+                        "b.ns.abc.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rawText",
+                    "data_type": "string",
+                    "example_values": [
+                        "Registrar: Handle: 281209_DOMAIN_COM-VRSN LDH Name: domain.com Nameserver: LDH Name: ns1.p31.dynect.net Event: Action: last changed Date: 2013-10-10T17:33:04Z Status: active Nameserver: LDH"
                     ]
                 },
                 {
@@ -1570,7 +1668,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1591,7 +1689,7 @@
                     "data_path": "action_result.data.*.registrant.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1665,7 +1763,7 @@
                         "email"
                     ],
                     "example_values": [
-                        "domain@splunk.com"
+                        "domain@abc.com"
                     ]
                 },
                 {
@@ -1686,7 +1784,7 @@
                     "data_path": "action_result.data.*.tech.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1728,7 +1826,7 @@
                     "data_path": "action_result.data.*.text",
                     "data_type": "string",
                     "example_values": [
-                        "Domain Name: SPLUNK.COM\n   Registry Domain ID: 1000008_DOMAIN_COM-TESTRSN\n   Registrar WHOIS Server: whois.testmonitor.com\n   Registrar URL: http://www.testmonitor.com\n   Updated Date: 2016-11-29T20:28:07Z\n   Creation Date: 1997-03-29T05:00:00Z\n   Registry Expiry Date: 2025-03-30T04:00:00Z\n   Registrar: TestMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@testmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://testcann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://testcann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://testcann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://testcann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://testcann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://testcann.org/epp#serverUpdateProhibited\n   Name Server: A.NS.SPLUNK.COM\n   Name Server: B.NS.SPLUNK.COM\n   DNSSEC: unsigned\n   URL of the TESTCANN Whois Inaccuracy Complaint Form: https://www.testcann.org/wicf/\n>>> Last update of whois database: 2018-06-22T07:40:22Z <<<\n\nFor more information on Whois status codes, please visit https://testcann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in TestSign Global Registry\nServices' (\"TestSign\") Whois database is provided by TestSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. TestSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to TestSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of TestSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. TestSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  TestSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. TestSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n\nDomain Name: splunk.com\nRegistry Domain ID: 2320948_DOMAIN_COM-TESTRSN\nRegistrar WHOIS Server: whois.testmonitor.com\nRegistrar URL: http://www.testmonitor.com\nUpdated Date: 2016-11-29T12:28:07-0800\nCreation Date: 1997-03-28T21:00:00-0800\nRegistrar Registration Expiration Date: 2025-03-29T00:00:00-0700\nRegistrar: TestMonitor, Inc.\nRegistrar IANA ID: 292\nRegistrar Abuse Contact Email: abusecomplaints@testmonitor.com\nRegistrar Abuse Contact Phone: +1.2000895740\nDomain Status: clientUpdateProhibited (https://www.testcann.org/epp#clientUpdateProhibited)\nDomain Status: clientTransferProhibited (https://www.testcann.org/epp#clientTransferProhibited)\nDomain Status: clientDeleteProhibited (https://www.testcann.org/epp#clientDeleteProhibited)\nDomain Status: serverUpdateProhibited (https://www.testcann.org/epp#serverUpdateProhibited)\nDomain Status: serverTransferProhibited (https://www.testcann.org/epp#serverTransferProhibited)\nDomain Status: serverDeleteProhibited (https://www.testcann.org/epp#serverDeleteProhibited)\nRegistry Registrant ID: \nRegistrant Name: Domain Administrator\nRegistrant Organization: Splunk, Inc.\nRegistrant Street: 270 Brannan St, \nRegistrant City: San Francisco\nRegistrant State/Province: CA\nRegistrant Postal Code: 94107\nRegistrant Country: US\nRegistrant Phone: +1.6500034800\nRegistrant Phone Ext: \nRegistrant Fax: +1.6500034800\nRegistrant Fax Ext: \nRegistrant Email: domain@splunk.com\nRegistry Admin ID: \nAdmin Name: Domain Administrator\nAdmin Organization: Splunk, Inc.\nAdmin Street: 270 Brannan St, \nAdmin City: San Francisco\nAdmin State/Province: CA\nAdmin Postal Code: 94107\nAdmin Country: US\nAdmin Phone: +1.6500034800\nAdmin Phone Ext: \nAdmin Fax: +1.6500034800\nAdmin Fax Ext: \nAdmin Email: domain@splunk.com\nRegistry Tech ID: \nTech Name: Domain Administrator\nTech Organization: Splunk, Inc.\nTech Street: 270 Brannan St, \nTech City: San Francisco\nTech State/Province: CA\nTech Postal Code: 94107\nTech Country: US\nTech Phone: +1.6500034800\nTech Phone Ext: \nTech Fax: +1.6500034800\nTech Fax Ext: \nTech Email: domain@splunk.com\nName Server: b.ns.splunk.com\nName Server: a.ns.splunk.com\nDNSSEC: unsigned\nURL of the TESTCANN WHOIS Data Problem Reporting System: http://testdprs.internic.net/\n>>> Last update of WHOIS database: 2018-06-22T00:35:57-0700 <<<\n\nIf certain contact information is not shown for a Registrant, Administrative,\nor Technical contact, and you wish to send a message to these contacts, please\nsend your message to whoisrelay@testmonitor.com and specify the domain name in\nthe subject line. We will forward that message to the underlying contact.\n\nIf you have a legitimate interest in viewing the non-public WHOIS details, send\nyour request and the reasons for your request to abusecomplaints@testmonitor.com\nand specify the domain name in the subject line. We will review that request and\nmay ask for supporting documentation and explanation.\n\nThe Data in TestMonitor.com's WHOIS database is provided by TestMonitor.com for\ninformation purposes, and to assist persons in obtaining information about or\nrelated to a domain name registration record.  TestMonitor.com does not guarantee\nits accuracy.  By submitting a WHOIS query, you agree that you will use this Data\nonly for lawful purposes and that, under no circumstances will you use this Data to:\n (1) allow, enable, or otherwise support the transmission of mass unsolicited,\n     commercial advertising or solicitations via e-mail (spam); or\n (2) enable high volume, automated, electronic processes that apply to\n     TestMonitor.com (or its systems).\nTestMonitor.com reserves the right to modify these terms at any time.\nBy submitting this query, you agree to abide by this policy.\n\nTestMonitor is the Global Leader in Online Brand Protection.\n\nTestMonitor Domain Management(TM)\nTestMonitor Brand Protection(TM)\nTestMonitor AntiPiracy(TM)\nTestMonitor AntiFraud(TM)\nProfessional and Managed Services\n\nVisit TestMonitor at http://www.testmonitor.com\nContact us at +1.8007459229\nIn Europe, at +44.02032062220\n\nFor more information on Whois status codes, please visit\n https://www.testcann.org/resources/pages/epp-status-codes-2014-06-16-en\n----"
+                        "Domain Name: ABC.COM\n   Registry Domain ID: 1000008_DOMAIN_COM-TESTRSN\n   Registrar WHOIS Server: whois.testmonitor.com\n   Registrar URL: http://www.testmonitor.com\n   Updated Date: 2016-11-29T20:28:07Z\n   Creation Date: 1997-03-29T05:00:00Z\n   Registry Expiry Date: 2025-03-30T04:00:00Z\n   Registrar: TestMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@testmonitor.com\n   Registrar Abuse Contact Phone: +1.2083895740\n   Domain Status: clientDeleteProhibited https://testcann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://testcann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://testcann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://testcann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://testcann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://testcann.org/epp#serverUpdateProhibited\n   Name Server: A.NS.ABC.COM\n   Name Server: B.NS.ABC.COM\n   DNSSEC: unsigned\n   URL of the TESTCANN Whois Inaccuracy Complaint Form: https://www.testcann.org/wicf/\n>>> Last update of whois database: 2018-06-22T07:40:22Z <<<\n\nFor more information on Whois status codes, please visit https://testcann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in TestSign Global Registry\nServices' (\"TestSign\") Whois database is provided by TestSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. TestSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to TestSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of TestSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. TestSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  TestSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. TestSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars.\n\nDomain Name: abc.com\nRegistry Domain ID: 2320948_DOMAIN_COM-TESTRSN\nRegistrar WHOIS Server: whois.testmonitor.com\nRegistrar URL: http://www.testmonitor.com\nUpdated Date: 2016-11-29T12:28:07-0800\nCreation Date: 1997-03-28T21:00:00-0800\nRegistrar Registration Expiration Date: 2025-03-29T00:00:00-0700\nRegistrar: TestMonitor, Inc.\nRegistrar IANA ID: 292\nRegistrar Abuse Contact Email: abusecomplaints@testmonitor.com\nRegistrar Abuse Contact Phone: +1.2000895740\nDomain Status: clientUpdateProhibited (https://www.testcann.org/epp#clientUpdateProhibited)\nDomain Status: clientTransferProhibited (https://www.testcann.org/epp#clientTransferProhibited)\nDomain Status: clientDeleteProhibited (https://www.testcann.org/epp#clientDeleteProhibited)\nDomain Status: serverUpdateProhibited (https://www.testcann.org/epp#serverUpdateProhibited)\nDomain Status: serverTransferProhibited (https://www.testcann.org/epp#serverTransferProhibited)\nDomain Status: serverDeleteProhibited (https://www.testcann.org/epp#serverDeleteProhibited)\nRegistry Registrant ID: \nRegistrant Name: Domain Administrator\nRegistrant Organization: Abc, Inc.\nRegistrant Street: 270 Brannan St, \nRegistrant City: San Francisco\nRegistrant State/Province: CA\nRegistrant Postal Code: 94107\nRegistrant Country: US\nRegistrant Phone: +1.6500034800\nRegistrant Phone Ext: \nRegistrant Fax: +1.6500034800\nRegistrant Fax Ext: \nRegistrant Email: domain@abc.com\nRegistry Admin ID: \nAdmin Name: Domain Administrator\nAdmin Organization: Abc, Inc.\nAdmin Street: 270 Brannan St, \nAdmin City: San Francisco\nAdmin State/Province: CA\nAdmin Postal Code: 94107\nAdmin Country: US\nAdmin Phone: +1.6500034800\nAdmin Phone Ext: \nAdmin Fax: +1.6500034800\nAdmin Fax Ext: \nAdmin Email: domain@abc.com\nRegistry Tech ID: \nTech Name: Domain Administrator\nTech Organization: Abc, Inc.\nTech Street: 270 Brannan St, \nTech City: San Francisco\nTech State/Province: CA\nTech Postal Code: 94107\nTech Country: US\nTech Phone: +1.6500034800\nTech Phone Ext: \nTech Fax: +1.6500034800\nTech Fax Ext: \nTech Email: domain@abc.com\nName Server: b.ns.abc.com\nName Server: a.ns.abc.com\nDNSSEC: unsigned\nURL of the TESTCANN WHOIS Data Problem Reporting System: http://testdprs.internic.net/\n>>> Last update of WHOIS database: 2018-06-22T00:35:57-0700 <<<\n\nIf certain contact information is not shown for a Registrant, Administrative,\nor Technical contact, and you wish to send a message to these contacts, please\nsend your message to whoisrelay@testmonitor.com and specify the domain name in\nthe subject line. We will forward that message to the underlying contact.\n\nIf you have a legitimate interest in viewing the non-public WHOIS details, send\nyour request and the reasons for your request to abusecomplaints@testmonitor.com\nand specify the domain name in the subject line. We will review that request and\nmay ask for supporting documentation and explanation.\n\nThe Data in TestMonitor.com's WHOIS database is provided by TestMonitor.com for\ninformation purposes, and to assist persons in obtaining information about or\nrelated to a domain name registration record.  TestMonitor.com does not guarantee\nits accuracy.  By submitting a WHOIS query, you agree that you will use this Data\nonly for lawful purposes and that, under no circumstances will you use this Data to:\n (1) allow, enable, or otherwise support the transmission of mass unsolicited,\n     commercial advertising or solicitations via e-mail (spam); or\n (2) enable high volume, automated, electronic processes that apply to\n     TestMonitor.com (or its systems).\nTestMonitor.com reserves the right to modify these terms at any time.\nBy submitting this query, you agree to abide by this policy.\n\nTestMonitor is the Global Leader in Online Brand Protection.\n\nTestMonitor Domain Management(TM)\nTestMonitor Brand Protection(TM)\nTestMonitor AntiPiracy(TM)\nTestMonitor AntiFraud(TM)\nProfessional and Managed Services\n\nVisit TestMonitor at http://www.testmonitor.com\nContact us at +1.8007459229\nIn Europe, at +44.02032062220\n\nFor more information on Whois status codes, please visit\n https://www.testcann.org/resources/pages/epp-status-codes-2014-06-16-en\n----"
                     ]
                 },
                 {
@@ -1739,6 +1837,21 @@
                     ],
                     "example_values": [
                         "whois.testmonitor.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
                     ]
                 },
                 {
@@ -1765,14 +1878,7 @@
                     "column_name": "Organization",
                     "column_order": 0,
                     "example_values": [
-                        "Splunk, Inc."
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "City: San Francisco, Country: us, Organization: Splunk, Inc."
+                        "Abc, Inc."
                     ]
                 },
                 {
@@ -1790,6 +1896,1023 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Whois Domain",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup certificate hash",
+            "description": "Lookup certificate by hash",
+            "type": "investigate",
+            "identifier": "lookup_certificate_hash",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "The SHA-1 hash of the certificate to retrieve",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "column_name": "Query",
+                    "contains": [
+                        "sha1",
+                        "hash"
+                    ],
+                    "example_values": [
+                        "cf23df2207d99a74fbe169e3eba035e633b65d94"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.firstSeen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 0,
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.lastSeen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 1,
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issueDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.fingerprint",
+                    "data_type": "string",
+                    "example_values": [
+                        "f2:28:ea:c5:3f:8e:45:4f:32:d2:a6:12:73:18:9f:d1:92:32:8f:c9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.serialNumber",
+                    "data_type": "string",
+                    "column_name": "Serial Number",
+                    "column_order": 2,
+                    "example_values": [
+                        "2475382717063105701088747457914605763880288261"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerCountry",
+                    "data_type": "string",
+                    "column_name": "Issuer Country",
+                    "column_order": 3,
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerSurname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Surname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.expirationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jan 09 17:59:21 2035 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerProvince",
+                    "data_type": "string",
+                    "example_values": [
+                        "Province Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectCountry",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectSurname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Surname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerGivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Xpress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectProvince",
+                    "data_type": "string",
+                    "example_values": [
+                        "Province Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerCommonName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Let's Encrypt Authority X3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectGivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectCommonName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerEmailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerLocalityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Issuer Locality"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerSerialNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "8571006865812752217367962054313612264"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerStreetAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "270 Brannan St,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectEmailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectLocalityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Subject Locality"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectSerialNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "8571006865812752217367962054313612264"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectStreetAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "270 Brannan St,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerOrganizationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Let's Encrypt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectOrganizationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerStateOrProvinceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.issuerOrganizationUnitName",
+                    "data_type": "string",
+                    "example_values": [
+                        "News"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectStateOrProvinceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificate.*.subjectOrganizationUnitName",
+                    "data_type": "string",
+                    "example_values": [
+                        "News"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "1c51e98fb3342365ca29bfe78d7533b7aa9f1b2d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.ipAddresses",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total records: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Lookup Certificate Hash",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup certificate",
+            "description": "Lookup certificate",
+            "type": "investigate",
+            "identifier": "lookup_certificate",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Field value for which to search certificates",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                },
+                "field": {
+                    "description": "The field for which to search certificates",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "value_list": [
+                        "issuerSurname",
+                        "subjectOrganizationName",
+                        "issuerCountry",
+                        "issuerOrganizationUnitName",
+                        "fingerprint",
+                        "subjectOrganizationUnitName",
+                        "serialNumber",
+                        "subjectEmailAddress",
+                        "subjectCountry",
+                        "issuerGivenName",
+                        "subjectCommonName",
+                        "issuerCommonName",
+                        "issuerStateOrProvinceName",
+                        "issuerProvince",
+                        "subjectStateOrProvinceName",
+                        "sha1",
+                        "subjectStreetAddress",
+                        "subjectSerialNumber",
+                        "issuerOrganizationName",
+                        "subjectSurname",
+                        "subjectLocalityName",
+                        "issuerStreetAddress",
+                        "issuerLocalityName",
+                        "subjectGivenName",
+                        "subjectProvince",
+                        "issuerSerialNumber",
+                        "issuerEmailAddress",
+                        "name",
+                        "issuerAlternativeName",
+                        "subjectAlternativeName"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "country"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.field",
+                    "data_type": "string",
+                    "example_values": [
+                        "issuerCountry"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.firstSeen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 0,
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.lastSeen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 1,
+                    "example_values": [
+                        "2018-10-22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "240461b20dbb24a61b0a986821c2ad01bd3a8522"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issueDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-02-15"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.fingerprint",
+                    "data_type": "string",
+                    "example_values": [
+                        "f2:28:ea:c5:3f:8e:45:4f:32:d2:a6:12:73:18:9f:d1:92:32:8f:c9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.serialNumber",
+                    "data_type": "string",
+                    "column_name": "Serial Number",
+                    "column_order": 2,
+                    "example_values": [
+                        "8571006865812752217367962054313612264"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerCountry",
+                    "data_type": "string",
+                    "column_name": "Issuer Country",
+                    "column_order": 3,
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerSurname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Surname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.expirationDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "Jan 09 17:59:21 2035 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerProvince",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectCountry",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectSurname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Surname"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerGivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Xpress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectProvince",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerCommonName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Let's Encrypt Authority X3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectGivenName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectCommonName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerEmailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerLocalityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Issuer Locality"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerSerialNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "8571006865812752217367962054313612264"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerStreetAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "270 Brannan St,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectEmailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectLocalityName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Subject Locality"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectSerialNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "8571006865812752217367962054313612264"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectStreetAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "270 Brannan St,"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerOrganizationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Let's Encrypt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectOrganizationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luxavate.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerStateOrProvinceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.issuerOrganizationUnitName",
+                    "data_type": "string",
+                    "example_values": [
+                        "News"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectStateOrProvinceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Texas"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl_certificates.*.subjectOrganizationUnitName",
+                    "data_type": "string",
+                    "example_values": [
+                        "News"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total Records: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Lookup Certificate",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get host components",
+            "description": "Retrieves the host attribute components of a query",
+            "verbose": "<p>By default, 2000 records will be fetched per page. If more data exists, then use the 'page' parameter for pagination.</p>",
+            "type": "investigate",
+            "identifier": "get_host_components",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "The domain or IP being queried",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                },
+                "from": {
+                    "description": "Start datetime (YYYY-MM-DD)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "to": {
+                    "description": "End datetime (YYYY-MM-DD)",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "page": {
+                    "description": "Page number for paging through results, defaults to 0",
+                    "data_type": "numeric",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "column_name": "Query",
+                    "column_order": 0,
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "column_name": "Start Date",
+                    "column_order": 1,
+                    "example_values": [
+                        "2018-09-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "column_name": "End Date",
+                    "column_order": 2,
+                    "example_values": [
+                        "2018-10-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "numeric",
+                    "column_name": "Page",
+                    "column_order": 3,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.label",
+                    "data_type": "string",
+                    "column_name": "Label",
+                    "column_order": 4,
+                    "example_values": [
+                        "CloudFlare"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.version",
+                    "data_type": "string",
+                    "column_name": "Version",
+                    "column_order": 5,
+                    "example_values": [
+                        "1.7.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.category",
+                    "data_type": "string",
+                    "column_name": "Category",
+                    "column_order": 6,
+                    "example_values": [
+                        "CDN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.hostname",
+                    "data_type": "string",
+                    "column_name": "Host Name",
+                    "column_order": 7,
+                    "example_values": [
+                        "www.abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.lastSeen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 8,
+                    "example_values": [
+                        "2018-09-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.components.*.firstSeen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 9,
+                    "example_values": [
+                        "2018-08-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total Records: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Get Host Components",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get host pairs",
+            "description": "Retrieves the host attribute pairs related to the query",
+            "verbose": "<p>Per page maximum 2000 record we got. If more data exist then use the 'page' parameter for pagination.</p>",
+            "type": "investigate",
+            "identifier": "get_host_pairs",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "The domain or IP being queried",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                },
+                "direction": {
+                    "description": "The directionality of the search",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "default": "children",
+                    "value_list": [
+                        "parents",
+                        "children"
+                    ]
+                },
+                "from": {
+                    "description": "Start datetime (YYYY-MM-DD)",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "to": {
+                    "description": "End datetime (YYYY-MM-DD)",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "page": {
+                    "description": "Page number for paging through results, defaults to 0",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "column_name": "Query",
+                    "column_order": 0,
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.direction",
+                    "data_type": "string",
+                    "column_name": "Direction",
+                    "column_order": 1,
+                    "example_values": [
+                        "parents",
+                        "children"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "column_name": "Start Date",
+                    "column_order": 2,
+                    "example_values": [
+                        "2020-01-13"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "column_name": "End Date",
+                    "column_order": 3,
+                    "example_values": [
+                        "2020-02-13"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "numeric",
+                    "column_name": "Page",
+                    "column_order": 4,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pairs.*.cause",
+                    "data_type": "string",
+                    "column_name": "Cause",
+                    "column_order": 5,
+                    "example_values": [
+                        "topLevelRedirect"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pairs.*.child",
+                    "data_type": "string",
+                    "column_name": "Child",
+                    "column_order": 6,
+                    "example_values": [
+                        "www.seagateshare.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pairs.*.parent",
+                    "data_type": "string",
+                    "column_name": "Parent",
+                    "column_order": 7,
+                    "example_values": [
+                        "86.152.19.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pairs.*.lastSeen",
+                    "data_type": "string",
+                    "column_name": "Last Seen",
+                    "column_order": 8,
+                    "example_values": [
+                        "2018-09-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pairs.*.firstSeen",
+                    "data_type": "string",
+                    "column_name": "First Seen",
+                    "column_order": 9,
+                    "example_values": [
+                        "2018-08-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: San Francisco, Country: us, Organization: Abc, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total Records: 10"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Get Host Pairs",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         }
     ]

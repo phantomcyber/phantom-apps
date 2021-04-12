@@ -1,0 +1,962 @@
+{
+    "appid": "bb05c97e-dc37-4fbf-9366-d69c542e187a",
+    "name": "SentinelOne",
+    "description": "This app integrates with the SentinelOne Singularity platform to perform prevention, detection, remediation, and forensic endpoint management tasks",
+    "type": "endpoint",
+    "product_vendor": "SentinelOne",
+    "logo": "logo_sentinelone.svg",
+    "logo_dark": "logo_sentinelone_dark.svg",
+    "product_name": "SentinelOne",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "SentinelOne",
+    "license": "Copyright (c) SentinelOne, 2018-2021",
+    "app_version": "2.1.1",
+    "utctime_updated": "2021-02-25T13:25:33.000000Z",
+    "package_name": "phantom_sentinelone",
+    "main_module": "sentinelone_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "sentinelone_console_url": {
+            "description": "SentinelOne Console URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://your-mgmt.sentinelone.net",
+            "order": 0
+        },
+        "sentinelone_api_token": {
+            "description": "SentinelOne API Token",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block hash",
+            "description": "Add a file hash to the global blocklist",
+            "type": "contain",
+            "identifier": "block_hash",
+            "read_only": false,
+            "parameters": {
+                "hash": {
+                    "description": "Hash of a file to block",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "Added via Phantom",
+                    "order": 1
+                },
+                "os_family": {
+                    "description": "OS Family",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "windows",
+                        "osx",
+                        "linux"
+                    ],
+                    "default": "windows",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.os_family",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unblock hash",
+            "description": "Remove a hash from the global blocklist",
+            "type": "correct",
+            "identifier": "unblock_hash",
+            "read_only": false,
+            "parameters": {
+                "hash": {
+                    "description": "Hash of a file to remove from the blocklist",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine device",
+            "description": "Quarantine an endpoint",
+            "type": "contain",
+            "identifier": "quarantine_device",
+            "undo": "unquarantine device",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to quarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine device",
+            "description": "Unquarantine an endpoint",
+            "type": "correct",
+            "identifier": "unquarantine_device",
+            "undo": "quarantine device",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to unquarantine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "mitigate threat",
+            "description": "Mitigate an identified threat",
+            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
+            "type": "correct",
+            "identifier": "mitigate_threat",
+            "read_only": false,
+            "parameters": {
+                "s1_threat_id": {
+                    "description": "The threat ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sentinelone s1 threat id"
+                    ],
+                    "order": 0
+                },
+                "action": {
+                    "description": "Allowed values include: kill, quarantine, remediate, rollback, and disconnectFromNetwork",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "kill",
+                        "quarantine",
+                        "remediate",
+                        "rollback",
+                        "disconnectFromNetwork"
+                    ],
+                    "default": "quarantine",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.s1_threat_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sentinelone s1 threat id"
+                    ],
+                    "column_name": "S1 Threat ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "column_name": "Action",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "scan endpoint",
+            "description": "Scan an endpoint for dormant threats",
+            "type": "generic",
+            "identifier": "scan_endpoint",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get endpoint info",
+            "description": "Get detailed information about an endpoint/agent",
+            "type": "investigate",
+            "identifier": "get_endpoint_info",
+            "read_only": true,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to get information",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentVersion",
+                    "data_type": "string",
+                    "column_name": "Agent Version",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.scanStatus",
+                    "data_type": "string",
+                    "column_name": "Scan Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "finished"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.scanStartedAt",
+                    "data_type": "string",
+                    "column_name": "Scan Started At",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.scanFinishedAt",
+                    "data_type": "string",
+                    "column_name": "Scan Finished At",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.infected",
+                    "data_type": "boolean",
+                    "column_name": "Infected",
+                    "column_order": 5,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.isActive",
+                    "data_type": "boolean",
+                    "column_name": "Is Active",
+                    "column_order": 6,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.isUpToDate",
+                    "data_type": "boolean",
+                    "column_name": "Is Up To Date",
+                    "column_order": 7,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatRebootRequired",
+                    "data_type": "boolean",
+                    "column_name": "Threat Reboot Required",
+                    "column_order": 9,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.networkStatus",
+                    "data_type": "string",
+                    "column_name": "Network Status",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.activeThreats",
+                    "data_type": "numeric",
+                    "column_name": "Active Threats",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "title": "Agent Endpoint Info"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get threat info",
+            "description": "Get detailed information about a threat",
+            "type": "investigate",
+            "identifier": "get_threat_info",
+            "read_only": true,
+            "parameters": {
+                "s1_threat_id": {
+                    "description": "The S1 Threat ID for a specific threat",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sentinelone s1 threat id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.s1_threat_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sentinelone s1 threat id"
+                    ],
+                    "column_name": "S1 Threat ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.mitigationStatusDescription",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.threatName",
+                    "data_type": "string",
+                    "column_name": "Threat Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.confidenceLevel",
+                    "data_type": "string",
+                    "column_name": "AI Confidence Level",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentRealtimeInfo.agentComputerName",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "column_name": "Endpoint",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.incidentStatusDescription",
+                    "data_type": "string",
+                    "column_name": "Incident Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.analystVerdictDescription",
+                    "data_type": "string",
+                    "column_name": "Analyst Verdict",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.createdAt",
+                    "data_type": "string",
+                    "column_name": "Reported At",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.engines",
+                    "data_type": "string",
+                    "column_name": "Engines",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.initiatedByDescription",
+                    "data_type": "string",
+                    "column_name": "Initiated By",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.classification",
+                    "data_type": "string",
+                    "column_name": "Classification",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentDetectionInfo.agentVersion",
+                    "data_type": "string",
+                    "column_name": "Agent Version On Detection",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentRealtimeInfo.agentVersion",
+                    "data_type": "string",
+                    "column_name": "Realtime Agent Version",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.mitigationStatus.*.action",
+                    "data_type": "string",
+                    "column_name": "Completed Actions",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.pendingActions",
+                    "data_type": "boolean",
+                    "column_name": "Pending Actions",
+                    "column_order": 14,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.rebootRequired",
+                    "data_type": "boolean",
+                    "column_name": "Reboot Required",
+                    "column_order": 15,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.failedActions",
+                    "data_type": "boolean",
+                    "column_name": "Failed Actions",
+                    "column_order": 16,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentDetectionInfo.agentMitigationMode",
+                    "data_type": "string",
+                    "column_name": "Policy At Detection",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.mitigatedPreemptively",
+                    "data_type": "boolean",
+                    "column_name": "Mitigated Preemptively",
+                    "column_order": 18,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.externalTicketExists",
+                    "data_type": "boolean",
+                    "column_name": "External Ticket",
+                    "column_order": 19,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.sha1",
+                    "data_type": "string",
+                    "column_name": "Hash",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentRealtimeInfo.agentOsRevision",
+                    "data_type": "string",
+                    "column_name": "Agent OS Revision",
+                    "column_order": 21
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.automaticallyResolved",
+                    "data_type": "boolean",
+                    "column_name": "Automatically Resolved",
+                    "column_order": 22,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.detectionType",
+                    "data_type": "string",
+                    "column_name": "Detection Type",
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.filePath",
+                    "data_type": "string",
+                    "column_name": "File Path",
+                    "column_order": 24
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.maliciousProcessArguments",
+                    "data_type": "string",
+                    "column_name": "Malicious Process Arguments",
+                    "column_order": 25
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.threatInfo.storyline",
+                    "data_type": "string",
+                    "column_name": "Story Line",
+                    "column_order": 26
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "description": "Container IDs to limit the ingestion to",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 0
+                },
+                "start_time": {
+                    "description": "Start of the time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "End of the time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "container_count": {
+                    "description": "Maximum number of container records to query for",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "Maximum number of artifact records to query for",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}

@@ -1,0 +1,138 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}
+    {% if title_logo %}
+        style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"
+    {% endif %}
+{% endblock %}
+{% block title1 %}
+    {{ title1 }}
+{% endblock %}
+{% block title2 %}
+    {{ title2 }}
+{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+
+    <!-- File: taniumthreatresponse_display_process_tree.html
+  Copyright (c) 2020-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+    <style>
+        .divInfo { font-size: 15px; }
+        div.processTable {
+            text-align: left;
+            border-collapse: collapse;
+        }
+        .divTable.processTable .divTableCell, .divTable.processTable .divTableHead {
+            border: 1px solid #AAAAAA;
+            padding: 3px 10px 3px 5px;
+        }
+        .divTable.processTable .divTableBody .divTableCell {
+            font-size: 10px;
+        }
+        .divTable.processTable .divTableHeading {
+        }
+        .divTable.processTable .divTableHeading .divTableHead {
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+        div.divTableCell > a:hover {
+            text-decoration: underline;
+        }
+        #children {
+            padding: 0px;
+        }
+        .divTable{ display: table; }
+        .divTableRow { display: table-row; }
+        .divTableHeading { display: table-header-group;}
+        .divTableCell, .divTableHead { display: table-cell;}
+        .divTableHeading { display: table-header-group;}
+        .divTableBody { display: table-row-group;}
+        span.fa-check-circle {
+            font-size: smaller;
+            padding-right: 5px;
+        }
+        span.fa-caret-down { font-size: smaller; }
+        .wf-h4-style {
+            font-size : 16px;
+        }
+    </style>
+    {%  for result in results %}
+        <br>
+        <div class="divInfo">
+            Connection ID: {{ result.parameter.connection_id }}<br>
+            Process Table ID: {{ result.parameter.process_table_id }}<br>
+        </div>
+        <br>
+        <!-- 2 level table -->
+        {% if not result.data %}
+            <h4 class="wf-h4-style">No data found</h4>
+        {% else %}
+            <div class="divTable processTable">
+                <div class="divTableHeading">
+                    <div class="divTableRow">
+                        <div class="divTableHead">PTID</div>
+                        <div class="divTableHead">NAME</div>
+                    </div>
+                </div>
+                {% for process in result.data %}
+                <div class="divTableBody">
+                    <div class="divTableRow">
+                        <div class="divTableCell">
+                            {% if process.ptid == result.parameter.process_table_id|add:"0" %}
+                                <span class="fa fa-check-circle"></span>
+                            {% endif %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ process.ptid }}' }], 0, {{ container.id }}, null, false);">
+                                {{ process.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
+                            </a>
+                        </div>
+                        <div class="divTableCell">{{ process.name }}</div>
+                    </div>
+                    {% if process.children %}
+                    <div class="divTableRow">
+                        <div class="divTableCell">
+                            Children:<br>
+                            <span class="fa fa-level-up fa-rotate-90"></span>
+                        </div>
+                        <div class="divTableCell" id="children">
+                            {% with data=process.children %}
+                            <div class="divTable processTable">
+                                <div class="divTableHeading">
+                                    <div class="divTableRow">
+                                        <div class="divTableHead">PTID</div>
+                                        <div class="divTableHead">NAME</div>
+                                    </div>
+                                </div>
+                                {% for childprocess in process.children %}
+                                <div class="divTableBody">
+                                    <div class="divTableRow">
+                                        <div class="divTableCell">
+                                            {% if childprocess.ptid == result.parameter.process_table_id|add:"0" %}
+                                                <span class="fa fa-check-circle"></span>
+                                            {% endif %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['threatresponse process table id'], 'value': '{{ childprocess.ptid }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ childprocess.ptid }} &nbsp;<span class="fa fa-caret-down"></span>
+                                            </a>
+                                        </div>
+                                        <div class="divTableCell">{{ childprocess.name }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <br>
+        {% endif %}
+    {%  endfor %}
+{% endblock %}

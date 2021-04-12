@@ -1,0 +1,1209 @@
+{
+    "appid": "5722c7e9-489b-4416-9966-564055122a2a",
+    "name": "FortiGate",
+    "description": "This app supports a variety of containment and investigative actions on the FortiGate Firewall",
+    "publisher": "Splunk",
+    "package_name": "phantom_fortigate",
+    "type": "firewall",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "main_module": "fortigate_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2020-04-17T19:10:14.000000Z",
+    "product_vendor": "Fortinet",
+    "product_name": "FortiGate",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.6.19142",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "On-premise v6.2.3 build1066 (GA)"
+    ],
+    "logo": "logo_fortinet.svg",
+    "logo_dark": "logo_fortinet_dark.svg",
+    "configuration": {
+        "url": {
+            "required": true,
+            "order": 0,
+            "data_type": "string",
+            "description": "Device URL for e.g. https://myforti.contoso.com"
+        },
+        "verify_server_cert": {
+            "default": false,
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "order": 1
+        },
+        "username": {
+            "required": true,
+            "order": 2,
+            "data_type": "string",
+            "description": "Username"
+        },
+        "password": {
+            "required": true,
+            "order": 3,
+            "data_type": "password",
+            "description": "Password"
+        },
+        "vdom": {
+            "required": false,
+            "order": 4,
+            "data_type": "string",
+            "description": "Virtual domain (vdom)"
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "block ip",
+            "identifier": "block_ip",
+            "type": "contain",
+            "read_only": false,
+            "description": "Block an IP",
+            "verbose": "The action supports the following format for the <b>ip</b> parameter:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action uses a multistep approach to block IP:<ul><li>Create an address entry named '<b>Phantom Addr [ip_address]_[net_bits]</b>' if address not present, else directly configure address as the destination.</li><li>Configure the address entered as the <i>destination</i> of the specified <b>policy name if the policy exists. If the policy does not exist, action returns an error- Policy probably does not exist in the given virtual domain.</b>.</li><li>The <b>policy</b> value expected is the IPv4 policy name.</li></ul>The action will fail if:<ul><li>The policy name is not found. The action does not create a policy but edits it.</li><li>Policy action is not a <b>deny</b>.</li><li>Another value other than policy name is given as the <b>policy</b> such as policy ID.</li><li>The policy name is not IPv4 policy.</li></ul>",
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "description": "IP to block",
+                    "order": 0,
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
+                },
+                "policy": {
+                    "required": true,
+                    "description": "IPv4 policy name",
+                    "order": 1,
+                    "data_type": "string",
+                    "contains": [
+                        "fortigate policy"
+                    ],
+                    "primary": true
+                },
+                "vdom": {
+                    "required": false,
+                    "order": 2,
+                    "data_type": "string",
+                    "description": "Virtual domain",
+                    "primary": true,
+                    "contains": [
+                        "fortigate vdom"
+                    ]
+                }
+            },
+            "versions": "EQ(*)",
+            "undo": "unblock ip",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Block IP"
+            },
+            "output": [
+                {
+                    "column_order": 3,
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "example_values": [
+                        "2.2.2.2"
+                    ]
+                },
+                {
+                    "column_order": 1,
+                    "contains": [
+                        "fortigate policy"
+                    ],
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string",
+                    "column_name": "Policy",
+                    "example_values": [
+                        "test policy"
+                    ]
+                },
+                {
+                    "contains": [
+                        "fortigate vdom"
+                    ],
+                    "data_path": "action_result.parameter.vdom",
+                    "data_type": "string",
+                    "example_values": [
+                        "test vdom"
+                    ],
+                    "column_name": "Vdom",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "column_order": 4,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "unblock ip",
+            "identifier": "unblock_ip",
+            "type": "correct",
+            "read_only": false,
+            "description": "Unblock an IP",
+            "verbose": "The action supports the following format for the <b>ip</b> parameter:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action uses a multistep approach to unblock IP:<ul><li>Re-configure the <b>policy</b> by removing the Address entry from the list of entries in the destination. If the Address entry is not present in the list of entries in the destination, action will return successfully with message- IP is already unblocked.</li><li>The action does <i>not</i> delete the address entry from the system.</li><li>If address entry is not found on the system, action will return an error- Address does not exist.</li><li>If the policy name is not found, action will return an error.</li><li>The action will validate the Address entry name, and therefore will only unblock IPs that are added by the <b>block ip</b> action.</li><li>If the policy name is not IPv4 policy, action will return an error.</li></ul>",
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "description": "IP to unblock",
+                    "order": 0,
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true
+                },
+                "policy": {
+                    "required": true,
+                    "description": "IPv4 policy name",
+                    "order": 1,
+                    "data_type": "string",
+                    "contains": [
+                        "fortigate policy"
+                    ],
+                    "primary": true
+                },
+                "vdom": {
+                    "required": false,
+                    "order": 2,
+                    "data_type": "string",
+                    "description": "Virtual domain",
+                    "primary": true,
+                    "contains": [
+                        "fortigate vdom"
+                    ]
+                }
+            },
+            "versions": "EQ(*)",
+            "undo": "block ip",
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Unblock IP"
+            },
+            "output": [
+                {
+                    "column_order": 3,
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "column_order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "example_values": [
+                        "2.2.2.2"
+                    ]
+                },
+                {
+                    "column_order": 1,
+                    "contains": [
+                        "fortigate policy"
+                    ],
+                    "data_path": "action_result.parameter.policy",
+                    "data_type": "string",
+                    "column_name": "Policy",
+                    "example_values": [
+                        "test policy"
+                    ]
+                },
+                {
+                    "contains": [
+                        "fortigate vdom"
+                    ],
+                    "data_path": "action_result.parameter.vdom",
+                    "data_type": "string",
+                    "example_values": [
+                        "test vdom"
+                    ],
+                    "column_name": "Vdom",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "column_order": 4,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "list policies",
+            "identifier": "list_policies",
+            "type": "investigate",
+            "read_only": true,
+            "description": "List configured IPv4 policies",
+            "parameters": {
+                "vdom": {
+                    "required": false,
+                    "order": 0,
+                    "data_type": "string",
+                    "description": "Virtual domain",
+                    "primary": true,
+                    "contains": [
+                        "fortigate vdom"
+                    ]
+                },
+                "limit": {
+                    "description": "Maximum number of policies to be fetched (Default: 100)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": 100,
+                    "order": 1
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "fortigate_view.list_policies",
+                "title": "Policies Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "contains": [
+                        "fortigate vdom"
+                    ],
+                    "data_path": "action_result.parameter.vdom",
+                    "data_type": "string",
+                    "example_values": [
+                        "test vdom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "deny"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.anti-replay",
+                    "data_type": "string",
+                    "example_values": [
+                        "enable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application-list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.auth-cert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.auth-path",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.auth-redirect-addr",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.auto-asic-offload",
+                    "data_type": "string",
+                    "example_values": [
+                        "enable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.av-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.block-notification",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.captive-portal-exempt",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.capture-packet",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.casi-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cifs-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comments",
+                    "data_type": "string",
+                    "example_values": [
+                        " (Copy of test10) (Reverse of test10)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.custom-log-fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.delay-tcp-npu-session",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.delay-tcp-npu-sessoin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.devices",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.diffserv-forward",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.diffserv-reverse",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.diffservcode-forward",
+                    "data_type": "string",
+                    "example_values": [
+                        "000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.diffservcode-rev",
+                    "data_type": "string",
+                    "example_values": [
+                        "000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.disclaimer",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dlp-sensor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.dnsfilter-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.dsri",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dstaddr-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dstaddr.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dstaddr.*.q_origin_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dstintf.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_interface"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dstintf.*.q_origin_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_interface"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email-collect",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailfilter-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.firewall-session-dirty",
+                    "data_type": "string",
+                    "example_values": [
+                        "check-all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fixedport",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fsso",
+                    "data_type": "string",
+                    "example_values": [
+                        "enable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fsso-agent-for-ntlm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.geoip-anycast",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.global-label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.http-policy-redirect",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.icap-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.identity-based-route",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.inbound",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.inspection-mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "flow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internet-service",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internet-service-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internet-service-src",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internet-service-src-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ippool",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips-sensor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.learning-mode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.logtraffic",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logtraffic-start",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.match-vip",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.match-vip-only",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "fortigate policy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nat",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.natinbound",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.natip",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.0.0.0 0.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.natoutbound",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ntlm",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ntlm-enabled-browsers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ntlm-guest",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.outbound",
+                    "data_type": "string",
+                    "example_values": [
+                        "enable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.per-ip-shaper",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.permit-any-host",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.permit-stun-host",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policyid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.poolname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile-group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.profile-protocol-options",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.profile-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "single"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.q_origin_key",
+                    "data_type": "numeric",
+                    "example_values": [
+                        45
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.radius-mac-auth-bypass",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.redirect-url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.replacemsg-override-group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation-direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "destination"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation-minimum",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rsso",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rtp-addr",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.rtp-nat",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scan-botnet-connections",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule",
+                    "data_type": "string",
+                    "example_values": [
+                        "always"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.schedule-timeout",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.send-deny-packet",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service.*.q_origin_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "ALL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.session-ttl",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.spamfilter-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.srcaddr-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.srcaddr.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.srcaddr.*.q_origin_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "all"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.srcintf.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_interface"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.srcintf.*.q_origin_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_interface"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssh-filter-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssh-policy-redirect",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl-mirror",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ssl-mirror-intf",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ssl-ssh-profile",
+                    "data_type": "string",
+                    "example_values": [
+                        "no-inspection"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tcp-mss-receiver",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tcp-mss-sender",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tcp-session-without-syn",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timeout-send-rst",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tos",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tos-mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tos-negate",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.traffic-shaper",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.traffic-shaper-reverse",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.users",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.utm-status",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "5axxx9c0-xxxx-51ea-xxxx-89exxxxx073d3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vlan-cos-fwd",
+                    "data_type": "numeric",
+                    "example_values": [
+                        255
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vlan-cos-rev",
+                    "data_type": "numeric",
+                    "example_values": [
+                        255
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vlan-filter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.voip-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vpntunnel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.waf-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.wanopt",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.wanopt-detection",
+                    "data_type": "string",
+                    "example_values": [
+                        "active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.wanopt-passive-opt",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.wanopt-peer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.wanopt-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.wccp",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.webcache",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.webcache-https",
+                    "data_type": "string",
+                    "example_values": [
+                        "disable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.webfilter-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webproxy-forward-server",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.webproxy-profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.wsso",
+                    "data_type": "string",
+                    "example_values": [
+                        "enable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_policies",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total policies: 6"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        }
+    ]
+}

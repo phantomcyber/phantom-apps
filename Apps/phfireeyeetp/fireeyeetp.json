@@ -1,0 +1,3460 @@
+{
+    "appid": "22dc105b-5791-4483-a408-8ad586649159",
+    "name": "Fireeye ETP",
+    "description": "Cloud Edition provides RESTful APIs for custom integration. The APIs are provided for Advanced Threats, Email Trace, and Quarantine functionalities",
+    "type": "email",
+    "product_vendor": "Fireeye",
+    "logo": "logo_fireeyeetp.svg",
+    "logo_dark": "logo_fireeyeetp_dark.svg",
+    "product_name": "Fireeye Email Threat Prevention",
+    "python_version": "2.7",
+    "product_version_regex": ".*",
+    "publisher": "Robert Drouin",
+    "license": "Copyright (c) Robert Drouin, 2021",
+    "app_version": "1.0.3",
+    "utctime_updated": "2020-06-22T21:07:35.969328Z",
+    "package_name": "phantom_fireeyeetp",
+    "main_module": "fireeyeetp_connector.pyc",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "The URL for your ETP instance",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "description": "API key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using the supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "verbose": "<p>Ingest alerts from ETP into Phantom. If 'start_time' is not specified, the default is past 10 days. If 'end_time' is not specified, the default is past 10 days.</p>",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "description": "Container IDs to size the ingestion to",
+                    "data_type": "string",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "start_time": {
+                    "description": "Start of the time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 1
+                },
+                "end_time": {
+                    "description": "End of the time range, in epoch time (milliseconds)",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "container_count": {
+                    "description": "The maximum number of container records to query for",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_count": {
+                    "description": "The maximum number of artifact records to query for",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list alerts",
+            "description": "Get a list of alerts from the ETP instance",
+            "verbose": "<p>The email status allows filtering by specific statuses. The valid values for email status are:</p><p><ul><li>ACE: Passthrough</li><li>quarantined</li><li>released</li><li>deleted</li><li>bcc:dropped</li><li>delivered (retroactive)</li><li>dropped (oob retroactive)</li></ul></p>",
+            "type": "investigate",
+            "identifier": "list_alerts",
+            "read_only": true,
+            "parameters": {
+                "legacy_id": {
+                    "description": "Alert ID as shown in Email Security Web Portal",
+                    "data_type": "numeric",
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp legacy id"
+                    ],
+                    "order": 0
+                },
+                "message_id": {
+                    "description": "ETP Email message ID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "order": 1
+                },
+                "email_status": {
+                    "description": "Filter by ETP email status. Comma-separated list allowed. See app documentation for a list of acceptable values",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 2
+                },
+                "num_days": {
+                    "description": "The number of days to get alerts for (ETP Defaults to last 90 days)",
+                    "data_type": "numeric",
+                    "default": 90,
+                    "order": 3
+                },
+                "size": {
+                    "description": "Number of alerts to retrieve per response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "default": 20,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.legacy_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123456789
+                    ],
+                    "contains": [
+                        "fireeyeetp legacy id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7EFF784241DDFA1a527644d12"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACE: Passthrough",
+                        "quarantined",
+                        "released",
+                        "deleted",
+                        "bcc:dropped",
+                        "delivered (retroactive)",
+                        "dropped (oob retroactive)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.num_days",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.alert.alert_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.alert.malware_md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "131d79133e0f05e27095a8d75302d1e7"
+                    ],
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.alert.product",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.alert.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.ati",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.attachment",
+                    "data_type": "string",
+                    "column_order": 5,
+                    "column_name": "Attachment Name"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.headers.cc",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 3,
+                    "column_name": "CC"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.headers.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.headers.subject",
+                    "data_type": "string",
+                    "column_order": 4,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.headers.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.smtp.mail_from",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.smtp.rcpt_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.source_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Source IP"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACE: Passthrough",
+                        "quarantined",
+                        "released",
+                        "deleted",
+                        "bcc:dropped",
+                        "delivered (retroactive)",
+                        "dropped (oob retroactive)"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.email.timestamp.accepted",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.acknowledged",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.last_malware",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phish.LIVE.DTI.URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.last_modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.legacy_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123456789
+                    ],
+                    "contains": [
+                        "fireeyeetp legacy id"
+                    ],
+                    "column_order": 9,
+                    "column_name": "Legacy ID"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.read",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.timestamp.db_insert_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.meta.timestamp.es_insert_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "jsYRfJMuJu1epufQQuC3"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Alert ID"
+                },
+                {
+                    "data_path": "action_result.data.*.links.detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/alerts/jsYRfJMuJu1epufQQuC3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alert",
+            "description": "Get details about a specific alert from the ETP instance",
+            "verbose": "<p>Get details about a specific alert by alert ID.</p>",
+            "type": "investigate",
+            "identifier": "get_alert",
+            "read_only": true,
+            "parameters": {
+                "alert_id": {
+                    "description": "Alert ID as shown in Email Security Web Portal",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "kaB6fYTBGTn_991YBM6T"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.ack",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes",
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "notified"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.alert_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.analysis",
+                    "data_type": "string",
+                    "example_values": [
+                        "binary"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.anomaly",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.channel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.port",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.protocol",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.sname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.cnc_service.cnc_service.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.application",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.downloaded_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.executed_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.md5sum",
+                    "data_type": "string",
+                    "example_values": [
+                        "131d79133e0f05e27095a8d75302d1e7"
+                    ],
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phish.LIVE.DTI.URL"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Alert Reason"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.origid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123456789
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.original",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "4E1243BD22C66E76C2BA9EDDC1F91394E57F9F83"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.sha512",
+                    "data_type": "string",
+                    "example_values": [
+                        "C6EE9E33CF5C6715A1D148FD73F7318884B41ADCB916021E2BC0E800A5C5DD97F5142178F6AE88C8FDD98E1AFB0CE4C8D2C54B5F37B30B7DA1997BB33B0B8A31"
+                    ],
+                    "contains": [
+                        "sha512"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.sid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123456789
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.stype",
+                    "data_type": "string",
+                    "example_values": [
+                        "duplicate-md5sum"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.submitted_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.malware_detected.malware.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.analysis.ftype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.analysis.mode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.analysis.product",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.analysis.verison",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.application.app_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.malicious_alert.*.classtype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.malicious_alert.*.display_msg",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os.arch",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os.sp",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os.verison",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os_monitor.build",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os_monitor.date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os_monitor.time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.os_monitor.verision",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.osinfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.cmdline",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.fid.ads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.fid.fid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.filesize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.md5sum",
+                    "data_type": "string",
+                    "example_values": [
+                        "131d79133e0f05e27095a8d75302d1e7"
+                    ],
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.mode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.no_extend",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.parentname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.pid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.ppid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.sha1sum",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.sha256sum",
+                    "data_type": "string",
+                    "example_values": [
+                        "9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.os_changes.process_information.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.explanation.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.malware_md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "131d79133e0f05e27095a8d75302d1e7"
+                    ],
+                    "contains": [
+                        "md5",
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "malware-object"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.product",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "major"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.alert.timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.ati",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.attachment",
+                    "data_type": "string",
+                    "column_order": 6,
+                    "column_name": "Attachment"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 9,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.headers.cc",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 4,
+                    "column_name": "CC"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.headers.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.headers.subject",
+                    "data_type": "string",
+                    "column_order": 5,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.headers.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.smtp.mail_from",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 3,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.smtp.rcpt_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.source_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Source IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.email.timestamp.accepted",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.acknowledged",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.last_malware",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phish.LIVE.DTI.URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.last_modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.legacy_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456789"
+                    ],
+                    "contains": [
+                        "fireeyeetp legacy id"
+                    ],
+                    "column_order": 10,
+                    "column_name": "Legacy ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.read",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.timestamp.db_insert_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.meta.timestamp.es_insert_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "jsYRfJMuJu1epufQQuC3"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Alert ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.links.detail",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v1/alerts/jsYRfJMuJu1epufQQuC3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list email attributes",
+            "description": "Get all the attributes from a list of email messages",
+            "verbose": "<p>Gets a list of messages that include specified message attributes that are accessible in the Email Security portal.</p>",
+            "type": "investigate",
+            "identifier": "list_email_attributes",
+            "read_only": true,
+            "parameters": {
+                "size": {
+                    "description": "The number of alerts to include in a response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "default": 20,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.acceptedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.downStreamMsgID",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Downstream Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.emailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9.87
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.lastModifiedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.originalMessageID",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Original Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "recipient rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Senders IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AS",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.PV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "jsYRfJMuJu1epufQQuC3"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.attributes.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.type",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "trace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get email attributes",
+            "description": "Get the attributes of a particular message with the specified Email Security message ID",
+            "type": "investigate",
+            "identifier": "get_email_attributes",
+            "read_only": true,
+            "parameters": {
+                "etp_message_id": {
+                    "description": "The ID of the Email Security message",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.acceptedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.downStreamMsgID",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Downstream Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.emailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9.21
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.lastModifiedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.originalMessageID",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Original Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "recipient rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Senders IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AS",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ],
+                    "column_order": 9,
+                    "column_name": "Spam"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ],
+                    "column_order": 10,
+                    "column_name": "Advanced Threat"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ],
+                    "column_order": 11,
+                    "column_name": "Virus"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.PV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ],
+                    "column_order": 12,
+                    "column_name": "Policy Violation"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ],
+                    "column_order": 13,
+                    "column_name": "YARA"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "jsYRfJMuJu1epufQQuC3"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.attributes.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "trace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "trace email",
+            "description": "Search for Email Message by specifying one or more filters",
+            "verbose": "<p>At least one parameter must be filled out. All fields are filtered by the IN clause where applicable searching always an AND.</p><p>The modified date always uses the greater than or equal to. For example, if you want to search for the last 7 days, put a timestamp from 7 days ago. IE. 2017-10-03T00:00:00.000Z. Also, note that the DatetTime stamps need to be in UTC otherwise the results will be off. ETP assumes all DateTime stamps are in UTC.</p><p>The status field allows for the following values<ul><li>accepted</li><li>deleted</li><li>delivered</li><li>delivered (retroactive)</li><li>dropped</li><li>dropped oob</li><li>dropped (oob retroactive)</li><li>permanent failure</li><li>processing</li><li>quarantined</li><li>rejected</li><li>temporary failure</li></ul></p><p>The tags field allows for the following values<ul><li>auto_remediation</li><li>impersonation</li><li>manual_remediation</li></ul></p>",
+            "type": "investigate",
+            "identifier": "trace_email",
+            "read_only": true,
+            "parameters": {
+                "domains": {
+                    "description": "Specific domain(s) to search by. Comma-separated list allowed",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 0
+                },
+                "modified_date": {
+                    "description": "Datetime stamp to limit the search period",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "recipients": {
+                    "description": "The recipients of the email. The maximum allowed per request is 10. Comma-separated list allowed",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "order": 2
+                },
+                "sender": {
+                    "description": "The sender of the email. The maximum allowed per request is 10. Comma-separated list allowed",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "order": 3
+                },
+                "status": {
+                    "description": "ETP status to search by. Comma-separated list allowed",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 4
+                },
+                "subject": {
+                    "description": "The subject of the email to search for",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "tags": {
+                    "description": "Tags from ETP that are associated with an email",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 6
+                },
+                "size": {
+                    "description": "The number of alerts to include in a response. Valid range: 1-300 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "default": 20,
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domains",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.modified_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-10-03T00:00:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "accepted",
+                        "deleted",
+                        "delivered",
+                        "delivered (retroactive)",
+                        "dropped",
+                        "dropped oob",
+                        "dropped (oob retroactive)",
+                        "permanent failure",
+                        "processing",
+                        "quarantined",
+                        "rejected",
+                        "temporary failure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "auto_remediation",
+                        "impersonation",
+                        "manual_remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.acceptedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.downStreamMsgID",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Downstream Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.emailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9.21
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.lastModifiedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.originalMessageID",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Original Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "recipient rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Senders IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AS",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.PV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.attributes.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "trace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "trace message",
+            "description": "Search for Email Message by specifying the Queue/Message-ID of the Downstream MTA or the Original Message-ID. At least one parameter must be filled out. All fields are filtered by the IN clause where applicable",
+            "type": "investigate",
+            "identifier": "trace_message",
+            "read_only": true,
+            "parameters": {
+                "original_message_id": {
+                    "description": "The email's Original-Message-ID header value",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "order": 0
+                },
+                "downstream_message_id": {
+                    "description": "The email's Downstream-Message-ID header value",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "order": 1
+                },
+                "size": {
+                    "description": "The number of alerts to include in a response. Valid range: 1-300 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "default": 20,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.original_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.downstream_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.acceptedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ],
+                    "column_order": 5,
+                    "column_name": "Domain"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.downStreamMsgID",
+                    "data_type": "string",
+                    "example_values": [
+                        "250 2.6.0 <97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net> [InternalId=23782507632821, Hostname=outlook.com] 89009 bytes in 0.136, 564.397 KB/sec Queued mail for delivery"
+                    ],
+                    "contains": [
+                        "fireeyeetp downstream message id"
+                    ],
+                    "column_order": 8,
+                    "column_name": "Downstream Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.emailSize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9.21
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.lastModifiedDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.originalMessageID",
+                    "data_type": "string",
+                    "example_values": [
+                        "<97be1b3701c4b71faec8bf7b6.13bf5ad01b.20200614582589.d1f0cfbf6b.ad7426e6@mail.net>"
+                    ],
+                    "contains": [
+                        "fireeyeetp original message id"
+                    ],
+                    "column_order": 7,
+                    "column_name": "Original Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.recipientSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "ETP210"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.rejectionReason.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "recipient rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderHeader",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderIP",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Senders IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.senderSMTP",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "delivered",
+                        "permanent failure",
+                        "quarantined",
+                        "rejected"
+                    ],
+                    "column_order": 6,
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AS",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AT",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.AV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.ActionYARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.PV",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.verdicts.YARA",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.attributes.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.included.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "trace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download email",
+            "description": "Download the email header as a text file and add it to the vault",
+            "type": "investigate",
+            "identifier": "download_email",
+            "read_only": true,
+            "parameters": {
+                "etp_message_id": {
+                    "description": "The ID of the Email Security message to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download pcap",
+            "description": "Downloads all the PCAP files of the alert for a specified alert ID and add the files to the vault",
+            "type": "investigate",
+            "identifier": "download_pcap",
+            "read_only": true,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the Email Security message to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "kaB6fYTBGTn_991YBM6T"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download malware files",
+            "description": "Download all malware files of the alert for a specified alert ID and add the files to the vault",
+            "verbose": "<p>These files can contain viruses or other malicious software. Be cautious when opening these files!</p>",
+            "type": "investigate",
+            "identifier": "download_malware_files",
+            "read_only": true,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the Email Security message to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "kaB6fYTBGTn_991YBM6T"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download case files",
+            "description": "Download all case files of the alert for a specified alert ID and add the files to the vault",
+            "type": "investigate",
+            "identifier": "download_case_files",
+            "read_only": true,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the Email Security message to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "kaB6fYTBGTn_991YBM6T"
+                    ],
+                    "contains": [
+                        "fireeyeetp alert id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remediate emails",
+            "description": "Enqueues the message IDs provided in the request for remediation from the user's Office365 mailbox",
+            "verbose": "<p><b>Note: There is no <i>undo</i> functionality with this action!</b></p><p>The permissions the API account needs to have to use this function are, <b>etp.email_trace.update</b> and <b>etp.email_trace.delete</b>. If the API user does not have these permission you will not be able to use this action.</p><p></p><p>Any Any ETP Messages that have a status from the list given below are ignored and no action will be taken on them. <p><ul><li>Deleted</li><li>Dropped</li><li>Dropped(OOB)</li><li>Dropped (OOB Retroactive)</li><li>Rejected</li><li>Split</li><li>Permanent Failure</li></ul></p></p><p>The action_override parameter allows you to override the default action for remediating an email. It is important to note that if you select Delete, that it is a permanent delete in Office365.</p><p>The move_to parameter allows you to move the identified emails to a specific folder. If the folder is not in the user's mailbox, a new custom folder will be created and then the email will be moved into the new folder. Common Office365 folders are <p><ul><li>junk email</li><li>junkemail</li><li>deleted items</li><li>deleteditems</li></ul> These folder names are not case sensitive.</p>",
+            "type": "contain",
+            "identifier": "remediate_emails",
+            "read_only": false,
+            "parameters": {
+                "etp_message_ids": {
+                    "description": "A comma-separated list of ETP Message IDs",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "action_override": {
+                    "description": "Allows you to override the default action",
+                    "data_type": "string",
+                    "value_list": [
+                        "Delete",
+                        "Quarantine",
+                        "Move"
+                    ],
+                    "default": "Quarantine",
+                    "order": 1
+                },
+                "move_to": {
+                    "description": "When 'move' is chosen for action_override, this parameter is mandatory and allows you to specify the folder to move the email to",
+                    "data_type": "string",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action_override",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delete",
+                        "Quarantine",
+                        "Move"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.move_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "junk email",
+                        "junkemail",
+                        "deleted items",
+                        "deleteditems"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.successful",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Successful Ids"
+                },
+                {
+                    "data_path": "action_result.data.*.data.failed",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.failure_reasons.*.reason",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "Failed Reason"
+                },
+                {
+                    "data_path": "action_result.data.*.data.failure_reasons.*.message_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "7EFF784241DDFA1a527644d12"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Failed IDs"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get quarantined email",
+            "description": "Download the email file present in the quarantine for the given Email Security message ID and add it to the vault",
+            "type": "investigate",
+            "identifier": "get_quarantined_email",
+            "read_only": true,
+            "parameters": {
+                "etp_message_id": {
+                    "description": "The ID of the Email Security message to download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine email",
+            "description": "Release the email file(s) present in the Quarantine within ETP",
+            "type": "correct",
+            "identifier": "unquarantine_email",
+            "read_only": false,
+            "parameters": {
+                "etp_message_id": {
+                    "description": "The ID of the Email Security message to unquarantine. Allows for a comma-separated string of IDs",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                },
+                "is_not_spam": {
+                    "description": "Report as not spam to the Spam Engines",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 1
+                },
+                "headers_only": {
+                    "description": "Share only the email headers with Spam Engines",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.is_not_spam",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.headers_only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email is submitted for release"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Response"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Invalid etp message ID or the message ID does not exist in quarantine"
+                    ],
+                    "column_order": 1,
+                    "column_name": "Error Message"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete quarantined email",
+            "description": "Delete the email file(s) present in quarantine for the given Email Security message ID",
+            "type": "correct",
+            "identifier": "delete_quarantined_email",
+            "read_only": false,
+            "parameters": {
+                "etp_message_id": {
+                    "description": "The ID of the Email Security message to delete. Allows a comma-separated string of IDs",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "allow_list": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.etp_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "D1670833091CA91B5359A4969"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        "True",
+                        "False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.failed_message_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "7EFF784241DDFA1a527644d12"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.operation",
+                    "data_type": "string",
+                    "example_values": [
+                        "deleted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.successful_message_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "7EFF784241DDFA1a527644d12"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "quarantine"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list quarantined emails",
+            "description": "Get a list of quarantined emails from a given query filter",
+            "verbose": "<p>When specifying a date in either the to or from dates, the date is assumed to be in UTC. The ETP server runs on UTC so if you are not converting the timestamp to that time the results will be off.</p>",
+            "type": "investigate",
+            "identifier": "list_quarantined_emails",
+            "read_only": true,
+            "parameters": {
+                "from_date": {
+                    "description": "Start date to use to search the by. Date in YYYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "to_date": {
+                    "description": "End date to use to search by. Date in YYYY-MM-DDTHH:MM:SS.SSSSSS in UTC",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "domains": {
+                    "description": "Specific domain(s) to search by. Comma-separated list allowed",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 2
+                },
+                "email_server": {
+                    "description": "Specific email server to search by",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 3
+                },
+                "from": {
+                    "description": "Email address of the sender to search by",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 4
+                },
+                "reason": {
+                    "description": "Reason the email was quarantined. The strings must be of the following reasons, Action, Advanced Threat, Policy, Spam or Virus. Comma-separated list allowed",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 5
+                },
+                "recipients": {
+                    "description": "Recipient(s) to search by. Comma-separated list allowed",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "order": 6
+                },
+                "sender_domain": {
+                    "description": "The senders domain to search by",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "subject": {
+                    "description": "The subject of the email to search by",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "size": {
+                    "description": "THe number of alerts to include in response. Valid range: 1-200 (ETP Defaults to 20)",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 20,
+                    "order": 9
+                },
+                "tags": {
+                    "description": "Tag associated with email. Must be of the follow tags, auto_remediation, impersonation or manual_remediation. Comma-separated list allowed",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 10
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.from_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domains",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email_server",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "Action",
+                        "Advanced Threat",
+                        "Policy",
+                        "Spam",
+                        "Virus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "example@email.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender_domain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "auto_remediation",
+                        "impersonation",
+                        "manual_remediation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.cc",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.country_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 2,
+                    "column_name": "From"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7EFF784241DDFA1a527644d12"
+                    ],
+                    "contains": [
+                        "fireeyeetp message id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "ETP Message ID"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.recipients",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.released.*.email_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.released.*.is_released",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.released.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "131d79133e0f05e27095a8d75302d1e7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.sender_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.local"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.sender_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Sender IP"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.timestamp_quarantine",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.timestamp_sent",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-01T01:01:01.804"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "email@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_order": 1,
+                    "column_name": "To"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.verdict_as",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.verdict_av",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.verdict_ex",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.verdict_pv",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass",
+                        "fail",
+                        "no match"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

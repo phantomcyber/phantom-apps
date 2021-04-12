@@ -8,13 +8,17 @@
     "logo_dark": "victorops_dark.svg",
     "product_name": "VictorOps",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2018 Splunk Inc.",
-    "app_version": "1.0.14",
-    "utctime_updated": "2018-12-07T01:38:20.000000Z",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud. API v1 tested on 2021-02-25"
+    ],
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-03-02T04:54:12.000000Z",
     "package_name": "phantom_victorops",
-    "main_module": "victorops_connector.pyc",
-    "min_phantom_version": "3.5.180",
+    "main_module": "victorops_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_id": {
@@ -31,9 +35,8 @@
         },
         "integration_url": {
             "description": "Custom REST based Integration URL defined in VictorOps",
-            "verbose": "Populate this field if you plan to create, update, or resolve incidents.",
+            "verbose": "Populate this field if you plan to create, update, or resolve incidents. i.e https://alert.victorops.com/integrations/generic/20131114/alert/84d34810-7b78-4cb9-91a4-3425aeecce68",
             "data_type": "string",
-            "required": false,
             "order": 2
         }
     },
@@ -42,7 +45,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -53,7 +55,6 @@
             "action": "list teams",
             "identifier": "list_teams",
             "description": "Get list of teams configured on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -62,7 +63,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -168,7 +170,6 @@
             "action": "list users",
             "identifier": "list_users",
             "description": "Get list of users configured on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -177,7 +178,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -198,7 +200,7 @@
                     "data_path": "action_result.data.*.email",
                     "data_type": "string",
                     "example_values": [
-                        "herman@phantom.us"
+                        "herman@test.us"
                     ],
                     "contains": [
                         "email"
@@ -296,7 +298,6 @@
             "action": "list incidents",
             "identifier": "list_incidents",
             "description": "Get list of incidents on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -305,7 +306,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -340,7 +342,7 @@
                     "example_values": [
                         "robots2"
                     ],
-                    "column_name": "Entity Id",
+                    "column_name": "Entity ID",
                     "column_order": 2
                 },
                 {
@@ -359,10 +361,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.host",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.incidentNumber",
@@ -514,22 +513,18 @@
             "action": "create incident",
             "identifier": "create_incident",
             "description": "Create incident on VictorOps",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "routing_key": {
                     "description": "Name of Routing key defined in VictorOps. If left blank, default route will be used",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "message_type": {
                     "description": "Behavior of the alert. CRITICAL: Triggers an incident, WARNING: May trigger an incident, depending on your settings",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "CRITICAL",
                         "WARNING"
@@ -540,7 +535,6 @@
                 "entity_id": {
                     "description": "ID of the Incident. This field is the identity of the incident and must remain the same throughout the life-cycle of an incident. If no entity_id is included, VictorOps will generate a random string",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "victorops id"
@@ -550,25 +544,20 @@
                 "entity_display_name": {
                     "description": "Display Name in the UI and Notifications. This field allows you to give custom, human-friendly, summary of your incidents without affecting the life-cycle workflow",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "victorops display name"
                     ],
-                    "order": 3
+                    "order": 3,
+                    "primary": true
                 },
                 "state_message": {
                     "description": "Verbose message field. This field has a high character limit and is intended for a long, verbose, explanation of the problem. This field will be included in notifications (full content in email, truncated version in push/phone/SMS notifications) Any URL links included in this field will be rendered as clickable links in email notifications",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 },
                 "state_start_time": {
                     "description": "Time this issue began [Number] (Linux/Unix time). The time this entity entered its current state (seconds since epoch). Defaults to the time alert is received",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 }
             },
@@ -577,7 +566,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -643,7 +633,7 @@
                     "example_values": [
                         "robots taking over id"
                     ],
-                    "column_name": "Entity Id",
+                    "column_name": "Entity ID",
                     "column_order": 2
                 },
                 {
@@ -698,7 +688,6 @@
             "action": "list oncalls",
             "identifier": "list_oncalls",
             "description": "Get all on-call users/teams on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -707,7 +696,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -792,7 +782,6 @@
             "action": "list policies",
             "identifier": "list_policies",
             "description": "Get list of policies configured on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -801,7 +790,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -878,7 +868,6 @@
             "action": "list routing",
             "identifier": "list_routing",
             "description": "Get list of routing keys and associated teams on VictorOps",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -887,7 +876,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -968,22 +958,18 @@
             "action": "update incident",
             "identifier": "update_incident",
             "description": "Update timeline of existing incident in VictorOps",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "routing_key": {
                     "description": "Name of Routing key defined in VictorOps. If left blank, default route will be used",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "message_type": {
                     "description": "Behavior of the alert. INFO: Creates a timeline event but does not trigger an incident. RECOVERY: Resolves an incident",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "INFO",
                         "RECOVERY"
@@ -991,9 +977,8 @@
                     "order": 1
                 },
                 "entity_id": {
-                    "description": "ID of the Incident. This field is the identity of the incident and must remain the same throughout the life-cycle of an incident",
+                    "description": "The entity_id of an existing incident. If not included, an update will be posted on timeline",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "victorops id"
@@ -1003,18 +988,15 @@
                 "entity_display_name": {
                     "description": "Display Name in the UI and Notifications. This field allows you to give custom, human-friendly, summary of your incidents without affecting the life-cycle workflow",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "victorops display name"
                     ],
-                    "order": 3
+                    "order": 3,
+                    "primary": true
                 },
                 "state_message": {
                     "description": "Verbose message field. This field has a high character limit and is intended for a long, verbose, explanation of the problem. This field will be included in notifications (full content in email, truncated version in push/phone/SMS notifications) Any URL links included in this field will be rendered as clickable links in email notifications",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 }
             },
@@ -1023,7 +1005,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1076,7 +1059,7 @@
                     "example_values": [
                         "robots taking over id"
                     ],
-                    "column_name": "Entity Id",
+                    "column_name": "Entity ID",
                     "column_order": 1
                 },
                 {

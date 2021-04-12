@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2019 Splunk Inc.
+  Copyright (c) 2019-2020 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -8,9 +8,22 @@
 
 Upon installing Mimecast and configuring your asset, you will not have an accessKey or secretKey (together known as a binding) that is required by Mimecast upon each call to its API.<br></br>
 When you run the first Mimecast action or test connectivity on the asset, your accessKey and secretKey will be generated and saved in your instance.<br></br>
-Every action run will be using the same accessKey and secretKey that was saved in order to avoid generating new keys on every request.<br></br>
+Every action run will be using the same accessKey and secretKey that was saved to avoid generating new keys on every request.<br></br>
 
-It is important to note that your accessKey and secretKey binding may expire after the period of time defined in the Authentication Cache TTL setting in the service user's effective Authentication Profile (accessible through the Mimecast Administration Console under Services>Applications>Authentication Profiles). It is recommended to set this to "Never Expires" so you do not have to deal with expired authentication.<br></br>
-
-In the event that you do want your authentication binding to expire after a specified time, the first failed action using the expired binding will make the Mimecast app automatically reset your accessKey and secretKey. Simply run the failed action once again and it should now be authorized with a new binding.
+It is important to note that your accessKey and secretKey binding may expire after the period of time defined in the Authentication Cache TTL setting in the service user's effective Authentication Profile (accessible through the Mimecast Administration Console under Services>Applications>Authentication Profiles). It is recommended to set this to "Never Expires" so you do not have to deal with expired authentication.
 <br></br>
+
+<p>
+    <b>Points to remember while connecting to Mimecast</b>
+    <ul>
+    <li>IP Range Restrictions:</li>
+    Be sure to enable your Mimecast to accept communication with the IP address of your Phantom server(s).
+    <li>Two Factor Authentication:</li>
+    Mimecast supports optional two-factor authentication. Two-factor authentication should be disabled for the account that is used to handle API communication with Phantom.
+    </ul>
+</p>
+
+<p>
+    <b>Note:</b>
+    The 'unblacklist url' and 'unwhitelist url' actions use the same API endpoint and action parameter to remove the URL from the blacklist and whitelist. Hence, removing the URL from the whitelist will automatically remove the URL from the blacklist as well.
+</p>

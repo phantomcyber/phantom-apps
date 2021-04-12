@@ -1,0 +1,213 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: jira_search_users.html
+    Copyright (c) 2016-2021 Splunk Inc.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+    .jira a:hover {
+        text-decoration:underline;
+    }
+
+    .jira .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .jira .wf-table-vertical td{
+    padding: 8px 10px;
+    border: 1px solid;
+    }
+
+    .jira .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+    }
+
+    .jira .wf-table-horizontal {
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .jira .no-word-wrap {
+        white-space: nowrap;
+    }
+
+    .jira .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .jira .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .jira .wf-h3-style {
+        font-size : 20px
+    }
+
+    .jira .wf-h4-style {
+        font-size : 16px
+    }
+
+    .jira .collapse.in {
+        display: block !important;
+    }
+
+    .jira .panel-collapse {
+        overflow-x: auto;
+    }
+
+    .jira .glyphicon.glyphicon-dot:before {
+        content: "\25cf"; font-size: 10px;
+    }
+
+    .jira a.nowrap {
+        white-space:nowrap;
+    }
+
+</style>
+<div class="jira" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    {% for result in results %} <!-- loop for each result -->
+    <br>
+
+    <!------------------- For each Result ---------------------->
+    {% if not result.data %}
+        <h4 class="wf-h4-style">No data found</h4>
+
+    {% else %}
+        <h4 class="wf-h4-style">Action Parameters</h4>
+        <table class="wf-table-vertical">
+            {% if result.param.username %}
+                <tr>
+                    <td>Username</td>
+                    <td>
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ result.param.username }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.username }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.display_name %}
+                <tr>
+                    <td>Display Name</td>
+                    <td>
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['jira user display name'], 'value':'{{ result.param.display_name }}' }], 0, {{ container.id }}, null, false);">
+                            {{ result.param.display_name }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.start_index %}
+                <tr>
+                    <td>Start Index</td>
+                    <td>
+                        {{ result.param.start_index }}
+                    </td>
+                </tr>
+            {% endif %}
+            {% if result.param.max_results %}
+                <tr>
+                    <td>Max Results</td>
+                    <td>
+                        {{ result.param.max_results }}
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+        <div class="results">
+            <h4 class="wf-h4-style">Users Information</h4>
+
+            <!--Default View-->
+                {% for data in result.data %}
+                <table class="wf-table-vertical">
+                    <tbody>
+                        {% if data.name %}
+                            <tr>
+                                <td> Username </td>
+                                <td><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ data.name }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ data.name }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a></td>
+                            </tr>
+                        {% endif %}
+                        {% if data.displayName %}
+                            <tr>
+                                <td> Display Name </td>
+                                <td><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['jira user display name'], 'value':'{{ data.displayName }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ data.displayName }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a></td>
+                            </tr>
+                        {% endif %}
+                        {% if data.accountId %}
+                            <tr>
+                                <td> Account ID </td>
+                                <td><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['jira user account id'], 'value':'{{ data.accountId }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ data.accountId }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a></td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td> Email Address </td>
+                            <td><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ data.emailAddress }}' }], 0, {{ container.id }}, null, false);">
+                                {{ data.emailAddress }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                {% endfor %}
+                
+        </div>
+    {% endif %}
+    {% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": false,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top">rt<"bottom"p><"clear">',
+        drawCallback: function(settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable();
+</script>
+{% endblock %} <!-- Main Start Block -->

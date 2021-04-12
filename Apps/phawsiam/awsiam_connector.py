@@ -1,5 +1,5 @@
 # File: awsiam_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2020 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -8,12 +8,18 @@ import hmac
 import hashlib
 import datetime
 import collections
-from urllib import urlencode, unquote
+import sys
 from collections import OrderedDict
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 from awsiam_consts import *
+
+try:
+    from urllib import urlencode, unquote
+except ImportError:
+    from urllib.parse import urlencode, unquote
 
 # Phantom App imports
 import phantom.app as phantom
@@ -37,9 +43,51 @@ class AwsIamConnector(BaseConnector):
         self._access_key = None
         self._secret_key = None
         self._response_metadata_dict = None
+        self._python_version = None
 
-    @staticmethod
-    def _process_empty_response(response, action_result):
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str is not None and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This function is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_msg = AWSIAM_UNKNOWN_ERROR_MSG
+        error_code = AWSIAM_UNKNOWN_ERROR_CODE
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSIAM_UNKNOWN_ERROR_CODE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = AWSIAM_TYPE_ERROR_MSG
+        except:
+            error_msg = AWSIAM_UNKNOWN_ERROR_MSG
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: Response data
@@ -50,11 +98,10 @@ class AwsIamConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
-                      None)
+        error_msg = "Status code: {}. Empty response and no information in the header".format(response.status_code)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), None)
 
-    @staticmethod
-    def _process_xml_response(response, action_result):
+    def _process_xml_response(self, response, action_result):
         """ This function is used to process XML response.
 
         :param response: Response data
@@ -64,11 +111,11 @@ class AwsIamConnector(BaseConnector):
 
         # Try a xml parse
         try:
-            text = (xmltodict.parse(response.text.encode('utf-8')))
+            text = (xmltodict.parse(self._handle_py_ver_compat_for_input_str(response.text)))
         except Exception as e:
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR,
-                                         "Unable to parse XML response. Error: {0}".format(str(e))), None)
+                                         "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, text)
@@ -79,7 +126,7 @@ class AwsIamConnector(BaseConnector):
         error_message = text[AWSIAM_JSON_ERROR_RESPONSE][AWSIAM_JSON_ERROR][AWSIAM_JSON_ERROR_MESSAGE]
 
         error = 'ErrorType: {}\nErrorCode: {}\nErrorMessage: {}'.\
-            format(error_type, error_code, error_message.encode('UTF-8'))
+            format(error_type, error_code, self._handle_py_ver_compat_for_input_str(error_message))
         # Process the error returned in the XML
         try:
             message = "Error from server. Status Code: {0} Data from server: {1}".\
@@ -90,8 +137,7 @@ class AwsIamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), text)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: Response data
@@ -104,14 +150,17 @@ class AwsIamConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8').encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -120,8 +169,7 @@ class AwsIamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _process_json_response(response, action_result):
+    def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: Response data
@@ -134,7 +182,7 @@ class AwsIamConnector(BaseConnector):
             resp_json = response.json()
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(str(e))), None)
+                                                   format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -142,7 +190,7 @@ class AwsIamConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".\
-            format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -183,12 +231,11 @@ class AwsIamConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".\
-            format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _aws_sign(key, data):
+    def _aws_sign(self, key, data):
         """ This function is used to generate cryptographic hash of the provided data.
 
         :param key: Secret key shared between two communicating endpoints
@@ -196,7 +243,7 @@ class AwsIamConnector(BaseConnector):
         :return: Cryptographic hash of the actual data combined with the shared secret key
         """
 
-        return hmac.new(key, data.encode('utf-8'), hashlib.sha256).digest()
+        return hmac.new(key, self._handle_py_ver_compat_for_input_str(data, always_encode=True), hashlib.sha256).digest()
 
     def _get_signature_key(self, date_stamp, region_name, service_name):
         """ This function is used to get signature key using AWS Signature Version 4.
@@ -206,7 +253,7 @@ class AwsIamConnector(BaseConnector):
         :param service_name: Service name whose requests are called
         return: Signature key generated using AWS Signature Version 4
         """
-        k_date = self._aws_sign(('{}{}'.format(AWSIAM_SIGNATURE_V4, self._secret_key)).encode('utf-8'), date_stamp)
+        k_date = self._aws_sign(self._handle_py_ver_compat_for_input_str('{}{}'.format(AWSIAM_SIGNATURE_V4, self._secret_key), always_encode=True), date_stamp)
         k_region = self._aws_sign(k_date, region_name)
         k_service = self._aws_sign(k_region, service_name)
         k_signing = self._aws_sign(k_service, AWSIAM_SIGNATURE_V4_REQUEST)
@@ -232,7 +279,7 @@ class AwsIamConnector(BaseConnector):
 
         # b) Create payload hash (hash of the request body content). For GET
         # requests, the payload is an empty string ("").
-        payload_hash = hashlib.sha256(''.encode('utf-8')).hexdigest()
+        payload_hash = hashlib.sha256(self._handle_py_ver_compat_for_input_str("", always_encode=True)).hexdigest()
 
         # c) Combine elements to create canonical request
         canonical_request = '{}\n/\n{}\n{}\n{}\n{}'.\
@@ -242,14 +289,14 @@ class AwsIamConnector(BaseConnector):
         # Match the algorithm to the hashing algorithm, either SHA-1 or SHA-256 (recommended)
         credential_scope = '{}/{}/{}/{}'.format(datestamp, AWSIAM_REGION, AWSIAM_SERVICE, AWSIAM_SIGNATURE_V4_REQUEST)
         string_to_sign = '{}\n{}\n{}\n{}'.format(AWSIAM_REQUESTS_SIGNING_ALGO, amzdate, credential_scope,
-                                                 hashlib.sha256(canonical_request.encode('utf-8')).hexdigest())
+                                                 hashlib.sha256(self._handle_py_ver_compat_for_input_str(canonical_request, always_encode=True)).hexdigest())
 
         # 3. Calculate the signature
         # a) Create the signing key using the function defined above.
         signing_key = self._get_signature_key(datestamp, AWSIAM_REGION, AWSIAM_SERVICE)
 
         # b) Sign the string_to_sign using the signing_key
-        signature = hmac.new(signing_key, string_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
+        signature = hmac.new(signing_key, self._handle_py_ver_compat_for_input_str(string_to_sign, always_encode=True), hashlib.sha256).hexdigest()
 
         authorization_header = '{} Credential={}/{}, SignedHeaders={}, Signature={}'.\
             format(AWSIAM_REQUESTS_SIGNING_ALGO, self._access_key, credential_scope, AWSIAM_SIGNED_HEADERS, signature)
@@ -273,14 +320,6 @@ class AwsIamConnector(BaseConnector):
 
         resp_json = None
 
-        try:
-            self._access_key = self._access_key.encode('utf-8')
-            self._secret_key = self._secret_key.encode('utf-8')
-        except:
-            self.debug_print(AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG),
-                          resp_json)
-
         if params is None:
             params = OrderedDict()
         params[AWSIAM_JSON_VERSION] = AWSIAM_API_VERSION
@@ -299,7 +338,7 @@ class AwsIamConnector(BaseConnector):
                                                                       params=urlencode(params)))
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
-                                                   format(str(e))), resp_json)
+                                                   format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(request_response, action_result)
 
@@ -351,7 +390,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile does not exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for disable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_DELETED_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -379,7 +418,7 @@ class AwsIamConnector(BaseConnector):
             for access_key in list_access_keys:
                 # b) Inactivate every access key
                 params = OrderedDict()
-                params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+                params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
                 params[AWSIAM_JSON_ACTION] = AWSIAM_UPDATE_ACCESS_KEYS_ENDPOINT
                 params[AWSIAM_JSON_STATUS] = AWSIAM_JSON_INACTIVE
                 params[AWSIAM_JSON_USERNAME] = username
@@ -422,7 +461,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for enable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_EXISTS_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -452,7 +491,7 @@ class AwsIamConnector(BaseConnector):
             for access_key in list_access_keys:
                 # b) Activate every access key
                 params = OrderedDict()
-                params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+                params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
                 params[AWSIAM_JSON_ACTION] = AWSIAM_UPDATE_ACCESS_KEYS_ENDPOINT
                 params[AWSIAM_JSON_STATUS] = AWSIAM_JSON_ACTIVE
                 params[AWSIAM_JSON_USERNAME] = username
@@ -688,7 +727,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every policy
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_DETACH_ROLE_POLICY_ENDPOINT
-            params[AWSIAM_JSON_POLICY_ARN] = policy[AWSIAM_JSON_POLICY_ARN].encode('utf-8')
+            params[AWSIAM_JSON_POLICY_ARN] = self._handle_py_ver_compat_for_input_str(policy[AWSIAM_JSON_POLICY_ARN])
             params[AWSIAM_JSON_ROLE_NAME] = role_name
 
             # make rest call
@@ -728,8 +767,8 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If role does not exist, then,
+            # 404 error is thrown and it needs to be handled for the calling action
             if AWSIAM_ROLE_DOES_NOT_EXISTS_MSG.format(role_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
@@ -755,15 +794,15 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If instance profile does not exist, then,
+            # 404 error is thrown and it needs to be handled for add role action
             if AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG.format(instance_profile_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
 
             return None
 
-        # Return True for role already exists if we are successfully able to fetch the given role
+        # Return True for instance profile already exists if we are successfully able to fetch the given role
         return True
 
     def _handle_add_role(self, param):
@@ -838,8 +877,7 @@ class AwsIamConnector(BaseConnector):
             return action_result.get_status()
 
         response_dict = response[AWSIAM_JSON_CREATE_ROLE_RESPONSE][AWSIAM_JSON_CREATE_ROLE_RESULT][AWSIAM_JSON_ROLE]
-        response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT]).\
-            decode('utf-8').encode('utf-8')
+        response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(response_dict[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT])
 
         # 3. Attach role with created container instance profile in step 1
         params = OrderedDict()
@@ -903,7 +941,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every policy
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_DETACH_USER_POLICY_ENDPOINT
-            params[AWSIAM_JSON_POLICY_ARN] = policy[AWSIAM_JSON_POLICY_ARN].encode('utf-8')
+            params[AWSIAM_JSON_POLICY_ARN] = self._handle_py_ver_compat_for_input_str(policy[AWSIAM_JSON_POLICY_ARN])
             params[AWSIAM_JSON_USERNAME] = username
 
             # make rest call
@@ -929,7 +967,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every group
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_REMOVE_USER_FROM_GROUP_ENDPOINT
-            params[AWSIAM_JSON_GROUP_NAME] = group[AWSIAM_JSON_GROUP_NAME].encode('utf-8')
+            params[AWSIAM_JSON_GROUP_NAME] = self._handle_py_ver_compat_for_input_str(group[AWSIAM_JSON_GROUP_NAME])
             params[AWSIAM_JSON_USERNAME] = username
 
             # make rest call
@@ -954,7 +992,7 @@ class AwsIamConnector(BaseConnector):
         for access_key in list_access_keys:
             # b) Remove user from every group
             params = OrderedDict()
-            params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+            params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
             params[AWSIAM_JSON_ACTION] = AWSIAM_DELETE_ACCESS_KEYS_ENDPOINT
             params[AWSIAM_JSON_USERNAME] = username
 
@@ -1172,7 +1210,7 @@ class AwsIamConnector(BaseConnector):
         # Add the roles data in action_result
         if group_name and user_path:
             for user in users_dict[AWSIAM_JSON_LIST_RESPONSE]:
-                if user_path.lower() == user[AWSIAM_JSON_PATH].encode('utf-8').lower():
+                if user_path.lower() == self._handle_py_ver_compat_for_input_str(user[AWSIAM_JSON_PATH]).lower():
                     user[AWSIAM_JSON_REQUEST_ID] = users_dict[AWSIAM_JSON_REQUEST_ID]
                     action_result.add_data(user)
         else:
@@ -1208,8 +1246,7 @@ class AwsIamConnector(BaseConnector):
         # Add the roles data in action_result
         for role in roles_dict[AWSIAM_JSON_LIST_RESPONSE]:
             role[AWSIAM_JSON_REQUEST_ID] = roles_dict[AWSIAM_JSON_REQUEST_ID]
-            role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT]).\
-                decode('utf-8').encode('utf-8')
+            role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT] = unquote(role[AWSIAM_JSON_ASSUME_POLICY_DOCUMENT])
             action_result.add_data(role)
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -1223,6 +1260,7 @@ class AwsIamConnector(BaseConnector):
 
         :param action_result: Object of ActionResult
         :param params: Dictionary of input parameters
+        :param key: Key parameter to retrieve the key from metadata
         :return: Dictionary of List of items retrieved from paginated response and request ID of request made
         """
 
@@ -1243,7 +1281,7 @@ class AwsIamConnector(BaseConnector):
             json_resp_part_1 = (self._response_metadata_dict[key])[1]
             json_resp_part_2 = (self._response_metadata_dict[key])[2]
 
-            pagination_key = response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_IS_TRUNCATED].encode('utf-8')
+            pagination_key = self._handle_py_ver_compat_for_input_str(response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_IS_TRUNCATED])
             if pagination_key == 'true':
                 is_pagination_required = True
             else:
@@ -1263,8 +1301,7 @@ class AwsIamConnector(BaseConnector):
                     list_items.extend(items)
 
             if is_pagination_required:
-                params[AWSIAM_JSON_MARKER] = response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_MARKER]\
-                    .encode('utf-8')
+                params[AWSIAM_JSON_MARKER] = self._handle_py_ver_compat_for_input_str(response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_MARKER])
             else:
                 break
 
@@ -1348,6 +1385,12 @@ class AwsIamConnector(BaseConnector):
         self._state = self.load_state()
         config = self.get_config()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+
         self._access_key = config[AWSIAM_ACCESS_KEY]
         self._secret_key = config[AWSIAM_SECRET_KEY]
         self._response_metadata_dict = self._get_response_metadata_dict()
@@ -1395,7 +1438,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1408,11 +1451,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1428,6 +1471,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

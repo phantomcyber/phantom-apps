@@ -1,0 +1,2151 @@
+{
+    "appid": "963c802e-8b8c-46d8-bd45-28e6c455f51e",
+    "name": "IronNet",
+    "description": "This app provides generic actions for interacting with IronDefense",
+    "type": "endpoint",
+    "product_vendor": "IronNet",
+    "logo": "logo_ironnet.svg",
+    "logo_dark": "logo_ironnet_dark.svg",
+    "product_name": "IronDefense",
+    "product_version_regex": ".*",
+    "publisher": "IronNet",
+    "license": "Copyright (c) IronNet, 2020",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-02-19T19:55:57.000000Z",
+    "package_name": "phantom_ironnet",
+    "main_module": "ironnet_connector.pyc",
+    "min_phantom_version": "4.6.19142",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "The base URL for the IronAPI",
+            "data_type": "string",
+            "required": true,
+            "default": "https://irondefense.hostname/IronApi",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Validate the IronAPI certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 1
+        },
+        "username": {
+            "description": "The username to use for authentication",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "The password to use for authentication",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "enable_alert_notifications": {
+            "description": "Ingest IronDefense Alert Notifications into Phantom",
+            "data_type": "boolean",
+            "required": false,
+            "default": true,
+            "order": 4
+        },
+        "alert_notification_actions": {
+            "description": "Alert Notification Actions to include for ingest (if ingest is enabled).  Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "default": "Alert Created",
+            "order": 5
+        },
+        "alert_categories": {
+            "description": "Alert Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "order": 6
+        },
+        "alert_subcategories": {
+            "description": "Alert SubCategories to exclude from ingest (if ingest is enabled). Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "order": 7
+        },
+        "alert_severity_lower": {
+            "description": "Minimum Severity of Alerts to ingest (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 500,
+            "order": 8
+        },
+        "alert_severity_upper": {
+            "description": "Maximum Severity of Alerts to ingest (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 1000,
+            "order": 9
+        },
+        "alert_limit": {
+            "description": "Limit of Alert Notifications to ingest at a time (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 500,
+            "order": 10
+        },
+        "enable_dome_notifications": {
+            "description": "Ingest IronDefense Dome Notifications into Phantom",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 11
+        },
+        "dome_categories": {
+            "description": "Dome Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "order": 12
+        },
+        "dome_limit": {
+            "description": "Limit of Dome Notifications to ingest at a time (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 500,
+            "order": 13
+        },
+        "enable_event_notifications": {
+            "description": "Ingest IronDefense Event Notifications into Phantom",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 14
+        },
+        "event_notification_actions": {
+            "description": "Event Notification Actions to include for ingest (if ingest is enabled).  Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "default": "Event Created",
+            "order": 15
+        },
+        "event_categories": {
+            "description": "Event Categories to exclude from ingest (if ingest is enabled).  Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "order": 16
+        },
+        "event_subcategories": {
+            "description": "Event SubCategories to exclude from ingest (if ingest is enabled). Enter in CSV format.",
+            "data_type": "string",
+            "required": false,
+            "order": 17
+        },
+        "event_severity_lower": {
+            "description": "Minimum Severity of Events to ingest (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 500,
+            "order": 18
+        },
+        "event_severity_upper": {
+            "description": "Maximum Severity of Events to ingest (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 1000,
+            "order": 19
+        },
+        "event_limit": {
+            "description": "Limit of Event Notifications to ingest at a time (if ingest is enabled)",
+            "data_type": "numeric",
+            "required": false,
+            "default": 500,
+            "order": 20
+        },
+        "store_event_notifs_in_alert_containers": {
+            "description": "Store Event Notification in Alert Containers. If selected, Event Notifications will be stored as artifacts in the container of their corresponding Alert (Note that if this option is selected, any Event Notifications prior to the event being associated with the alert will not be ingested). If left unselected, Event Notifications will be stored as artifacts in their own container.",
+            "data_type": "boolean",
+            "required": false,
+            "default": true,
+            "order": 21
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "rate alert",
+            "identifier": "irondefense_rate_alert",
+            "description": "Provides a rating for an Alert within IronDefense",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the IronDefense alert",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "order": 0
+                },
+                "analyst_severity": {
+                    "description": "The severity of the alert",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "undecided",
+                        "benign",
+                        "suspicious",
+                        "malicious"
+                    ],
+                    "default": "undecided",
+                    "order": 1
+                },
+                "analyst_expectation": {
+                    "description": "The analyst expectation for the alert",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "expected",
+                        "unexpected",
+                        "unknown"
+                    ],
+                    "default": "unknown",
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Text of comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 3
+                },
+                "share_comment_with_irondome": {
+                    "description": "Shares the provided comment with IronDome",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "column_name": "Alert ID",
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.analyst_expectation",
+                    "data_type": "string",
+                    "example_values": [
+                        "expected",
+                        "unexpected",
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.analyst_severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "undecided",
+                        "benign",
+                        "suspicious",
+                        "malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set alert status",
+            "identifier": "irondefense_set_alert_status",
+            "description": "Sets the status of an Alert within IronDefense",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the IronDefense alert",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "order": 0
+                },
+                "alert_status": {
+                    "description": "The status of the alert",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "awaiting review",
+                        "under review",
+                        "closed"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Text of comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "share_comment_with_irondome": {
+                    "description": "Shares the provided comment with IronDome",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "column_name": "Alert ID",
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "comment on alert",
+            "identifier": "irondefense_comment_on_alert",
+            "description": "Adds a comment to an Alert within IronDefense",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the IronDefense alert",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Text of comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "share_comment_with_irondome": {
+                    "description": "Shares the provided comment with IronDome",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "column_name": "Alert ID",
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.share_comment_with_irondome",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "report bad activity",
+            "identifier": "irondefense_report_observed_bad_activity",
+            "description": "Reports observed bad activity to IronDefense",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Identifying name of the observed bad activity",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description of the observed bad activity",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "domain": {
+                    "description": "Domain associated with the observed bad activity",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 2
+                },
+                "ip": {
+                    "description": "IP associated with the observed bad activity",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 3
+                },
+                "activity_start_time": {
+                    "description": "Start time of observed bad activity - in RFC3339 format (https://tools.ietf.org/html/rfc3339)",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 4
+                },
+                "activity_end_time": {
+                    "description": "End time of observed bad activity - in RFC3339 format (https://tools.ietf.org/html/rfc3339)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.activity_end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.activity_start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 09:36:43.676105+00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get community info",
+            "identifier": "irondefense_get_alert_irondome_info",
+            "description": "Gets community information related to an IronDefense alert",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the IronDefense alert",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string",
+                    "column_name": "Alert ID",
+                    "column_order": 1,
+                    "contains": [
+                        "irondefense alert id"
+                    ],
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.cognitive_system_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.community_comments.*.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "example community comment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.community_comments.*.self",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.community_comments.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.community_comments.*.dome_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.community_comments.*.enterprise",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlations.*.correlations.*.enterprise_correlations",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlations.*.correlations.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlations.*.correlations.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "example.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlations.*.correlations.*.community_correlations",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlations.*.dome_tag",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dome_notifications.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "DNC_PARTICIPANT_ADDED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dome_notifications.*.alert_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "c60c4168-3fe8-4a6d-b0d1-4977673c98fd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dome_notifications.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123456
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dome_notifications.*.dome_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dome_notifications.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.malicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.benign_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.resource_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.activity_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.comments_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.whitelisted_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.suspicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.malicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.benign_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.resource_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.activity_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.comments_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.whitelisted_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.suspicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.malicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.benign_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.resource_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.activity_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.comments_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.whitelisted_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.suspicious_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.first_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.behavior",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.correlation_participation.*.dome_tag",
+                    "data_type": "string",
+                    "example_values": [
+                        "example-tag"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get events",
+            "identifier": "irondefense_get_events",
+            "description": "Retrieves IronDefense Events for a given Alert ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The ID of the alert associated with the events to retrieve",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 32,
+                "height": 1,
+                "title": "Event Summary",
+                "menu_name": "IronDefense Event Summary"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieving events was successful"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.sub_category",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNUSUAL_SERVER_CONNECTIONS"
+                    ],
+                    "column_name": "Subcategory",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_entity_attribute_type",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Destination Entity Attribute Type",
+                    "column_order": 26
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.src_entity_attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Source Entity Attribute",
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ],
+                    "column_name": "Alert ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.total_bytes",
+                    "data_type": "string",
+                    "column_name": "Total Bytes",
+                    "column_order": 19
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.src_entity_attribute_type",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Source Entity Attribute Type",
+                    "column_order": 24
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "C2",
+                        "ACTION",
+                        "ACCESS",
+                        "RECON",
+                        "OTHER"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.is_blacklisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Is Blacklisted",
+                    "column_order": 21
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Confidence",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.raw_data_formats",
+                    "data_type": "string",
+                    "example_values": [
+                        "RDF_DNS_LOGS"
+                    ],
+                    "column_name": "Raw Data Formats",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.bytes_in",
+                    "data_type": "string",
+                    "column_name": "Bytes In",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.is_whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Is Whitelisted",
+                    "column_order": 22
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.src_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Source IP",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-04-30T20:41:35.000Z"
+                    ],
+                    "column_name": "End Time",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-05-01T14:43:13.318275Z"
+                    ],
+                    "column_name": "Updated",
+                    "column_order": 31
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.bytes_out",
+                    "data_type": "string",
+                    "column_name": "Bytes Out",
+                    "column_order": 18
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "Start Time",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_entity_attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Destination Entity Attribute",
+                    "column_order": 25
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "Created",
+                    "column_order": 30
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "https://example.url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 28
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.secondary_app_protocol",
+                    "data_type": "string",
+                    "column_name": "Secondary App Protocol",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.primary_app_protocol",
+                    "data_type": "string",
+                    "contains": [
+                        "protocol"
+                    ],
+                    "example_values": [
+                        "http"
+                    ],
+                    "column_name": "Primary App Protocol",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "example_values": [
+                        "443"
+                    ],
+                    "column_name": "Destination Port",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.iron_dome_shared_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "IronDome Shared Time",
+                    "column_order": 27
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "column_name": "Destination IP",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.vue_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://1.2.3.4/event?uuid=9f61e9e9af904540ac8bd730f5ed48d2"
+                    ],
+                    "column_name": "Vue URL",
+                    "column_order": 29
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.src_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ],
+                    "column_name": "Source Network ID",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.dst_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ],
+                    "column_name": "Destination Network ID",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.total",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Ingests Configured Notifications from IronDefense into Phantom",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get alerts",
+            "identifier": "irondefense_get_alerts",
+            "description": "Retrieves Alerts within IronDefense",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "alert_id": {
+                    "description": "The IDs of the IronDefense alerts to filter. Enter in CSV format.",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 0
+                },
+                "category": {
+                    "description": "The categories of the IronDefense alerts to filter. Enter in CSV format.",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "sub_category": {
+                    "description": "The subcategories of the IronDefense alerts to filter. Enter in CSV format.",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
+                },
+                "status": {
+                    "description": "The statuses of the IronDefense alerts to filter. Enter in CSV format.",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "min_severity": {
+                    "description": "The minimum severity of IronDefense alerts to filter.",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 6
+                },
+                "max_severity": {
+                    "description": "The maximum severity of IronDefense alerts to filter.",
+                    "data_type": "numeric",
+                    "required": false,
+                    "order": 7
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 16,
+                "height": 1,
+                "title": "Alert Summary",
+                "menu_name": "IronDefense Alert Summary"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.sub_category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.min_severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.max_severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "STATUS_AWAITING_REVIEW",
+                        "STATUS_UNDER_REVIEW",
+                        "STATUS_CLOSED"
+                    ],
+                    "column_name": "Alert Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "C2",
+                        "ACTION",
+                        "ACCESS",
+                        "RECON",
+                        "OTHER"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ],
+                    "column_name": "Updated",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.raw_data_formats",
+                    "data_type": "string",
+                    "example_values": [
+                        "RDF_TAP"
+                    ],
+                    "column_name": "Raw Data Formats",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ],
+                    "column_name": "Created",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.first_event_created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ],
+                    "column_name": "First Event Created",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.aggregation_criteria",
+                    "data_type": "string",
+                    "example_values": [
+                        "scanner.scanner_ip: [\"1.2.3.4\"]"
+                    ],
+                    "column_name": "Aggregation Criteria",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.event_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Event Count",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.analyst_severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "SEVERITY_UNDECIDED",
+                        "SEVERITY_BENIGN",
+                        "SEVERITY_SUSPICIOUS",
+                        "SEVERITY_MALICIOUS"
+                    ],
+                    "column_name": "Analyst Severity",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.vue_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://1.2.3.4/alerts?alerts.sort=severity%3ADESC&filter=alertId%3D%3D<alert-id>"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "Vue URL",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.last_event_created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-09-05T19:33:32.000Z"
+                    ],
+                    "column_name": "Last Event Created",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c60c4168-3fe8-4a6d-b0d1-4977673c98fd"
+                    ],
+                    "column_name": "Alert ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.analyst_expectation",
+                    "data_type": "string",
+                    "example_values": [
+                        "EXP_EXPECTED",
+                        "EXP_UNEXPECTED",
+                        "EXP_UNKNOWN"
+                    ],
+                    "column_name": "Analyst Expectation",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.alerts.*.sub_category",
+                    "data_type": "string",
+                    "example_values": [
+                        "EXTERNAL_PORT_SCANNING"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.total",
+                    "data_type": "string",
+                    "example_values": [
+                        "1014890"
+                    ],
+                    "column_name": "Subcategory",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.constraint.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort_field",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort_order",
+                    "data_type": "string",
+                    "example_values": [
+                        "Descending"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get event",
+            "identifier": "irondefense_get_event",
+            "description": "Retrieves IronDefense Event for a given Event ID",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "event_id": {
+                    "description": "The ID of the event to retrieve",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 32,
+                "height": 1,
+                "title": "Event Summary",
+                "menu_name": "IronDefense Event Summary"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.event_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.event.sub_category",
+                    "data_type": "string",
+                    "example_values": [
+                        "THREAT_INTELLIGENCE_RULE_MATCH"
+                    ],
+                    "column_name": "Subcategory",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_entity_attribute_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "EAT_NONE"
+                    ],
+                    "column_name": "Destination Entity Attribute Type",
+                    "column_order": 26
+                },
+                {
+                    "data_path": "action_result.data.*.event.src_entity_attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Source Entity Attribute",
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.data.*.event.alert_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ],
+                    "column_name": "Alert ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.event.total_bytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "948"
+                    ],
+                    "column_name": "Total Bytes",
+                    "column_order": 19
+                },
+                {
+                    "data_path": "action_result.data.*.event.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c740a2c-a566-4c95-a8be-5f48082de2b2"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.event.src_entity_attribute_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "EAT_NONE"
+                    ],
+                    "column_name": "Source Entity Attribute Type",
+                    "column_order": 24
+                },
+                {
+                    "data_path": "action_result.data.*.event.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "OTHER"
+                    ],
+                    "column_name": "Category",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.event.is_blacklisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Is Blacklisted",
+                    "column_order": 21
+                },
+                {
+                    "data_path": "action_result.data.*.event.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Confidence",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.event.raw_data_formats",
+                    "data_type": "string",
+                    "example_values": [
+                        "RDF_DNS_LOGS"
+                    ],
+                    "column_name": "Raw Data Formats",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.event.severity",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.event.bytes_in",
+                    "data_type": "string",
+                    "example_values": [
+                        "807"
+                    ],
+                    "column_name": "Bytes In",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.event.is_whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Is Whitelisted",
+                    "column_order": 22
+                },
+                {
+                    "data_path": "action_result.data.*.event.src_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Source IP",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.event.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "End Time",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.event.app_domains",
+                    "data_type": "string",
+                    "example_values": [
+                        "example.domain"
+                    ],
+                    "column_name": "App Domains",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.data.*.event.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "Updated",
+                    "column_order": 31
+                },
+                {
+                    "data_path": "action_result.data.*.event.bytes_out",
+                    "data_type": "string",
+                    "example_values": [
+                        "141"
+                    ],
+                    "column_name": "Bytes Out",
+                    "column_order": 18
+                },
+                {
+                    "data_path": "action_result.data.*.event.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "Start Time",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_entity_attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ],
+                    "column_name": "Destination Entity Attribute",
+                    "column_order": 25
+                },
+                {
+                    "data_path": "action_result.data.*.event.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "Created",
+                    "column_order": 30
+                },
+                {
+                    "data_path": "action_result.data.*.event.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "https://example.url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 28
+                },
+                {
+                    "data_path": "action_result.data.*.event.secondary_app_protocol",
+                    "data_type": "string",
+                    "column_name": "Secondary App Protocol",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.event.primary_app_protocol",
+                    "data_type": "string",
+                    "contains": [
+                        "protocol"
+                    ],
+                    "example_values": [
+                        "http"
+                    ],
+                    "column_name": "Primary App Protocol",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_port",
+                    "data_type": "string",
+                    "contains": [
+                        "port"
+                    ],
+                    "example_values": [
+                        "443"
+                    ],
+                    "column_name": "Destination Port",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.event.iron_dome_shared_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-10-24 10:36:43.676105+00"
+                    ],
+                    "column_name": "IronDome Shared Time",
+                    "column_order": 27
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "column_name": "Destination IP",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.event.vue_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://1.2.3.4/event?uuid=0c740a2ca5664c95a8be5f48082de2b2"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "Vue URL",
+                    "column_order": 29
+                },
+                {
+                    "data_path": "action_result.data.*.event.src_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ],
+                    "column_name": "Source Network ID",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.event.dst_network_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample-network"
+                    ],
+                    "column_name": "Destination Network ID",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "flows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.long_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "majestic_tdurs_rank"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.trans_protocol_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.bool_value",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.string_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.ip_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.2.3.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.app_protocol_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.uuid_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c740a2ca5664c95a8be5f48082de2b2"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.*.columns.*.values.*.data.*.double_value",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
