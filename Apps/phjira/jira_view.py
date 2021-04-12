@@ -50,14 +50,12 @@ def display_view(provides, all_app_runs, context):
             results.append(ctx_result)
 
     if provides == 'set status':
-        return_page = "jira_set_status_items.html"
-    if provides == 'get ticket':
-        return_page = "jira_get_ticket.html"
-    if provides == 'update ticket':
-        return_page = "jira_update_ticket.html"
-    if provides == "list tickets":
-        return_page = "jira_list_tickets.html"
-    if provides == 'lookup users':
-        return_page = "jira_search_users.html"
-
-    return return_page
+        return "jira_set_status_items.html"
+    elif provides == 'get ticket':
+        return "jira_get_ticket.html"
+    elif provides == 'update ticket':
+        return "jira_update_ticket.html"
+    elif provides == "list tickets":
+        return "jira_list_tickets.html"
+    elif provides == 'lookup users':
+        return "jira_search_users.html"
