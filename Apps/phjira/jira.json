@@ -3,6 +3,11 @@
     "name": "Jira",
     "description": "This app integrates with JIRA to perform several ticket management actions",
     "publisher": "Splunk",
+    "contributors": [
+        {
+            "name": "Juliya Smith"
+        }
+    ],
     "type": "ticketing",
     "main_module": "jira_connector.py",
     "app_version": "3.0.3",
