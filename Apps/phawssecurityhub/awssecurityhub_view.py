@@ -1,5 +1,5 @@
 # File: awssecurityhub_view.py
-# Copyright (c) 2016-2020 Splunk Inc.
+# Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -42,7 +42,7 @@ def display_view(provides, all_app_runs, context):
     """
 
     context['results'] = results = []
-    for summary, action_results in all_app_runs:
+    for _, action_results in all_app_runs:
         for result in action_results:
 
             ctx_result = get_ctx_result(provides, result)
