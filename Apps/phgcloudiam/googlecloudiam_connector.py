@@ -329,15 +329,6 @@ class GoogleCloudIamConnector(BaseConnector):
         config = self.get_config()
         self.key_json = config["key_json"]
         self.project = config["project"]
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         return phantom.APP_SUCCESS
 
