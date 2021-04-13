@@ -1,5 +1,5 @@
 # File: hackerone_connector.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2020-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -32,9 +32,8 @@ class HackerOneConnector(BaseConnector):
 
         if self.is_polling_action:
             self.debug_print('HackerOne', message)
-            self.save_progress( message )
         else:
-            self.save_progress( message )
+            self.save_progress(message)
 
     def _validate_integer(self, action_result, parameter, key):
         if parameter is not None:
@@ -79,24 +78,24 @@ class HackerOneConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERROR_CODE_MSG
+                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERROR_CODE_MSG
-                error_msg = ERROR_MSG_UNAVAILABLE
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERROR_CODE_MSG
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             error_msg = self._handle_unicode_for_input_str(error_msg)
         except TypeError:
             error_msg = TYPE_ERR_MSG
         except:
-            error_msg = ERROR_MSG_UNAVAILABLE
+            error_msg = ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERROR_CODE_MSG:
+            if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -185,9 +184,9 @@ class HackerOneConnector(BaseConnector):
             return None
 
     def _get_rest_data(self, url, url_params):
-        self.__print('Start: _get_rest_data(): {0}'.format(datetime.datetime.now()))
+        self.debug_print('Start: _get_rest_data(): {0}'.format(datetime.datetime.now()))
         try:
-            self.__print(url)
+            self.__print("Connecting to endpoint '{}'".format(url))
             u, p = self._get_auth()
             if url_params:
                 response = requests.get(url, auth=(u, p), params=url_params, headers=self._get_headers(), verify=False)
@@ -201,8 +200,8 @@ class HackerOneConnector(BaseConnector):
                 else:
                     return content['data'], None
             else:
-                self.__print(code)
-                self.__print(content)
+                self.debug_print(code)
+                self.debug_print(content)
                 return None, None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -290,7 +289,7 @@ class HackerOneConnector(BaseConnector):
                     }
                 }
             }
-            url = "https://api.hackerone.com/v1/reports/" + report_id + "/issue_tracker_reference_id"
+            url = "https://api.hackerone.com/v1/reports/{0}/issue_tracker_reference_id".format(report_id)
             if self._post_rest_data(url, data):
                 self.__print('Successfully updated tracking id')
                 return action_result.set_status(phantom.APP_SUCCESS, 'Successfully updated tracking id')
@@ -518,50 +517,48 @@ class HackerOneConnector(BaseConnector):
             action_result.add_exception_details(err)
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get reports')
 
-    def _extract_urls( self, source ):
+    def _extract_urls(self, source):
         artifacts = []
-        url_pattern = re.compile( r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+' )
-        domain_pattern = re.compile( r'^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)' )
-        invalid_pattern = re.compile( r'[^a-zA-Z0-9\.\-]' )
-        for value in re.finditer( url_pattern, source):
-            url = value.group( 0 )
+        url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+#]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+        domain_pattern = re.compile(r'^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)')
+        invalid_pattern = re.compile(r'[^a-zA-Z0-9\.\-]')
+        for value in re.finditer(url_pattern, source):
+            url = value.group(0)
             domain = None
-            for match in re.finditer( domain_pattern, url ):
-                domain = match.group( 1 )
+            for match in re.finditer(domain_pattern, url):
+                domain = match.group(1)
                 break
-            if domain and len( re.findall( invalid_pattern, domain ) ) == 0:
+            if domain and len(re.findall(invalid_pattern, domain)) == 0:
                 artifact = {}
                 artifact['label'] = 'extracted url'
                 artifact['name'] = 'extracted url'
-                artifact['source_data_identifier'] = 'Hacker1 url - {0}'.format( url[:60] )
+                artifact['source_data_identifier'] = 'Hacker1 url - {0}'.format(url[:60])
                 artifact['severity'] = 'medium'
                 cef = {}
                 cef['requestURL'] = url
                 cef['domain'] = domain
                 artifact['cef'] = cef
-                artifacts.append( artifact )
+                artifacts.append(artifact)
         return artifacts
 
-    def _test( self, action_result, param ):
-        self.__print( '_test()' )
+    def _test(self, action_result, param):
+        self.debug_print('_test()')
         try:
             config = self.get_config()
             url_params = {'filter[program][]': self._handle_unicode_for_input_str(config['program_name']), 'page[size]': 1}
-            reports = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
+            reports, _ = self._get_rest_data('https://api.hackerone.com/v1/reports', url_params)
             if reports:
-                self.__print('Successfully connected to HackerOne')
-                return action_result.set_status(phantom.APP_SUCCESS, 'Successfully connected to HackerOne')
+                return action_result.set_status(phantom.APP_SUCCESS, 'Test connectivity passed')
             else:
-                self.__print('Failed to connect to HackerOne')
-                return action_result.set_status(phantom.APP_ERROR, 'Failed to connect to HackerOne')
+                return action_result.set_status(phantom.APP_ERROR, 'Test connectivity failed')
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            self.__print('Failed to connect to HackerOne')
             action_result.add_exception_details(err)
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to connect to HackerOne')
+            return action_result.set_status(phantom.APP_ERROR, 'Test connectivity failed')
 
-    def _on_poll( self, param ):
-        self.__print( '_on_poll()' )
+    def _on_poll(self, param):
+        self.__print('_on_poll()')
+        self.debug_print("There might be timezone variance. Please check for the timezone variance.")
         current_time_marker = datetime.datetime.now()
         previous_time_marker = None
         self.load_state()
@@ -569,7 +566,7 @@ class HackerOneConnector(BaseConnector):
         try:
             previous_time_marker = current_state['time_marker']
         except:
-            current_state['time_marker'] = current_time_marker.strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
+            current_state['time_marker'] = current_time_marker.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         login_url = self._get_phantom_base_url()
         config = self.get_config()
@@ -597,11 +594,11 @@ class HackerOneConnector(BaseConnector):
         add_comments = config.get('full_comments', False)
         reports = self._get_filtered_reports(program, state, assignment, add_comments, date)
         if reports is not None:
-            self.__print('{0} reports were returned'.format(len(reports)))
+            self.save_progress('{0} reports were returned'.format(len(reports)))
             for report in reports:
                 existing_container = None
-                container_name = 'H1 {0}: {1}'.format( report['id'], re.sub(r'[^\x00-\x7f]', r'', report['title']) )
-                endpoint = login_url + '/rest/container?_filter_name__startswith="H1 {0}"'.format(report['id'])
+                container_name = 'H1 {0}: {1}'.format(report['id'], re.sub(r'[^\x00-\x7f]', r'', report['title']))
+                endpoint = '{0}/rest/container?_filter_name__startswith="H1 {1}"'.format(login_url, report['id'])
                 containers = self._get_phantom_data(endpoint)
                 if containers['count'] > 0:
                     existing_container = containers['data'][0]['id']
@@ -639,23 +636,23 @@ class HackerOneConnector(BaseConnector):
                 except:
                     pass
                 try:
-                    url_artifacts = self._extract_urls( report['vulnerability_information'] )
+                    url_artifacts = self._extract_urls(report['vulnerability_information'])
                     for artifact in url_artifacts:
-                        artifacts.append( artifact )
+                        artifacts.append(artifact)
                 except:
                     pass
                 if not existing_container:
                     container['artifacts'] = artifacts
                     self.save_container(container)
                 else:
-                    endpoint = login_url + '/rest/container/{0}/artifacts?page_size=0'.format(existing_container)
+                    endpoint = '{0}/rest/container/{1}/artifacts?page_size=0'.format(login_url, existing_container)
                     container_artifacts = self._get_phantom_data(endpoint)['data']
                     duplicates = {}
                     updated_report = False
                     for container_artifact in container_artifacts:
                         if 'report' == container_artifact['label']:
-                            endpoint = 'https://127.0.0.1/rest/artifact/{0}'.format( container_artifact['id'] )
-                            self._delete_phantom_data( endpoint )
+                            endpoint = '{0}rest/artifact/{1}'.format(self.get_phantom_base_url(), container_artifact['id'])
+                            self._delete_phantom_data(endpoint)
                             updated_report = True
                         else:
                             duplicates[container_artifact['name']] = container_artifact['id']
@@ -666,19 +663,19 @@ class HackerOneConnector(BaseConnector):
                                 artifact['cef']['updated'] = updated_report
                                 artifact['container_id'] = existing_container
                                 artifact['run_automation'] = True
-                                artifact['source_data_identifier'] = '{0}-HackerOne-Report'.format( report['id'] )
-                                status, message, artid = self.save_artifact( artifact )
-                                self.__print( status )
-                                self.__print( message )
-                                self.__print( artid )
+                                artifact['source_data_identifier'] = '{0}-HackerOne-Report'.format(report['id'])
+                                status, message, artid = self.save_artifact(artifact)
+                                self.__print(status)
+                                self.__print(message)
+                                self.__print(artid)
                                 added_report = True
                         if artifact['name'] not in duplicates:
                             artifact['container_id'] = existing_container
-                            self.save_artifact( artifact )
-                self.__print( 'Successfully stored report container' )
+                            self.save_artifact(artifact)
+                self.__print('Successfully stored report container')
 
-            current_state['time_marker'] = current_time_marker.strftime( '%Y-%m-%dT%H:%M:%S.%fZ' )
-            self.save_state( current_state )
+            current_state['time_marker'] = current_time_marker.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            self.save_state(current_state)
             return self.set_status(phantom.APP_SUCCESS, 'Successfully stored report data')
         else:
             self.__print('Failed to connect to HackerOne')
@@ -722,14 +719,14 @@ if __name__ == '__main__':
     import pudb
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print( 'No test json specified as input' )
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as (f):
         in_json = f.read()
         in_json = json.loads(in_json)
-        print( json.dumps(in_json, indent=4) )
+        print(json.dumps(in_json, indent=4))
         connector = HackerOneConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print( json.dumps(json.loads(ret_val), indent=4) )
+        print(json.dumps(json.loads(ret_val), indent=4))
     exit(0)

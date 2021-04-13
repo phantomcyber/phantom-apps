@@ -4,7 +4,7 @@
     "description": "This app integrates with HackerOne to support various generic and investigative actions",
     "publisher": "Splunk Community",
     "type": "generic",
-    "main_module": "hackerone_connector.pyc",
+    "main_module": "hackerone_connector.py",
     "app_version": "1.5.3",
     "utctime_updated": "2020-01-28T00:00:00.000000Z",
     "package_name": "phantom_hackerone",
@@ -12,10 +12,10 @@
     "product_name": "HackerOne",
     "product_version_regex": ".*",
     "python_version": "3",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "logo": "logo_hackerone.svg",
     "logo_dark": "logo_hackerone_dark.svg",
-    "license": "Copyright (c) 2020 Splunk Inc.",
+    "license": "Copyright (c) 2020-2021 Splunk Inc.",
     "configuration": {
         "api_identifier": {
             "description": "HackerOne Identifier",
@@ -333,7 +333,6 @@
                     "description": "Report State Filter",
                     "data_type": "string",
                     "order": 0
-
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
