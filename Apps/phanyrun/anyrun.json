@@ -4,8 +4,8 @@
     "description": "This App implements investigative actions on Any.Run, interactive malware hunting service",
     "type": "sandbox",
     "product_vendor": "Any.Run",
-    "logo": "anyrun.svg",
-    "logo_dark": "anyrun_dark.svg",
+    "logo": "logo_anyrun.svg",
+    "logo_dark": "logo_anyrun_dark.svg",
     "product_name": "Any.Run",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -27,7 +27,6 @@
             "description": "Any.Run base URL (e.g. https://myservice/)",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "https://api.any.run/v1/",
             "order": 0
         },
@@ -41,9 +40,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -51,18 +50,15 @@
         },
         {
             "action": "get report",
-            "identifier": "get_report",
             "description": "Query for results of a detonation",
             "type": "investigate",
+            "identifier": "get_report",
             "read_only": true,
             "parameters": {
                 "id": {
                     "description": "Detonation ID to get the report of",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -70,29 +66,19 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "ID",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
-                    "column_name": "analysis status",
+                    "column_name": "Analysis Status",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.analysis.scores.verdict.threatLevelText",
                     "data_type": "string",
-                    "column_name": "threat level",
+                    "column_name": "Threat Level",
                     "column_order": 3
                 },
                 {
@@ -106,7 +92,7 @@
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.filename",
                     "data_type": "string",
-                    "column_name": "filename",
+                    "column_name": "Filename",
                     "column_order": 4
                 },
                 {
@@ -116,23 +102,64 @@
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.info.mime",
                     "data_type": "string",
-                    "column_name": "mime",
+                    "column_name": "Mime",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.hashes.sha256",
                     "data_type": "string",
-                    "contains": ["hash", "sha256"]
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.hashes.sha1",
                     "data_type": "string",
-                    "contains": ["hash", "sha1"]
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.analysis.content.mainObject.hashes.md5",
                     "data_type": "string",
-                    "contains": ["hash", "md5"]
+                    "contains": [
+                        "hash",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -142,21 +169,19 @@
         },
         {
             "action": "detonate file",
-            "identifier": "detonate_file",
             "description": "Run the file in the sandbox and returns the ID of created task",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "identifier": "detonate_file",
+            "read_only": false,
             "parameters": {
                 "vault_id": {
-                    "description": "Vault ID of file to detonate",
+                    "description": "Vault ID of the file to detonate",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
                         "vault id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -167,22 +192,44 @@
                     "contains": [
                         "vault id"
                     ],
-                    "column_name": "vault_id",
+                    "column_name": "Vault ID",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.taskid",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.taskid",
+                    "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

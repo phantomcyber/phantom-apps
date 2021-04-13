@@ -11,9 +11,11 @@ from __future__ import print_function, unicode_literals
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
-
-# Usage of the consts file is recommended
+import phantom.rules as ph_rules
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 from anyrun_consts import *
 import requests
 import json
@@ -36,9 +38,40 @@ class AnyrunConnector(BaseConnector):
         self._state = None
 
         # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
         self._base_url = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ANYRUN_ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ANYRUN_ERR_CODE_MSG
+                error_msg = ANYRUN_ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ANYRUN_ERR_CODE_MSG
+            error_msg = ANYRUN_ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ANYRUN_ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print(ANYRUN_PARSE_ERR_MSG)
+            error_text = ANYRUN_PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
         if response.status_code == 200:
@@ -46,7 +79,7 @@ class AnyrunConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code: {}. Empty response, no information in header".format(response.status_code)
             ), None
         )
 
@@ -56,6 +89,8 @@ class AnyrunConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -66,7 +101,7 @@ class AnyrunConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(
             status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -74,10 +109,11 @@ class AnyrunConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(
-                        str(e))
+                        err)
                 ), None
             )
 
@@ -144,27 +180,29 @@ class AnyrunConnector(BaseConnector):
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.ConnectionError:
+            err = "Error connecting to server. Connection Refused from the Server for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                        str(e))
+                        err)
                 ), resp_json
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # NOTE: test connectivity does _NOT_ take any parameters
@@ -172,127 +210,93 @@ class AnyrunConnector(BaseConnector):
         # Also typically it does not add any data into an action_result either.
         # The status and progress messages are more important.
 
-        headers = {
-            'Authorization': 'API-Key {}'.format(self.get_config().get('API_key'))
-        }
-
         self.save_progress("Connecting to endpoint")
         # make rest call
         ret_val, response = self._make_rest_call(
-            ANYRUN_TEST_CONNECTIVITY_ENDPOINT, action_result, params=None, headers=headers
+            ANYRUN_TEST_CONNECTIVITY_ENDPOINT, action_result, params=None, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-        # For now return Error with a message, in case of success we don't set the message, but use the summary
-        # return action_result.set_status(phantom.APP_ERROR, "Action not yet implemented")
-
     def _handle_get_report(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(
             self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         id = param['id']
-
-        # Optional values should use the .get() function
-        # optional_parameter = param.get('optional_parameter', 'default_value')
-
-        headers = {
-            'Authorization': 'API-Key {}'.format(self.get_config().get('API_key'))
-        }
 
         # make rest call
         ret_val, response = self._make_rest_call(
-            ANYRUN_GET_REPORT_ENDPOINT.format(taskid=id), action_result, params=None, headers=headers
+            ANYRUN_GET_REPORT_ENDPOINT.format(taskid=id), action_result, params=None, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress(action_result.get_message())
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
+        self.save_progress("Successfully fetched report for {}".format(id))
+        try:
+            action_result.add_data(response['data'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
-        self.save_progress("Successfully fetched report {}".format(id))
-        # Add the response into the data section
-        action_result.add_data(response['data'])
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['counters'] = data['counters']
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched report for {}".format(id))
 
     def _handle_detonate_file(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(
             self.get_action_identifier()))
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the 'param' dictionary
-
-        # Required values can be accessed directly
         vault_id = param['vault_id']
 
-        # Optional values should use the .get() function
         # file_name = param.get('file_name', '')
-        file_path = Vault.get_file_path(vault_id)
 
-        headers = {
-            'Authorization': 'API-Key {}'.format(self.get_config().get('API_key')),
-        }
+        try:
+            success, message, vault_meta_info = ph_rules.vault_info(vault_id=vault_id)
+            vault_meta_info = list(vault_meta_info)
+            if not success or not vault_meta_info:
+                error_msg = " Error Details: {}".format(unquote(message)) if message else ''
+                return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="vault meta info"), error_msg))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="vault meta info"), err))
 
+        # phantom vault file path
+        file_path = vault_meta_info[0].get('path')
+        if not file_path:
+            return action_result.set_status(phantom.APP_ERROR, ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
+        self.debug_print(f"FILE PATH: {file_path}")
         files = [
             ('file', open(file_path, 'rb'))
         ]
 
-        self.save_progress("Detonating file {}".format(file_path))
-
         # make rest call
         ret_val, response = self._make_rest_call(
-            ANYRUN_DETONATE_FILE_ENDPOINT, action_result, method="post", files=files, headers=headers
+            ANYRUN_DETONATE_FILE_ENDPOINT, action_result, method="post", files=files, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
             self.save_progress(action_result.get_message())
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
         self.save_progress("Successfully detonated file")
+        try:
+            action_result.add_data(response['data'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
-        # Add the response into the data section
-        action_result.add_data(response['data'])
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['num_data'] = len(action_result['data'])
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -300,7 +304,7 @@ class AnyrunConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -320,17 +324,12 @@ class AnyrunConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
 
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
+        self._base_url = config['base_url']
+        self._api_key = config['API_key']
+        self._headers = {
+            'Authorization': 'API-Key {}'.format(self._api_key)
+        }
         # Security check on URL format
         if not self._base_url.endswith('/'):
             self._base_url += "/"
