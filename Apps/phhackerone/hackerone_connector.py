@@ -176,7 +176,11 @@ class HackerOneConnector(BaseConnector):
         try:
             self.__print(url)
             response = requests.delete(url, headers=self._get_phantom_headers(), verify=False)
-            content = json.loads(response.text)
+            try:
+                content = json.loads(response.text)
+            except Exception as e:
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                return None
             code = response.status_code
             if code >= 200 and code < 300:
                 self.__print('Finish: _delete_phantom_data(): {0}'.format(datetime.datetime.now()))
@@ -200,7 +204,11 @@ class HackerOneConnector(BaseConnector):
                 response = requests.get(url, auth=(u, p), params=url_params, headers=self._get_headers(), verify=False)
             else:
                 response = requests.get(url, auth=(u, p), headers=self._get_headers(), verify=False)
-            content = json.loads(response.text)
+            try:
+                content = json.loads(response.text)
+            except Exception as e:
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                return None, None
             code = response.status_code
             if code == 200:
                 if 'links' in content:
