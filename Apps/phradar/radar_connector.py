@@ -418,13 +418,7 @@ class RadarConnector(BaseConnector):
 
         # construct note output with fields we want to render
         note = dict()
-        try:
-            note["id"] = data["headers"]["Location"].split("/")[4]
-        # return error for missing id from response headers
-        except Exception:
-            self.debug_print(f" Action: {action} - Cannot parse 'id' from response headers: {data['headers']}")
-            return action_result.set_status(phantom.APP_ERROR, "API Response payload is missing necessary fields: 'id'")
-
+        note["id"] = data["id"]
         note["incident_id"] = incident_id
         note["content"] = content
 
