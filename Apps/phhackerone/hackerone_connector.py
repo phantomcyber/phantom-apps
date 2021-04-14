@@ -31,7 +31,7 @@ class HackerOneConnector(BaseConnector):
             pass
 
         if self.is_polling_action:
-            self.debug_print('HackerOne', message)
+            self.debug_print('HackerOne {}'.format(message))
         else:
             self.save_progress(message)
 
@@ -127,7 +127,11 @@ class HackerOneConnector(BaseConnector):
         try:
             self.__print(endpoint)
             response = requests.get(endpoint, headers=self._get_phantom_headers(), verify=False)
-            content = json.loads(response.text)
+            try:
+                content = json.loads(response.text)
+            except Exception as e:
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                return None
             code = response.status_code
             if code == 200:
                 self.__print('Finish: _get_phantom_data(): {0}'.format(datetime.datetime.now()))
@@ -148,7 +152,11 @@ class HackerOneConnector(BaseConnector):
         try:
             self.__print(url)
             response = requests.post(url, headers=self._get_phantom_headers(), json=dictionary, verify=False)
-            content = json.loads(response.text)
+            try:
+                content = json.loads(response.text)
+            except Exception as e:
+                self.__print("Error parsing JSON Object: {}".format(self._get_error_message_from_exception(e)))
+                return None
             code = response.status_code
             if code >= 200 and code < 300:
                 self.__print('Finish: _post_phantom_data(): {0}'.format(datetime.datetime.now()))
@@ -205,7 +213,7 @@ class HackerOneConnector(BaseConnector):
                 return None, None
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            print(err)
+            self.__print(err)
             return None, None
 
     def _put_rest_data(self, url, dictionary):
@@ -651,7 +659,7 @@ class HackerOneConnector(BaseConnector):
                     updated_report = False
                     for container_artifact in container_artifacts:
                         if 'report' == container_artifact['label']:
-                            endpoint = '{0}rest/artifact/{1}'.format(self.get_phantom_base_url(), container_artifact['id'])
+                            endpoint = '{0}rest/artifact/{1}'.format(login_url, container_artifact['id'])
                             self._delete_phantom_data(endpoint)
                             updated_report = True
                         else:
