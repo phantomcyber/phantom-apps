@@ -63,7 +63,8 @@
                     "description": "Unique Red Canary detection identifier",
                     "data_type" : "numeric",
                     "required" : true,
-                    "primary" : true
+                    "primary" : true,
+                    "order" : 0
                 }
             },
             "output": [
@@ -108,7 +109,8 @@
                     "description": "Unique Red Canary detection identifier",
                     "data_type" : "numeric",
                     "required" : true,
-                    "primary" : true
+                    "primary" : true,
+                    "order": 0
                 },
                 "remediation_state" : {
                     "description": "Way in which the detection was remediated",
@@ -119,12 +121,14 @@
                         "not_remediated_false_positive",
                         "not_remediated_sanctioned_activity",
                         "not_remediated_unwarranted"
-                    ]
+                    ],
+                    "order": 1
                 },
                 "comment" : {
                     "description" : "Comment describing the reason why the detection was remediated in this manner",
                     "data_type": "string",
-                    "required" : false
+                    "required" : false,
+                    "order": 2
                 }
             },
             "output": [
