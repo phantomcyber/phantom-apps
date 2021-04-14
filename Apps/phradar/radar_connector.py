@@ -37,7 +37,7 @@ class RadarConnector(BaseConnector):
 
         # set asset config and env vars
         config = self.get_config()
-        self._api_url = config.get("radar_api_url").strip('/')
+        self._api_url = config.get("radar_api_url").strip("/")
         self._verify_ssl = not os.getenv(ALLOW_SELF_SIGNED_CERTS)
         self._time_zone = config.get("time_zone", "UTC")
         self._request_headers = {
