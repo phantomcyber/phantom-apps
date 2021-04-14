@@ -77,10 +77,16 @@ class RTConnector(BaseConnector):
 
         # A text reponse is expected for every action
         response_text = response.text
-        status_code = int(re.findall(r'\d{3}', response_text[:response_text.index('\n')])[0])
-
-        self.debug_print(status_code)
         self.debug_print(response_text)
+
+        # The body of the response can be empty
+        if response.status_code == 200 and not response_text.strip():
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS), response_text)
+
+        # The status code given by response.status_code will be 200 even when certain failures happen
+        # This line will extract the actual status code from the body of the response
+        status_code = int(re.findall(r'\d{3}', response_text[:response_text.index('\n')])[0])
+        self.debug_print(status_code)
 
         # Please specify the status codes here
         if 200 <= status_code < 399:
