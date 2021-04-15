@@ -1,4 +1,4 @@
-# File: signalfx_constsr.py
+# File: signalfx_consts.py
 # Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)

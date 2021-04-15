@@ -18,8 +18,8 @@ This page is intended to serve as a _living_ document for this app with plently 
     - [Run Query](#run-query)
     - [Add group members](#add-group-members)
     - [Remove group members](#remove-group-members)
-    - [Get Attribute](#get-attribute)
-    - [Set Attribute](#set-attribute)
+    - [Get Attributes](#get-attributes)
+    - [Set Attributes](#set-attributes)
     - [Disable Account](#disable-account)
     - [Enable Account](#enable-account)
     - [Unlock Account](#unlock-account)
@@ -62,7 +62,7 @@ In my lab, I got the following results:
 
 ![](.docs/run_query_result.png)
 
-Note that the UI has a custom renderer to show all the attributes requested. 
+Note that the UI has a custom renderer to show all the attributes requested.
 
 #### Important Notes for 'Run Query':
 Because the Phantom architecture requires the resulting values in the data path to be coded during app-development, the attributes dynamically requested cannot be defined in the json file. Consequently, they are not available when using the VPE. Instead, you must plug in the attribute by name. For an arbitrary example, imagine you have a playbook that periodically runs looking for users who *do* have a `manager` assigned but do *not* have a `mail` attribute assign. We might set up a playbook like this:
@@ -102,10 +102,10 @@ The `add group members` action allows for a many-to-many group modification. Spe
 
 ![](.docs/add_grpmem_action.png)
 
-Here, the users `robert` and `sam` will be added to the groups `splunk-admins` and `phantom-admins`. This is helpful in cases where certain actions might necessitate group additions (or removals) to multiple groups. Any number of situations might come to mind where this could be useful, for example a "no interactive logon" group used by a GPO and a "disable-sso" group tied to the single sign-on environment might be used during a phishing remediation. 
+Here, the users `robert` and `sam` will be added to the groups `splunk-admins` and `phantom-admins`. This is helpful in cases where certain actions might necessitate group additions (or removals) to multiple groups. Any number of situations might come to mind where this could be useful, for example a "no interactive logon" group used by a GPO and a "disable-sso" group tied to the single sign-on environment might be used during a phishing remediation.
 
 Also, as is the goal with all actions of the "ADLDAP" App, we include the "use_samaccountname" parameter. This allows for the usage of sAMAccountName instead of distinguishedName attributes to reference objects in the directory. However:  
-*If you use this option, then both groups AND users must be a semi-colon separated list of samaccountnames*. Do not mix distinguishednames and samaccountnames, it will not work. 
+*If you use this option, then both groups AND users must be a semi-colon separated list of samaccountnames*. Do not mix distinguishednames and samaccountnames, it will not work.
 
 Another interesting point to note is that the `add/remove groups members` actions are not tied to _users_. Other Active Directory objects (such as computers) can also be added (and removed) from groups.
 
@@ -118,7 +118,7 @@ You can see that the folks in the Analytics group are neither in the 'splunk-ana
 The playbook looks like the following:  
 ![](.docs/add_grpmem_playbook_nonoptimal.png)
 
-The first block is our query block. You can read about this more generally in the ![](#run-query) section, but the settings here are as follows. Note that our LDAP query is `(department=analytics)`. 
+The first block is our query block. You can read about this more generally in the ![](#run-query) section, but the settings here are as follows. Note that our LDAP query is `(department=analytics)`.
 
 ![](.docs/add_grpmem_ldap_query.png)
 
@@ -126,7 +126,7 @@ This block can directly be connected to the `add group members` block and config
 
 ![](.docs/add_grpmem_add_nonopt.png)
 
-This command will make several things available to the data path, including all of the attributes you requested (in this case, just 'samaccountname') - but they (the selected attributes) will not be availble to select in the UI due to reasons covered in the [run query](#run-query) section, so we'll have to type those in here. In the screenshot above, you can see that I have appended ".samaccountname" to the selected attribute of `run_query_1:action_result.data.*.entries.*.attributes` to make `run_query_1:action_result.data.*.entries.*.attributes.samaccountname`, which was used as the input to `members` field. You can also see that the groups to which the users will be added are `splunk-analysts` and `lab-employees` (separated by a semi-colon). 
+This command will make several things available to the data path, including all of the attributes you requested (in this case, just 'samaccountname') - but they (the selected attributes) will not be availble to select in the UI due to reasons covered in the [run query](#run-query) section, so we'll have to type those in here. In the screenshot above, you can see that I have appended ".samaccountname" to the selected attribute of `run_query_1:action_result.data.*.entries.*.attributes` to make `run_query_1:action_result.data.*.entries.*.attributes.samaccountname`, which was used as the input to `members` field. You can also see that the groups to which the users will be added are `splunk-analysts` and `lab-employees` (separated by a semi-colon).
 
 When this is run, the output displays the distinguishedNames and function (add or remove) of the user. The following screenshot is an example:
 
@@ -134,7 +134,7 @@ When this is run, the output displays the distinguishedNames and function (add o
 
 
 #### Important Notes for Add/Remove Group Members
-One important note regarding this (and `remove group members`) action is around optimization. The previous example set-up works just fine and can be used without issue. However, because the `add group members` block is connected directly to the `run query` block, the `add group members` block will be called once for each result returned by `run query`. So, if a large number of results are returned, then Domain Controller is going to be hit once for each user instead of a single connection doing all the work. 
+One important note regarding this (and `remove group members`) action is around optimization. The previous example set-up works just fine and can be used without issue. However, because the `add group members` block is connected directly to the `run query` block, the `add group members` block will be called once for each result returned by `run query`. So, if a large number of results are returned, then Domain Controller is going to be hit once for each user instead of a single connection doing all the work.
 
 How to optimize? Well, the `add group members` block is built to support any number of users being passed in and then it will only connect to the directory once for all of them - much faster. The set-up for this is actually only slightly more complicated than the one above. It only adds a single format block and will look something like this:
 
@@ -166,7 +166,7 @@ TODO: See [Add Group Members](#add-group-members)
 ---
 
 ### Get Attributes
-The `get attributes` action is useful if you do not wish to specify a full LDAP query using the `run query` action but would rather just specify some objects and get their associated attributes back. This action solely works with AND logic. In other words, it will return any results found for all principals entered. 
+The `get attributes` action is useful if you do not wish to specify a full LDAP query using the `run query` action but would rather just specify some objects and get their associated attributes back. This action solely works with AND logic. In other words, it will return any results found for all principals entered.
 
 A deviation from the norm with this action is that we allow enter generic security principals instead of just distinguishedname or samaccountname. What does this mean for you? It means that you can enter any of:
 
@@ -184,7 +184,7 @@ query += ")"
 
 This will find any of the three types mentioned.
 
-Let's look at a simple use-case for `get attributes`. In this example we are simply going to prompt a user to enter a principal from a prompt as well as some desired attributes.  We will retrieve them and then have another prompt to display what was found.  Of course this is a trivial example, but one can imagine using the command for context enrichment in an unlimited set of use-cases. 
+Let's look at a simple use-case for `get attributes`. In this example we are simply going to prompt a user to enter a principal from a prompt as well as some desired attributes.  We will retrieve them and then have another prompt to display what was found.  Of course this is a trivial example, but one can imagine using the command for context enrichment in an unlimited set of use-cases.
 
 The playbook:
 ![](.docs/get_attributes_playbook.png)
