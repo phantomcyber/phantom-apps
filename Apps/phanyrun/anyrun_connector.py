@@ -239,7 +239,6 @@ class AnyrunConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            self.save_progress(action_result.get_message())
             return action_result.get_status()
 
         self.save_progress("Successfully fetched report for {}".format(id))
@@ -258,8 +257,6 @@ class AnyrunConnector(BaseConnector):
 
         vault_id = param['vault_id']
 
-        # file_name = param.get('file_name', '')
-
         try:
             success, message, vault_meta_info = ph_rules.vault_info(vault_id=vault_id)
             vault_meta_info = list(vault_meta_info)
@@ -274,7 +271,7 @@ class AnyrunConnector(BaseConnector):
         file_path = vault_meta_info[0].get('path')
         if not file_path:
             return action_result.set_status(phantom.APP_ERROR, ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
-        self.debug_print(f"FILE PATH: {file_path}")
+        self.save_progress("Detonating file {}".format(file_path))
         files = [
             ('file', open(file_path, 'rb'))
         ]
@@ -286,7 +283,6 @@ class AnyrunConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
-            self.save_progress(action_result.get_message())
             return action_result.get_status()
 
         self.save_progress("Successfully detonated file")

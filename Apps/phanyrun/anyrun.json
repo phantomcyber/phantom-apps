@@ -59,6 +59,10 @@
                     "description": "Detonation ID to get the report of",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "anyrun task id"
+                    ],
                     "order": 0
                 }
             },
@@ -66,8 +70,14 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+                    "contains": [
+                        "anyrun task id"
+                    ],
                     "column_name": "ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "0cf223f2-530e-4a50-b68f-563045268648"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
@@ -197,13 +207,21 @@
                 },
                 {
                     "data_path": "action_result.data.*.taskid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "anyrun task id"
+                    ],
+                    "column_name": "Task ID",
+                    "column_order": 1,
+                    "example_values": [
+                        "0cf223f2-530e-4a50-b68f-563045268648"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "success",
                         "failed"
