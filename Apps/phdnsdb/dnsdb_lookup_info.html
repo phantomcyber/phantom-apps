@@ -24,6 +24,16 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
   td { padding: 7px }
 
+  .dataTables_filter input {
+   border: 1px solid;
+  }
+  .dataTables_filter input:hover {
+   border: 1px solid;
+  }
+  .dataTables_filter input:focus {
+   border: 1px solid;
+  }
+
 </style>
 <div class="dnsdb" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
   {% for result in results %} <!-- loop for each result -->
@@ -115,7 +125,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
               <thead>
               <tr>
-                <th>RDATA</th>
+                <th>RDATA <p class="lowercase" style="display:inline">(unique values only)</p></th>
               </tr>
               </thead>
               <tbody>
@@ -167,7 +177,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         <tr>
           <td> IP </td>
           <td>
-            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
               {{ result.param.ip }}
               &nbsp;
               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -180,7 +190,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         <tr>
           <td> Name </td>
           <td>
-            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
               {{ result.param.name }}
               &nbsp;
               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -271,7 +281,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         <tr>
           <th>RRName</th>
           <th>RRType</th>
-          <th>RRData</th>
+          <th>RData</th>
           <th>Count</th>
         </tr>
         </thead>
@@ -291,12 +301,33 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
               </a>
             </td>
-            <td>
+            {% if result.param.name %}
               {% for rdata in data.rdata %}
-                {{ rdata }}
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                    {{ rdata }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
               {% endfor %}
+            {% elif result.param.ip %}
+                <td>
+                  {% for rdata in data.rdata %} 
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                    {{ rdata }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                  {% endfor %}
+                </td>
+              {% endif %}
+            <td>
+                <a href="javascript:;">
+                  {{ data.count }}
+                   &nbsp;
+                </a>
             </td>
-            <td>{{ data.count }}</td>
           </tr>
         {% endfor %}
         </tbody>
@@ -309,7 +340,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         <tr>
           <td> Raw RDATA </td>
           <td>
-            <a href="javascript:;" onclick="context_menu(this, ['value': '{{ result.param.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rdata'],'value': '{{ result.param.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
               {{ result.param.raw_rdata }}
               &nbsp;
               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -373,7 +404,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         {% for curr_result in result.data.raw.domains %}
           <tr>
             <td>
-              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_result }}' }], 0, {{ container.id }}, null, false);">
                 {{ curr_result }}
                 &nbsp;
                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -391,7 +422,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             <tr>
               <th>RRName</th>
               <th>RRType</th>
-              <th>RRData</th>
+              <th>RData</th>
               <th>Count</th>
             </tr>
             </thead>
@@ -399,7 +430,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             {% for data in result.data.response %}        
               <tr>
                 <td>
-                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain.rrname }}' }], 0, {{ container.id }}, null, false);">
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
                     {{ data.rrname }}
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -413,10 +444,19 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                 </td>
                 <td>
                   {% for rdata in data.rdata %}
-                    {{ rdata }}
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                      {{ rdata }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
                   {% endfor %}
                 </td>
-                <td>{{ data.count }}</td>
+                <td>
+                  <a href="javascript:;">
+                    {{ data.count }}
+                    &nbsp;
+                  </a>
+                </td>
               </tr>
             {% endfor %}
             </tbody>
@@ -438,7 +478,11 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
         </tr>
         <tr>
           <td> Type </td>
-          <td> {{ result.param.type }} </td>
+          {% if result.param.type %}
+            <td> {{ result.param.type }} </td>
+          {% else %}
+            <td> ANY </td>
+          {% endif %}
         </tr>
         
         {% if result.param.bailiwick %}
@@ -590,7 +634,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                     </a>
                   {% elif curr_rrtype == 'AAAA' %}
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ipv6'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb ipv6'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
                       {{ curr_rdata }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -654,16 +698,5 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
     }
   }
 </script>
-<style>
-  .dataTables_filter input {
-   border: 1px solid;
-  }
-  .dataTables_filter input:hover {
-   border: 1px solid;
-  }
-  .dataTables_filter input:focus {
-   border: 1px solid;
-}
-</style>
 {% endblock %} <!-- Main Start Block -->
 

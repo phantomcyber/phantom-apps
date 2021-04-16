@@ -130,7 +130,7 @@ class DnsdbConnector(BaseConnector):
         self.save_progress(DNSDB_TEST_CONNECTIVITY_SUCCESS_MSG % (rate.get('limit'), rate.get('remaining'), rate.get('reset')))
 
         action_result.add_data(rate)
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Rate limit details fetched successfully")
 
     def _is_ipv6(self, address):
 
@@ -638,18 +638,24 @@ class DnsdbConnector(BaseConnector):
 
         timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
         for i in timestamps:
-            if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
-                return action_result.set_status(phantom.APP_ERROR, "Invalid input: Future timestamp in action parameter value. Please enter valid time")
+            try:
+                if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+                    action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME)
+            except ValueError:
+                utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime(int(i)))
+                if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+                    return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err)
 
-        if time_first_after and time_last_before:
-            if time_first_after > time_last_before:
-                return action_result.set_status(phantom.APP_ERROR,
+        if (time_first_after and time_last_before) and time_first_after > time_last_before:
+            return action_result.set_status(phantom.APP_ERROR,
                     ("Invalid time range. 'time first after' should not be greater than 'time last before'"))
 
-        if time_last_after and time_last_before:
-            if time_last_after > time_first_before:
-                return action_result.set_status(phantom.APP_ERROR,
-                    ("Invalid time range. 'time last after' should not be greater than 'time first before'"))
+        if (time_last_after and time_first_before) and time_last_after > time_first_before:
+            return action_result.set_status(phantom.APP_ERROR,
+                ("Invalid time range. 'time last after' should not be greater than 'time first before'"))
 
         if limit:
             ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
