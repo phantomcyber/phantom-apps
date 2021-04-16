@@ -131,7 +131,7 @@ def list_processes(action_result, response):
                         data[key] = value
                     last_key = key
                 else:
-                    # Scenario: When the value of particular key is continuing into multiple lines, each line of that value will be appended to the last key value
+                    # Scenario: When the value of the particular key is continuing into multiple lines, each line of that value will be appended to the last key-value
                     if last_key:
                         data[last_key] = "{}{}".format(data[last_key], line)
         if data:
