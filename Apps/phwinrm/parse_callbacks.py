@@ -92,18 +92,6 @@ def ensure_no_errors(action_result, response):
     return phantom.APP_SUCCESS
 
 
-def get_column_header_indexes(column_headers):
-    column_headers_list = column_headers.split()
-    column_indexes = []
-    previous_searched_index = 0
-    for word in column_headers_list:
-        word_start_index = column_headers.index(word, previous_searched_index)
-        word_end_index = word_start_index + len(word) - 1
-        previous_searched_index = word_end_index
-        column_indexes.append((word_start_index, word_end_index))
-    return column_indexes
-
-
 def list_processes(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
