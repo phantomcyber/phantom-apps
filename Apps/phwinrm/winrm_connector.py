@@ -398,7 +398,7 @@ class WindowsRemoteManagementConnector(BaseConnector):
         if not self._init_session(action_result, param):
             return action_result.get_status()
 
-        ret_val = self._run_ps(action_result, 'get-process', pc.list_processes)
+        ret_val = self._run_ps(action_result, 'get-process | select *', pc.list_processes)
         if phantom.is_fail(ret_val):
             return ret_val
 

@@ -112,49 +112,49 @@ def list_processes(action_result, response):
         )
 
     output = response.std_out
-    lines = [y for y in [i for i in output.splitlines() if i] if not y.startswith('-----')]
-    if not lines:
+    processes = output.split("\r\n\r\n")
+    if not processes:
         summary = action_result.update_summary({})
         summary['num_processes'] = 0
         return action_result.set_status(phantom.APP_ERROR, "No processes found")
-
-    column_headers = lines[0]
-    column_headers_list = column_headers.split()
-    column_indexes = get_column_header_indexes(column_headers)
-
-    header = [y.lower() for y in column_headers_list]
-    processes = lines[1:]
     result = []
-    for line in processes:
-        columns = line.split()
-        process_dict = dict()
-        if len(columns) != len(column_headers_list):
-            for index, (start, end) in enumerate(column_indexes):
-                if not line[start: end + 1].strip():
-                    columns.insert(index, None)
-        for i, column in enumerate(columns):
-            if i >= len(header):
-                process_dict[f"unknown_column_{i - len(header)}"] = column
-            else:
-                process_dict[header[i]] = column
-        result.append(process_dict)
+    for process in processes:
+        data = dict()
+        last_key = None
+        for line in process.splitlines():
+            if line:
+                if ":" in line:
+                    row = line.split(":")
+                    if len(row) > 1:
+                        key = row[0].strip()
+                        value = row[1].strip()
+                        data[key] = value
+                    last_key = key
+                else:
+                    # Scenario: When the value of particular key is continuing into multiple lines, each line of that value will be appended to the last key value
+                    if last_key:
+                        data[last_key] = "{}{}".format(data[last_key], line)
+        if data:
+            result.append(data)
 
     column_mapping = {
-        'handles': 'handles',
-        'npm(k)': 'non_paged_memory_(K)',
-        'pm(k)': 'paged_memory_(K)',
-        'ws(k)': 'working_set_(K)',
-        'vm(m)': 'virtual_memory_(M)',
-        'cpu(s)': 'processor_time_(s)',
-        'id': 'pid',
-        'si': 'session_id',
-        'processname': 'name',
+        'Handles': 'handles',
+        'NPM': 'non_paged_memory',
+        'PM': 'paged_memory',
+        'WS': 'working_set',
+        'VM': 'virtual_memory',
+        'CPU': 'processor_time_(s)',
+        'Id': 'pid',
+        'SessionId': 'session_id',
+        'Name': 'name',
     }
 
     for line in result:
         data = { 'raw': line }
         for key, value in line.items():
-            data[column_mapping.get(key, key)] = value
+            key = column_mapping.get(key)
+            if key:
+                data[key] = value if value else None
         action_result.add_data(data)
 
     size = action_result.get_data_size()
