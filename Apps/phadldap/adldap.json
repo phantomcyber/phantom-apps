@@ -87,7 +87,7 @@
         {
             "action": "add group members",
             "identifier": "add_group_members",
-            "description": "Adds one more more AD objects to one or more groups",
+            "description": "Adds one or more Active Directory objects to one or more groups",
             "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
@@ -220,7 +220,7 @@
         {
             "action": "remove group members",
             "identifier": "remove_group_members",
-            "description": "Removes one more more AD objects to one or more groups",
+            "description": "Removes one or more Active Directory objects from one or more groups",
             "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
@@ -367,7 +367,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the user dn to unlock",
+                    "description": "Specify the user to unlock. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -482,7 +482,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to disable",
+                    "description": "Specify the user to disable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -589,7 +589,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to enable",
+                    "description": "Specify the user to enable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -695,7 +695,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to enable",
+                    "description": "Specify the user whose password will be reset. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -823,7 +823,7 @@
         {
             "action": "move object",
             "identifier": "move_object",
-            "description": "Moves an entry in active directory",
+            "description": "Moves an entry in Active Directory",
             "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
@@ -837,7 +837,7 @@
                     "order": 0
                 },
                 "destination_ou": {
-                    "description": "The OU the specified object will move to",
+                    "description": "The distinguishedName of the OU the specified object will move to",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -927,7 +927,7 @@
             "read_only": true,
             "parameters": {
                 "filter": {
-                    "description": "The LDAP filter",
+                    "description": "The LDAP filter (must be in LDAP Syntax)",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -935,7 +935,7 @@
                     "order": 0
                 },
                 "search_base": {
-                    "description": "The search base to use. If not specified, the 'defaultNamingContext' will be used",
+                    "description": "The search base to use in its distinguishedName format. If not specified, the 'defaultNamingContext' will be used",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
