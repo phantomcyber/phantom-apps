@@ -275,7 +275,7 @@ class DigitalGuardianArcConnector(BaseConnector):
             try:
                 jsonText = json.loads(request_response.text)
                 if jsonText['total_hits'] == 0:
-                    return RetVal(action_result.set_status(phantom.APP_SUCCESS), None)
+                    return RetVal(phantom.APP_SUCCESS, None)
                 for field in jsonText['fields']:
                     print('name=' + field['name'])
                     headerField.append(field['name'])
@@ -290,7 +290,7 @@ class DigitalGuardianArcConnector(BaseConnector):
                             entryLine[headerField[headerPosition]] = dataValue
                         headerPosition += 1
                     exportdata.append(entryLine)
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS), exportdata)
+                return RetVal(phantom.APP_SUCCESS, exportdata)
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response. {0}'.format(err)), None)
@@ -539,8 +539,8 @@ class DigitalGuardianArcConnector(BaseConnector):
                 for jText in jsonText:
                     if self._handle_py_ver_compat_for_input_str(jText['display_name']).lower() == watchListName.lower():
                         list_id = jText['name']
-                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), list_id)
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find watch list {}".format(watchListName)), list_id)
+                        return RetVal(phantom.APP_SUCCESS, list_id)
+                return RetVal(phantom.APP_SUCCESS, list_id)
             else:
                 data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
                 message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
@@ -565,9 +565,9 @@ class DigitalGuardianArcConnector(BaseConnector):
                 for jText in jsonText:
                     if self._handle_py_ver_compat_for_input_str(jText['value_name']).lower() == watchlist_entry.lower():
                         entryExists = True
-                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), jText['value_id'])
+                        return RetVal(phantom.APP_SUCCESS, jText['value_id'])
                 if not entryExists:
-                    return RetVal(action_result.set_status(phantom.APP_SUCCESS), '')
+                    return RetVal(phantom.APP_SUCCESS, '')
             else:
                 data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
                 message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
@@ -595,8 +595,8 @@ class DigitalGuardianArcConnector(BaseConnector):
                 for jText in jsonText:
                     if self._handle_py_ver_compat_for_input_str(jText['name']).lower() == list_name.lower():
                         list_id = jText['id']
-                        return RetVal(action_result.set_status(phantom.APP_SUCCESS), list_id)
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS, "Could not find list {}".format(list_name)), None)
+                        return RetVal(phantom.APP_SUCCESS, list_id)
+                return RetVal(phantom.APP_SUCCESS, None)
             else:
                 data = self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))
                 message = 'Error from server. Status Code: {0} Data from server: {1}'.format(r.status_code, data)
