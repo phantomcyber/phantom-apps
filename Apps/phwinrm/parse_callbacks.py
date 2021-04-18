@@ -17,6 +17,7 @@ from collections import OrderedDict
 
 from builtins import str
 import six
+import json
 
 
 def clean_str(input_str):
@@ -100,31 +101,11 @@ def list_processes(action_result, response):
         )
 
     output = response.std_out
-    processes = output.split("\r\n\r\n")
+    processes = json.loads(output)
     if not processes:
         summary = action_result.update_summary({})
         summary['num_processes'] = 0
         return action_result.set_status(phantom.APP_ERROR, "No processes found")
-    result = []
-    for process in processes:
-        data = dict()
-        last_key = None
-        for line in process.splitlines():
-            if line:
-                if ":" in line:
-                    row = line.split(":")
-                    if len(row) > 1:
-                        key = row[0].strip()
-                        value = row[1].strip()
-                        data[key] = value
-                    last_key = key
-                else:
-                    # Scenario: When the value of the particular key is continuing into multiple lines, each line of that value will be appended to the last key-value
-                    if last_key:
-                        data[last_key] = "{}{}".format(data[last_key], line)
-        if data:
-            result.append(data)
-
     column_mapping = {
         'Handles': 'handles',
         'NPM': 'non_paged_memory',
@@ -137,12 +118,12 @@ def list_processes(action_result, response):
         'Name': 'name',
     }
 
-    for line in result:
-        data = { 'raw': line }
-        for key, value in line.items():
+    for process in processes:
+        data = { 'raw': process }
+        for key, value in process.items():
             key = column_mapping.get(key)
             if key:
-                data[key] = value if value else None
+                data[key] = value
         action_result.add_data(data)
 
     size = action_result.get_data_size()
