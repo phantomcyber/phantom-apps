@@ -8,15 +8,15 @@
     "logo_dark": "forescoutcounteract_dark.svg",
     "product_name": "CounterACT",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "app_version": "1.0.5",
     "utctime_updated": "2018-12-07T01:15:08.000000Z",
     "package_name": "phantom_forescoutcounteract",
-    "main_module": "forescoutcounteract_connector.pyc",
-    "min_phantom_version": "4.8.24304",
+    "main_module": "forescoutcounteract_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
-    "python_version": "2.7",
+    "python_version": "3",
     "configuration": {
         "device": {
             "description": "Hostname or IP of appliance (ie: 10.10.10.10)",
@@ -27,49 +27,41 @@
         "ph_0": {
             "description": "Placeholder",
             "data_type": "ph",
-            "required": false,
             "order": 1
         },
         "dex_account": {
             "description": "Data Exchange (DEX) account name",
             "data_type": "string",
-            "required": false,
             "order": 4
         },
         "dex_username": {
             "description": "Data Exchange (DEX) username",
             "data_type": "string",
-            "required": false,
             "order": 2
         },
         "dex_password": {
             "description": "Data Exchange (DEX) password",
             "data_type": "password",
-            "required": false,
             "order": 3
         },
         "ph_1": {
             "description": "Placeholder",
             "data_type": "ph",
-            "required": false,
             "order": 5
         },
         "web_username": {
             "description": "Web API username",
             "data_type": "string",
-            "required": false,
             "order": 6
         },
         "web_password": {
             "description": "Web API password",
             "data_type": "password",
-            "required": false,
             "order": 7
         },
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": true,
             "order": 8,
             "default": false
         }
@@ -77,9 +69,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -87,19 +79,12 @@
         },
         {
             "action": "list hosts",
-            "identifier": "list_hosts",
             "description": "List hosts in CounterACT",
             "type": "investigate",
+            "identifier": "list_hosts",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
@@ -151,6 +136,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -186,19 +179,12 @@
         },
         {
             "action": "list policies",
-            "identifier": "list_policies",
             "description": "List policies in CounterACT",
             "type": "investigate",
+            "identifier": "list_policies",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.rules.*.ruleId",
                     "data_type": "numeric",
@@ -248,6 +234,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -289,16 +283,15 @@
         },
         {
             "action": "get device info",
-            "identifier": "list_host_properties",
             "description": "Get the properties of a host",
-            "verbose": "One of the parameters (host_id, host_ip, or host_mac) are required and the first to be provided is used (in that order).",
+            "verbose": "One of the parameters (host_id, host_ip, or host_mac) is required and the first to be provided is used (in that order).",
             "type": "investigate",
+            "identifier": "list_host_properties",
             "read_only": true,
             "parameters": {
                 "host_id": {
                     "description": "Host ID of device (Used first, if provided)",
                     "data_type": "numeric",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "forescout host id"
@@ -308,7 +301,6 @@
                 "host_ip": {
                     "description": "Current local IP address of device (Used second, if provided)",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "ip"
@@ -318,7 +310,6 @@
                 "host_mac": {
                     "description": "Host MAC address of device (Used last, if provided)",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "mac address"
@@ -328,10 +319,33 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.parameter.host_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "forescout host id"
+                    ],
                     "example_values": [
-                        "success"
+                        167841953
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "203.0.113.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_mac",
+                    "data_type": "string",
+                    "contains": [
+                        "mac address"
+                    ],
+                    "example_values": [
+                        "00:50:56:8b:00:91"
                     ]
                 },
                 {
@@ -603,40 +617,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Host id: 10.1.16.161"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "forescout host id"
-                    ],
-                    "example_values": [
-                        167841953
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host_ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ],
-                    "example_values": [
-                        "203.0.113.1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host_mac",
-                    "data_type": "string",
-                    "contains": [
-                        "mac address"
-                    ],
-                    "example_values": [
-                        "0050568b0091"
                     ]
                 },
                 {
@@ -675,17 +667,15 @@
         },
         {
             "action": "get sessions",
-            "identifier": "get_active_sessions",
             "description": "Get active sessions in CounterACT",
             "type": "investigate",
+            "identifier": "get_active_sessions",
             "read_only": true,
             "parameters": {
                 "rule_id": {
                     "description": "Comma separated list of policies or policy sub-rules",
-                    "verbose": "Filter results to only return sessions that are selected by ALL the policies or rules are returned.",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "forescout rule id"
                     ],
@@ -693,19 +683,26 @@
                 },
                 "prop_val": {
                     "description": "Comma separated list of host property values (ie: Prop_String=Sales,Prop_Int=5)",
-                    "verbose": "Filter results to only return sessions that are selected by ALL the property values. Format each comma-separated value as {prop}={value}, where {prop} is the internal identity string of a host property in CounterACT and {value} is a string representation of the property value to be matched. {prop} and {value} are case sensitive.",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.prop_val",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "fsapi_Prop_String=mystring, fsapi_Prop_Test=test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rule_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7042988451856611698"
+                    ],
+                    "contains": [
+                        "forescout rule id"
                     ]
                 },
                 {
@@ -725,8 +722,7 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "column_name": "MAC Address",
-                    "column_order": 1,
-                    "example_values": []
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.hostId",
@@ -760,6 +756,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -788,23 +792,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.prop_val",
-                    "data_type": "string",
-                    "example_values": [
-                        "fsapi_Prop_String=mystring, fsapi_Prop_Test=test"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.rule_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "7042988451856611698"
-                    ],
-                    "contains": [
-                        "forescout rule id"
-                    ]
                 }
             ],
             "render": {
@@ -814,18 +801,17 @@
         },
         {
             "action": "install firewall",
-            "identifier": "install_vfw",
             "description": "Install a virtual firewall with a property",
             "type": "generic",
+            "identifier": "install_vfw",
             "read_only": false,
             "parameters": {
                 "host_key_name": {
                     "description": "Type of identifier used to specify the endpoint",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
-                        "mac address",
+                        "mac",
                         "ip"
                     ],
                     "default": "ip",
@@ -846,82 +832,16 @@
                     "description": "The property that will be added",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 },
                 "property_value": {
                     "description": "The value of the property",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 3
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string",
-                    "example_values": [
-                        "FSAPI_OK"
-                    ],
-                    "column_name": "Response Code",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.response_message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully updated [1] properties for new host [ip=10.1.16.3]"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.host_key_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.1.16.3"
-                    ],
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.host_key_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.property_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "new vfw"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.property_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Prop_String"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Message: Successfully updated [1] properties for new host [ip=10.1.16.3]"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.property_value",
                     "data_type": "string",
@@ -955,6 +875,71 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.response_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "FSAPI_OK"
+                    ],
+                    "column_name": "Response Code",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.response_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated [1] properties for new host [ip=10.1.16.3]"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.host_key_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.16.3"
+                    ],
+                    "contains": [
+                        "mac address",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_key_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.property_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "new vfw"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.property_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Prop_String"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message: Successfully updated [1] properties for new host [ip=10.1.16.3]"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
@@ -983,18 +968,17 @@
         },
         {
             "action": "delete property",
-            "identifier": "delete_property",
             "description": "Delete a property of a host",
             "type": "correct",
+            "identifier": "delete_property",
             "read_only": false,
             "parameters": {
                 "host_key_name": {
                     "description": "Type of identifier used to specify the host",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
-                        "mac address",
+                        "mac",
                         "ip"
                     ],
                     "default": "ip",
@@ -1015,16 +999,33 @@
                     "description": "The property that will be deleted",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.property_name",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "Prop_Test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_key_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.16.161"
+                    ],
+                    "contains": [
+                        "mac address",
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_key_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
                     ]
                 },
                 {
@@ -1070,35 +1071,18 @@
                     "column_order": 1
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Message: Successfully deleted 1 properties for [ip=10.1.16.161]"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.property_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Prop_Test"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host_key_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.1.16.161"
-                    ],
-                    "contains": [
-                        "mac address",
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host_key_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "ip"
                     ]
                 },
                 {
@@ -1130,18 +1114,17 @@
         },
         {
             "action": "update property",
-            "identifier": "update_property",
             "description": "Update a property of a host",
             "type": "correct",
+            "identifier": "update_property",
             "read_only": false,
             "parameters": {
                 "host_key_name": {
                     "description": "Type of identifier used to specify the host",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
-                        "mac address",
+                        "mac",
                         "ip"
                     ],
                     "default": "ip",
@@ -1162,89 +1145,22 @@
                     "description": "The property that will be modified",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 },
                 "property_value": {
                     "description": "The new value of the property",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 3
                 },
                 "create_host": {
                     "description": "If set to true and the host is not known to CounterACT, create a new host",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "default": true,
                     "order": 4
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.response_code",
-                    "data_type": "string",
-                    "example_values": [
-                        "FSAPI_OK"
-                    ],
-                    "column_name": "Response Code",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data.*.response_message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully updated [1] properties for host [ip=10.1.16.161]"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.host_key_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.1.16.161"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.host_key_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.property_value",
-                    "data_type": "string",
-                    "example_values": [
-                        "property_value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.property_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Prop_String"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Message: Successfully updated [1] properties for host [ip=10.1.16.161]"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.create_host",
                     "data_type": "boolean",
@@ -1286,6 +1202,70 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.response_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "FSAPI_OK"
+                    ],
+                    "column_name": "Response Code",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.response_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully updated [1] properties for host [ip=10.1.16.161]"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.host_key_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.16.161"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_key_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.property_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "property_value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.property_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Prop_String"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message: Successfully updated [1] properties for host [ip=10.1.16.161]"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
                     "example_values": [
@@ -1314,57 +1294,35 @@
         },
         {
             "action": "update list",
-            "identifier": "update_list_property",
             "description": "Update a list by adding, deleting, or deleting all values from it",
             "type": "correct",
+            "identifier": "update_list_property",
             "read_only": false,
             "parameters": {
                 "action": {
                     "description": "Type of update for list",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "value_list": [
                         "add list values",
                         "delete list values",
                         "delete all list values"
                     ],
-                    "default": "",
                     "order": 0
                 },
                 "list_name": {
                     "description": "Name of list to update",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
                     "order": 1
                 },
                 "values": {
                     "description": "Comma separated list of values to update. This field is required for add_list_values and delete_list_values actions",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Message: Successfully added values to the [1] lists.",
-                        "Message: Successfully deleted all values in the [1] lists."
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.action",
                     "data_type": "string",
@@ -1392,6 +1350,24 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message: Successfully added values to the [1] lists.",
+                        "Message: Successfully deleted all values in the [1] lists."
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.summary.message",

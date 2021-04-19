@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: list_host_properties.html
-  Copyright (c) 2018-2019 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -91,21 +91,35 @@
             </tr>
           </table>
           <br>
-          <table class="wf-table-horizontal">
-            <tr>
-              <th>Field</th>
-              <th>Value</th>
-              <th>Timestamp</th>
-            </tr>
-            {% for field, value in items.fields.iteritems %}
+          {% if items.fields %}
+            <table class="wf-table-horizontal">
               <tr>
-                <td>{{ field }}</td>
-                <td>{{ value.value }}</td>
-                <td>{{ value.timestamp }}</td>
+                <th>Field</th>
+                <th>Value</th>
+                <th>Timestamp</th>
               </tr>
-            {% endfor %}
-            </table>
+              {% for field, value in items.fields.items %}
+                {% if value.value %}
+                  <tr>
+                    <td>{{ field }}</td>
+                    <td>{{ value.value }}</td>
+                    <td>{{ value.timestamp }}</td>
+                  </tr>
+                {% else %}
+                  {% for each in value %}
+                    <tr>
+                      <td>{{ field }}</td>
+                      <td>{{ each.value }}</td>
+                      <td>{{ each.timestamp }}</td>
+                    </tr>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+              </table>
+            {% endif %}
         {% endfor %}
+      {% else %}
+        <h3 class="wf-h4-style">No data found</h3>
       {% endif %}
 
     <br>

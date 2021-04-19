@@ -1,5 +1,5 @@
 # File: forescoutcounteract_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -16,6 +16,7 @@ import requests
 import json
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
+from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -36,6 +37,38 @@ class ForescoutCounteractConnector(BaseConnector):
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = FS_ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = FS_ERR_CODE_MSG
+                error_msg = FS_ERR_MSG_UNAVAILABLE
+        except:
+            error_code = FS_ERR_CODE_MSG
+            error_msg = FS_ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in FS_ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = FS_PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
@@ -71,7 +104,8 @@ class ForescoutCounteractConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err), None))
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -79,7 +113,7 @@ class ForescoutCounteractConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, unquote(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -89,7 +123,8 @@ class ForescoutCounteractConnector(BaseConnector):
         try:
             resp_xml = ET.fromstring(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(err), None))
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -164,8 +199,8 @@ class ForescoutCounteractConnector(BaseConnector):
         self.save_progress("Creating JWT for Web API call")
 
         url = self._base_url + FS_WEB_LOGIN
-        header = { 'Content-Type': 'application/x-www-form-urlencoded' }
-        body = { 'username': config['web_username'], 'password': config['web_password']}
+        header = {'Content-Type': 'application/x-www-form-urlencoded'}
+        body = {'username': config['web_username'], 'password': config['web_password']}
 
         try:
             response = requests.post(url, headers=header, data=body, verify=config.get('verify_server_cert', False))
@@ -222,8 +257,15 @@ class ForescoutCounteractConnector(BaseConnector):
                             headers=headers,
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err), resp_json))
 
         return self._process_response(r, action_result)
 
@@ -488,7 +530,7 @@ class ForescoutCounteractConnector(BaseConnector):
             list_body = '<LIST NAME="{}"></LIST>'.format(list_name)
         else:
             if not values:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Values required"), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide 'value' action parameter"), None)
             list_of_values = "".join(["<VALUE>" + item.strip() + "</VALUE>" for item in values.split(',')])
             list_body = '<LIST NAME="{}">{}</LIST>'.format(list_name, list_of_values)
 
@@ -591,8 +633,9 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            print("Accessing the Login page")
+            login_url = "{}/login".format(BaseConnector._get_phantom_base_url())
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -602,13 +645,13 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -624,6 +667,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

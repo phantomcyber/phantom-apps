@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: list_policies.html
-  Copyright (c) 2018-2019 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -87,21 +87,27 @@
           </tr>
         </table>
         <br>
-        <table class="wf-table-horizontal">
-          <tr>
-            <th>Rule Name</th>
-            <th>ID</th>
-            <th>Description</th>
-          </tr>
-        {% for rule in items.rules %}
+        {% if items.rules %}
+          <table class="wf-table-horizontal">
             <tr>
-              <td>{{ rule.name }}</td>
-              <td>{{ rule.ruleId }}</td>
-              <td>{{ rule.description }}</td>
+              <th>Rule Name</th>
+              <th>ID</th>
+              <th>Description</th>
             </tr>
-          {% endfor %}
+              {% for rule in items.rules %}
+                  <tr>
+                    <td>{{ rule.name }}</td>
+                    <td>{{ rule.ruleId }}</td>
+                    <td>{{ rule.description }}</td>
+                  </tr>
+              {% endfor %}
           </table>
+        {% else %}
+          <h5>No Rules Found for {{ items.name }} policy</h5>
+        {% endif %}
       {% endfor %}
+    {% else %}
+      <h3 class="wf-h4-style">No data found</h3>
     {% endif %}
 
     <br>

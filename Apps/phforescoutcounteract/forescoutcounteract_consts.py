@@ -1,5 +1,5 @@
 # File: forescoutcounteract_consts.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -58,3 +58,8 @@ FS_WEB_LOGIN = '/api/login'
 FS_WEB_HOSTS = '/api/hosts'
 FS_WEB_HOSTFIELDS = '/api/hostfields'
 FS_WEB_POLICIES = '/api/policies'
+
+# Error message constants
+FS_ERR_CODE_MSG = "Error code unavailable"
+FS_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+FS_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
