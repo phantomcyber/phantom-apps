@@ -1,7 +1,7 @@
 {
     "appid": "cfac072d-79fa-406b-a2e1-25a2fd5785c4",
     "name": "VMRay",
-    "description": "This app enables you to detonate files and URLs, and perform investigative actions, using the VMRay Platform, thereby giving you automated analysis and advanced threat detection through an agentless hypervisor-based sandbox.",
+    "description": "This app enables you to detonate files and URLs, and perform investigative actions, using the VMRay Platform, thereby giving you automated analysis and advanced threat detection through an agentless hypervisor-based sandbox",
     "publisher": " VMRay",
     "contributors": [
         "Jens Thom"
@@ -11,7 +11,7 @@
     "license": "Copyright (c) VMRay GmbH 2017",
     "main_module": "vmray_connector.pyc",
     "app_version": "1.0.5",
-    "min_phantom_version": "4.8.0",
+    "min_phantom_version": "4.9.39220",
     "product_vendor": "VMRay GmbH",
     "product_name": "VMRay Platform",
     "product_version_regex": ".*",
@@ -27,7 +27,7 @@
           },
           "vmray_api_key": {
             "description": "API Key",
-            "data_type": "string",
+            "data_type": "password",
             "order": 1,
             "required": true
           },
@@ -74,7 +74,8 @@
                     "data_type": "string",
                     "contains": ["hash", "sha256", "sha1", "md5"],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 }
             },
             "output": [
@@ -1110,7 +1111,8 @@
                 },
                 "timeout": {
                     "description": "Timeout",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "order": 2
                 }
             },
             "output": [
@@ -1491,11 +1493,13 @@
                     "data_type": "string",
                     "contains": ["hash", "sha256", "sha1", "md5"],
                     "primary": true,
-                    "required": true
+                    "required": true,
+                    "order": 0
                 },
                 "timeout": {
                     "description": "Timeout",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "order": 1
                 }
             },
             "output": [

@@ -296,19 +296,19 @@ class VMRayConnector(BaseConnector):
 
         params = {"reanalyze": True}
         if param.get("comment"):
-            params["comment"] = param["comment"]
+            params["comment"] = param.get("comment")
         if param.get("tags"):
-            params["tags"] = param["tags"]
+            params["tags"] = param.get("tags")
         if param.get("type"):
-            params["sample_type"] = param["type"]
+            params["sample_type"] = param.get("type")
         if param.get("config"):
-            params["user_config"] = param["config"]
+            params["user_config"] = param.get("config")
         if param.get("jobrules"):
-            params["jobrule_entries"] = param["jobrules"]
+            params["jobrule_entries"] = param.get("jobrules")
 
         if param.get("file_name"):
             params["sample_filename_b64enc"] = base64.b64encode(
-                param["file_name"].encode()
+                param.get("file_name").encode()
             ).decode()
         elif vault_info.get("name"):
             params["sample_filename_b64enc"] = base64.b64encode(
@@ -332,7 +332,7 @@ class VMRayConnector(BaseConnector):
         submission_url = res["submissions"][0]["submission_webif_url"]
         submission_finished = True
 
-        iocs_only = param["ioc_only"]
+        iocs_only = param.get("ioc_only", True)
         status, report = self._get_report(submission_id, DEFAULT_TIMEOUT, iocs_only)
         if status == phantom.APP_ERROR:
             error_msg, _exc = report
@@ -382,13 +382,13 @@ class VMRayConnector(BaseConnector):
 
         params = {"reanalyze": True}
         if param.get("comment"):
-            params["comment"] = param["comment"]
+            params["comment"] = param.get("comment")
         if param.get("tags"):
-            params["tags"] = param["tags"]
+            params["tags"] = param.get("tags")
         if param.get("config"):
-            params["user_config"] = param["config"]
+            params["user_config"] = param.get("config")
         if param.get("jobrules", "") != "":
-            params["jobrule_entries"] = param["jobrules"]
+            params["jobrule_entries"] = param.get("jobrules")
 
         try:
             res = api.submit_url(url, params=params)
@@ -408,7 +408,7 @@ class VMRayConnector(BaseConnector):
 
         submission_finished = True
 
-        iocs_only = param["ioc_only"]
+        iocs_only = param.get("ioc_only", True)
         status, report = self._get_report(submission_id, DEFAULT_TIMEOUT, iocs_only)
         if status == phantom.APP_ERROR:
             error_msg, _exc = report
@@ -520,7 +520,7 @@ class VMRayConnector(BaseConnector):
         submission_id = int(param["submission_id"])
         timeout = self._get_timeout(param)
 
-        iocs_only = param["ioc_only"]
+        iocs_only = param.get("ioc_only", True)
         status, res = self._get_report(submission_id, timeout, iocs_only)
         if status == phantom.APP_ERROR:
             error_msg, exc = res
