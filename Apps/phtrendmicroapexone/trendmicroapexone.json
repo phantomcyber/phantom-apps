@@ -254,7 +254,7 @@
         {
             "action": "list endpoints",
             "identifier": "list_endpoints",
-            "description": "List all the endpoints/sensors configured on the device",
+            "description": "List all the configured security agents",
             "verbose": "",
             "type": "investigate",
             "read_only": true,
@@ -331,7 +331,7 @@
         {
             "action": "get system info",
             "identifier": "get_system_info",
-            "description": "Get information about an endpoint",
+            "description": "Get information about an security agent",
             "verbose": "",
             "type": "investigate",
             "read_only": true,

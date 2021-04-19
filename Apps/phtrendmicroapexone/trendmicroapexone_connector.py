@@ -271,7 +271,8 @@ class TrendMicroApexOneConnector(BaseConnector):
         ret_val, response = self._modify_device(action_result, ip_hostname, action="cmd_isolate_agent")
 
         if phantom.is_fail(ret_val) or not response.get("result_content"):
-            return action_result.get_status()
+            if not response.get("result_content"):
+                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
         action_result.add_data(response["result_content"][0])
 
@@ -289,8 +290,10 @@ class TrendMicroApexOneConnector(BaseConnector):
         
         ret_val, response = self._modify_device(action_result, ip_hostname, action="cmd_restore_isolated_agent")
 
-        if phantom.is_fail(ret_val) or not response.get("result_content"):
-            return action_result.get_status()
+        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:            
+            if not response.get("result_content"):
+                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
+
 
         action_result.add_data(response["result_content"][0])
 
@@ -339,7 +342,11 @@ class TrendMicroApexOneConnector(BaseConnector):
             endpoint + qs, action_result, params=None
         )
 
-        if phantom.is_fail(ret_val) or not response.get("result_content"):
+        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:
+            
+            if not response.get("result_content"):
+                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
+
             return action_result.get_status()
 
         action_result.add_data(response["result_content"][0])
