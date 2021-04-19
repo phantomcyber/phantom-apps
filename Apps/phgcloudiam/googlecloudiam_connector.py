@@ -102,6 +102,9 @@ class GoogleCloudIamConnector(BaseConnector):
         except errors.Error as e:
             err = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Google API Request Error: {}'.format(err)), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error Processing Request: {}'.format(err)), None)
 
         return phantom.APP_SUCCESS, response
 
@@ -129,8 +132,11 @@ class GoogleCloudIamConnector(BaseConnector):
         account = param['account']
 
         name = f"projects/{self.project}/serviceAccounts/{account}"
-
-        request = self._client.projects().serviceAccounts().keys().list(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().keys().list(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -152,7 +158,11 @@ class GoogleCloudIamConnector(BaseConnector):
         key = param['key']
 
         name = f"projects/{self.project}/serviceAccounts/{account}/keys/{key}"
-        request = self._client.projects().serviceAccounts().keys().get(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().keys().get(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -174,7 +184,11 @@ class GoogleCloudIamConnector(BaseConnector):
         key = param['key']
 
         name = f"projects/{self.project}/serviceAccounts/{account}/keys/{key}"
-        request = self._client.projects().serviceAccounts().keys().delete(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().keys().delete(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -196,7 +210,11 @@ class GoogleCloudIamConnector(BaseConnector):
         save_key = param.get("save_key_to_vault")
 
         name = f"projects/{self.project}/serviceAccounts/{account}"
-        request = self._client.projects().serviceAccounts().keys().create(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().keys().create(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
         if phantom.is_fail(ret_val):
             return ret_val
@@ -216,8 +234,9 @@ class GoogleCloudIamConnector(BaseConnector):
                 response["vault_id"] = vault_ret[phantom.APP_JSON_HASH]
                 response["filename"] = key_filename
                 action_result.set_summary({"created_vault_id": vault_ret[phantom.APP_JSON_HASH]})
-            except:
-                return action_result.set_status(phantom.APP_ERROR, VAULT_FILE_CREATION_ERR_MSG)
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err)
 
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS, CREATE_SERVICE_ACCOUNT_KEY_SUCCESS_MSG)
@@ -234,7 +253,11 @@ class GoogleCloudIamConnector(BaseConnector):
         account = param['account']
 
         name = f"projects/{self.project}/serviceAccounts/{account}"
-        request = self._client.projects().serviceAccounts().get(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().get(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -255,7 +278,11 @@ class GoogleCloudIamConnector(BaseConnector):
         account = param['account']
 
         name = f"projects/{self.project}/serviceAccounts/{account}"
-        request = self._client.projects().serviceAccounts().disable(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().disable(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
@@ -276,8 +303,11 @@ class GoogleCloudIamConnector(BaseConnector):
         account = param['account']
 
         name = f"projects/{self.project}/serviceAccounts/{account}"
-
-        request = self._client.projects().serviceAccounts().enable(name=name)
+        try:
+            request = self._client.projects().serviceAccounts().enable(name=name)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err)
         ret_val, response = self._send_request(request, action_result)
 
         if phantom.is_fail(ret_val):
