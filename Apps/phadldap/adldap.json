@@ -1210,7 +1210,9 @@
                     "data_type": "string",
                     "example_values": [
                         "success"
-                    ]
+                    ],
+                    "column_name": "status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
