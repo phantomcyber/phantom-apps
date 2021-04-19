@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_host_urls.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -37,6 +37,7 @@ em{font-style: normal}
 .fs-17{font-size:17px!important}
 .fs-13{font-size:13px!important}
 .fs-11{font-size:11px!important}
+.wf-h4-style{font-size:16px}
 .br-top-3{border-top:3px solid #535454;}
 .br-gray{border:1px solid #D8D8D8;}
 .br-gray-bottom{border-bottom:1px solid #D8D8D8;}
@@ -99,170 +100,169 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 		{% for result in results %} <!-- Loop for each result -->
 
-		<section class="mb-20 mt-20">
-			<!-- Host Report section -->
-			<h2 class="mb-10">SlashNext Phishing Incident Response - Host URLs</h2>
+			{% if not result.data %}
+				<h4 class="wf-h4-style">No data found</h4>
+			{% else %}
+				<section class="mb-20 mt-20">
+					<!-- Host Report section -->
+					<h2 class="mb-10">SlashNext Phishing Incident Response - Host URLs</h2>
 
-			<h3 class="mb-5">action = host urls</h3>
-			<h3 class="mb-5">host = {{result.param.host}}</h3>
+					<h3 class="mb-5">action = host urls</h3>
+					<h3 class="mb-5">host = {{result.param.host}}</h3>
 
-			{% if result.data.errorNo == 0 %} <!-- Host report success condition -->
+					{% if result.data.errorNo == 0 %} <!-- Host report success condition -->
 
-			{% if result.data.normalizeData.normalizeStatus == 1 %}
-			<!--h3 class="mb-5">host = {{result.param.host}}<em class="cr-blue1">*</em></h3-->
-			<h3 class="mb-5 cr-blue1">*{{result.data.normalizeData.normalizeMessage}}</h3>
+						{% if result.data.urlDataList.0.threatData.verdict == "Unrated, No Intel Found" %} <!-- No related URLs found -->
+							<h3 class="mb-5">No entries found.</h3>
+						{% else %} <!-- Certain related URLs found -->
+
+							{% for urlData in result.data.urlDataList %} <!-- Loop for each found URL data -->
+								<div class="blockDiv mb-15">
+									<div class="blockHead blockHead2 bg-grey4">
+										{% if urlData.threatData.verdict == "Malicious" %}
+											<div><label>Scanned URL</label>
+												<span>
+													<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
+												</span>
+											</div>
+											<div><label>Verdict</label><span class="cr-red1">{{urlData.threatData.verdict}}</span></div>
+										{% elif urlData.threatData.verdict == "Benign" %}
+											<div><label>Scanned URL</label>
+												<span>
+													<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
+												</span>
+											</div>
+											<div><label>Verdict</label><span class="cr-green1">{{urlData.threatData.verdict}}</span></div>
+										{% elif urlData.threatData.verdict == "Suspicious" %}
+											<div><label>Scanned URL</label>
+												<span>
+													<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
+												</span>
+											</div>
+											<div><label>Verdict</label><span class="cr-orange1">{{urlData.threatData.verdict}}</span></div>
+										{% else %}
+											<div><label>Scanned URL</label>
+												<span>
+													<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
+												</span>
+											</div>
+											<div><label>Verdict</label><span>{{urlData.threatData.verdict}}</span></div>
+										{% endif %}
+									</div>
+									<div class="blockRow blockRow3">
+										<div><label>Threat Status</label><span>{{urlData.threatData.threatStatus}}</span></div>
+										<div><label>Threat Name</label><span>{{urlData.threatData.threatName}}</span></div>
+										<div><label>Threat Type</label><span>{{urlData.threatData.threatType}}</span></div>
+										<div><label>Scan ID</label>
+											{% if urlData.scanId == "N/A" %}
+												<span>{{urlData.scanId}}</span>
+											{% else %}
+												<span>
+													<a href="javascript:;" onclick="context_menu(this, [{'contains': ['snx scan id'], 'value': '{{ urlData.scanId|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.scanId}}</a>
+												</span>
+											{% endif %}
+										</div>
+										<div><label>First Seen</label><span>{{urlData.threatData.firstSeen}}</span></div>
+										<div><label>Last Seen</label><span>{{urlData.threatData.lastSeen}}</span></div>
+									</div>
+
+									{% if urlData.finalUrl %}
+										<div class="blockRow blockRow2 bg-blue2">
+											{% if urlData.threatData.verdict == "Malicious" %}
+												<div><label>Final URL</label>
+													<span>
+														<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-red1">{{urlData.threatData.verdict}}</span></div>
+											{% elif urlData.threatData.verdict == "Benign" %}
+												<div><label>Final URL</label>
+													<span>
+														<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-green1">{{urlData.threatData.verdict}}</span></div>
+											{% elif urlData.threatData.verdict == "Suspicious" %}
+												<div><label>Final URL</label>
+													<span>
+														<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-orange1">{{urlData.threatData.verdict}}</span></div>
+											{% else %}
+												<div><label>Final URL</label>
+													<span>
+														<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span>{{urlData.threatData.verdict}}</span></div>
+											{% endif %}
+										</div>
+									{% endif %}
+
+									{% if urlData.landingUrl %}
+										<div class="blockRow blockRow2 bg-blue2">
+											{% if urlData.landingUrl.threatData.verdict == "Malicious" %}
+												<div><label>Redirected URL</label>
+													<span>
+														<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-red1">{{urlData.landingUrl.threatData.verdict}}</span></div>
+											{% elif urlData.landingUrl.threatData.verdict == "Benign" %}
+												<div><label>Redirected URL</label>
+													<span>
+														<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-green1">{{urlData.landingUrl.threatData.verdict}}</span></div>
+											{% elif urlData.landingUrl.threatData.verdict == "Suspicious" %}
+												<div><label>Redirected URL</label>
+													<span>
+														<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span class="cr-orange1">{{urlData.landingUrl.threatData.verdict}}</span></div>
+											{% else %}
+												<div><label>Redirected URL</label>
+													<span>
+														<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
+													</span>
+												</div>
+												<div><label>Verdict</label><span>{{urlData.landingUrl.threatData.verdict}}</span></div>
+											{% endif %}
+										</div>
+										<div class="blockRow blockRow3">
+											<div><label>Threat Status</label><span>{{urlData.landingUrl.threatData.threatStatus}}</span></div>
+											<div><label>Threat Name</label><span>{{urlData.landingUrl.threatData.threatName}}</span></div>
+											<div><label>Threat Type</label><span>{{urlData.landingUrl.threatData.threatType}}</span></div>
+											<div><label>Scan ID</label>
+												{% if urlData.landingUrl.scanId == "N/A" %}
+													<span>{{urlData.landingUrl.scanId}}</span>
+												{% else %}
+													<span>
+														<a href="javascript:;" onclick="context_menu(this, [{'contains': ['snx scan id'], 'value': '{{ urlData.landingUrl.scanId|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.scanId}}</a>
+													</span>
+												{% endif %}
+											</div>
+											<div><label>First Seen</label><span>{{urlData.landingUrl.threatData.firstSeen}}</span></div>
+											<div><label>Last Seen</label><span>{{urlData.landingUrl.threatData.lastSeen}}</span></div>
+										</div>
+									{% endif %}
+								</div>
+							{% endfor %} <!-- Loop for each found URL data -->
+
+						{% endif %} <!-- No related URLs found -->
+
+					{% else %} <!-- Host report error condition -->
+						<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+						<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+					{% endif %} <!-- Host report success condition -->
+
+				</section>
 			{% endif %}
 
-			{% if result.data.urlDataList.0.threatData.verdict == "Unrated, No Intel Found" %} <!-- No related URLs found -->
-			<h3 class="mb-5">No entries found.</h3>
-			{% else %} <!-- Certain related URLs found -->
-
-			{% for urlData in result.data.urlDataList %} <!-- Loop for each found URL data -->
-			<div class="blockDiv mb-15">
-				<div class="blockHead blockHead2 bg-grey4">
-					{% if urlData.threatData.verdict == "Malicious" %}
-					<div><label>Scanned URL</label>
-						<span>
-							<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-red1">{{urlData.threatData.verdict}}</span></div>
-					{% elif urlData.threatData.verdict == "Benign" %}
-					<div><label>Scanned URL</label>
-						<span>
-							<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-green1">{{urlData.threatData.verdict}}</span></div>
-					{% elif urlData.threatData.verdict == "Suspicious" %}
-					<div><label>Scanned URL</label>
-						<span>
-							<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-orange1">{{urlData.threatData.verdict}}</span></div>
-					{% else %}
-					<div><label>Scanned URL</label>
-						<span>
-							<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span>{{urlData.threatData.verdict}}</span></div>
-					{% endif %}
-				</div>
-				<div class="blockRow blockRow3">
-					<div><label>Threat Status</label><span>{{urlData.threatData.threatStatus}}</span></div>
-					<div><label>Threat Name</label><span>{{urlData.threatData.threatName}}</span></div>
-					<div><label>Threat Type</label><span>{{urlData.threatData.threatType}}</span></div>
-					<div><label>Scan ID</label>
-						{% if urlData.scanId == "N/A" %}
-						<span>{{urlData.scanId}}</span>
-						{% else %}
-						<span>
-							<a href="javascript:;" onclick="context_menu(this, [{'contains': ['snx scan id'], 'value': '{{ urlData.scanId|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.scanId}}</a>
-						</span>
-						{% endif %}
-					</div>
-					<div><label>First Seen</label><span>{{urlData.threatData.firstSeen}}</span></div>
-					<div><label>Last Seen</label><span>{{urlData.threatData.lastSeen}}</span></div>
-				</div>
-
-				{% if urlData.finalUrl %}
-				<div class="blockRow blockRow2 bg-blue2">
-					{% if urlData.threatData.verdict == "Malicious" %}
-					<div><label>Final URL</label>
-						<span>
-							<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-red1">{{urlData.threatData.verdict}}</span></div>
-					{% elif urlData.threatData.verdict == "Benign" %}
-					<div><label>Final URL</label>
-						<span>
-							<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-green1">{{urlData.threatData.verdict}}</span></div>
-					{% elif urlData.threatData.verdict == "Suspicious" %}
-					<div><label>Final URL</label>
-						<span>
-							<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-orange1">{{urlData.threatData.verdict}}</span></div>
-					{% else %}
-					<div><label>Final URL</label>
-						<span>
-							<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.finalUrl|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.finalUrl}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span>{{urlData.threatData.verdict}}</span></div>
-					{% endif %}
-				</div>
-				{% endif %}
-
-				{% if urlData.landingUrl %}
-				<div class="blockRow blockRow2 bg-blue2">
-					{% if urlData.landingUrl.threatData.verdict == "Malicious" %}
-					<div><label>Redirected URL</label>
-						<span>
-							<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-red1">{{urlData.landingUrl.threatData.verdict}}</span></div>
-					{% elif urlData.landingUrl.threatData.verdict == "Benign" %}
-					<div><label>Redirected URL</label>
-						<span>
-							<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-green1">{{urlData.landingUrl.threatData.verdict}}</span></div>
-					{% elif urlData.landingUrl.threatData.verdict == "Suspicious" %}
-					<div><label>Redirected URL</label>
-						<span>
-							<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span class="cr-orange1">{{urlData.landingUrl.threatData.verdict}}</span></div>
-					{% else %}
-					<div><label>Redirected URL</label>
-						<span>
-							<a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ urlData.landingUrl.url|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.url}}</a>
-						</span>
-					</div>
-					<div><label>Verdict</label><span>{{urlData.landingUrl.threatData.verdict}}</span></div>
-					{% endif %}
-				</div>
-				<div class="blockRow blockRow3">
-					<div><label>Threat Status</label><span>{{urlData.landingUrl.threatData.threatStatus}}</span></div>
-					<div><label>Threat Name</label><span>{{urlData.landingUrl.threatData.threatName}}</span></div>
-					<div><label>Threat Type</label><span>{{urlData.landingUrl.threatData.threatType}}</span></div>
-					<div><label>Scan ID</label>
-						{% if urlData.landingUrl.scanId == "N/A" %}
-						<span>{{urlData.landingUrl.scanId}}</span>
-						{% else %}
-						<span>
-							<a href="javascript:;" onclick="context_menu(this, [{'contains': ['snx scan id'], 'value': '{{ urlData.landingUrl.scanId|escapejs }}' }], 0, {{ container.id }}, null, false);">{{urlData.landingUrl.scanId}}</a>
-						</span>
-						{% endif %}
-					</div>
-					<div><label>First Seen</label><span>{{urlData.landingUrl.threatData.firstSeen}}</span></div>
-					<div><label>Last Seen</label><span>{{urlData.landingUrl.threatData.lastSeen}}</span></div>
-				</div>
-				{% endif %}
-			</div>
-			{% endfor %} <!-- Loop for each found URL data -->
-
-			{% endif %} <!-- No related URLs found -->
-
-			{% else %} <!-- Host report error condition -->
-			<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
-			<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
-			{% endif %} <!-- Host report success condition -->
-
-		</section>
-
-	{% endfor %} <!-- Loop for each result end -->
+		{% endfor %} <!-- Loop for each result end -->
 
 	</div>
 </div> <!-- Main Div -->

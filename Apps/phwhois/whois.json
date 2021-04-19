@@ -6,12 +6,12 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "whois_connector.py",
-    "app_version": "2.0.7",
-    "utctime_updated": "2020-06-10T20:37:28.000000Z",
+    "app_version": "2.0.9",
+    "utctime_updated": "2020-12-11T08:45:40.000000Z",
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.8.24304",
     "python_version": "3",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "app_config_render": "default",
@@ -46,8 +46,7 @@
             }
         ]
     },
-    "configuration": {},
-    "app_config": {
+    "configuration": {
         "update_days": {
             "data_type": "numeric",
             "order": 0,
@@ -57,6 +56,16 @@
         }
     },
     "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the configuration for connectivity",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
         {
             "action": "whois domain",
             "description": "Execute a whois lookup on the given domain",
@@ -417,7 +426,7 @@
                     ],
                     "column_order": 0,
                     "example_values": [
-                        "203.88.139.34"
+                        "127.127.127.127"
                     ]
                 },
                 {
@@ -435,7 +444,7 @@
                     "column_name": "ASN CIDR",
                     "column_order": 2,
                     "example_values": [
-                        "203.88.139.0/24"
+                        "127.127.127.127/24"
                     ]
                 },
                 {
@@ -489,7 +498,7 @@
                     "column_name": "CIDR",
                     "column_order": 8,
                     "example_values": [
-                        "203.88.128.0/20"
+                        "127.127.127.127/20"
                     ]
                 },
                 {
@@ -577,7 +586,7 @@
                     "column_name": "Range",
                     "column_order": 16,
                     "example_values": [
-                        "203.88.128.0 - 203.88.143.255"
+                        "127.127.127.127 - 127.127.143.255"
                     ]
                 },
                 {
@@ -615,7 +624,7 @@
                     "data_path": "action_result.data.*.query",
                     "data_type": "string",
                     "example_values": [
-                        "203.88.139.34"
+                        "127.127.127.127"
                     ],
                     "contains": [
                         "ip"
@@ -658,7 +667,7 @@
                     "data_path": "action_result.summary.nets.*.range",
                     "data_type": "string",
                     "example_values": [
-                        "203.88.128.0 - 203.88.143.255"
+                        "127.127.127.127 - 127.127.143.255"
                     ]
                 },
                 {

@@ -4,18 +4,22 @@
     "description": "This app integrates with AWS CloudTrail to perform various investigative actions",
     "type": "generic",
     "product_vendor": "AWS",
-    "logo": "logo_awscloudtrail.svg",
-    "logo_dark": "logo_awscloudtrail_dark.svg",
+    "logo": "logo_aws.svg",
+    "logo_dark": "logo_aws_dark.svg",
     "product_name": "CloudTrail",
     "product_version_regex": ".*",
+    "python_version": "3",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.6",
-    "utctime_updated": "2019-10-11T00:18:46.000000Z",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-02-18T09:45:13.000000Z",
     "package_name": "phantom_awscloudtrail",
-    "main_module": "awscloudtrail_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "main_module": "awscloudtrail_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
+    "latest_tested_versions": [
+        "Cloud tested on 10-02-2021"
+    ],
     "configuration": {
         "Access Key": {
             "description": "AWS Access Key",
@@ -65,7 +69,7 @@
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+                "input_file": "wheels/boto3-1.17.7-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
@@ -73,15 +77,11 @@
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
-            },
-            {
-                "module": "futures",
-                "input_file": "wheels/futures-3.2.0-py2-none-any.whl"
+                "input_file": "wheels/botocore-1.20.7-py2.py3-none-any.whl"
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
@@ -110,7 +110,6 @@
                 "include_shadow_trails": {
                     "description": "Inform command to include shadow trails",
                     "data_type": "boolean",
-                    "required": false,
                     "default": true,
                     "order": 0
                 }
@@ -273,9 +272,8 @@
             "description": "Lookup the management events captured by CloudTrail",
             "parameters": {
                 "attribute_key": {
-                    "description": "Select an Attribute to query on (or blank)",
+                    "description": "Select an Attribute to query by (or leave blank to retrieve all records)",
                     "data_type": "string",
-                    "required": false,
                     "value_list": [
                         "EventId",
                         "EventName",
@@ -289,27 +287,23 @@
                     "order": 0
                 },
                 "attribute_value": {
-                    "description": "Select the Value by which to search. Note that true/false values must be lower-case",
+                    "description": "Specify the Value by which to search. Note that true/false values must be lower-case",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "start_date": {
                     "description": "Start date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
                     "data_type": "string",
-                    "required": false,
                     "order": 2
                 },
                 "end_date": {
                     "description": "End date in the format of yyyy-mm-dd (e.g. 2019-12-25)",
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "max_results": {
                     "description": "Max results to return",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 50,
                     "order": 4
                 }
@@ -325,15 +319,28 @@
                 },
                 {
                     "data_path": "action_result.parameter.attribute_key",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "EventName",
+                        "Username"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.attribute_value",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "DescribeTable",
+                        "false",
+                        "true"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.end_date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-02-10",
+                        "1980-08-12"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.max_results",
@@ -344,7 +351,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.start_date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-02-10",
+                        "1980-08-12"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.AccessKeyId",
@@ -587,7 +598,7 @@
                     "data_path": "action_result.data.*.ExtractedCloudTrailEvent.requestParameters.iPAddress",
                     "data_type": "string",
                     "example_values": [
-                        "172.31.92.126"
+                        "122.122.122.122"
                     ],
                     "contains": [
                         "ip"

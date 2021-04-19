@@ -1,0 +1,1292 @@
+{
+    "appid": "a5730e5d-a396-4695-92c2-35ff391aaf45",
+    "name": "AD LDAP",
+    "description": "App specifically designed for interacting with Microsoft Active Directory's LDAP Implementation",
+    "type": "identity management",
+    "product_vendor": "Splunk",
+    "logo": "logo_microsoft.svg",
+    "logo_dark": "logo_microsoft_dark.svg",
+    "product_name": "Active Directory LDAP",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "2.0.2",
+    "utctime_updated": "2021-04-09T21:47:07.000000Z",
+    "package_name": "phantom_adldap",
+    "main_module": "adldap_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.2",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "ldap3 on 1/05/2021"
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "ldap3",
+                "input_file": "wheels/ldap3-2.6.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1",
+                "input_file": "wheels/pyasn1-0.4.7-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "server": {
+            "description": "The Active Directory Server hostname, IP, or VIP for binding",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "username": {
+            "description": "The username with which to bind to LDAP",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "password": {
+            "description": "The password for the binding user",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "force_ssl": {
+            "description": "Force the use of SSL protocol. Note that some actions are not possible without secure binding!",
+            "data_type": "boolean",
+            "required": true,
+            "default": true,
+            "order": 3
+        },
+        "validate_ssl_cert": {
+            "description": "Select if you want to validate the LDAP SSL certificate",
+            "data_type": "boolean",
+            "required": true,
+            "default": false,
+            "order": 4
+        },
+        "ssl_port": {
+            "description": "The port to bind for SSL (default 636)",
+            "data_type": "numeric",
+            "required": true,
+            "default": "636",
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add group members",
+            "identifier": "add_group_members",
+            "description": "Adds one or more Active Directory objects to one or more groups",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Specify members AND groups as sAMAccountName(s) instead of distinguishedName(s) (note: member AND groups will use sAMAccountName if selected)",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "members": {
+                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false, then these must be distinguishedName(s)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "groups": {
+                    "description": "Semi-colon (';') separated list of groups to which the members will be added. If 'use samaccountname' is false, then these must be distinguishedName(s)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.member",
+                    "data_type": "string",
+                    "column_name": "member",
+                    "column_order": 0,
+                    "example_values": [
+                        "cn=svc-splunk,ou=splunk,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.function",
+                    "data_type": "string",
+                    "column_name": "function",
+                    "column_order": 1,
+                    "example_values": [
+                        "added"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group",
+                    "data_type": "string",
+                    "column_name": "group",
+                    "column_order": 2,
+                    "example_values": [
+                        "cn=domain guests,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "added member(s) to group(s)."
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "string",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.members",
+                    "data_type": "string",
+                    "example_values": [
+                        "svc-splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Guests"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found_user_records",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.requested_user_records",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "remove group members",
+            "identifier": "remove_group_members",
+            "description": "Removes one or more Active Directory objects from one or more groups",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Specify members AND groups as sAMAccountName(s) instead of distinguishedName(s)",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "members": {
+                    "description": "Semi-colon (';') separated list of users. If 'use samaccountname' is false, then these must be distinguishedName(s)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "groups": {
+                    "description": "Semi-colon (';') separated list of groups from which the members will be removed. If 'use samaccountname' is false, then these must be distinguishedName(s)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.member",
+                    "data_type": "string",
+                    "column_name": "member",
+                    "column_order": 0,
+                    "example_values": [
+                        "cn=svc-splunk,ou=splunk,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.function",
+                    "data_type": "string",
+                    "column_name": "function",
+                    "column_order": 1,
+                    "example_values": [
+                        "removed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.group",
+                    "data_type": "string",
+                    "column_name": "group",
+                    "column_order": 2,
+                    "example_values": [
+                        "cn=domain guests,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "removed member(s) to group(s)."
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "string",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.members",
+                    "data_type": "string",
+                    "example_values": [
+                        "svc-splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Guests"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found_user_records",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.requested_user_records",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "unlock account",
+            "identifier": "unlock_account",
+            "description": "Unlocks a locked Active Directory account",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Use sAMAccountName for user instead of distinguishedName(s)",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "Specify the user to unlock. If 'use samaccountname' is false, then this must be the user's distinguishedName",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.user_dn",
+                    "data_type": "string",
+                    "column_name": "user dn",
+                    "column_order": 0,
+                    "example_values": [
+                        "cn=defaultaccount,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.samaccountname",
+                    "data_type": "string",
+                    "column_name": "samaccountname",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.unlocked",
+                    "data_type": "boolean",
+                    "column_name": "Unlocked",
+                    "column_order": 2,
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unlocked: True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "CN=DEFAULTACCOUNT,CN=USERS,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.unlocked",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "disable account",
+            "identifier": "disable_account",
+            "description": "Disables an Active Directory account",
+            "type": "generic",
+            "read_only": false,
+            "undo": "enable account",
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Specify sAMAccountName instead of distinguishedName",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "Specify the user to disable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "target user",
+                    "column_order": 0,
+                    "example_values": [
+                        "CN=DEFAULTACCOUNT,CN=USERS,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starting_status",
+                    "data_type": "string",
+                    "column_name": "started status",
+                    "column_order": 1,
+                    "example_values": [
+                        "enabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.account_status",
+                    "data_type": "string",
+                    "column_name": "current status",
+                    "column_order": 2,
+                    "example_values": [
+                        "disabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Account status: disabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "cn=defaultaccount,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "enable account",
+            "identifier": "enable_account",
+            "description": "Enables a disabled Active Directory account",
+            "type": "generic",
+            "read_only": false,
+            "undo": "disable account",
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Specify sAMAccountName instead of distinguishedName",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "Specify the user to enable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "target user",
+                    "column_order": 0,
+                    "example_values": [
+                        "CN=DEFAULTACCOUNT,CN=USERS,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.starting_status",
+                    "data_type": "string",
+                    "column_name": "started status",
+                    "column_order": 1,
+                    "example_values": [
+                        "disabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.account_status",
+                    "data_type": "string",
+                    "column_name": "current status",
+                    "column_order": 2,
+                    "example_values": [
+                        "enabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Account status: enabled"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "cn=defaultaccount,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "reset password",
+            "identifier": "reset_password",
+            "description": "Reset a user's password",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Specify sAMAccountName instead of distinguishedName",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "Specify the user whose password will be reset. If 'use samaccountname' is false, then this must be the user's distinguishedName",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": false,
+                    "order": 1
+                },
+                "password": {
+                    "description": "New password",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 2
+                },
+                "confirm_password": {
+                    "description": "Re-type the password",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "target user",
+                    "column_order": 0,
+                    "example_values": [
+                        "CN=DEFAULTACCOUNT,CN=USERS,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reset",
+                    "data_type": "boolean",
+                    "column_name": "Was Reset",
+                    "column_order": 1,
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "cn=defaultaccount,cn=users,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.samaccountname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thisisanewpw!123"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.confirm_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thisisanewpw!123"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reset: True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "move object",
+            "identifier": "move_object",
+            "description": "Moves an entry in Active Directory",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "object": {
+                    "description": "Specify the distinguishedName to move",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "destination_ou": {
+                    "description": "The distinguishedName of the OU the specified object will move to",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.object",
+                    "data_type": "string",
+                    "column_name": "object",
+                    "column_order": 0,
+                    "example_values": [
+                        "CN=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination_ou",
+                    "data_type": "string",
+                    "column_name": "destination",
+                    "column_order": 1,
+                    "example_values": [
+                        "OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.moved",
+                    "data_type": "string",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source_object",
+                    "data_type": "string",
+                    "example_values": [
+                        "CN=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.destination_container",
+                    "data_type": "string",
+                    "example_values": [
+                        "OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Moved: True"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "run query",
+            "identifier": "run_query",
+            "description": "Query Active Directory LDAP",
+            "verbose": "This action flexibly supports querying Active Directory using LDAP syntax.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "filter": {
+                    "description": "The LDAP filter (must be in LDAP Syntax)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 0
+                },
+                "search_base": {
+                    "description": "The search base to use in its distinguishedName format. If not specified, the 'defaultNamingContext' will be used",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "",
+                    "order": 1
+                },
+                "attributes": {
+                    "description": "Semi-colon separated list of attributes to collect (e.g. sAMAccountName;mail)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "sAMAccountName",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.entries.*.attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "(sAMAccountName=*)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search_base",
+                    "data_type": "string",
+                    "example_values": [
+                        "ou=splunk,dc=splunk,dc=lab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attributes",
+                    "data_type": "string",
+                    "example_values": [
+                        "sAMAccountName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total objects: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "CN=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.attributes.samaccountname",
+                    "data_type": "string",
+                    "example_values": [
+                        "SVC-SPLUNK"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "adldap_view.display_attributes",
+                "title": "AD Query"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get attributes",
+            "identifier": "get_attributes",
+            "description": "Get attributes of various principals",
+            "verbose": "This action takes any number of principals (sAMAccountName, distinguishedName, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "principals": {
+                    "description": "The semi-colon separated principals. These can be sAMAccountName, userprincipalname, or distinguishedName",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "",
+                    "order": 0
+                },
+                "attributes": {
+                    "description": "Semi-colon separated list of attributes to collect",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "sAMAccountName",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.principals",
+                    "data_type": "string",
+                    "example_values": [
+                        "SVC-SPLUNK;defaultaccount"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attributes",
+                    "data_type": "string",
+                    "example_values": [
+                        "ObjectGUID"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total objects: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "CN=SVC-SPLUNK,OU=splunk,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.attributes.objectGUID",
+                    "data_type": "string",
+                    "example_values": [
+                        "{a6c536dd-2487-41dd-8524-0037342505da}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "adldap_view.display_attributes",
+                "title": "AD Query"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set attribute",
+            "identifier": "set_attribute",
+            "description": "Add, delete, or replace an attribute of a user",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Use sAMAccountName instead of distinguishedName",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "User whose attributes are to be modified",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": "",
+                    "order": 1
+                },
+                "attribute": {
+                    "description": "The attribute to modify (add/delete/replace)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "default": "mail",
+                    "order": 2
+                },
+                "value": {
+                    "description": "Attribute value",
+                    "data_type": "string",
+                    "primary": false,
+                    "default": "user@foo.bar",
+                    "order": 3
+                },
+                "action": {
+                    "description": "Semi-colon separated list of attributes to collect",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [
+                        "ADD",
+                        "DELETE",
+                        "REPLACE"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Summary: Successfully Set Attributes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully Set Attributes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB",
+                        "SVC-SPLUNK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "svc_splunk@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "REPLACE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attribute",
+                    "data_type": "string",
+                    "example_values": [
+                        "mail"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 5,
+                "title": "Set Attributes"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
