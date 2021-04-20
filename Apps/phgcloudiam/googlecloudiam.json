@@ -197,7 +197,7 @@
             "description": "Gets a ServiceAccount",
             "type": "investigate",
             "identifier": "get_serviceaccount",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "account": {
                     "description": "Email address or the uniqueId of the service account",
