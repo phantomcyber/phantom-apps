@@ -284,6 +284,46 @@ class RedCanaryConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, int(self._detection_count)
 
+    def _handle_ack_detection(self, param):
+        """Acknowledges a Red Canary detection"""
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        det_id = param.get('detection_id')
+        self.save_progress(f"Acknowledging detection {det_id}")
+
+        url = self._generate_base_api_url(f'detections/{det_id}/mark_acknowledged')
+
+        ret_val, _ = self._make_rest_call(
+            url, action_result, params=None, headers=self._generate_headers(), method="patch"
+        )
+
+        if phantom.is_fail(ret_val):
+            self.save_progress("Detection acknowledge failed")
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully acknowledged detection")
+
+    def _handle_update_remediation(self, param):
+        """Updates remediation information associated with a RC detection"""
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        det_id = param.get('detection_id')
+        self.save_progress(f"Updating remediation information for {det_id}")
+
+        http_params = dict()
+        http_params.update({'remediation_state': param.get('remediation_state')})
+        http_params.update({'comment': param.get('comment')})
+
+        url = self._generate_base_api_url(f'detections/{det_id}/update_remediation_state')
+
+        ret_val, _ = self._make_rest_call(
+            url, action_result, params=http_params, headers=self._generate_headers(), method="patch"
+        )
+
+        if phantom.is_fail(ret_val):
+            self.save_progress("Detection acknowledge failed")
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully acknowledged detection")
+
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -472,8 +512,14 @@ class RedCanaryConnector(BaseConnector):
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
 
-        elif (action_id == 'on_poll'):
+        elif action_id == 'on_poll':
             ret_val = self._on_poll(param)
+
+        elif action_id == 'ack_detection':
+            ret_val = self._handle_ack_detection(param)
+
+        elif action_id == 'remediate':
+            ret_val = self._handle_update_remediation(param)
 
         return ret_val
 
