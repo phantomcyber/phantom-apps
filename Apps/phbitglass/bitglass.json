@@ -201,6 +201,9 @@
                     "description": "Name of the group to create or update",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
                     "default": "RiskyUsers",
                     "order": 0
                 },
@@ -215,6 +218,9 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
                     "column_name": "Bg Group Name",
                     "column_order": 0
                 },
@@ -280,6 +286,9 @@
                     "description": "Name of the group to delete",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
                     "default": "RiskyUsers",
                     "order": 0
                 }
@@ -288,6 +297,9 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
                     "column_name": "Bg Group Name",
                     "column_order": 0
                 },
@@ -348,6 +360,9 @@
                     "description": "Name of the group to add the risky user to",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
                     "default": "RiskyUsers",
                     "order": 0
                 },
@@ -366,6 +381,9 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
                     "column_name": "Bg Group Name",
                     "column_order": 0
                 },
@@ -435,6 +453,9 @@
                     "description": "Name of the group to add the risky user to",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
                     "default": "RiskyUsers",
                     "order": 0
                 },
@@ -453,6 +474,9 @@
                 {
                     "data_path": "action_result.parameter.bg_group_name",
                     "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
                     "column_name": "Bg Group Name",
                     "column_order": 0
                 },
