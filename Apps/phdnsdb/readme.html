@@ -19,7 +19,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             <ul>
               <li><b><u>Action Parameter</u>​ - name</b>
                 <ul>
-                  <li>The value is a DNS domain name in presentation format("www.example.com"), or a left-hand (“.example.com”) or right-hand (“www.example.”) wildcard domain name. Note that left-hand wildcard queries are somewhat more expensive than right-hand wildcard queries.</li>
+                  <li>The value is a DNS domain name in presentation format("www.example.com"), or a left-hand (“.example.com”) or right-hand (“www.example.”) wildcard domain name.</li>
                   <li>Example: www.farsightsecurity.io</li>
                 </ul>
               </li>
@@ -35,7 +35,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
             <ul>
               <li><b><u>Action Parameter</u>​ - ip</b>
                 <ul>
-                  <li>The value is one of an IPv4 or IPv6 single address, with a prefix length, or with an address range. If a prefix is provided, the delimiter between the network address and prefix length is a single comma (“,”) character rather than the usual slash (“/”) character to avoid clashing with the HTTP URI path name separator.</li>
+                  <li>The value is one of an IPv4 or IPv6 single address, with a prefix length, or with an address range.</li>
                   <li>Example: 192.18.12.01</li>
                 </ul>
               </li>
@@ -53,6 +53,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                   </li>
                 </ul>
               </li>
+              <li><b>Note: </b> If a prefix is provided, the delimiter between the network address and prefix length is a single comma (“,”) character rather than the usual slash (“/”) character to avoid clashing with the HTTP URI path name separator.</li>
             </ul>
           <br>
           <h3 class="lowercase"><li>RDATA Raw Lookup</li></h3>
@@ -88,8 +89,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
               </li>
               <li><b><u>Action Parameter</u>​ - bailiwick</b>
                 <ul>
-                  <li>The “bailiwick” of an RRset in DNSDB observed via passive DNS replication is the closest enclosing zone delegated to a nameserver that served the RRset.
-                      The “bailiwick” of an RRset in DNSDB observed in a zone file is simply the name of the zone containing the RRset.</li>
+                  <li>A bailiwick is an enclosing zone for a nameserver that serves the RRset or the name of the zone containing the RRset.</li>
                   <li>Example: 
                   owner name = farsightsecurity.com.
                   bailiwick = com.

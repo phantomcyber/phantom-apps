@@ -155,23 +155,16 @@ class DnsdbConnector(BaseConnector):
 
         bailiwick = param.get(DNSDB_JSON_BAILIWICK)
         limit = param.get(DNSDB_JSON_LIMIT, 200)
-        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
-        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
-        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
-        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
+        ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         summary_data = action_result.update_summary({})
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val = self._validate_params(param, action_result)
+        ret_val, timestamps = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
@@ -260,16 +253,9 @@ class DnsdbConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         limit = param.get(DNSDB_JSON_LIMIT, 200)
-        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
-        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
-        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
-        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
+        ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         summary_data = action_result.update_summary({})
 
@@ -295,7 +281,7 @@ class DnsdbConnector(BaseConnector):
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val = self._validate_params(param, action_result)
+        ret_val, timestamps = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
@@ -352,23 +338,16 @@ class DnsdbConnector(BaseConnector):
         name = param[DNSDB_JSON_NAME]
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 200)
-        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
-        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
-        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
-        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
+        ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         summary_data = action_result.update_summary({})
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val = self._validate_params(param, action_result)
+        ret_val, timestamps = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
@@ -424,28 +403,20 @@ class DnsdbConnector(BaseConnector):
         # Getting mandatory input parameter
         raw_rdata = param[DNSDB_JSON_RAW_RDATA]
         # Getting optional input parameter
+        limit = param.get(DNSDB_JSON_LIMIT, 200)
+        ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         record_type = param.get(DNSDB_JSON_TYPE, DNSDB_JSON_TYPE_DEFAULT)
         if record_type and record_type not in DNSDB_LOOKUP_TYPE_VALUE_LIST:
             return action_result.set_status(phantom.APP_ERROR, DNSDB_VALUE_LIST_VALIDATION_MSG.format(DNSDB_LOOKUP_TYPE_VALUE_LIST, DNSDB_JSON_TYPE))
-
-        limit = param.get(DNSDB_JSON_LIMIT, 200)
-        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
-        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
-        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
-        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
 
         summary_data = action_result.update_summary({})
 
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val = self._validate_params(param, action_result)
+        ret_val, timestamps = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
@@ -510,16 +481,9 @@ class DnsdbConnector(BaseConnector):
 
         # Getting optional input parameter
         limit = param.get(DNSDB_JSON_LIMIT, 10000)
-        time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
-        time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
-        time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-        time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
+        ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         exclude = param.get(DNSDB_JSON_EXCLUDE)
 
@@ -528,7 +492,7 @@ class DnsdbConnector(BaseConnector):
         # Constructing request parameters based on input
         # Validating the input parameters provided
         # Would be used during REST call
-        ret_val = self._validate_params(param, action_result)
+        ret_val, timestamps = self._validate_params(param, action_result)
 
         # Something went wrong while validing input parameters
         if phantom.is_fail(ret_val):
@@ -606,63 +570,55 @@ class DnsdbConnector(BaseConnector):
         """
 
         # Getting optional input parameter
-        limit = param.get(DNSDB_JSON_LIMIT, 200)
         time_first_before = param.get(DNSDB_JSON_TIME_FIRST_BEFORE)
         time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
         time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
         time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
 
+        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
+        for i, timestamp in enumerate(timestamps):
+            try:
+                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
+            except (ValueError, TypeError):
+                pass
+
         if time_first_before:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_first_before):
                 return action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_first_before))
+                                                    DNSDB_ERR_INVALID_TIME_FORMAT.format(time=time_first_before)), None
 
         if time_first_after:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_first_after):
                 return action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_first_after))
+                                                    DNSDB_ERR_INVALID_TIME_FORMAT.format(time=time_first_after)), None
 
         if time_last_before:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_last_before):
                 return action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_last_before))
+                                                    DNSDB_ERR_INVALID_TIME_FORMAT.format(time=time_last_before)), None
 
         if time_last_after:
             # Validating the input for time format(epoch or relative seconds)
             if not self._is_valid_time(time_last_after):
                 return action_result.set_status(phantom.APP_ERROR,
-                                                 (DNSDB_ERR_INVALID_TIME_FORMAT).format(time=time_last_after))
+                                                    DNSDB_ERR_INVALID_TIME_FORMAT.format(time=time_last_after)), None
 
-        timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
         for i in timestamps:
             try:
                 if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
-                    action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME)
+                    return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
             except ValueError:
                 utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime(int(i)))
                 if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
-                    return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME)
+                    return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
-                return action_result.set_status(phantom.APP_ERROR, err)
+                return action_result.set_status(phantom.APP_ERROR, err), None
 
-        if (time_first_after and time_last_before) and time_first_after > time_last_before:
-            return action_result.set_status(phantom.APP_ERROR,
-                    ("Invalid time range. 'time first after' should not be greater than 'time last before'"))
-
-        if (time_last_after and time_first_before) and time_last_after > time_first_before:
-            return action_result.set_status(phantom.APP_ERROR,
-                ("Invalid time range. 'time last after' should not be greater than 'time first before'"))
-
-        if limit:
-            ret_val, limit = self._validate_integer(action_result, limit, DNSDB_LIMIT_KEY)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-
-        return phantom.APP_SUCCESS
+        return phantom.APP_SUCCESS, timestamps
 
     def _is_valid_time(self, time_value):
         """ Function that validates given time,
