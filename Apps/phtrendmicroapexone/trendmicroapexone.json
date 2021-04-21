@@ -10,7 +10,7 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "license": "Copyright (c) Splunk Community, 2021",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2021-04-16T11:37:07.068082Z",
     "package_name": "phantom_trendmicroapexone",
@@ -54,7 +54,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -65,7 +64,6 @@
             "action": "quarantine device",
             "identifier": "quarantine_device",
             "description": "Quarantine the endpoint",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -160,7 +158,6 @@
             "action": "unquarantine device",
             "identifier": "unquarantine_device",
             "description": "Unquarantine the endpoint",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "parameters": {
@@ -255,7 +252,6 @@
             "action": "list endpoints",
             "identifier": "list_endpoints",
             "description": "List all the configured security agents",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {},
@@ -332,7 +328,6 @@
             "action": "get system info",
             "identifier": "get_system_info",
             "description": "Get information about an security agent",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
