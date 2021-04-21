@@ -76,15 +76,7 @@ class TrendMicroApexOneConnector(BaseConnector):
 
     def _create_checksum(self, http_method, raw_url, headers, request_body):
         """ This function is used to derive the checksum that needs to be sent with the HTTP request in order for the request to be accepted by the API"""
-        string_to_hash = (
-            http_method.upper()
-            + "|"
-            + raw_url.lower()
-            + "|"
-            + headers
-            + "|"
-            + request_body
-        )
+        string_to_hash = (http_method.upper() + "|" + raw_url.lower() + "|" + headers + "|" + request_body)
         base64_string = base64.b64encode(
             hashlib.sha256(str.encode(string_to_hash)).digest()
         ).decode("utf-8")
@@ -332,11 +324,7 @@ class TrendMicroApexOneConnector(BaseConnector):
             action_result, ip_hostname, action="cmd_restore_isolated_agent"
         )
 
-        if (
-            phantom.is_fail(ret_val)
-            or not response.get("result_content")
-            or response.get("result_code") != 1
-        ):
+        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:
             if not response.get("result_content"):
                 action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
@@ -388,11 +376,7 @@ class TrendMicroApexOneConnector(BaseConnector):
             endpoint + qs, action_result, params=None
         )
 
-        if (
-            phantom.is_fail(ret_val)
-            or not response.get("result_content")
-            or response.get("result_code") != 1
-        ):
+        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:
 
             if not response.get("result_content"):
                 action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
