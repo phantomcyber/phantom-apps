@@ -608,9 +608,10 @@ class DnsdbConnector(BaseConnector):
 
         for i in timestamps:
             try:
-                if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+                utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime((i)))
+                if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
                     return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
-            except ValueError:
+            except TypeError:
                 utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime(int(i)))
                 if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
                     return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
