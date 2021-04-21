@@ -9,7 +9,7 @@
     "product_name": "Windows Remote Management",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2020 Splunk Inc.",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "app_version": "2.0.0",
     "utctime_updated": "2020-12-22T07:23:12.000000Z",
     "package_name": "phantom_winrm",
@@ -96,9 +96,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -106,10 +106,10 @@
         },
         {
             "action": "run command",
-            "identifier": "run_command",
             "description": "Execute a command on the endpoint",
             "verbose": "Unless you implement a custom parser, this action will always succeed regardless of the input. Either a <b>command</b> or pair of <b>command_id</b> and <b>shell_id</b> must be specified. If a <b>command_id</b> is present, all other parameters will be ignored. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
             "type": "generic",
+            "identifier": "run_command",
             "read_only": false,
             "parameters": {
                 "command": {
@@ -168,14 +168,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.arguments",
                     "data_type": "string",
                     "example_values": [
@@ -215,7 +207,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -260,6 +253,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 0,
+                    "example_values": [
+                        "Successfully ran command"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.command_id",
                     "data_type": "string",
                     "contains": [
@@ -277,15 +291,6 @@
                     ],
                     "example_values": [
                         "1AAA1111-1A11-11A1-1111-1A1AAA1A11A1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 0,
-                    "example_values": [
-                        "Successfully ran command"
                     ]
                 },
                 {
@@ -310,10 +315,10 @@
         },
         {
             "action": "run script",
-            "identifier": "run_script",
             "description": "Run a PowerShell script on the endpoint",
             "verbose": "The script you provide can either be in the vault, or it can just be a string of the script to run. If both values are present, it will use the <b>script_file</b> over the <b>script_str</b>. Unless you implement a custom parser, this action will always succeed regardless of the input. If <b>command_id</b> and <b>shell_id</b> are present, <b>script_file</b> and <b>script_str</b> will be ignored. This action will fail if at least one of <b>script_file</b>, <b>script_str</b>, or the pair of <b>command_id</b> and <b>shell_id</b> are not specified. <p><b>Note:</b> The command_id and shell_id you provide to fetch the output can only be used once because once the output is fetched successfully server will remove output from its cache.</p>",
             "type": "generic",
+            "identifier": "run_script",
             "read_only": false,
             "parameters": {
                 "script_file": {
@@ -376,14 +381,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.async",
                     "data_type": "boolean",
                     "example_values": [
@@ -409,7 +406,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -471,6 +469,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 0,
+                    "example_values": [
+                        "Successfully ran PowerShell script"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.command_id",
                     "data_type": "string",
                     "contains": [
@@ -488,15 +507,6 @@
                     ],
                     "example_values": [
                         "1AAA1111-1A11-11A1-1111-1A1AAA1A11A1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 0,
-                    "example_values": [
-                        "Successfully ran PowerShell script"
                     ]
                 },
                 {
@@ -521,9 +531,9 @@
         },
         {
             "action": "list processes",
-            "identifier": "list_processes",
             "description": "List the currently running processes",
             "type": "investigate",
+            "identifier": "list_processes",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -539,14 +549,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -554,7 +556,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -577,21 +580,21 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.non_paged_memory_(K)",
+                    "data_path": "action_result.data.*.non_paged_memory",
                     "data_type": "numeric",
                     "example_values": [
                         3
                     ],
-                    "column_name": "Non Paged Memory (K)",
+                    "column_name": "Non Paged Memory",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.paged_memory_(K)",
+                    "data_path": "action_result.data.*.paged_memory",
                     "data_type": "numeric",
                     "example_values": [
                         1564
                     ],
-                    "column_name": "Paged Memory (K)",
+                    "column_name": "Paged Memory",
                     "column_order": 3
                 },
                 {
@@ -616,26 +619,31 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.virtual_memory_(M)",
+                    "data_path": "action_result.data.*.virtual_memory",
                     "data_type": "numeric",
                     "example_values": [
                         14
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.working_set_(K)",
+                    "data_path": "action_result.data.*.working_set",
                     "data_type": "numeric",
                     "example_values": [
                         2384
                     ],
-                    "column_name": "Working Set (K)",
+                    "column_name": "Working Set",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.summary.num_processes",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.session_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        451
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -643,6 +651,17 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully got process list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_processes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        451
                     ]
                 },
                 {
@@ -667,9 +686,9 @@
         },
         {
             "action": "terminate process",
-            "identifier": "terminate_process",
             "description": "Terminate a process",
             "type": "generic",
+            "identifier": "terminate_process",
             "read_only": false,
             "parameters": {
                 "pid": {
@@ -703,14 +722,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -718,7 +729,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -746,8 +758,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -757,6 +773,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -780,9 +800,9 @@
         },
         {
             "action": "list connections",
-            "identifier": "list_connections",
             "description": "List all active connections",
             "type": "investigate",
+            "identifier": "list_connections",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -798,14 +818,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -813,7 +825,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -837,7 +850,7 @@
                     "contains": [
                         "port"
                     ],
-                    "column_name": "Port",
+                    "column_name": "Foreign Address Port",
                     "column_order": 4
                 },
                 {
@@ -861,7 +874,7 @@
                     "contains": [
                         "port"
                     ],
-                    "column_name": "Port",
+                    "column_name": "Local Address Port",
                     "column_order": 2
                 },
                 {
@@ -893,10 +906,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_connections",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        451
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -904,6 +918,17 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully listed connections"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_connections",
+                    "data_type": "numeric",
+                    "example_values": [
+                        451
                     ]
                 },
                 {
@@ -928,10 +953,10 @@
         },
         {
             "action": "list firewall rules",
-            "identifier": "list_firewall_rules",
             "description": "List the firewall rules",
             "verbose": "When you are using the <b>other</b> parameter, you can match for any field which is returned in the action result. It will only return a rule if it matches all of the criteria, not if it matches at least one.",
             "type": "investigate",
+            "identifier": "list_firewall_rules",
             "read_only": true,
             "parameters": {
                 "filter_port": {
@@ -956,7 +981,6 @@
                     "description": "Only show firewall rules in this direction",
                     "data_type": "string",
                     "value_list": [
-                        "",
                         "in",
                         "out"
                     ],
@@ -966,7 +990,7 @@
                     "description": "Only show firewall rules using this protocol",
                     "data_type": "string",
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ],
                     "order": 4,
                     "primary": true
@@ -988,14 +1012,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.direction",
                     "data_type": "string",
@@ -1031,7 +1047,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -1048,7 +1065,7 @@
                         "tcp"
                     ],
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ]
                 },
                 {
@@ -1126,7 +1143,7 @@
                         "tcp"
                     ],
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ]
                 },
                 {
@@ -1166,10 +1183,11 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.summary.num_rules",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        451
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1177,6 +1195,17 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully retrieved firewall rules"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_rules",
+                    "data_type": "numeric",
+                    "example_values": [
+                        451
                     ]
                 },
                 {
@@ -1201,10 +1230,10 @@
         },
         {
             "action": "delete firewall rule",
-            "identifier": "delete_firewall_rule",
             "description": "Remove a firewall rule using netsh",
             "verbose": "This action will invoke the command <code>netsh advfirewall firewall delete rule</code>, and the rest is determined by the input. At a minimum, the rule name must be provided, but if you need to you can also specify any other arguments which the command accepts, in the same manner, that input from the <b>add firewall rule</b> gets added.",
             "type": "generic",
+            "identifier": "delete_firewall_rule",
             "read_only": false,
             "parameters": {
                 "name": {
@@ -1266,7 +1295,7 @@
                     "description": "Firewall rule acts on this protocol",
                     "data_type": "string",
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ],
                     "order": 7,
                     "primary": true
@@ -1289,14 +1318,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.dir",
                     "data_type": "string",
                     "example_values": [
@@ -1312,7 +1333,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -1356,7 +1378,7 @@
                     "data_path": "action_result.parameter.protocol",
                     "data_type": "string",
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ],
                     "example_values": [
                         "any",
@@ -1388,10 +1410,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.rules_deleted",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1402,6 +1425,17 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.rules_deleted",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1425,9 +1459,9 @@
         },
         {
             "action": "block ip",
-            "identifier": "block_ip",
             "description": "Create a firewall rule to block a specified IP",
             "type": "generic",
+            "identifier": "block_ip",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -1463,14 +1497,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -1478,7 +1504,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -1506,8 +1533,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1517,6 +1548,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1540,10 +1575,10 @@
         },
         {
             "action": "add firewall rule",
-            "identifier": "create_firewall_rule",
             "description": "Add a firewall rule using netsh",
             "verbose": "This action will invoke the command <code>netsh advfirewall firewall add rule</code>, where the rest is determined by the input. Each <b>key-value</b> pair from the <b>other</b> parameter will be added in the form of <b>key</b>=<b>value</b>. The user input will  be sanitized.",
             "type": "generic",
+            "identifier": "create_firewall_rule",
             "read_only": false,
             "parameters": {
                 "name": {
@@ -1617,7 +1652,7 @@
                     "description": "Firewall rule acts on this protocol",
                     "data_type": "string",
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ],
                     "order": 8,
                     "primary": true
@@ -1639,14 +1674,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.action",
                     "data_type": "string",
@@ -1670,7 +1697,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -1714,7 +1742,7 @@
                     "data_path": "action_result.parameter.protocol",
                     "data_type": "string",
                     "contains": [
-                        "protocol"
+                        "winrm protocol"
                     ],
                     "example_values": [
                         "any",
@@ -1746,8 +1774,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1757,6 +1789,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1780,9 +1816,9 @@
         },
         {
             "action": "logoff user",
-            "identifier": "logoff_user",
             "description": "Logoff a user",
             "type": "generic",
+            "identifier": "logoff_user",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -1808,18 +1844,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
@@ -1841,8 +1870,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1852,6 +1885,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1875,9 +1912,9 @@
         },
         {
             "action": "list sessions",
-            "identifier": "list_sessions",
             "description": "List all active sessions",
             "type": "investigate",
+            "identifier": "list_sessions",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -1892,19 +1929,12 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
+               {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
@@ -1954,10 +1984,11 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.summary.num_sessions",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1965,6 +1996,17 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully listed all sessions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.num_sessions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
@@ -1989,11 +2031,10 @@
         },
         {
             "action": "deactivate partition",
-            "identifier": "deactivate_partition",
             "description": "Deactivate a partition",
             "verbose": "Deactivates the system partitions of a machine, which disallows booting from said partition. The subsequent boot of the machine results in using the next option specified in the BIOS to boot from. Often used to netboot for remote reimaging.",
-            "undo": "activate partition",
             "type": "contain",
+            "identifier": "deactivate_partition",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2009,14 +2050,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -2024,7 +2057,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -2032,8 +2066,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2043,6 +2081,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2066,10 +2108,9 @@
         },
         {
             "action": "activate partition",
-            "identifier": "activate_partition",
             "description": "Activate a partition",
-            "undo": "deactivate partition",
             "type": "correct",
+            "identifier": "activate_partition",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2085,14 +2126,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
@@ -2100,7 +2133,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -2108,8 +2142,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2119,6 +2157,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2142,9 +2184,9 @@
         },
         {
             "action": "shutdown system",
-            "identifier": "shutdown_system",
             "description": "Shutdown a system",
             "type": "generic",
+            "identifier": "shutdown_system",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2165,14 +2207,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
@@ -2187,7 +2221,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -2195,8 +2230,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2206,6 +2245,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2229,9 +2272,9 @@
         },
         {
             "action": "restart system",
-            "identifier": "restart_system",
             "description": "Restart a system",
             "type": "generic",
+            "identifier": "restart_system",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2252,14 +2295,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
@@ -2274,7 +2309,8 @@
                         "host name"
                     ],
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ]
                 },
                 {
@@ -2282,8 +2318,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2293,6 +2333,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2316,9 +2360,9 @@
         },
         {
             "action": "list policies",
-            "identifier": "list_applocker_policies",
             "description": "List AppLocker Policies",
             "type": "investigate",
+            "identifier": "list_applocker_policies",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -2350,18 +2394,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
@@ -2426,6 +2463,7 @@
                     "example_values": [
                         "Allow"
                     ],
+                    "column_name": "Action",
                     "column_order": 3
                 },
                 {
@@ -2490,7 +2528,7 @@
                     "data_path": "action_result.data.*.user_or_group_sid",
                     "data_type": "string",
                     "contains": [
-                        "user or group sid"
+                        "winrm user or group sid"
                     ],
                     "example_values": [
                         "S-1-1-0"
@@ -2499,8 +2537,12 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2508,6 +2550,10 @@
                     "example_values": [
                         "Successfully listed AppLocker Policies"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2531,10 +2577,10 @@
         },
         {
             "action": "block file path",
-            "identifier": "create_applocker_policy",
             "description": "Create a new AppLocker policy to block a file path",
             "verbose": "By default, this policy will apply to the \"Everyone\" group. You can specify the user with either a variety of formats, which are documented <a href=\"https://technet.microsoft.com/en-us/library/ee460963.aspx\" target=\"_blank\">here</a>. By specifying LDAP, it will apply that policy to that GPO, as opposed to just the local machine. By default, Windows <b>does not</b> have the service required service running for AppLocker policies to be enforced. The <b>Application Identity</b> service must be running for AppLocker to enforce its policies.",
             "type": "generic",
+            "identifier": "create_applocker_policy",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2572,7 +2618,7 @@
                     "data_type": "string",
                     "order": 3,
                     "contains": [
-                        "user or group sid"
+                        "winrm user or group sid"
                     ],
                     "primary": true
                 },
@@ -2588,14 +2634,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.deny_allow",
                     "data_type": "string",
@@ -2618,7 +2656,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
@@ -2643,7 +2682,7 @@
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "contains": [
-                        "user or group sid"
+                        "winrm user or group sid"
                     ],
                     "example_values": [
                         "Administrator"
@@ -2654,8 +2693,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2665,6 +2708,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2688,9 +2735,9 @@
         },
         {
             "action": "delete policy",
-            "identifier": "delete_applocker_policy",
             "description": "Delete an AppLocker policy",
             "type": "generic",
+            "identifier": "delete_applocker_policy",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2720,15 +2767,7 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
+               {
                     "data_path": "action_result.parameter.applocker_policy_id",
                     "data_type": "string",
                     "example_values": [
@@ -2742,7 +2781,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
@@ -2761,8 +2801,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2772,6 +2816,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2795,9 +2843,9 @@
         },
         {
             "action": "get file",
-            "identifier": "get_file",
             "description": "Copy a file from the Windows Endpoint to the Vault",
             "type": "investigate",
+            "identifier": "get_file",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -2823,14 +2871,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.file_path",
                     "data_type": "string",
                     "example_values": [
@@ -2839,21 +2879,45 @@
                     ],
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "column_name": "File Path",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
                         "host name"
-                    ]
+                    ],
+                    "column_name": "IP/Hostname",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved file and added it to the Vault"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -2870,13 +2934,6 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully retrieved file and added it to the Vault"
-                    ]
-                },
-                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -2891,16 +2948,16 @@
                     ]
                 }
             ],
-            "versions": "EQ(*)",
             "render": {
                 "type": "table"
-            }
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "upload file",
-            "identifier": "send_file",
             "description": "Copy a file from the vault to the Windows Endpoint",
             "type": "generic",
+            "identifier": "send_file",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -2936,14 +2993,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.destination",
                     "data_type": "string",
                     "example_values": [
@@ -2951,18 +3000,23 @@
                     ],
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "column_name": "Destination",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
                         "host name"
-                    ]
+                    ],
+                    "column_name": "IP/Hostname",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
@@ -2972,15 +3026,21 @@
                     ],
                     "contains": [
                         "vault id"
-                    ]
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -2990,6 +3050,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3006,17 +3070,17 @@
                     ]
                 }
             ],
-            "versions": "EQ(*)",
             "render": {
                 "type": "table"
-            }
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "copy file",
-            "identifier": "copy_file",
             "description": "Run the copy command on the Windows Endpoint",
             "verbose": "For best results, both the <b>from</b> and <b>to</b> parameters should be absolute paths to their respective locations.",
             "type": "generic",
+            "identifier": "copy_file",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -3052,14 +3116,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.from",
                     "data_type": "string",
                     "example_values": [
@@ -3067,18 +3123,23 @@
                     ],
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "column_name": "From",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
                         "host name"
-                    ]
+                    ],
+                    "column_name": "IP/Hostname",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.to",
@@ -3088,15 +3149,21 @@
                     ],
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "column_name": "To",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3106,6 +3173,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3129,10 +3200,10 @@
         },
         {
             "action": "delete file",
-            "identifier": "delete_file",
             "description": "Run the delete command on the Windows Endpoint",
             "verbose": "For best results, the <b>file path</b> parameter should be an absolute path to a location.",
             "type": "generic",
+            "identifier": "delete_file",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -3164,14 +3235,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.file_path",
                     "data_type": "string",
                     "example_values": [
@@ -3179,7 +3242,9 @@
                     ],
                     "contains": [
                         "file path"
-                    ]
+                    ],
+                    "column_name": "File Path",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.force",
@@ -3187,26 +3252,35 @@
                     "example_values": [
                         true,
                         false
-                    ]
+                    ],
+                    "column_name": "Force",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
-                        "8.8.8.8"
+                        "8.8.8.8",
+                        "8.8.8.8\\testphantom.local"
                     ],
                     "contains": [
                         "ip",
                         "host name"
-                    ]
+                    ],
+                    "column_name": "IP/HOSTNAME",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3216,6 +3290,10 @@
                     ],
                     "column_name": "Message",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
