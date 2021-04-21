@@ -205,7 +205,8 @@
                         "bg group name"
                     ],
                     "default": "RiskyUsers",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 },
                 "bg_new_group_name": {
                     "description": "New name of the group to rename to",
@@ -290,7 +291,8 @@
                         "bg group name"
                     ],
                     "default": "RiskyUsers",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 }
             },
             "output": [
@@ -364,7 +366,8 @@
                         "bg group name"
                     ],
                     "default": "RiskyUsers",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 },
                 "bg_user_name": {
                     "description": "User name to add",
@@ -457,7 +460,8 @@
                         "bg group name"
                     ],
                     "default": "RiskyUsers",
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 },
                 "bg_user_name": {
                     "description": "User name to remove",
