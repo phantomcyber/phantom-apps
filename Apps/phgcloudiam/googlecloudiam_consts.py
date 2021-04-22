@@ -13,7 +13,6 @@ ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configu
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 API_CLIENT_ERR_MSG = "Could not create API client"
 INVALID_SERVICE_ACCOUNT_JSON = "Please provide a valid value in the 'Contents of Service Account JSON file' asset configuration parameter"
-VAULT_FILE_CREATION_ERR_MSG = "Error occurred while saving the file to vault"
 LIST_SERVICE_ACCOUNT_KEY_SUCCESS_MSG = "Successfully retrieved the service account key(s)"
 GET_SERVICE_ACCOUNT_KEY_SUCCESS_MSG = "Successfully retrieved the service account key"
 DELETE_SERVICE_ACCOUNT_KEY_SUCCESS_MSG = "Successfully deleted the service account key"

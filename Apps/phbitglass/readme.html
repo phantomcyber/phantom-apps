@@ -1,0 +1,121 @@
+<!-- File: readme.html
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<p>
+    The app pulls cloudaudit and access Bitglass log data filtered down to the specified DLP patterns. It also provides actions for access to Bitglass REST APIs for group and user manipulation. A sample playbook is included.
+</p>
+<h2>Troubleshooting tips, known issues, and miscellaneous notes</h2>
+<p>
+    <ul>
+        <li>After installing the app, please perform the following configuration steps:</li>
+        <ul>
+            <li>Create a new asset and save the required settings 'OAuth 2 Authentication Token' and 'Bitglass API URL' in the 'Asset Settings' tab</li>
+            <li>In the 'Ingest Settings' tab, select the source (i.e 'events') and enable polling interval or another scheduling option, press SAVE</li>
+            <li>Do 'Asset Settings / TEST CONNECTIVITY' and make sure it passes</li>
+        </ul>
+        <li>The Phantom logs are available in /var/log/phantom or ${phantom_home}/var/log/phantom (for a non-root installation)</li>
+        <li>The last ingested data with the time and error code (if failed) is available in the app state directory /opt/phantom/local_data/app_states/8119e222-818e-42f5-a210-1c7c9d337e81 in lastlog-*.json files</li>
+        <li>Optionally, install the bitglass_dlp_response.tgz playbook sample before creating your playbook from scratch</li>
+    </ul>
+</p>
+<h2>The actions available with the app roughly fall into 3 groups</h2>
+<p>
+    <ul>
+        Phantom standard and Bitglass log event retrieval
+        <ul>
+            <li>'test connectivity': Phantom requirement to test the asset settings (API url, authentication token, etc.)</li>
+            <li>'on poll': Phantom requirement for automatic data ingestion. Only the 'DLP Pattern for Access' and 'DLP Pattern for CloudAudit' matches from the log types 'Access' and 'CloudAudit' correspondingly get ingested into Phantom</li>
+            <li>'filter by dlp pattern': Additionally to filtering done according to the asset params 'DLP Pattern for Access' and 'DLP Pattern for CloudAudit' (as part of the ingestion), filter the ingested Bitglass log events further down as defined by the 'bg_match_expression' action param</li>
+        </ul>
+        User manipulation in response to log events from either Bitglass or other vendors
+        <ul>
+            <li>'add user to group': Add the user from the offending log event to a Bitglass group. For Bitglass log event source, the user is determined according to the asset params 'DLP Pattern for Access', 'DLP Pattern for CloudAudit' and the 'bg_match_expression' param of the 'filter by dlp pattern' action by chaining this action after 'filter by dlp pattern'</li>
+            <li>'remove user from group': Same but in reverse</li>
+            <li>'deactivate user': A more drastic action in comparison to 'add user to group' above</li>
+            <li>'reactivate user': Same but in reverse</li>
+        </ul>
+        Other available actions covering the rest of the methods in Bitglass REST API, please refer to the online documentation for reference
+        <ul>
+            <li>'create update user'</li>
+            <li>'create update group'</li>
+            <li>'delete group'</li>
+        </ul>
+    </ul>
+</p>
+<h2>The following describes creating a simple playbook from scratch for the 'User manipulation' use case described above. The resulting playbook should be similar to the sample bitglass_dlp_response.tgz playbook included with the app package</h2>
+<p>
+    <ol>
+        <li>Go to the 'Playbooks' page and click '+ PLAYBOOK'</li>
+        <li>Drag the arrow on the 'START' block and click 'Action' in the menu on the left</li>
+        <li>Choose 'Bitglass', the available actions will be listed</li>
+        <li>Choose 'filter by dlp pattern'. This action will narrow down the available data (in the form of Phantom artifacts already available and the ones to be ingested into the future)</li>
+        <li>Choose the asset configured earlier. Please note, that the artifacts available on the system have been already pre-filtered according to the 'DLP Pattern for Access' and 'DLP Pattern for CloudAudit' asset settings</li>
+        <li>Override the 'bg_match_expression' and 'bg_log_event' params if necessary (keeping the defaults values of Malware.* and artifact:*.id correspondingly should be good for a start)</li>
+        <li>Click 'SAVE'. That concludes defining the first action</li>
+        <li>Pull at the output pin of the first action and click 'Action' to define the next action</li>
+        <li>Choose 'Bitglass', the available actions will be listed</li>
+        <li>Choose 'add user to risk group'. This action will extract the user name from the artifact data corresponding to the log event and call Bitglass REST API to add the offending user to the group of risky users</li>
+        <li>Choose the same asset configured earlier</li>
+        <li>Override the 'bg_group_name' param if necessary. This group must have been created previously so that it exists</li>
+        <li>For the 'bg_user_name', this value has been extracted by the previous action and is available to pick as 'data.*.userName', use it</li>
+        <li>Click 'SAVE'. That concludes defining the second action</li>
+        <li>Connect the output pin of the second action to the 'END' block</li>
+        <li>Click 'PLAYBOOK SETTINGS' and set 'Operates on' to 'events' and check 'Active'</li>
+        <li>Enter the desired playbook name in the upper left corner</li>
+        <li>Click the 'SAVE' button</li>
+        <li>Enter the description if prompted and click the 'SAVE' button</li>
+        <li>From now on, the playbook will be run automatically whenever new data conforming to the filter parameters defined above arrives</li>
+        <li>IMPORTANT! If using the Playbook Debugger or invoking the playbook manually, be sure to change the default value of the 'Scope' setting from the default 'new' to 'all'. Skipping this step will result in a Phantom error as the input data set will be empty in such a case</li>
+    </ol>
+</p>
+<h2>The following table summarizes all the params available</h2>
+<p>
+    <table>
+        <tr>
+            <th>Param name</th>
+            <th>Found in asset / action</th>
+            <th>Type</th>
+            <th>Value example</th>
+        </tr>
+        <tr>
+            <td>'DLP Pattern for Access'</td>
+            <td>asset</td>
+            <td>regex</td>
+            <td>Malware.*|PCI.*</td>
+        </tr>
+        <tr>
+            <td>'DLP Pattern for CloudAudit'</td>
+            <td>asset</td>
+            <td>regex</td>
+            <td>^PCI.*</td>
+        </tr>
+        <tr>
+            <td>'bg_match_expression'</td>
+            <td>'filter by dlp pattern'</td>
+            <td>regex</td>
+            <td>Malware.*</td>
+        </tr>
+        <tr>
+            <td>'bg_log_event' </td>
+            <td>'filter by dlp pattern'</td>
+            <td>Phantom wildcard</td>
+            <td>artifact:*.id</td>
+        </tr>
+        <tr>
+            <td>'bg_group_name'</td>
+            <td>'add user to group'</td>
+            <td>string</td>
+            <td>RiskyUsers</td>
+        </tr>
+        <tr>
+            <td>'bg_user_name'</td>
+            <td>'add user to group'</td>
+            <td>Phantom wildcard</td>
+            <td>filter_by_dlp_pattern_1:action_result.data.*.userName</td>
+        </tr>
+    </table>
+</p>
+<p>
+    All filtering params of the asset and actions described above are Python regular expressions. For example, Malware.*|PCI.* matches any string containing EITHER the substring of 'Malware' followed by any number of chars including zero OR, likewise, with the 'PCI' char sequence. Please refer to the Python regex documentation
+</p>
