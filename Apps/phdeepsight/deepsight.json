@@ -123,26 +123,42 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.domain",
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.firstSeen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-17T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.lastSeen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-18T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reputationValues.reputation",
@@ -161,19 +177,31 @@
                     "data_type": "numeric",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300517
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T22:10:59Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300517"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.person",
@@ -273,11 +301,17 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False, Last seen: 2016-11-18T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.domain",
@@ -285,6 +319,9 @@
                     "contains": [
                         "url",
                         "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar"
                     ]
                 },
                 {
@@ -301,19 +338,32 @@
                 },
                 {
                     "data_path": "action_result.summary.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.last_seen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-18T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -347,7 +397,10 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.MD5",
@@ -361,38 +414,62 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "0fe84a1aba99ff4b20d138216b1bbe95de273f582cb9dec07da6a6aaa8f79ea7"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.reputation",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.id",
                     "data_type": "numeric",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300516
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "GozNym Threat Persists despite Researcher Disruption Efforts"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T21:03:11Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300516"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Reputation: Malicious, Total reports: 1"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.file",
@@ -401,23 +478,38 @@
                         "hash",
                         "md5",
                         "sha256"
+                    ],
+                    "example_values": [
+                        "0fe84a1aba99ff4b20d138216b1bbe95de273f582cb9dec07da6a6aaa8f79ea7"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.reputation",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_reports",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -449,18 +541,29 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.url",
                     "data_type": "string",
                     "contains": [
-                        "url"
+                        "url",
+                        "file name"
+                    ],
+                    "example_values": [
+                        "http://eworldmagazine.org/reference/nfgsrcx.exe"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.firstSeen",
@@ -475,61 +578,100 @@
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "eworldmagazine.org"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.host.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/eworldmagazine.org"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.id",
                     "data_type": "numeric",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300527
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Armyworm Likely Responsible for November 2015 Compromise of Nuclear Fusion Research Center in Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-19T15:11:08Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300527"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.person",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Moto Sato"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.email",
                     "data_type": "string",
                     "contains": [
                         "email"
+                    ],
+                    "example_values": [
+                        "snowyowl@jpnsec.com"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.organization",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Personal"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.city",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Suginami-Ku"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.postalCode",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "166-0013"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.country",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.created",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-06-17T10:33:26Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.updated",
@@ -537,17 +679,26 @@
                 },
                 {
                     "data_path": "action_result.data.*.whois.expires",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-06-17T10:33:26Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.registrar",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Gmo Internet, Inc. D/B/A Onamae.Com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.whois.nameServers",
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "NS12.VALUE-DOMAIN.COM"
                     ]
                 },
                 {
@@ -587,22 +738,36 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
-                        "url"
+                        "url",
+                        "file name"
+                    ],
+                    "example_values": [
+                        "http://eworldmagazine.org/reference/nfgsrcx.exe"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.last_seen",
@@ -610,11 +775,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -646,26 +817,42 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ip",
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.firstSeen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-03-29T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.lastSeen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-28T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.reputationValues.reputation",
@@ -684,23 +871,38 @@
                     "data_type": "numeric",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300524
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery Activity Observed in the Middle East"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-16T21:53:48Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matiReports.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300524"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.organization.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Dedicated Servers"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.organization.type",
@@ -716,51 +918,87 @@
                 },
                 {
                     "data_path": "action_result.data.*.network.carrier",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Uab Cherry Servers"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.asn",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        16125
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.lineSpeed",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.ipRouting",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Fixed"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.anonymizerStatus",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Private"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.proxyType",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Service"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.proxyLevel",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Elite"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.network.proxyLastDetected",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-05-18T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.geolocation.country",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Lithuania"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.geolocation.city",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Vilnius"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.geolocation.latitude",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        54.6872
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.geolocation.longitude",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25.2797
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.behaviours.*.behaviour",
@@ -810,17 +1048,26 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False, Last seen: 2020-01-28T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
                     ]
                 },
                 {
@@ -837,19 +1084,32 @@
                 },
                 {
                     "data_path": "action_result.summary.whitelisted",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.last_seen",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-28T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ]
         },
@@ -885,27 +1145,45 @@
                     "data_type": "numeric",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300524
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-16T21:53:48Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery Activity Observed in the Middle East"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300524"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.threatDomains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Cyber Espionage"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.yaraSignature.*.name",
@@ -940,6 +1218,9 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
                     ]
                 },
                 {
@@ -962,17 +1243,26 @@
                 },
                 {
                     "data_path": "action_result.data.*.report_data.ips.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/ips/46.166.161.29"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.domains.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/feteh-asefa.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.domains.*.domain",
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "feteh-asefa.com"
                     ]
                 },
                 {
@@ -1028,43 +1318,68 @@
                     "data_type": "string",
                     "contains": [
                         "md5"
+                    ],
+                    "example_values": [
+                        "03af83e3ca033b4811f507cb68468865"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/files/d55601473131f78b0ec0d7d6b5714322e8946fe9f41a84478efe31db849975e1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.sha256",
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "d55601473131f78b0ec0d7d6b5714322e8946fe9f41a84478efe31db849975e1"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.isMalicious",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.detectionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.filename",
                     "data_type": "string",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "NTnghNgIMtRngWB.exe"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.size",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "5697816"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.files.*.parentMd5s",
                     "data_type": "string",
                     "contains": [
                         "md5"
+                    ],
+                    "example_values": [
+                        "ec6c6334946cb48bb2fd646a1966edf9"
                     ]
                 },
                 {
@@ -1094,6 +1409,9 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
                     ]
                 },
                 {
@@ -1136,27 +1454,45 @@
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.regions.*.regionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.countries.*.iso",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "sau"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.countries.*.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Saudi Arabia"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.subregionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Western Asia"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.industries.*.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Educational Services"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.industries.*.naics",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        611
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_data.targets.industries.*.percentage",
@@ -1164,11 +1500,17 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total reports: 1"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.file",
@@ -1177,19 +1519,31 @@
                         "hash",
                         "md5",
                         "sha256"
+                    ],
+                    "example_values": [
+                        "03af83e3ca033b4811f507cb68468865"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.total_reports",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1230,11 +1584,17 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.schemaVersion",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.threatDomains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Cybercrime"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.yaraSignature.*.name",
@@ -1269,11 +1629,17 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "31.42.175.188"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.ips.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/ips/31.42.175.188"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.ips.*.classifications",
@@ -1298,11 +1664,17 @@
                     "data_type": "string",
                     "contains": [
                         "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.domains.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/kurtmiguens.com.ar"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.domains.*.classifications",
@@ -1313,6 +1685,9 @@
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ],
+                    "example_values": [
+                        "200.58.120.18"
                     ]
                 },
                 {
@@ -1324,26 +1699,44 @@
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.subject",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Fwd: \u53f0\u98a8\u5bfe\u7b56\u306b\u3064\u3044\u3066"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.from",
                     "data_type": "string",
                     "contains": [
                         "email"
+                    ],
+                    "example_values": [
+                        "samoto@yahoo.co.jp"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-14T00:00:00Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.content",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "\u5bfe\u7b56\u4f5c\u696d\u3092\u958b\u59cb\u3057\u3066\u3044\u308b\u3068\u601d\u3044\u307e\u3059\u304c\u3001\u69cb\u9020\u7269\u7b49\u306e\u88ab\u707d"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.relatedFileHashes",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "30cd449bba4614c2b0f2adc1984275f6"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emails.*.relatedUrls",
@@ -1357,21 +1750,34 @@
                     "data_type": "string",
                     "contains": [
                         "file name"
+                    ],
+                    "example_values": [
+                        "2016.9.28n\u00ef\u00bd\u00b0595323766doc.zip"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.size",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "569856"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.isMalicious",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.md5",
                     "data_type": "string",
                     "contains": [
                         "md5"
+                    ],
+                    "example_values": [
+                        "a27f6b871202fbad98eedf20088d3a15"
                     ]
                 },
                 {
@@ -1379,15 +1785,24 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "c7a2bc376d6ddfc678e7c7b3324b021edf19c896a80ab1ec7c2f36bc004ef29e"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/files/c7a2bc376d6ddfc678e7c7b3324b021edf19c896a80ab1ec7c2f36bc004ef29e"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.detectionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Gen"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.files.*.parentMd5s",
@@ -1465,11 +1880,17 @@
                 },
                 {
                     "data_path": "action_result.data.*.targets.industries.*.naics",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        52
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targets.industries.*.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Finance and Insurance"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targets.industries.*.percentage",
@@ -1477,42 +1898,69 @@
                 },
                 {
                     "data_path": "action_result.data.*.targets.regions.*.regionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targets.regions.*.subregions.*.subregionName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Eastern Asia"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targets.regions.*.subregions.*.countries.*.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targets.regions.*.subregions.*.countries.*.iso",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "jpn"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_summary_data.id",
                     "data_type": "string",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        300517
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.report_summary_data.uri",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300517"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_summary_data.date",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T22:10:59Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_summary_data.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.report_summary_data.summary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "DeepSight Intelligence observed a spam operation using a Japanese-language template and delivering the URLZone malware from a Cutwail bot between September 2016 and November 2016. The URLZone payload downloaded additional malware executables, including an ISFB sample that uses web injects targeting Japanese banks. Over the past three months, detections of distinct URLZone infections dropped significantly in November, but infections in Japan continue to account for the vast majority of URLZone activity. This operation has demonstrated a clear focus on Japanese targets, and it is likely that URLZone activity will continue to heavily target Japan in spam campaigns using language and themes relevant to its people."
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.vault.size",
@@ -1547,26 +1995,42 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Summary title: Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.mati_id",
                     "data_type": "string",
                     "contains": [
                         "deepsight report id"
+                    ],
+                    "example_values": [
+                        "300517"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.download_report",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.summary_title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.vault_id",
@@ -1581,11 +2045,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
