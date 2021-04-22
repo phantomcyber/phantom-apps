@@ -63,3 +63,8 @@ FS_WEB_POLICIES = '/api/policies'
 FS_ERR_CODE_MSG = "Error code unavailable"
 FS_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 FS_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+# validate integer
+ERR_VALID_INT_MSG = "Please provide a valid integer value in the {}"
+ERR_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {}"
+HOST_ID_INT_PARAM = "'host_id' action parameter"

@@ -70,12 +70,31 @@ class ForescoutCounteractConnector(BaseConnector):
 
         return error_text
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(
+            action_result.set_status(
+                phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)
+            ), None
+        )
 
     def _process_html_response(self, response, action_result):
 
@@ -84,6 +103,9 @@ class ForescoutCounteractConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -225,21 +247,21 @@ class ForescoutCounteractConnector(BaseConnector):
         if module == 'dex':
             status, msg = self._verify_dex_allowed(action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
 
             auth = (config['dex_username'] + '@' + config['dex_account'], config['dex_password'])
-            headers = { 'Content-Type': 'application/xml' }
+            headers = {'Content-Type': 'application/xml'}
 
         if module == 'web':
             status, msg = self._verify_web_allowed(action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
 
             ret_val, token = self._get_web_jwt_token(action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, token), None)
 
             headers = {
@@ -248,7 +270,7 @@ class ForescoutCounteractConnector(BaseConnector):
             }
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -286,7 +308,7 @@ class ForescoutCounteractConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress("Test Connectivity for DEX Failed")
                 return action_result.get_status()
 
@@ -302,7 +324,7 @@ class ForescoutCounteractConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call('web', FS_WEB_HOSTS, action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress("Test Connectivity for web Failed")
                 return action_result.get_status()
 
@@ -313,7 +335,7 @@ class ForescoutCounteractConnector(BaseConnector):
 
         if not dex_credentials and not web_credentials:
             self.save_progress("Test Connectivity Failed")
-            return action_result.get_status()
+            return action_result.set_status(phantom.APP_ERROR, "Credentials for neither DEX nor Web were provided")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -326,7 +348,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', FS_WEB_HOSTS, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -350,7 +372,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', FS_WEB_POLICIES, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -374,6 +396,10 @@ class ForescoutCounteractConnector(BaseConnector):
         host_id = param.get('host_id')
         host_ip = param.get('host_ip')
         host_mac = param.get('host_mac')
+
+        ret_val, host_id = self._validate_integer(action_result, host_id, HOST_ID_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if host_id:
             url = '{}/{}'.format(FS_WEB_HOSTS, host_id)
@@ -428,7 +454,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', url, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -459,7 +485,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -498,7 +524,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data({'host_key_name': host_key_name,
@@ -539,7 +565,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_LIST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add a dictionary that is made up of the most important values from data into the summary
