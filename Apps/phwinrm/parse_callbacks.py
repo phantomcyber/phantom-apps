@@ -1,5 +1,5 @@
 # File: parse_callbacks.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -17,6 +17,7 @@ from collections import OrderedDict
 
 from builtins import str
 import six
+import json
 
 
 def clean_str(input_str):
@@ -100,22 +101,30 @@ def list_processes(action_result, response):
         )
 
     output = response.std_out
-    lines = output.splitlines()
-    for line in lines[2:]:
-        process = {}
-        columns = line.split()
-        try:
-            process['handles'] = int(columns[0])
-            process['non_paged_memory_(K)'] = int(columns[1])
-            process['paged_memory_(K)'] = int(columns[2])
-            process['working_set_(K)'] = int(columns[3])
-            process['virtual_memory_(M)'] = int(columns[4])
-            process['processor_time_(s)'] = float(columns[5])
-            process['pid'] = int(columns[6])
-            process['name'] = columns[7]
-        except:
-            continue
-        action_result.add_data(process)
+    processes = json.loads(output)
+    if not processes:
+        summary = action_result.update_summary({})
+        summary['num_processes'] = 0
+        return action_result.set_status(phantom.APP_ERROR, "No processes found")
+    column_mapping = {
+        'Handles': 'handles',
+        'NPM': 'non_paged_memory',
+        'PM': 'paged_memory',
+        'WS': 'working_set',
+        'VM': 'virtual_memory',
+        'CPU': 'processor_time_(s)',
+        'Id': 'pid',
+        'SessionId': 'session_id',
+        'Name': 'name',
+    }
+
+    for process in processes:
+        data = { 'raw': process }
+        for key, value in process.items():
+            key = column_mapping.get(key)
+            if key:
+                data[key] = value
+        action_result.add_data(data)
 
     size = action_result.get_data_size()
     if size == 0:
@@ -270,6 +279,8 @@ def list_firewall_rules(action_result, response, **kwargs):
     summary = action_result.update_summary({})
     summary['num_rules'] = size
 
+    if size == 0:
+        return action_result.set_status(phantom.APP_SUCCESS, "No firewall rule found for given parameters")
     return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved firewall rules")
 
 
