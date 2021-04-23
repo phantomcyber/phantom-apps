@@ -59,12 +59,15 @@
             "identifier": "ack_detection",
             "read_only": false,
             "parameters": {
-                "detection_id" : {
+                "detection_id": {
                     "description": "Unique Red Canary detection identifier",
-                    "data_type" : "numeric",
-                    "required" : true,
-                    "primary" : true,
-                    "order" : 0
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ],
+                    "primary": true
                 }
             },
             "output": [
@@ -72,7 +75,14 @@
                     "data_path": "action_result.parameter.detection_id",
                     "data_type": "string",
                     "column_name": "Detection ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
@@ -91,6 +101,20 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -100,23 +124,26 @@
         },
         {
             "action": "remediate detection",
-            "description": "You can update a detection's remediation state",
+            "description": "Update a detection's remediation state",
             "type": "generic",
             "identifier": "remediate",
             "read_only": false,
             "parameters": {
-                "detection_id" : {
+                "detection_id": {
                     "description": "Unique Red Canary detection identifier",
-                    "data_type" : "numeric",
-                    "required" : true,
-                    "primary" : true,
-                    "order": 0
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ],
+                    "primary": true
                 },
-                "remediation_state" : {
+                "remediation_state": {
                     "description": "Way in which the detection was remediated",
                     "data_type": "string",
-                    "required" : true,
-                    "value_list" : [
+                    "required": true,
+                    "value_list": [
                         "remediated",
                         "not_remediated_false_positive",
                         "not_remediated_sanctioned_activity",
@@ -124,10 +151,9 @@
                     ],
                     "order": 1
                 },
-                "comment" : {
-                    "description" : "Comment describing the reason why the detection was remediated in this manner",
+                "comment": {
+                    "description": "Comment describing the reason why the detection was remediated in this manner",
                     "data_type": "string",
-                    "required" : false,
                     "order": 2
                 }
             },
@@ -136,7 +162,10 @@
                     "data_path": "action_result.parameter.detection_id",
                     "data_type": "string",
                     "column_name": "Detection ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.remediation_state",
@@ -149,6 +178,10 @@
                     "data_type": "string",
                     "column_name": "Comment",
                     "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
@@ -167,6 +200,20 @@
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -174,7 +221,5 @@
             },
             "versions": "EQ(*)"
         }
-
-
     ]
 }

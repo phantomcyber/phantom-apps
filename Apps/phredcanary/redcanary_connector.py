@@ -40,9 +40,13 @@ class RedCanaryConnector(BaseConnector):
         self._base_url = None
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error messages from the exception.
-        :param e: Exception object
-        :return: error message
+        """
+        This method is used to get appropriate error messages from the exception
+
+        Parameters:
+            :e: Exception object
+        Returns:
+            :return: error message
         """
 
         try:
@@ -104,7 +108,7 @@ class RedCanaryConnector(BaseConnector):
         if status_code != 200:
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-        return RetVal(action_result.set_status(phantom.APP_SUCCESS, message), None)
+        return RetVal(phantom.APP_SUCCESS, None)
 
     def _process_json_response(self, r, action_result):
         # Try a json parse
@@ -137,8 +141,6 @@ class RedCanaryConnector(BaseConnector):
             action_result.add_debug_data({'r_text': r.text})
             action_result.add_debug_data({'r_headers': r.headers})
 
-        # Process each 'Content-Type' of response separately
-
         # Process a json response
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
@@ -161,8 +163,6 @@ class RedCanaryConnector(BaseConnector):
             r.text.replace('{', '{{').replace('}', '}}')
         )
 
-        self.set_status("APP ERROR: {}".format(phantom.APP_ERROR))
-
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
@@ -184,6 +184,9 @@ class RedCanaryConnector(BaseConnector):
                 verify=self.config.get('verify_server_cert', False),
                 **kwargs
             )
+        except requests.exceptions.ConnectionError:
+            error_message = "Error connecting to server. Connection refused from the server for %s" % (endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             return RetVal(
@@ -198,9 +201,6 @@ class RedCanaryConnector(BaseConnector):
         """
         Returns base url for Red Canary API
         """
-
-        self.debug_print("Config: {}".format(self.config))
-
         return "{}/openapi/v3/{}".format(self.config.get('URL').rstrip("/"), string)
 
     def _build_url_list(self, base_url):
@@ -209,7 +209,6 @@ class RedCanaryConnector(BaseConnector):
 
         Parameters:
             :baseurl:   String of base url (up to parameter)
-            :args:      Tuple list of arguments and values to include with the URL
         Returns:
             :return: list of urls
         """
@@ -244,8 +243,8 @@ class RedCanaryConnector(BaseConnector):
         Generates full URLS for API polls
 
         Parameters:
-            :baseurl:   String of base url (up to parameter)
-            :args:      Tuple list of arguments and values to include with the URL
+            :baseurl:    String of base url (up to parameter)
+            :param_list: Tuple list of arguments and values to include with the URL
         Returns:
             :return: string value of the url to query
         """
@@ -284,10 +283,41 @@ class RedCanaryConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, int(self._detection_count)
 
+    def _validate_integer(self, action_result, parameter, key):
+        """
+        Validate an integer
+
+        Parameters:
+            :action_result: object of ActionResult class
+            :parameter: value to validate
+            :key: name of the parameter
+        Returns:
+            :return: status phantom.APP_ERROR/phantom.APP_SUCCESS, value
+        """
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, INVALID_INTEGER_ERR_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _handle_ack_detection(self, param):
         """Acknowledges a Red Canary detection"""
         action_result = self.add_action_result(ActionResult(dict(param)))
+
         det_id = param.get('detection_id')
+        # Validate 'detection_id' parameter
+        ret_val, det_id = self._validate_integer(action_result, det_id, DETECTION_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         self.save_progress(f"Acknowledging detection {det_id}")
 
         url = self._generate_base_api_url(f'detections/{det_id}/mark_acknowledged')
@@ -305,7 +335,13 @@ class RedCanaryConnector(BaseConnector):
     def _handle_update_remediation(self, param):
         """Updates remediation information associated with a RC detection"""
         action_result = self.add_action_result(ActionResult(dict(param)))
+
         det_id = param.get('detection_id')
+        # Validate 'detection_id' parameter
+        ret_val, det_id = self._validate_integer(action_result, det_id, DETECTION_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         self.save_progress(f"Updating remediation information for {det_id}")
 
         http_params = dict()
@@ -319,23 +355,23 @@ class RedCanaryConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Detection acknowledge failed")
+            self.save_progress("Detection's remediation state update failed")
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully acknowledged detection")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated detection's remediation state")
 
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to Red Canary")
-        # make rest call
         url = self._generate_base_api_url("docs/index.html")
 
         self.save_progress("Testing Connection to: {0}".format(url))
 
         headers = self._generate_headers()
 
+        # make rest call
         ret_val, _ = self._make_rest_call(
             url, action_result, params=None, headers=headers
         )
@@ -344,11 +380,9 @@ class RedCanaryConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
-
             return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _on_poll(self, param):
@@ -406,9 +440,9 @@ class RedCanaryConnector(BaseConnector):
         # Failure to parse count
         if phantom.is_fail(ret_val):
             self.save_progress("Failed to parse detection count")
-            self.debug_print("Failed to parse detection count", response)
+            self.debug_print("Failed to parse detection count")
 
-            return action_result.set_status(ret_val)
+            return action_result.set_status(ret_val, count)
 
         # If there are no detections stop
         if count == 0:
@@ -454,17 +488,21 @@ class RedCanaryConnector(BaseConnector):
             detections.extend(response.get('data'))
 
         self.save_progress(f"Found {len(detections)} new detections")
-        self.save_progress("Enriching detection data. This can take a long time.")
+        self.save_progress("Enriching detection data. This can take a long time")
 
-        obj_detections = RCDetections(detections, self.config.get("API Key"))
-        self.save_progress("Pulling user details")
-        obj_detections.get_user_details()
-        self.save_progress("Pulling detector details")
-        obj_detections.get_detector_details()
-        self.save_progress("Pulling detection timelines")
-        obj_detections.get_detection_timeline()
-        self.save_progress("Pulling endpoint details")
-        obj_detections.get_endpoint_details()
+        try:
+            obj_detections = RCDetections(detections, self.config.get("API Key"))
+            self.save_progress("Pulling user details")
+            obj_detections.get_user_details()
+            self.save_progress("Pulling detector details")
+            obj_detections.get_detector_details()
+            self.save_progress("Pulling detection timelines")
+            obj_detections.get_detection_timeline()
+            self.save_progress("Pulling endpoint details")
+            obj_detections.get_endpoint_details()
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Error occurred while pulling the data. {}".format(err_msg))
 
         for detection in obj_detections.Detections:
             ret_val, message, cid = self._save_artifacts(detection, cid)
@@ -481,7 +519,8 @@ class RedCanaryConnector(BaseConnector):
         Saves artifacts to container id
 
         Parameters:
-            :json_response: Data section of the web response
+            :detection: Detection
+            :cid: Container ID
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), message, cid
         """
@@ -540,24 +579,16 @@ class RedCanaryConnector(BaseConnector):
 
         # get the asset config
         self.config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
         self._base_url = self.config.get('base_url')
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
-        # Save the state, this data is saved across actions and app upgrades
-
         # If polling action was run save start time to the state file if no errors were encountered
         if self.get_action_identifier() == "on_poll" and self.get_status() != phantom.APP_ERROR:
             self._state[STR_LAST_RUN] = self._poll_action_start
 
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         # self.save_progress("Final State: {0}".format(self._state))
         return phantom.APP_SUCCESS
