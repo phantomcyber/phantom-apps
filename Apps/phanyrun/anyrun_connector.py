@@ -267,10 +267,14 @@ class AnyrunConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. {}".format(ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="vault meta info"), err))
 
-        # phantom vault file path
-        file_path = vault_meta_info[0].get('path')
-        if not file_path:
+        try:
+            # phantom vault file path
+            file_path = vault_meta_info[0].get('path')
+            if not file_path:
+                return action_result.set_status(phantom.APP_ERROR, ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
+        except:
             return action_result.set_status(phantom.APP_ERROR, ANYRUN_ERR_UNABLE_TO_FETCH_FILE.format(key="path"))
+
         self.save_progress("Detonating file {}".format(file_path))
         files = [
             ('file', open(file_path, 'rb'))
