@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "2.0.0",
-    "utctime_updated": "2020-12-22T07:23:12.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-04-23T05:46:27.000000Z",
     "package_name": "phantom_winrm",
     "main_module": "winrm_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1929,7 +1929,7 @@
                 }
             },
             "output": [
-               {
+                {
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "example_values": [
@@ -2767,7 +2767,7 @@
                 }
             },
             "output": [
-               {
+                {
                     "data_path": "action_result.parameter.applocker_policy_id",
                     "data_type": "string",
                     "example_values": [
