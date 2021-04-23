@@ -1,5 +1,5 @@
 # File: winrm_consts.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -80,9 +80,22 @@ $d = "{}"
 """
 
 WINRM_UNICODE_ERR_MESSAGE = "Invalid unicode detected"
-WINRM_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-WINRM_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or the action parameters."
-WINRM_UNICODE_DAMMIT_TYPE_ERR_MESSAGE = "Error occurred while connecting to the Windows server. Please check the asset configuration and|or the action parameters."
+
+# Constants relating to '_validate_integer'
 WINRM_ERR_INVALID_INT = 'Please provide a valid {msg} integer value in the "{param}"'
-WINRM_ERR_PARTITION = "Failed to fetch system volume, Please check the asset configuration and|or \"ip hostname\" parameter."
+WINRM_ERR_PARTITION = "Failed to fetch system volume, Please check the asset configuration and|or \"ip hostname\" parameter"
 WINRM_ERR_INVALID_VAULT_ID = "Could not retrieve vault file"
+
+# Constants relating to '_get_error_message_from_exception'
+WINRM_ERR_CODE_MSG = "Error code unavailable"
+WINRM_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+WINRM_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+WINRM_TYPE_ERR_MSG = "Error occurred while connecting to the Winrm Server. Please check the asset configuration and|or the action parameters"
+
+# Constants relating to value_list check
+DIRECTION_VALUE_LIST = ["in", "out"]
+DIR_VALUE_LIST = ["in", "out"]
+ACTION_VALUE_LIST = ["allow", "block", "bypass"]
+LOCATION_VALUE_LIST = ["local", "domain", "effective"]
+DENY_ALLOW_VALUE_LIST = ["deny", "allow"]
+VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

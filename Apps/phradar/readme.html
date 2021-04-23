@@ -1,6 +1,6 @@
 <!--
 File: readme.html
-Copyright (c) 2020 Splunk Inc.
+Copyright (c) 2020-2021 RADAR, LLC
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -23,15 +23,15 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                 <li>Follow the directions for contacting the Radar integration team.</li>
             </ul>
 
-        <p>When running the Radar app on the Splunk Phantom platform, the 'base_url' must be configured on the company settings page. To configure the 'base_url' go to admin/company_settings/info and specify a valid URL for the base URL field. If the 'base_url' is not configured, 'create_privacy_incident' action will throw an error message as 'Base URL for phantom appliance must be configured'.</p>
+        <p>When running the Radar app on the Splunk Phantom platform, the 'base_url' must be configured on the company settings page. To configure the 'base_url' go to admin/company_settings/info and specify a valid URL for the base URL field. If the 'base_url' is not configured, the 'create_privacy_incident' action will throw an error message as 'Base URL for phantom appliance must be configured'.</p>
 
 
         <h2>Asset Configuration</h2>
         <p>The configuration that must be set is under the "Asset Settings" tab. Below lists some details for each configuration setting:</p>
         <ul>
             <li>Radar API Bearer Token - A valid Radar bearer token with privileges for reading and writing radar incidents and notes.</li>
-            <li>Radar API URL - defaults to the production URL, but can be set to a test or staging URL.</li>
-            <li>Time Zone - should reflect the time that the Splunk Phantom instance is running in. This configuration is used in a couple of different ways:
+            <li>Radar API URL - Defaults to the production URL, but can be set to a test or staging URL.</li>
+            <li>Time Zone - Should reflect the time that the Splunk Phantom instance is running in. This configuration is used in a couple of different ways:
                 <ul>
                     <li>To specify a privacy incident’s ‘discovered’ timezone, when it is created by the “create privacy incident” action. This data is used during incident assessment and is critically important in determining regulatory timelines for incident notification to governmental agencies.</li>
                     <li>Used when displaying certain action outputs, such as the “created at” and “updated at” outputs from the “get privacy incident” action. These timestamps are converted to the time zone specified in the asset configuration.</li>
