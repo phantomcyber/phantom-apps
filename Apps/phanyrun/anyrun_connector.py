@@ -326,7 +326,7 @@ class AnyrunConnector(BaseConnector):
         config = self.get_config()
 
         self._base_url = config['base_url']
-        self._api_key = config['API_key']
+        self._api_key = config['api_key']
         self._headers = {
             'Authorization': 'API-Key {}'.format(self._api_key)
         }
