@@ -672,7 +672,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         self.debug_print(param)
         watchlist_name = self._handle_py_ver_compat_for_input_str(param['watchlist_name'])
         watchlist_entry = self._handle_py_ver_compat_for_input_str(param['watchlist_entry'])
-        msg_string = '{0} from watchlist={1}'.format(watchlist_entry, watchlist_name)
+        msg_string = '{0} in watchlist={1}'.format(watchlist_entry, watchlist_name)
         ret_val, watch_list_id = self.get_watchlist_id(watchlist_name, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -722,7 +722,7 @@ class DigitalGuardianArcConnector(BaseConnector):
         self.debug_print(param)
         componentlist_name = self._handle_py_ver_compat_for_input_str(param['componentlist_name'])
         componentlist_entry = self._handle_py_ver_compat_for_input_str(param['componentlist_entry'])
-        msg_string = '{0} to componentlist={1}'.format(componentlist_entry, componentlist_name)
+        msg_string = '{0} from componentlist={1}'.format(componentlist_entry, componentlist_name)
         ret_val, list_id = self.get_list_id(componentlist_name, 'component_list', action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()

@@ -139,7 +139,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Add Entry to Watchlist action succeeded"
+                        "Successfully added abc.exe to watchlist=Global - Webmail Domains"
                     ]
                 },
                 {
@@ -171,7 +171,7 @@
         },
         {
             "action": "remove watchlist entry",
-            "description": "Remove the entry from ARC Watchlist",
+            "description": "Remove an entry from ARC Watchlist",
             "type": "contain",
             "identifier": "remove_watchlist_entry",
             "undo": "add watchlist entry",
@@ -243,7 +243,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from Watchlist action succeeded"
+                        "Successfully removed abc.exe from watchlist=Global - Webmail Domains"
                     ]
                 },
                 {
@@ -275,7 +275,7 @@
         },
         {
             "action": "check watchlist entry",
-            "description": "Check for the entry in ARC Watchlist",
+            "description": "Check for an entry in ARC Watchlist",
             "type": "investigate",
             "identifier": "check_watchlist_entry",
             "read_only": true,
@@ -346,7 +346,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Entry in ARC Watchlist action succeeded"
+                        "Successfully found abc.exe in watchlist=Global - Webmail Domains"
                     ]
                 },
                 {
@@ -450,7 +450,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Add Entry to Componentlist action succeeded"
+                        "Successfully added abc.com to componentlist=Global - Webmail Domains"
                     ]
                 },
                 {
@@ -482,7 +482,7 @@
         },
         {
             "action": "remove componentlist entry",
-            "description": "Remove the entry from Componentlist",
+            "description": "Remove an entry from Componentlist",
             "type": "contain",
             "identifier": "remove_componentlist_entry",
             "undo": "add componentlist entry",
@@ -554,7 +554,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from Componentlist action succeeded"
+                        "Successfully removed abc.com from componentlist=Global - Webmail Domains"
                     ]
                 },
                 {
@@ -586,7 +586,7 @@
         },
         {
             "action": "check componentlist entry",
-            "description": "Check the entry in Componentlist",
+            "description": "Check for an entry in Componentlist",
             "type": "investigate",
             "identifier": "check_componentlist_entry",
             "read_only": true,
@@ -657,7 +657,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Remove Entry from Componentlist action succeeded"
+                        "Successfully found abc.com in componentlist=Global - Webmail Domains"
                     ]
                 },
                 {
