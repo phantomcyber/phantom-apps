@@ -1,5 +1,5 @@
 # File: radar_connector.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2020-2021 RADAR, LLC
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -37,10 +37,14 @@ class RadarConnector(BaseConnector):
 
         # set asset config and env vars
         config = self.get_config()
-        self._api_url = config.get("radar_api_url")
-        self._api_url = self._api_url.strip('/')
+        self._api_url = config.get("radar_api_url").strip("/")
         self._verify_ssl = not os.getenv(ALLOW_SELF_SIGNED_CERTS)
         self._time_zone = config.get("time_zone", "UTC")
+        self._request_headers = {
+            "User-Agent": "Splunk Phantom",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {config['radar_api_token']}"
+        }
 
         return phantom.APP_SUCCESS
 
@@ -81,7 +85,7 @@ class RadarConnector(BaseConnector):
         except ValueError as ex:
             err = self._get_error_message_from_exception(ex)
             if 200 <= response.status_code < 399:
-                return RetVal(action_result.set_status(phantom.APP_SUCCESS), {"headers": dict(response.headers)})
+                return RetVal(phantom.APP_SUCCESS, {"headers": dict(response.headers)})
             else:
                 self.debug_print(f"Action: {self.get_action_identifier()} - Process JSON error: {err}")
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err), None)
@@ -205,13 +209,7 @@ class RadarConnector(BaseConnector):
         self.save_progress("Inside Make rest call")
 
         url = f"{self._api_url}{endpoint}"
-        config = self.get_config()
         resp_json = None
-        request_headers = {
-            "User-Agent": "Splunk Phantom",
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {config['radar_api_token']}"
-        }
 
         self.save_progress(f"Sending {method} request to {url}")
 
@@ -224,7 +222,7 @@ class RadarConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
-            resp = request_func(url, verify=self._verify_ssl, headers=request_headers, **kwargs)
+            resp = request_func(url, verify=self._verify_ssl, headers=self._request_headers, **kwargs)
             return self._process_response(resp, action_result)
         except Exception as ex:
             err = self._get_error_message_from_exception(ex)
@@ -420,13 +418,7 @@ class RadarConnector(BaseConnector):
 
         # construct note output with fields we want to render
         note = dict()
-        try:
-            note["id"] = data["headers"]["Location"].split("/")[4]
-        # return error for missing id from response headers
-        except Exception:
-            self.debug_print(f" Action: {action} - Cannot parse 'id' from response headers: {data['headers']}")
-            return action_result.set_status(phantom.APP_ERROR, "API Response payload is missing necessary fields: 'id'")
-
+        note["id"] = data["id"]
         note["incident_id"] = incident_id
         note["content"] = content
 
