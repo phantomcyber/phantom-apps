@@ -18,13 +18,13 @@
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "URL": {
+        "url": {
             "description": "Red Canary instance URL (ex. https://domain.my.redcanary.co)",
             "data_type": "string",
             "required": true,
             "order": 0
         },
-        "API Key": {
+        "api_key": {
             "description": "Red Canary API authentication key",
             "data_type": "password",
             "required": true,

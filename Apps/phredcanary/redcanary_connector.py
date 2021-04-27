@@ -201,7 +201,7 @@ class RedCanaryConnector(BaseConnector):
         """
         Returns base url for Red Canary API
         """
-        return "{}/openapi/v3/{}".format(self.config.get('URL').rstrip("/"), string)
+        return "{}/openapi/v3/{}".format(self.config.get('url').rstrip("/"), string)
 
     def _build_url_list(self, base_url):
         """
@@ -223,7 +223,7 @@ class RedCanaryConnector(BaseConnector):
                     (STR_PER_PAGE, str(MAX_PER_PAGE)),
                     (STR_PAGE, str(count))
                 ]
-            # Not first run and need to incldue since param
+            # Not first run and need to include since param
             else:
                 params = [
                     (STR_PER_PAGE, str(MAX_PER_PAGE)),
@@ -259,7 +259,7 @@ class RedCanaryConnector(BaseConnector):
         """
         Returns dictionary for headers used in Red Canary API request
         """
-        return {'X-Api-Key': self.config.get("API Key")}
+        return {'X-Api-Key': self.config.get("api_key")}
 
     def _find_detection_count(self, json_response):
         """
@@ -318,9 +318,9 @@ class RedCanaryConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        self.save_progress(f"Acknowledging detection {det_id}")
+        self.save_progress("Acknowledging detection {}".format(det_id))
 
-        url = self._generate_base_api_url(f'detections/{det_id}/mark_acknowledged')
+        url = self._generate_base_api_url('detections/{}/mark_acknowledged'.format(det_id))
 
         ret_val, _ = self._make_rest_call(
             url, action_result, params=None, headers=self._generate_headers(), method="patch"
@@ -342,13 +342,13 @@ class RedCanaryConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        self.save_progress(f"Updating remediation information for {det_id}")
+        self.save_progress("Updating remediation information for {}".format(det_id))
 
         http_params = dict()
         http_params.update({'remediation_state': param.get('remediation_state')})
         http_params.update({'comment': param.get('comment')})
 
-        url = self._generate_base_api_url(f'detections/{det_id}/update_remediation_state')
+        url = self._generate_base_api_url('detections/{}/update_remediation_state'.format(det_id))
 
         ret_val, _ = self._make_rest_call(
             url, action_result, params=http_params, headers=self._generate_headers(), method="patch"
@@ -462,7 +462,7 @@ class RedCanaryConnector(BaseConnector):
             "artifacts": []
         })
         ret_val, message, cid = self.save_container(container)
-        self.debug_print(f"save_container (with artifacts) returns, value: {ret_val}, reason: {message}, id: {cid}")
+        self.debug_print("save_container (with artifacts) returns, value: {}, reason: {}, id: {}".format(ret_val, message, cid))
 
         if phantom.is_fail(ret_val):
             self.save_progress("Failed to create container {}".format(ret_val))
@@ -472,7 +472,7 @@ class RedCanaryConnector(BaseConnector):
         detections = []
         for full_url in self._urls:
 
-            self.save_progress(f"Querying URL {full_url}")
+            self.save_progress("Querying URL {}".format(full_url))
 
             # Make API request
             ret_val, response = self._make_rest_call(
@@ -481,17 +481,17 @@ class RedCanaryConnector(BaseConnector):
 
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to connect received return value {}".format(ret_val))
-                self.debug_print("Failed to query for total number of new detections", response)
+                self.debug_print("Failed to query for total number of new detections")
                 return action_result.get_status()
 
             # Add detections to list
             detections.extend(response.get('data'))
 
-        self.save_progress(f"Found {len(detections)} new detections")
+        self.save_progress("Found {} new detections".format(len(detections)))
         self.save_progress("Enriching detection data. This can take a long time")
 
         try:
-            obj_detections = RCDetections(detections, self.config.get("API Key"))
+            obj_detections = RCDetections(detections, self.config.get("api_key"))
             self.save_progress("Pulling user details")
             obj_detections.get_user_details()
             self.save_progress("Pulling detector details")
