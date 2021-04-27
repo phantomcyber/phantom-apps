@@ -17,8 +17,8 @@ import simplejson as json
 class CiscoUmbrellaInvestigateConnector(BaseConnector):
 
     # actions supported by this script
-    ACTION_ID_LOOKUP_IP = "lookup_ip"
-    ACTION_ID_LOOKUP_DOMAIN = "lookup_domain"
+    ACTION_ID_IP_REPUTATION = "ip_reputation"
+    ACTION_ID_DOMAIN_REPUTATION = "domain_reputation"
     ACTION_ID_WHOIS_DOMAIN = "whois_domain"
 
     def __init__(self):
@@ -221,14 +221,14 @@ class CiscoUmbrellaInvestigateConnector(BaseConnector):
 
         # parse the response
         if (response):
-            data[INVESTIGATE_JSON_FEATURES] = response.get(INVESTIGATE_JSON_FEATURES, [])
-            risk_score = response.get(INVESTIGATE_JSON_RISK_SCORE, 0)
+            data[INVESTIGATE_JSON_INDICATORS] = response.get(INVESTIGATE_JSON_INDICATORS, [])
+            risk_score = response.get(INVESTIGATE_JSON_RISK_SCORE, 'Not Found')
             data[INVESTIGATE_JSON_RISK_SCORE] = risk_score
             summary.update({INVESTIGATE_JSON_RISK_SCORE: risk_score})
 
         return phantom.APP_SUCCESS
 
-    def _lookup_domain(self, param):
+    def _domain_reputation(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -282,7 +282,7 @@ class CiscoUmbrellaInvestigateConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _lookup_ip(self, param):
+    def _ip_reputation(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -381,10 +381,10 @@ class CiscoUmbrellaInvestigateConnector(BaseConnector):
 
         ret_val = phantom.APP_SUCCESS
 
-        if (action == self.ACTION_ID_LOOKUP_IP):
-            ret_val = self._lookup_ip(param)
-        elif (action == self.ACTION_ID_LOOKUP_DOMAIN):
-            ret_val = self._lookup_domain(param)
+        if (action == self.ACTION_ID_IP_REPUTATION):
+            ret_val = self._ip_reputation(param)
+        elif (action == self.ACTION_ID_DOMAIN_REPUTATION):
+            ret_val = self._domain_reputation(param)
         elif (action == self.ACTION_ID_WHOIS_DOMAIN):
             ret_val = self._whois_domain(param)
         elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
