@@ -22,7 +22,6 @@ class CheckpointReputationConnector(BaseConnector):
     def __init__(self):
         super(CheckpointReputationConnector, self).__init__()
 
-
     def initialize(self):
         state = self.load_state()
         config = self.get_config()
@@ -33,7 +32,6 @@ class CheckpointReputationConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-
     def finalize(self):
         state = {
             consts.STATE_TOKEN: self._token
@@ -41,7 +39,6 @@ class CheckpointReputationConnector(BaseConnector):
         self.save_state(state)
 
         return phantom.APP_SUCCESS
-
 
     def _handle_test_connectivity(self, params):
         """
@@ -58,9 +55,8 @@ class CheckpointReputationConnector(BaseConnector):
         else:
             self.save_progress("Login to Check Point reputation API is successful")
             self.save_progress("Test Connectivity passed")
-        
-        return ret_val
 
+        return ret_val
 
     def _get_reputation(self, params, endpoint):
         """
@@ -90,8 +86,14 @@ class CheckpointReputationConnector(BaseConnector):
             action_result.add_data(response)
 
             response_status = response.get(consts.RESPONSE_STATUS, {})
-            response_status_label = response_status.get(consts.RESPONSE_STATUS_LABEL, consts.RESPONSE_STATUS_LABEL_ERROR)
-            response_status_message = response_status.get(consts.RESPONSE_STATUS_MESSAGE, consts.RESPONSE_STATUS_MESSAGE_DEFAULT)
+            response_status_label = response_status.get(
+                consts.RESPONSE_STATUS_LABEL,
+                consts.RESPONSE_STATUS_LABEL_ERROR
+            )
+            response_status_message = response_status.get(
+                consts.RESPONSE_STATUS_MESSAGE,
+                consts.RESPONSE_STATUS_MESSAGE_DEFAULT
+            )
 
             if response_status_label in consts.RESPONSE_STATUS_LABEL_SUCCESSES:
                 result_message = consts.RESPONSE_STATUS_MESSAGE_SUCCESS.format(
@@ -101,9 +103,8 @@ class CheckpointReputationConnector(BaseConnector):
                 action_result.set_status(phantom.APP_SUCCESS, result_message)
             else:
                 action_result.set_status(phantom.APP_ERROR, response_status_message)
-        
-        return action_result.get_status()
 
+        return action_result.get_status()
 
     def _token_manager(self, rest_function, kwargs):
         """
@@ -114,7 +115,7 @@ class CheckpointReputationConnector(BaseConnector):
         """
         if not self._token:
             self._token = self._create_token()
-        
+
         try:
             result = rest_function(**kwargs)
         except HTTPError as err:
@@ -124,9 +125,8 @@ class CheckpointReputationConnector(BaseConnector):
                 result = rest_function(**kwargs)
             else:
                 raise err
-        
-        return result
 
+        return result
 
     def _create_token(self):
         """
@@ -145,9 +145,8 @@ class CheckpointReputationConnector(BaseConnector):
 
         response = requests.get(full_url, headers=headers)
         response.raise_for_status()
-        
-        return response.text
 
+        return response.text
 
     def _reputation_rest_call(self, endpoint, resource):
         """
@@ -170,7 +169,6 @@ class CheckpointReputationConnector(BaseConnector):
         response.raise_for_status()
 
         return response.json()
-
 
     def handle_action(self, params):
 
