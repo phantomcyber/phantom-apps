@@ -574,13 +574,7 @@ class DnsdbConnector(BaseConnector):
         time_first_after = param.get(DNSDB_JSON_TIME_FIRST_AFTER)
         time_last_before = param.get(DNSDB_JSON_TIME_LAST_BEFORE)
         time_last_after = param.get(DNSDB_JSON_TIME_LAST_AFTER)
-
         timestamps = [time_first_before, time_first_after, time_last_before, time_last_after]
-        for i, timestamp in enumerate(timestamps):
-            try:
-                timestamps[i] = int(time.mktime(time.strptime(timestamp, DNSDB_TIME_FORMAT)))
-            except (ValueError, TypeError):
-                pass
 
         if time_first_before:
             # Validating the input for time format(epoch or relative seconds)
@@ -608,12 +602,10 @@ class DnsdbConnector(BaseConnector):
 
         for i in timestamps:
             try:
-                utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime((i)))
-                if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+                if i and time.strptime(i, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
                     return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
-            except TypeError:
-                utc = time.strftime(DNSDB_TIME_FORMAT, time.localtime(int(i)))
-                if utc and time.strptime(utc, DNSDB_TIME_FORMAT) > datetime.utcnow().timetuple():
+            except ValueError:
+                if i and int(i) > int(datetime.utcnow().timestamp()):
                     return action_result.set_status(phantom.APP_ERROR, DNSDB_ERR_INVALID_TIME), None
             except Exception as e:
                 err = self._get_error_message_from_exception(e)
