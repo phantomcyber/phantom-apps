@@ -342,8 +342,7 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2,
-                    "required": true
+                    "order": 2
                 }
             },
             "output": [
@@ -431,8 +430,7 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2,
-                    "required": true
+                    "order": 2
                 },
                 "range": {
                     "description": "How many minutes back to get changed reports from",
