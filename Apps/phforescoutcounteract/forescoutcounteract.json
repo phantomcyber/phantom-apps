@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "1.0.5",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:15:08.000000Z",
     "package_name": "phantom_forescoutcounteract",
     "main_module": "forescoutcounteract_connector.py",
@@ -282,7 +282,7 @@
         {
             "action": "get device info",
             "description": "Get the properties of a host",
-            "verbose": "One of the parameters (host_id, host_ip, or host_mac) is required and the first to be provided is used (in that order).",
+            "verbose": "One of the parameters (host_id, host_ip, or host_mac) is required and the first to be provided is used (in that order). This action requires Web API credential in asset configuration.",
             "type": "investigate",
             "identifier": "list_host_properties",
             "read_only": true,
@@ -669,6 +669,7 @@
         {
             "action": "get sessions",
             "description": "Get active sessions in CounterACT",
+            "verbose": "This action requires Web API credential in asset configuration",
             "type": "investigate",
             "identifier": "get_active_sessions",
             "read_only": true,
@@ -807,6 +808,7 @@
         {
             "action": "install firewall",
             "description": "Install a virtual firewall with a property",
+            "verbose": "This action requires DEX credential in asset configuration.",
             "type": "generic",
             "identifier": "install_vfw",
             "read_only": false,
@@ -870,7 +872,9 @@
                     "contains": [
                         "forescout mac address",
                         "ip"
-                    ]
+                    ],
+                    "column_name": "Host Key Value",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.host_key_name",
@@ -974,6 +978,7 @@
         {
             "action": "delete property",
             "description": "Delete a property of a host",
+            "verbose": "This action requires DEX credential in asset configuration.",
             "type": "correct",
             "identifier": "delete_property",
             "read_only": false,
@@ -1024,7 +1029,9 @@
                     "contains": [
                         "forescout mac address",
                         "ip"
-                    ]
+                    ],
+                    "column_name": "Host Key Value",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.host_key_name",
@@ -1120,6 +1127,7 @@
         {
             "action": "update property",
             "description": "Update a property of a host",
+            "verbose": "This action requires DEX credential in asset configuration.<p>The created new host will be only seen on UI when the host value is in the range of IP segment configured in ForeScout CounterACT.</p><p>The property_name field is the Property Tag field of Property created in CounterACT. This action won’t support composite type of property.</p>",
             "type": "correct",
             "identifier": "update_property",
             "read_only": false,
@@ -1183,7 +1191,9 @@
                     "contains": [
                         "forescout mac address",
                         "ip"
-                    ]
+                    ],
+                    "column_name": "Host Key Value",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.host_key_name",
@@ -1300,6 +1310,7 @@
         {
             "action": "update list",
             "description": "Update a list by adding, deleting, or deleting all values from it",
+            "verbose": "This action requires DEX credential in asset configuration.",
             "type": "correct",
             "identifier": "update_list_property",
             "read_only": false,

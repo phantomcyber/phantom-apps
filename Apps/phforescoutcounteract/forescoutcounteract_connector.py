@@ -250,7 +250,7 @@ class ForescoutCounteractConnector(BaseConnector):
             if phantom.is_fail(status):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
 
-            auth = (config['dex_username'] + '@' + config['dex_account'], config['dex_password'])
+            auth = ("{}@{}".format(config['dex_username'], config['dex_account']).encode('utf-8'), config['dex_password'])
             headers = {'Content-Type': 'application/xml'}
 
         if module == 'web':
@@ -283,7 +283,7 @@ class ForescoutCounteractConnector(BaseConnector):
             error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
-            error_message = "Error connecting to server. Connection Refused from the Server for %s" % (url)
+            error_message = "Error connecting to server. Connection Refused from the Server for invalid URL %s" % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -298,6 +298,10 @@ class ForescoutCounteractConnector(BaseConnector):
 
         dex_credentials = config.get('dex_account') and config.get('dex_username') and config.get('dex_password')
         web_credentials = config.get('web_username') and config.get('web_password')
+
+        if not dex_credentials and not web_credentials:
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, "The credential of DEX or Web API must be provided")
 
         if dex_credentials:
             # Test connectivity for DEX
@@ -332,10 +336,6 @@ class ForescoutCounteractConnector(BaseConnector):
             self.save_progress("Test Connectivity for web Passed")
         else:
             self.save_progress("Credentials for web not supplied. Skipping test connectivity for web")
-
-        if not dex_credentials and not web_credentials:
-            self.save_progress("Test Connectivity Failed")
-            return action_result.set_status(phantom.APP_ERROR, "Credentials for neither DEX nor Web were provided")
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -439,13 +439,29 @@ class ForescoutCounteractConnector(BaseConnector):
 
         rule_id = param.get('rule_id')
         if rule_id:
-            params += "matchRuleId=" + ",".join([item.strip() for item in rule_id.split(',')])
+            rule_id_list = []
+            for item in rule_id.split(','):
+                item = item.strip()
+                if item:
+                    rule_id_list.append(item)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'rule_id' action parameter")
+            if rule_id_list:
+                params += "matchRuleId=" + ",".join(rule_id_list)
 
         prop_val = param.get('prop_val')
         if prop_val:
             if rule_id:
                 params += "&"
-            params += "&".join([item.strip() for item in prop_val.split(',')])
+            prop_val_list = []
+            for item in prop_val.split(','):
+                item = item.strip()
+                if item:
+                    prop_val_list.append(item)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'prop_val' action parameter")
+            if prop_val_list:
+                params += "&".join(prop_val_list)
 
         url = FS_WEB_HOSTS
         if rule_id or prop_val:
@@ -556,7 +572,7 @@ class ForescoutCounteractConnector(BaseConnector):
             list_body = '<LIST NAME="{}"></LIST>'.format(list_name)
         else:
             if not values:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide 'value' action parameter"), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide values in 'values' action parameter"), None)
             list_of_values = "".join(["<VALUE>" + item.strip() + "</VALUE>" for item in values.split(',')])
             list_body = '<LIST NAME="{}">{}</LIST>'.format(list_name, list_of_values)
 
