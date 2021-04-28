@@ -1037,7 +1037,7 @@ class CrowdstrikeConnector(BaseConnector):
         # optional parameters
         if CROWDSTRIKE_JSON_LIST_IOC in param:
             api_data["values"] = [param.get(CROWDSTRIKE_JSON_LIST_IOC)]
-        if CROWDSTRIKE_IOCS_POLICY in param and param[CROWDSTRIKE_IOCS_POLICY] != "all":
+        if CROWDSTRIKE_IOCS_POLICY in param and param.get(CROWDSTRIKE_IOCS_POLICY) != "all":
             api_data["policies"] = [param.get(CROWDSTRIKE_IOCS_POLICY)]
         if CROWDSTRIKE_IOCS_SHARE_LEVEL in param and param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL) != "all":
             api_data["share_levels"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL)
