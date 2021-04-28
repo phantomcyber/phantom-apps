@@ -1036,21 +1036,22 @@ class CrowdstrikeConnector(BaseConnector):
 
         # optional parameters
         if CROWDSTRIKE_JSON_LIST_IOC in param:
-            api_data["values"] = [param[CROWDSTRIKE_JSON_LIST_IOC]]
+            api_data["values"] = [param.get(CROWDSTRIKE_JSON_LIST_IOC)]
         if CROWDSTRIKE_IOCS_POLICY in param and param[CROWDSTRIKE_IOCS_POLICY] != "all":
-            api_data["policies"] = [param[CROWDSTRIKE_IOCS_POLICY]]
-        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param and param[CROWDSTRIKE_IOCS_SHARE_LEVEL] != "all":
-            api_data["share_levels"] = param[CROWDSTRIKE_IOCS_SHARE_LEVEL]
+            api_data["policies"] = [param.get(CROWDSTRIKE_IOCS_POLICY)]
+        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param and param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL) != "all":
+            api_data["share_levels"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL)
         if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
-            api_data["from.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION]
+            api_data["from.expiration_timestamp"] = param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION)
         if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
-            api_data["to.expiration_timestamp"] = param[CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION]
+            api_data["to.expiration_timestamp"] = param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION)
         if CROWDSTRIKE_IOCS_SOURCE in param:
-            api_data["sources"] = param[CROWDSTRIKE_IOCS_SOURCE]
-        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param[CROWDSTRIKE_SEARCH_IOCS_TYPE] != "all":
-            api_data["types"] = param[CROWDSTRIKE_SEARCH_IOCS_TYPE]
-            if param[CROWDSTRIKE_SEARCH_IOCS_TYPE] == "hash":
+            api_data["sources"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) != "all":
+            if param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) == "hash":
                 api_data["types"] = ["md5", "sha1", "sha256"]
+            else:
+                api_data["types"] = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
 
         more = True
 
@@ -1996,14 +1997,14 @@ class CrowdstrikeConnector(BaseConnector):
         # optional parameters
         api_data["share_level"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL, 'red')
         if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param[CROWDSTRIKE_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+            data = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
             if data is None:
                 return action_result.get_status()
             api_data["expiration_days"] = data
         if CROWDSTRIKE_IOCS_SOURCE in param:
-            api_data["source"] = param[CROWDSTRIKE_IOCS_SOURCE]
+            api_data["source"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
         if CROWDSTRIKE_IOCS_DESCRIPTION in param:
-            api_data["description"] = param[CROWDSTRIKE_IOCS_DESCRIPTION]
+            api_data["description"] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=[api_data], method="post")
 
@@ -2029,18 +2030,18 @@ class CrowdstrikeConnector(BaseConnector):
 
         # optional parameters
         if CROWDSTRIKE_IOCS_POLICY in param:
-            update_data["policy"] = param[CROWDSTRIKE_IOCS_POLICY]
+            update_data["policy"] = param.get(CROWDSTRIKE_IOCS_POLICY)
         if CROWDSTRIKE_IOCS_SHARE_LEVEL in param:
-            update_data["share_level"] = param[CROWDSTRIKE_IOCS_SHARE_LEVEL]
+            update_data["share_level"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL)
         if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param[CROWDSTRIKE_IOCS_EXPIRATION], 'expiration', allow_zero=True)
+            data = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
             if data is None:
                 return action_result.get_status()
             update_data["expiration_days"] = data
         if CROWDSTRIKE_IOCS_SOURCE in param:
-            update_data["source"] = param[CROWDSTRIKE_IOCS_SOURCE]
+            update_data["source"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
         if CROWDSTRIKE_IOCS_DESCRIPTION in param:
-            update_data["description"] = param[CROWDSTRIKE_IOCS_DESCRIPTION]
+            update_data["description"] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_data, method="patch", params=api_data)
         if phantom.is_fail(ret_val):
