@@ -669,7 +669,7 @@
         {
             "action": "get sessions",
             "description": "Get active sessions in CounterACT",
-            "verbose": "This action requires Web API credential in asset configuration",
+            "verbose": "This action requires Web API credential in asset configuration.",
             "type": "investigate",
             "identifier": "get_active_sessions",
             "read_only": true,
