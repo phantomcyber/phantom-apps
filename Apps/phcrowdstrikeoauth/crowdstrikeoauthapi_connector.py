@@ -1577,6 +1577,12 @@ class CrowdstrikeConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             return action_result.get_status()
 
+                        if resources[0].get('complete') and resources[0].get('stderr') is not None and resp_json.get('resources', [{}])[0].get('sequence_id'):
+                            return action_result.set_status(
+                                phantom.APP_ERROR,
+                                "Errors occurred while executing command {}".format("\r\n".join(resources[0].get('stderr')))
+                            )
+
                         action_result.add_data(resp_json)
                         # if sequence_id is not present, break out
                         if not resp_json.get('resources', [{}])[0].get('sequence_id'):
