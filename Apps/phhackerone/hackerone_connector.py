@@ -575,7 +575,7 @@ class HackerOneConnector(BaseConnector):
     def _on_poll(self, param):
         self.__print('_on_poll()')
         self.debug_print("There might be timezone variance. Please check for the timezone variance.")
-        current_time_marker = datetime.datetime.now()
+        current_time_marker = datetime.datetime.utcnow()
         previous_time_marker = None
         self.load_state()
         current_state = self.get_state()
@@ -595,7 +595,7 @@ class HackerOneConnector(BaseConnector):
         date = None
         if self.is_poll_now():
             self.debug_print("There might be timezone variance. Please check for the timezone variance.")
-            date = (datetime.datetime.now() - datetime.timedelta(hours=hours)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            date = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         else:
             date = previous_time_marker
         program = config['program_name']
