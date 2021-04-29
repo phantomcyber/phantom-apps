@@ -17,6 +17,9 @@
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "python_version": "3",
+    "latest_tested_versions": [
+        "On-Prem, v8.2.2"
+    ],
     "configuration": {
         "device": {
             "description": "Hostname or IP of appliance (ie: 10.10.10.10)",
@@ -80,6 +83,7 @@
         {
             "action": "list hosts",
             "description": "List hosts in CounterACT",
+            "verbose": "This action requires Web API credential in asset configuration.",
             "type": "investigate",
             "identifier": "list_hosts",
             "read_only": true,
@@ -180,6 +184,7 @@
         {
             "action": "list policies",
             "description": "List policies in CounterACT",
+            "verbose": "This action requires Web API credential in asset configuration.",
             "type": "investigate",
             "identifier": "list_policies",
             "read_only": true,

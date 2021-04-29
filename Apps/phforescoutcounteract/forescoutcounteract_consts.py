@@ -67,4 +67,5 @@ FS_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset co
 # validate integer
 ERR_VALID_INT_MSG = "Please provide a valid integer value in the {}"
 ERR_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {}"
+ERR_POSITIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
 HOST_ID_INT_PARAM = "'host_id' action parameter"

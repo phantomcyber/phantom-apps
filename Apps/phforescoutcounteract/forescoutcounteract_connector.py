@@ -83,6 +83,9 @@ class ForescoutCounteractConnector(BaseConnector):
             if parameter < 0:
                 return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
 
+            if parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_POSITIVE_INTEGER_MSG.format(key)), None
+
         return phantom.APP_SUCCESS, parameter
 
     def _process_empty_response(self, response, action_result):
@@ -445,7 +448,7 @@ class ForescoutCounteractConnector(BaseConnector):
                 if item:
                     rule_id_list.append(item)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'rule_id' action parameter")
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in 'rule_id' action parameter")
             if rule_id_list:
                 params += "matchRuleId=" + ",".join(rule_id_list)
 
@@ -459,7 +462,7 @@ class ForescoutCounteractConnector(BaseConnector):
                 if item:
                     prop_val_list.append(item)
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid 'prop_val' action parameter")
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in 'prop_val' action parameter")
             if prop_val_list:
                 params += "&".join(prop_val_list)
 
