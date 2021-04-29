@@ -39,109 +39,30 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         self._policy = None
 
     def _extract_kaspersky_summary(self, response):
-
         # Generate the OTX summary
-        summary = dict()
-        summary['found'] = False
-        summary['count'] = 0
-        summary['zone'] = "Grey"
-        summary['categories'] = []
-        summary['threat_score'] = 0
-        summary['DayRequests'] = 0
-        summary['DayQuota'] = 0
-        summary['hits_count'] = 0
-        summary['hash'] = ''
-        summary['sha1'] = ''
-        summary['sha2'] = ''
-
-        summary['apt_related'] = False
-        summary['apt_report'] = None
-        summary['apt_url'] = ''
-        summary['apt_report_id'] = ''
-        summary['apt_report_desc'] = ''
-        summary['apt_report_geo'] = ''
-        summary['apt_report_industry'] = ''
-        summary['apt_report_actors'] = ''
-
+        summary = self._init_summary()
         tmp_indicator = ''
-        summary['tip_url'] = ''
 
         if 'Zone' in response:
-            if response['Zone'] != "Grey":
-                summary['found'] = True
-                summary['count'] = 1
-                summary['zone'] = response['Zone']
+            summary = self._get_zone_info(response, summary)
 
         if 'DomainGeneralInfo' in response:
-            tmp_indicator = response['DomainGeneralInfo']['Domain']
-            summary['hits_count'] = response['DomainGeneralInfo']['HitsCount']
-            if len(response['DomainGeneralInfo']['Categories']) > 0:
-                summary['categories'] = response['DomainGeneralInfo']['Categories']
-
-            if response['DomainGeneralInfo']['HasApt']:
-                summary['apt_related'] = True
-                if len(response['DomainGeneralInfo']['RelatedAptReports']) > 0:
-                    summary['apt_report'] = response['DomainGeneralInfo']['RelatedAptReports'][0]['Title']
-                    summary['apt_report_id'] = response['DomainGeneralInfo']['RelatedAptReports'][0]['Id']
+            summary, tmp_indicator = self._get_domain_info(response, summary)
 
         if 'IpGeneralInfo' in response:
-            tmp_indicator = response['IpGeneralInfo']['Ip']
-            summary['hits_count'] = response['IpGeneralInfo']['HitsCount']
-            if len(response['IpGeneralInfo']['Categories']) > 0:
-                summary['categories'] = response['IpGeneralInfo']['Categories']
-
-            if response['IpGeneralInfo']['HasApt']:
-                summary['apt_related'] = True
-                if len(response['IpGeneralInfo']['RelatedAptReports']) > 0:
-                    summary['apt_report'] = response['IpGeneralInfo']['RelatedAptReports'][0]['Title']
-                    summary['apt_report_id'] = response['IpGeneralInfo']['RelatedAptReports'][0]['Id']
-
-            if response['IpGeneralInfo']['ThreatScore']:
-                summary['threat_score'] = response['IpGeneralInfo']['ThreatScore']
+            summary, tmp_indicator = self._get_ip_info(response, summary)
 
         if 'FileGeneralInfo' in response:
-            tmp_indicator = response['FileGeneralInfo']['Md5']
-            summary['hits_count'] = response['FileGeneralInfo']['HitsCount']
-            if response.get('DetectionsInfo'):
-                if len(response['DetectionsInfo']) > 0:
-                    for categories in response['DetectionsInfo']:
-                        summary['categories'].append(categories['DetectionName'])
-                        if len(summary['categories']) == int(self._recordcount):
-                            break
-            else:
-                summary['categories'] = '-'
+            summary, tmp_indicator = self._get_file_info(response, summary)
 
-            if response['FileGeneralInfo']['Md5']:
-                summary['hash'] = response['FileGeneralInfo']['Md5']
-
-            if response['FileGeneralInfo']['Sha1']:
-                summary['sha1'] = response['FileGeneralInfo']['Sha1']
-
-            if response['FileGeneralInfo']['Sha256']:
-                summary['sha2'] = response['FileGeneralInfo']['Sha256']
-
-            if response['FileGeneralInfo']['HasApt']:
-                summary['apt_related'] = True
-                if len(response['FileGeneralInfo']['RelatedAptReports']) > 0:
-                    summary['apt_report'] = response['FileGeneralInfo']['RelatedAptReports'][0]['Title']
-                    summary['apt_report_id'] = response['FileGeneralInfo']['RelatedAptReports'][0]['Id']
+        if 'UrlGeneralInfo' in response:
+            summary, tmp_indicator = self._get_url_info(response, summary)
 
         if 'LicenseInfo' in response:
             if response['LicenseInfo']['DayRequests']:
                 summary['DayRequests'] = response['LicenseInfo']['DayRequests']
             if response['LicenseInfo']['DayQuota']:
                 summary['DayQuota'] = response['LicenseInfo']['DayQuota']
-
-        if 'UrlGeneralInfo' in response:
-            tmp_indicator = response['UrlGeneralInfo']['Url']
-            if len(response['UrlGeneralInfo']['Categories']) > 0:
-                summary['categories'] = response['UrlGeneralInfo']['Categories']
-
-            if response['UrlGeneralInfo']['HasApt']:
-                summary['apt_related'] = True
-                if len(response['UrlGeneralInfo']['RelatedAptReports']) > 0:
-                    summary['apt_report'] = response['UrlGeneralInfo']['RelatedAptReports'][0]['Title']
-                    summary['apt_report_id'] = response['UrlGeneralInfo']['RelatedAptReports'][0]['Id']
 
         summary['tip_url'] = 'https://tip.kaspersky.com/search?searchString=' + tmp_indicator
 
@@ -164,6 +85,111 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
                 summary['apt_report_actors'] = response['return_data']['tags_actors']
 
         return summary
+
+    def _init_summary(self):
+        # initialize summary var
+        summary = dict()
+        summary['found'] = False
+        summary['count'] = 0
+        summary['zone'] = "Grey"
+        summary['categories'] = []
+        summary['threat_score'] = 0
+        summary['DayRequests'] = 0
+        summary['DayQuota'] = 0
+        summary['hits_count'] = 0
+        summary['hash'] = ''
+        summary['sha1'] = ''
+        summary['sha2'] = ''
+        summary['tip_url'] = ''
+        summary['apt_related'] = False
+        summary['apt_report'] = None
+        summary['apt_url'] = ''
+        summary['apt_report_id'] = ''
+        summary['apt_report_desc'] = ''
+        summary['apt_report_geo'] = ''
+        summary['apt_report_industry'] = ''
+        summary['apt_report_actors'] = ''
+        return summary
+
+    def _get_zone_info(self, response, summary):
+        # get info about object zone
+        if response['Zone'] != "Grey":
+            summary['found'] = True
+            summary['count'] = 1
+            summary['zone'] = response['Zone']
+        return summary
+
+    def _get_domain_info(self, response, summary):
+        # get info about requested domain
+        tmp_indicator = response['DomainGeneralInfo']['Domain']
+        summary['hits_count'] = response['DomainGeneralInfo']['HitsCount']
+        if len(response['DomainGeneralInfo']['Categories']) > 0:
+            summary['categories'] = response['DomainGeneralInfo']['Categories']
+
+        if response['DomainGeneralInfo']['HasApt']:
+            summary['apt_related'] = True
+            if len(response['DomainGeneralInfo']['RelatedAptReports']) > 0:
+                summary['apt_report'] = response['DomainGeneralInfo']['RelatedAptReports'][0]['Title']
+                summary['apt_report_id'] = response['DomainGeneralInfo']['RelatedAptReports'][0]['Id']
+        return summary, tmp_indicator
+
+    def _get_url_info(self, response, summary):
+        tmp_indicator = response['UrlGeneralInfo']['Url']
+        if len(response['UrlGeneralInfo']['Categories']) > 0:
+            summary['categories'] = response['UrlGeneralInfo']['Categories']
+
+        if response['UrlGeneralInfo']['HasApt']:
+            summary['apt_related'] = True
+            if len(response['UrlGeneralInfo']['RelatedAptReports']) > 0:
+                summary['apt_report'] = response['UrlGeneralInfo']['RelatedAptReports'][0]['Title']
+                summary['apt_report_id'] = response['UrlGeneralInfo']['RelatedAptReports'][0]['Id']
+        return summary, tmp_indicator
+
+    def _get_ip_info(self, response, summary):
+        # get info about requested ip
+        tmp_indicator = response['IpGeneralInfo']['Ip']
+        summary['hits_count'] = response['IpGeneralInfo']['HitsCount']
+        if len(response['IpGeneralInfo']['Categories']) > 0:
+            summary['categories'] = response['IpGeneralInfo']['Categories']
+
+        if response['IpGeneralInfo']['HasApt']:
+            summary['apt_related'] = True
+            if len(response['IpGeneralInfo']['RelatedAptReports']) > 0:
+                summary['apt_report'] = response['IpGeneralInfo']['RelatedAptReports'][0]['Title']
+                summary['apt_report_id'] = response['IpGeneralInfo']['RelatedAptReports'][0]['Id']
+
+        if response['IpGeneralInfo']['ThreatScore']:
+            summary['threat_score'] = response['IpGeneralInfo']['ThreatScore']
+        return summary, tmp_indicator
+
+    def _get_file_info(self, response, summary):
+        # get info about requested file
+        tmp_indicator = response['FileGeneralInfo']['Md5']
+        summary['hits_count'] = response['FileGeneralInfo']['HitsCount']
+        if response.get('DetectionsInfo'):
+            if len(response['DetectionsInfo']) > 0:
+                for categories in response['DetectionsInfo']:
+                    summary['categories'].append(categories['DetectionName'])
+                    if len(summary['categories']) == int(self._recordcount):
+                        break
+        else:
+            summary['categories'] = '-'
+
+        if response['FileGeneralInfo']['Md5']:
+            summary['hash'] = response['FileGeneralInfo']['Md5']
+
+        if response['FileGeneralInfo']['Sha1']:
+            summary['sha1'] = response['FileGeneralInfo']['Sha1']
+
+        if response['FileGeneralInfo']['Sha256']:
+            summary['sha2'] = response['FileGeneralInfo']['Sha256']
+
+        if response['FileGeneralInfo']['HasApt']:
+            summary['apt_related'] = True
+            if len(response['FileGeneralInfo']['RelatedAptReports']) > 0:
+                summary['apt_report'] = response['FileGeneralInfo']['RelatedAptReports'][0]['Title']
+                summary['apt_report_id'] = response['FileGeneralInfo']['RelatedAptReports'][0]['Id']
+        return summary, tmp_indicator
 
     def _prepare_url(self, url_input):
         # prepare url for send
@@ -232,7 +258,7 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except Exception as e:
-            error_text = "Cannot parse error details"
+            error_text = "Cannot parse error details: {0}".format(str(e))
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
@@ -426,7 +452,7 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         self.debug_print(indicator)
         endpoint = self.type_of_indicator(indicator) + "?count=" + str(self._recordcount)
         if param.get('sections'):
-            endpoint += '&sections=' + param['sections']
+            endpoint += '&sections=' + param.get('sections')
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
