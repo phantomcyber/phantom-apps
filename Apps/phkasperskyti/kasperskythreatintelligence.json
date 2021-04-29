@@ -1,7 +1,7 @@
 {
     "appid": "2492d30e-9c79-4905-abab-9359d78e85bc",
     "name": "Kaspersky Threat Intelligence",
-    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications. Now you can mitigate and respond to threats more effectively, defending your system against attacks even before they are launched.",
+    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications. Now you can mitigate and respond to threats more effectively, defending your system against attacks even before they are launched",
     "type": "reputation",
     "product_vendor": "Kaspersky Lab",
     "logo": "kasperskythreatintelligence.svg",
@@ -14,7 +14,8 @@
     "utctime_updated": "2021-04-29T15:03:52.567624Z",
     "package_name": "phantom_kasperskythreatintelligence",
     "main_module": "kasperskythreatintelligence_connector.py",
-    "min_phantom_version": "4.2.7532",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
     "app_wizard_version": "1.2.2",
     "configuration": {        
         "username": {
@@ -66,8 +67,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
+            "description": "Validate the asset configuration for connectivity using supplied configuration.",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -77,8 +77,7 @@
         {
             "action": "domain reputation",
             "identifier": "domain_reputation",
-            "description": "Looks up information about domains in Kaspersky Threat Intelligence Portal",
-            "verbose": "",
+            "description": "Looks up information about domains in Kaspersky Threat Intelligence Portal.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -159,7 +158,6 @@
             "action": "ip reputation",
             "identifier": "ip_reputation",
             "description": "Looks up information about IP addresses in Kaspersky Threat Intelligence Portal",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -246,7 +244,6 @@
             "action": "file reputation",
             "identifier": "file_reputation",
             "description": "Looks up information about hashes in Kaspersky Threat Intelligence Portal",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -283,7 +280,7 @@
                         "hash"
                     ],
                     "column_name": "SHA1",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary.sha2",
@@ -292,43 +289,43 @@
                         "hash"
                     ],
                     "column_name": "SHA256",
-                    "column_order": 0
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary.zone",
                     "data_type": "string",
                     "column_name": "Zone",
-                    "column_order": 2
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.summary.categories",
                     "data_type": "string",
                     "column_name": "Categories",
-                    "column_order": 3
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.summary.apt_related",
                     "data_type": "boolean",
                     "column_name": "Related to APT",
-                    "column_order": 4                  
+                    "column_order": 6                  
                 },
                 {
                     "data_path": "action_result.summary.apt_report",
                     "data_type": "string",
                     "column_name": "APT report name",
-                    "column_order": 5                  
+                    "column_order": 7                  
                 },
                 {
                     "data_path": "action_result.summary.apt_report_id",
                     "data_type": "string",
                     "column_name": "APT report ID",
-                    "column_order": 6                  
+                    "column_order": 8                  
                 }, 
                 {
                     "data_path": "summary.total_objects",
@@ -348,7 +345,6 @@
             "action": "url reputation",
             "identifier": "url_reputation",
             "description": "Looks up information about URLs in Kaspersky Threat Intelligence Portal",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -433,12 +429,11 @@
             "action": "get detailed info",
             "identifier": "get_more_info",
             "description": "Queries detailed informations about indicator",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "indicator": {
-                    "description": "indicator to query",
+                    "description": "Indicator to query",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -456,7 +451,7 @@
                     "order": 0
                 },
                 "sections": {
-                    "description": "sections to query",
+                    "description": "Sections to query",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -522,7 +517,6 @@
             "action": "get reports",
             "identifier": "get_reports",
             "description": "Requests APT reports by using the Kaspersky Threat Intelligence Portal API",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
