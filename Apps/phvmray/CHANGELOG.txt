@@ -1,0 +1,12 @@
+Version 1.0.3
+-------------
+    - added 'contains' to the metadata given to the vault when adding a file
+      (get file). Hence, vault files should have a 'contains' generated from
+      the Analyzers sample_type.
+
+Version 1.0.4
+-------------
+    - added summary.json to outputs of 'get report' and 'detonate file'.
+    - added certain fields (i.e. extracted_files.*_hash, ip, norm_filename,
+      url) of summary.json to the vmray.json and added appropriate contains
+      markers.
