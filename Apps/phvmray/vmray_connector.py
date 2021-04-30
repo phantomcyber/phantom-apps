@@ -127,10 +127,9 @@ class VMRayConnector(BaseConnector):
 
         try:
             VMRay(server, api_key, not disable_cert)
-        except VMRayRESTAPIError as exc:
-            err = self._get_error_message_from_exception(exc)
+        except VMRayRESTAPIError:
             self.save_progress(VMRAY_ERR_CONNECTIVITY_TEST)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_CONNECTION.format(err))
+            return action_result.set_status(phantom.APP_ERROR, "Could not connect to server")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(VMRAY_ERR_CONNECTIVITY_TEST)
@@ -153,10 +152,9 @@ class VMRayConnector(BaseConnector):
         try:
             self._api = VMRay(server, api_key, not disable_cert)
             return (phantom.APP_SUCCESS, self._api)
-        except VMRayRESTAPIError as exc:
+        except VMRayRESTAPIError:
             self._api = None
-            err = self._get_error_message_from_exception(exc)
-            action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_CONNECTION.format(err))
+            action_result.set_status(phantom.APP_ERROR, "Could not connect to server")
             return (action_result.get_status(), None)
         except Exception as e:
             self._api = None
