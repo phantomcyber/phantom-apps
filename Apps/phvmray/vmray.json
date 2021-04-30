@@ -1,0 +1,1359 @@
+{
+    "appid": "cfac072d-79fa-406b-a2e1-25a2fd5785c4",
+    "name": "VMRay",
+    "description": "Connector for VMRay Analyzer",
+    "publisher": " VMRay ",
+    "package_name": "phantom_vmray",
+    "type": "sandbox",
+    "license": "Copyright (c) VMRay GmbH 2017",
+    "main_module": "vmray_connector.pyc",
+    "app_version": "1.0.4",
+    "min_phantom_version": "3.0.190",
+    "product_vendor": "VMRay GmbH",
+    "product_name": "VMRay Analyzer",
+    "product_version_regex": ".*",
+    "logo": "vmray.png",
+    "configuration": {
+          "vmray_server": {
+            "description": "Server IP/Hostname",
+            "data_type": "string",
+            "order": 0,
+            "required": true
+          },
+          "vmray_api_key": {
+            "description": "API Key",
+            "data_type": "string",
+            "order": 1,
+            "required": true
+          },
+          "disable_cert_verification": {
+            "description": "Disable Certificate Verification",
+            "data_type": "boolean",
+            "order": 2,
+            "required": true
+          }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions":"EQ(*)"
+        },
+        {
+            "action": "get file",
+            "description": "Download a file from the VMRay Analyzer and add it to the vault",
+            "verbose": "Downloads the file with the given hash from the VMRay Analyzer and adds it to the vault. This action returns a vault id which can be used to detonate the file.",
+            "type": "investigate",
+            "identifier": "get_file",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "render": {
+              "type": "table",
+              "width": 2,
+              "height": 5,
+              "title": "Get File Details"
+            },
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.hash",
+                "timeout": 300
+            },
+            "parameters": {
+                "hash": {
+                    "description": "The hash of the file to be downloaded",
+                    "data_type": "string",
+                    "contains": ["hash", "sha256", "sha1", "md5"],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "column_name": "Hash",
+                    "column_order": 0,
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Vault ID",
+                    "column_order": 1,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "contains": ["vault id"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                }
+            ]
+        },
+        {
+            "action": "detonate file",
+            "description": "Detonate file in the VMRay Analyzer",
+            "verbose": "The <b>file_name</b> parameter overrides the filename, if none is given the app tries to get the filename from the vaults metadata. The <b>type</b> overrides the automatic detection of the VMRay Analyzer. The <b>config</b> parameter specifies additional configuration options passed to the Analyzer (See user_config in the REST API documentation). With <b>jobrules</b> you can specify custom jobrule entries (See jobrule_enries in the REST API documentation).",
+            "type": "investigate",
+            "identifier": "detonate_file",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "render": {
+              "type": "table",
+              "width": 3,
+              "height": 5,
+              "title": "Detonate File Details"
+            },
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.vault_id",
+                "timeout": 300
+            },
+            "parameters": {
+                "vault_id": {
+                    "description": "The vault_id of the file to be analyzed.",
+                    "data_type": "string",
+                    "contains": ["vault id", "pe file", "pdf", "flash", "apk", "jar", "doc", "xls", "ppt", "javascript"],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "file_name": {
+                    "description": "The file name to use",
+                    "data_type": "string",
+                    "contains": ["file name"],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment for this submission",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "tags": {
+                    "description": "Tags for this submission",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "type": {
+                    "description": "The sample type",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "config": {
+                    "description": "Additional configuration",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "jobrules": {
+                    "description": "Jobrules",
+                    "data_type": "string",
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "column_name": "Submission ID",
+                    "column_order": 0,
+                    "contains": [
+                        "vmray submission id"
+                    ],
+                    "data_path": "action_result.summary.submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "Analysis ID",
+                    "column_order": 1,
+                    "data_path": "action_result.data.*.analysis.analysis_id",
+                    "contains": ["vmray analysis id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "finished",
+                    "column_order": 2,
+                    "data_path": "action_result.summary.submission_finished",
+                    "data_type": "boolean"
+                },
+                {
+                    "column_name": "severity",
+                    "column_order": 3,
+                    "data_path": "action_result.summary.severity",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "url",
+                    "column_order": 4,
+                    "data_path": "action_result.summary.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "contains": ["vault id", "pe file", "pdf", "flash", "apk", "jar", "doc", "xls", "ppt", "javascript"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.jobrules",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.config",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "contains": ["file name"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_started",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_sampletype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_prescript_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_str",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_submission_id",
+                    "contains": ["vmray submission id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_built_in_rules_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_custom_rules_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_webif_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_latest_ruleset_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_match_count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.md5_hash",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha1_hash",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha256_hash",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.ips.*.ip_address",
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.urls.*.url",
+                    "contains": [
+                        "url"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.mutexes.*.mutex_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.registry.*.reg_key_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                }
+            ]
+        },
+        {
+            "action": "detonate url",
+            "description": "Detonate a url in the VMRay Analyzer",
+            "verbose": "See <b>detonate file</b> for a detailed parameter description.",
+            "type": "investigate",
+            "identifier": "detonate_url",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "render": {
+              "type": "table",
+              "width": 2,
+              "height": 5,
+              "title": "Detonate URL Details"
+            },
+            "lock": {
+                "enabled": true,
+                "data_path": "parameters.url",
+                "timeout": 300
+            },
+            "parameters": {
+                "url": {
+                    "description": "URL to detonate",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true,
+                    "contains": ["url"]
+                },
+                "comment": {
+                    "description": "Comment for this submission",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "tags": {
+                    "description": "Tags added for this submission",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "config": {
+                    "description": "Additional configuration",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "jobrules": {
+                    "description": "Jobrules",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "column_name": "Submission ID",
+                    "column_order": 0,
+                    "contains": [
+                        "vmray submission id"
+                    ],
+                    "data_path": "action_result.summary.submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "finished",
+                    "column_order": 1,
+                    "data_path": "action_result.summary.submission_finished",
+                    "data_type": "boolean"
+                },
+                {
+                    "column_name": "severity",
+                    "column_order": 2,
+                    "data_path": "action_result.summary.severity",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "url",
+                    "column_order": 3,
+                    "data_path": "action_result.summary.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.jobrules",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.config",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "contains": ["url"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_id",
+                    "contains": ["vmray analysis id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_started",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_sampletype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_prescript_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_str",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_submission_id",
+                    "contains": ["vmray submission id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_built_in_rules_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_custom_rules_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_webif_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_latest_ruleset_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_match_count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.md5_hash",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha1_hash",
+                    "contains": [
+                        "hash",
+                        "sha1"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha256_hash",
+                    "contains": [
+                        "hash",
+                        "sha256"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.ips.*.ip_address",
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.urls.*.url",
+                    "contains": [
+                        "url"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.mutexes.*.mutex_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.registry.*.reg_key_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                }
+            ]
+        },
+        {
+            "action": "get report",
+            "description": "Get the report(s) for a submission",
+            "verbose": "This action requires a <b>submission_id</b>. The <b>timeout</b> parameter specifies the time to wait for the report to be finished before aborting this action. The <b>timeout</b> is specified in seconds. Zero indicates no wait, hence the action will return immediately. If this option is not set it will default to a five minute timeout.",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "render": {
+              "type": "table",
+              "width": 3,
+              "height": 5,
+              "title": "Report Details"
+            },
+            "lock": {"enabled": false},
+            "parameters": {
+                "submission_id": {
+                    "description": "The VMRay Analyzer submission ID",
+                    "data_type": "numeric",
+                    "contains": ["vmray submission id"],
+                    "primary": true,
+                    "required": true
+                },
+                "timeout": {
+                    "description": "Timeout",
+                    "data_type": "numeric"
+                }
+            },
+            "output": [
+                {
+                    "column_name": "submission id",
+                    "column_order": 0,
+                    "contains": ["vmray submission id"],
+                    "data_path": "action_result.summary.submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "severity",
+                    "column_order": 1,
+                    "data_path": "action_result.summary.severity",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "report url",
+                    "column_order": 2,
+                    "data_path": "action_result.summary.url",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.submission_id",
+                    "contains": ["vmray submission id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_analyzer_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_configuration_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_id",
+                    "contains": ["vmray analysis id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_job_started",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_jobrule_sampletype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_prescript_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_result_str",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_snapshot_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_submission_id",
+                    "contains": ["vmray submission id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vm_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vmhost_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_built_in_rules_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_custom_rules_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_vti_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_webif_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_latest_ruleset_date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.analysis_yara_match_count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_job_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_result_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_md5",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha1",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_sample_sha256",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_submission_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation_lookup.reputation_lookup_user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.md5_hash",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha1_hash",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.sha256_hash",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.extracted_files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.ips.*.ip_address",
+                    "contains": [
+                        "ip"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.urls.*.url",
+                    "contains": [
+                        "url"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.mutexes.*.mutex_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.registry.*.reg_key_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.norm_filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.analysis.summary.artifacts.files.*.filename",
+                    "contains": [
+                        "file path"
+                    ],
+                    "data_type": "string"
+                }
+            ]
+        },
+        {
+            "action": "get info",
+            "description": "Get information of a specific sample",
+            "verbose": "This action gets information about a sample given its <b>hash</b>. See <b>get report</b> for a description of the <b>timeout</b> parameter.",
+            "type": "investigate",
+            "identifier": "get_info",
+            "read_only": true,
+            "versions": "EQ(*)",
+            "render": {
+              "type": "table",
+              "width": 4,
+              "height": 5,
+              "title": "Sample Info"
+            },
+            "lock": {"enabled": false},
+            "parameters": {
+                "hash": {
+                    "description": "The sample hash",
+                    "data_type": "string",
+                    "contains": ["hash", "sha256", "sha1", "md5"],
+                    "primary": true,
+                    "required": true
+                },
+                "timeout": {
+                    "description": "Timeout",
+                    "data_type": "numeric"
+                }
+            },
+            "output": [
+                {
+                    "column_name": "Hash",
+                    "column_order": 0,
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "Severity Score",
+                    "column_order": 1,
+                    "data_path": "action_result.summary.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "column_name": "Severity",
+                    "column_order": 2,
+                    "data_path": "action_result.summary.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Type",
+                    "column_order": 3,
+                    "data_path": "action_result.data.*.sample_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_filename",
+                    "contains": ["file name"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_filesize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_highest_vti_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_highest_vti_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_id",
+                    "contains": ["vmray sample id"],
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_is_multipart",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_last_md_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_last_reputation_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_last_vt_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_md5hash",
+                    "contains": [ "md5" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_sha1hash",
+                    "contains": [ "sha1" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_sha256hash",
+                    "contains": [ "sha256" ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_url",
+                    "contains": ["url"],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_vti_score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sample_webif_url",
+                    "data_type": "string"
+                }
+            ]
+        }
+    ]
+}
