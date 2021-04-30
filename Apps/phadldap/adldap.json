@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2021 Splunk Inc.",
-    "app_version": "2.0.2",
-    "utctime_updated": "2021-04-09T21:47:07.000000Z",
+    "app_version": "2.0.3",
+    "utctime_updated": "2021-04-19T18:23:19.000000Z",
     "package_name": "phantom_adldap",
     "main_module": "adldap_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1210,7 +1210,9 @@
                     "data_type": "string",
                     "example_values": [
                         "success"
-                    ]
+                    ],
+                    "column_name": "status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",

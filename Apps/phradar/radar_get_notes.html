@@ -1,6 +1,7 @@
 <!--
 File: radar_get_notes.html
-Copyright (c) 2020 Splunk Inc.
+
+Copyright (c) 2020-2021 RADAR, LLC
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -66,52 +67,95 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
     </style>
     <div class="display-container">
         {% for result in results %}
-                {% if result.status_success %}
-                    {% if not result.data %}
-                        <h2 class="wf-h2-style">No Notes for Incident {{result.param.incident_id}}</h2>
-                        <br/>
-                    {% else %}
-                        <h2 class="wf-h2-style">Notes for Radar Incident {{ result.param.incident_id }}</h2>
-                    {% for note in result.data %}
-                        <table class="wf-table-vertical">
-                            <tr>
-                                <td class="td-row-start">note id</td>
-                                <td>{{note.id}}</td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">incident id</td>
-                                <td>
-                                    <a href="javascript:;"
-                                       onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
-                                        {{ note.incident_id }}
-                                        &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">content</td>
-                                <td>{{ note.content }}</td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">created at</td>
-                                <td>{{ note.created_at }}</td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">created by</td>
-                                <td>{{ note.created_by }}</td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">updated at</td>
-                                <td>{{ note.updated_at }}</td>
-                            </tr>
-                            <tr>
-                                <td class="td-row-start">updated by</td>
-                                <td>{{ note.updated_by }}</td>
-                            </tr>
-                        </table>
-                        <br/>
-                        <br/>
-                    {% endfor %}
+            {% if result.status_success %}
+                {% if not result.data_list and not result.data %}
+                    <h2 class="wf-h2-style">No Notes for Incident {{result.param.incident_id}}</h2>
+                    <br/>
+                {% else %}
+                    <h2 class="wf-h2-style">Notes for Radar Incident {{ result.param.incident_id }}</h2>
+                        {% if result.data_list %}
+                            {% for note in result.data_list %}
+                                <table class="wf-table-vertical">
+                                    <tr>
+                                        <td class="td-row-start">note id</td>
+                                        <td>{{note.id}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">incident id</td>
+                                        <td>
+                                            <a href="javascript:;"
+                                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ note.incident_id }}
+                                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">content</td>
+                                        <td>{{ note.content }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">created at</td>
+                                        <td>{{ note.created_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">created by</td>
+                                        <td>{{ note.created_by }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">updated at</td>
+                                        <td>{{ note.updated_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">updated by</td>
+                                        <td>{{ note.updated_by }}</td>
+                                    </tr>
+                                </table>
+                                <br/>
+                                <br/>
+                            {% endfor %}
+                        {% else %}
+                            {% with note=result.data%}
+                                <table class="wf-table-vertical">
+                                    <tr>
+                                        <td class="td-row-start">note id</td>
+                                        <td>{{note.id}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">incident id</td>
+                                        <td>
+                                            <a href="javascript:;"
+                                               onclick="context_menu(this, [{'contains': ['radar incident id'], 'value': '{{ note.incident_id }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ note.incident_id }}
+                                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">content</td>
+                                        <td>{{ note.content }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">created at</td>
+                                        <td>{{ note.created_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">created by</td>
+                                        <td>{{ note.created_by }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">updated at</td>
+                                        <td>{{ note.updated_at }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="td-row-start">updated by</td>
+                                        <td>{{ note.updated_by }}</td>
+                                    </tr>
+                                </table>
+                                <br/>
+                                <br/>
+                            {% endwith %}
+                        {% endif %}
                 {% endif %}
             {% else %}
                 <h2 class="wf-h2-style">No data found</h2>

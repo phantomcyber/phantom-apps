@@ -10,12 +10,13 @@
     "product_name": "Radar",
     "product_version_regex": ".*",
     "publisher": "RADAR, LLC",
-    "license": "Copyright (c) 2020 Splunk Inc.",
-    "app_version": "1.0.1",
+    "license": "Copyright (c) 2020-2021 RADAR, LLC",
+    "app_version": "1.0.2",
     "python_version": "3",
     "package_name": "phantom_radar",
     "main_module": "radar_connector.py",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
+    "utctime_updated": "2021-04-23T06:34:59.000000Z",
     "pip_dependencies": {
         "pypi": [
             {
@@ -409,7 +410,7 @@
         },
         {
             "action": "create privacy incident",
-            "description": "Create Radar privacy incident",
+            "description": "Create a Radar privacy incident",
             "verbose": "This action creates a privacy incident in Radar using Splunk Phantom settings and asset configurations. The base URL for the Splunk Phantom appliance configured on the company settings page is used to link the incident's \"intake method\" to this instance of the Splunk Phantom. The time zone specified in the asset settings is used in combination with the current moment the action is triggered to set the incident's \"discovered\" date and time. The container ID for the associated Splunk Phantom event or case is used to specify the Radar incident channel ID. This is used to associate the Radar incident with the Splunk Phantom container. Action parameters are used to set the Radar incident name and description.",
             "type": "generic",
             "identifier": "create_privacy_incident",
@@ -440,41 +441,29 @@
                 {
                     "data_path": "action_result.data.*.incident_id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0,
                     "contains": [
                         "radar incident id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.discovered",
-                    "data_type": "string",
-                    "column_name": "Discovered At",
-                    "column_order": 3
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.url",
-                    "data_type": "string",
-                    "column_name": "URL",
-                    "column_order": 4
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 5,
                     "example_values": [
                         "success",
                         "failed"
@@ -483,8 +472,6 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 6,
                     "example_values": [
                         "Successfully created a privacy incident"
                     ]
@@ -546,71 +533,49 @@
                 {
                     "data_path": "action_result.data.*.incident_id",
                     "data_type": "numeric",
-                    "column_name": "ID",
-                    "column_order": 0,
                     "contains": [
                         "radar incident id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.url",
-                    "data_type": "string",
-                    "column_name": "URL",
-                    "column_order": 3
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_at",
-                    "data_type": "string",
-                    "column_name": "Created At",
-                    "column_order": 4
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.discovered_at",
-                    "data_type": "string",
-                    "column_name": "Discovered At",
-                    "column_order": 5
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.updated_at",
-                    "data_type": "string",
-                    "column_name": "Updated At",
-                    "column_order": 6
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.updated_by",
-                    "data_type": "string",
-                    "column_name": "Updated By",
-                    "column_order": 7
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.incident_status",
-                    "data_type": "string",
-                    "column_name": "Incident Status",
-                    "column_order": 8
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.assignee",
-                    "data_type": "string",
-                    "column_name": "Assignee",
-                    "column_order": 9
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 10,
                     "example_values": [
                         "success",
                         "failed"
@@ -619,8 +584,6 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 11,
                     "example_values": [
                         "Successfully fetched privacy incident"
                     ]
@@ -691,30 +654,22 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "column_name": "Note ID",
-                    "column_order": 0
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.incident_id",
                     "data_type": "numeric",
-                    "column_name": "Incident ID",
-                    "column_order": 1,
                     "contains": [
                         "radar incident id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.content",
-                    "data_type": "string",
-                    "column_name": "Note Content",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"
@@ -723,8 +678,6 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 4,
                     "example_values": [
                         "Successfully added note"
                     ]
@@ -779,53 +732,37 @@
                 {
                     "data_path": "action_result.parameter.incident_id",
                     "data_type": "numeric",
-                    "column_name": "Incident ID",
-                    "column_order": 1,
                     "contains": [
                         "radar incident id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "column_name": "Note ID",
-                    "column_order": 0
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.content",
-                    "data_type": "string",
-                    "column_name": "Note Content",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_at",
-                    "data_type": "string",
-                    "column_name": "Created At",
-                    "column_order": 3
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.created_by",
-                    "data_type": "string",
-                    "column_name": "Created By",
-                    "column_order": 4
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.updated_at",
-                    "data_type": "string",
-                    "column_name": "Updated At",
-                    "column_order": 5
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.updated_by",
-                    "data_type": "string",
-                    "column_name": "Updated By",
-                    "column_order": 6
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 7,
                     "example_values": [
                         "success",
                         "failed"
@@ -834,8 +771,6 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "column_name": "Message",
-                    "column_order": 8,
                     "example_values": [
                         "Successfully fetched notes"
                     ]
@@ -867,6 +802,5 @@
             },
             "versions": "EQ(*)"
         }
-    ],
-    "utctime_updated": "2020-11-24T11:29:54.000000Z"
+    ]
 }
