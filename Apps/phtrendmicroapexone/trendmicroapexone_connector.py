@@ -260,7 +260,7 @@ class TrendMicroApexOneConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
-            return action_result.set_status(phantom.APP_ERROR)
+            return action_result.get_status()
 
         self.save_progress("Test Connectivity Passed")
 
@@ -311,7 +311,7 @@ class TrendMicroApexOneConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Quarantined Successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unquarantine_device(self, param):
         self.save_progress(
@@ -340,7 +340,7 @@ class TrendMicroApexOneConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Unquarantined Successfully")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_endpoints(self, param):
         self.save_progress(
@@ -367,7 +367,7 @@ class TrendMicroApexOneConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved the list of configured security agents")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_system_info(self, param):
         self.save_progress(
@@ -402,7 +402,7 @@ class TrendMicroApexOneConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved the agent information")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
