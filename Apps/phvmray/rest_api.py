@@ -1,3 +1,6 @@
+# File: rest_api.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 """Python client library for VMRay REST API"""
 
 
@@ -128,12 +131,12 @@ class VMRayRESTAPI():
 
         # do request
         result = requests_func(self.server + api_path,
-                               data=req_data,
-                               params=req_params,
-                               headers={"Authorization": "api_key " + self.api_key},
-                               files=files,
-                               verify=self.verify_cert,
-                               stream=raw_data)
+                            data=req_data,
+                            params=req_params,
+                            headers={"Authorization": "api_key " + self.api_key},
+                            files=files,
+                            verify=self.verify_cert,
+                            stream=raw_data)
         handle_rest_api_result(result)
 
         if raw_data:

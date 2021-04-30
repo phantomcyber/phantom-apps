@@ -1,7 +1,10 @@
+# File: vmray_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 VMRAY_JSON_SERVER = "vmray_server"
 VMRAY_JSON_API_KEY = "vmray_api_key"
 VMRAY_JSON_DISABLE_CERT = "disable_cert_verification"
-VMRAY_ERR_SERVER_CONNECTION = "Could not connect to server"
+VMRAY_ERR_SERVER_CONNECTION = "Could not connect to server. {}"
 VMRAY_ERR_CONNECTIVITY_TEST = "Connectivity test failed"
 VMRAY_SUCC_CONNECTIVITY_TEST = "Connectivity test passed"
 VMRAY_ERR_UNSUPPORTED_HASH = "Unsupported hash"
@@ -16,6 +19,12 @@ VMRAY_ERR_SUBMISSION_NOT_FINISHED = "Submission is not finished"
 VMRAY_ERR_NO_SUBMISSIONS = "Sample has no submissions"
 VMRAY_ERR_FILE_EXISTS = "File already exists"
 VMRAY_ERR_REST_API = "REST API Error"
+VMRAY_ERR_CODE_MSG = "Error code unavailable"
+VMRAY_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+VMRAY_PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+VMRAY_ERR_SERVER_RES = "Error processing server response. {}"
+VMRAY_INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {}"
+VMRAY_NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-negative integer value in the {}"
 
 ACTION_ID_VMRAY_GET_FILE = "get_file"
 ACTION_ID_VMRAY_DETONATE_FILE = "detonate_file"
