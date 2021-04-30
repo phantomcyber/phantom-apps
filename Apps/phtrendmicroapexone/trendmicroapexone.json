@@ -4,8 +4,8 @@
     "description": "This app provides investigative and containment actions for Trend Micro Apex One",
     "type": "endpoint",
     "product_vendor": "Trend Micro",
-    "logo": "trendmicroapexone.svg",
-    "logo_dark": "trendmicroapexone_dark.svg",
+    "logo": "logo_trendmicroapexone.svg",
+    "logo_dark": "logo_trendmicroapexone_dark.svg",
     "product_name": "Apex One",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -14,7 +14,7 @@
     "app_version": "1.0.0",
     "utctime_updated": "2021-04-16T11:37:07.068082Z",
     "package_name": "phantom_trendmicroapexone",
-    "main_module": "trendmicroapexone_connector.pyc",
+    "main_module": "trendmicroapexone_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -30,16 +30,12 @@
             "description": "Apex Server URL",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "application_id": {
             "description": "Apex Central Application ID",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "api_key": {
@@ -52,9 +48,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -62,9 +58,10 @@
         },
         {
             "action": "quarantine device",
-            "identifier": "quarantine_device",
-            "description": "Quarantine the endpoint",
+            "description": "Quarantine an endpoint",
             "type": "contain",
+            "undo": "unquarantine device",
+            "identifier": "quarantine_device",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -76,8 +73,6 @@
                         "host name",
                         "ip"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -89,28 +84,8 @@
                         "host name",
                         "ip"
                     ],
-                    "column_name": "ip_hostname",
+                    "column_name": "IP/Hostname",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.msg",
-                    "data_type": "string",
-                    "column_name": "msg",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.product",
@@ -126,7 +101,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.host_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.folder_path",
@@ -147,6 +125,44 @@
                 {
                     "data_path": "action_result.data.*.managing_server_id",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.msg",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -156,9 +172,10 @@
         },
         {
             "action": "unquarantine device",
-            "identifier": "unquarantine_device",
-            "description": "Unquarantine the endpoint",
+            "description": "Unquarantine an endpoint",
             "type": "correct",
+            "undo": "quarantine device",
+            "identifier": "unquarantine_device",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -170,8 +187,6 @@
                         "host name",
                         "ip"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -183,28 +198,8 @@
                         "host name",
                         "ip"
                     ],
-                    "column_name": "ip_hostname",
+                    "column_name": "IP/Hostname",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.msg",
-                    "data_type": "string",
-                    "column_name": "msg",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.product",
@@ -220,7 +215,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.host_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.folder_path",
@@ -241,6 +239,44 @@
                 {
                     "data_path": "action_result.data.*.managing_server_id",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.msg",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -250,38 +286,12 @@
         },
         {
             "action": "list endpoints",
-            "identifier": "list_endpoints",
             "description": "List all the configured security agents",
             "type": "investigate",
+            "identifier": "list_endpoints",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.total_objects",
-                    "data_type": "numeric",
-                    "column_name": "total objects",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.msg",
-                    "data_type": "string",
-                    "column_name": "msg",
-                    "column_order": 2
-                },
                 {
                     "data_path": "action_result.data.*.endpoints.*.product",
                     "data_type": "string"
@@ -296,7 +306,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.endpoints.*.host_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.endpoints.*.folder_path",
@@ -317,6 +330,46 @@
                 {
                     "data_path": "action_result.data.*.endpoints.*.managing_server_id",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.msg",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.total_objects",
+                    "data_type": "numeric",
+                    "column_name": "Total Objects",
+                    "column_order": 1,
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -326,9 +379,9 @@
         },
         {
             "action": "get system info",
-            "identifier": "get_system_info",
-            "description": "Get information about an security agent",
+            "description": "Get information about a security agent",
             "type": "investigate",
+            "identifier": "get_system_info",
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
@@ -351,28 +404,8 @@
                         "host name",
                         "ip"
                     ],
-                    "column_name": "ip_hostname",
+                    "column_name": "IP/Hostname",
                     "column_order": 0
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.msg",
-                    "data_type": "string",
-                    "column_name": "msg",
-                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.product",
@@ -388,7 +421,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.host_name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.folder_path",
@@ -409,6 +445,44 @@
                 {
                     "data_path": "action_result.data.*.managing_server_id",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.msg",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {

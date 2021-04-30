@@ -1,8 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: trendmicroapexone_connector.py
+#
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -11,8 +11,6 @@ from __future__ import print_function, unicode_literals
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-
-# Usage of the consts file is recommended
 from trendmicroapexone_consts import *
 import json
 from bs4 import BeautifulSoup
@@ -52,31 +50,31 @@ class TrendMicroApexOneConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERR_CODE_MSG
+                    error_code = APEX_ONE_ERR_CODE_MSG
                     error_msg = e.args[0]
             else:
-                error_code = ERR_CODE_MSG
-                error_msg = ERR_MSG_UNAVAILABLE
+                error_code = APEX_ONE_ERR_CODE_MSG
+                error_msg = APEX_ONE_ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERR_CODE_MSG
-            error_msg = ERR_MSG_UNAVAILABLE
+            error_code = APEX_ONE_ERR_CODE_MSG
+            error_msg = APEX_ONE_ERR_MSG_UNAVAILABLE
 
         try:
-            if error_code in ERR_CODE_MSG:
+            if error_code in APEX_ONE_ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
                 error_text = "Error Code: {0}. Error Message: {1}".format(
                     error_code, error_msg
                 )
         except:
-            self.debug_print(PARSE_ERR_MSG)
-            error_text = PARSE_ERR_MSG
+            self.debug_print(APEX_ONE_PARSE_ERR_MSG)
+            error_text = APEX_ONE_PARSE_ERR_MSG
 
         return error_text
 
     def _create_checksum(self, http_method, raw_url, headers, request_body):
         """ This function is used to derive the checksum that needs to be sent with the HTTP request in order for the request to be accepted by the API"""
-        string_to_hash = (http_method.upper() + "|" + raw_url.lower() + "|" + headers + "|" + request_body)
+        string_to_hash = "{0}|{1}|{2}|{3}".format(http_method.upper(), raw_url.lower(), headers, request_body)
         base64_string = base64.b64encode(
             hashlib.sha256(str.encode(string_to_hash)).digest()
         ).decode("utf-8")
@@ -113,9 +111,8 @@ class TrendMicroApexOneConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
-            ),
-            None,
+                phantom.APP_ERROR, "Status Code: {}. Empty response, no information in header".format(response.status_code)
+            ), None
         )
 
     def _process_html_response(self, response, action_result):
@@ -124,6 +121,8 @@ class TrendMicroApexOneConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -143,19 +142,18 @@ class TrendMicroApexOneConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
+            err = self._get_error_message_from_exception(e)
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Unable to parse JSON response. Error: {0}".format(str(e)),
+                    "Unable to parse JSON response. Error: {0}".format(err),
                 ),
-                None,
+                None
             )
 
-        # Please specify the status codes here
         if 200 <= r.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code, r.text.replace("{", "{{").replace("}", "}}")
         )
@@ -168,8 +166,6 @@ class TrendMicroApexOneConnector(BaseConnector):
             action_result.add_debug_data({"r_status_code": r.status_code})
             action_result.add_debug_data({"r_text": r.text})
             action_result.add_debug_data({"r_headers": r.headers})
-
-        # Process each 'Content-Type' of response separately
 
         # Process a json response
         if "json" in r.headers.get("Content-Type", ""):
@@ -207,11 +203,11 @@ class TrendMicroApexOneConnector(BaseConnector):
                 action_result.set_status(
                     phantom.APP_ERROR, "Invalid method: {0}".format(method)
                 ),
-                resp_json,
+                resp_json
             )
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         # Add authentication information
         token = self._create_jwt_token(
@@ -224,34 +220,34 @@ class TrendMicroApexOneConnector(BaseConnector):
             time.time(),
         )
         headers = {
-            "Authorization": "Bearer " + token,
+            "Authorization": "Bearer {}".format(token),
             "Content-Type": "application/json;charset=utf-8",
         }
 
         try:
             r = request_func(
                 url,
-                # auth=(username, password),  # basic authentication
                 verify=config.get("verify_server_cert", False),
                 headers=headers,
                 **kwargs,
             )
+        except requests.exceptions.ConnectionError:
+            error_reason = 'Error Details: Connection refused from the server for URL: %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_reason), resp_json)
         except Exception as e:
             error_reason = self._get_error_message_from_exception(e)
 
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error Connecting to server. Details: {0}".format(error_reason),
+                    "Error Connecting to server. Details: {0}".format(error_reason)
                 ),
-                resp_json,
+                resp_json
             )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
-
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
@@ -300,17 +296,22 @@ class TrendMicroApexOneConnector(BaseConnector):
             action_result, ip_hostname, action="cmd_isolate_agent"
         )
 
-        if phantom.is_fail(ret_val) or not response.get("result_content"):
-            if not response.get("result_content"):
-                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        action_result.add_data(response["result_content"][0])
+        if response and not response.get("result_content"):
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
-        summary = action_result.update_summary({})
-        summary["status"] = response["result_content"][0].get("isolation_status")
-        summary["msg"] = response.get("result_description", "")
+        try:
+            action_result.add_data(response["result_content"][0])
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+            summary = action_result.update_summary({})
+            summary["status"] = response["result_content"][0].get("isolation_status")
+            summary["msg"] = response.get("result_description", "")
+        except:
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Quarantined Successfully")
 
     def _handle_unquarantine_device(self, param):
         self.save_progress(
@@ -324,17 +325,22 @@ class TrendMicroApexOneConnector(BaseConnector):
             action_result, ip_hostname, action="cmd_restore_isolated_agent"
         )
 
-        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:
-            if not response.get("result_content"):
-                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        action_result.add_data(response["result_content"][0])
+        if response and (not response.get("result_content") or response.get("result_code") != 1):
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
-        summary = action_result.update_summary({})
-        summary["status"] = response["result_content"][0].get("isolation_status")
-        summary["msg"] = response.get("result_description", "")
+        try:
+            action_result.add_data(response["result_content"][0])
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+            summary = action_result.update_summary({})
+            summary["status"] = response["result_content"][0].get("isolation_status")
+            summary["msg"] = response.get("result_description", "")
+        except:
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Unquarantined Successfully")
 
     def _handle_list_endpoints(self, param):
         self.save_progress(
@@ -346,16 +352,22 @@ class TrendMicroApexOneConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None)
 
-        if phantom.is_fail(ret_val) or not response.get("result_content"):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.add_data({"endpoints": response["result_content"]})
+        if response and not response.get("result_content"):
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
-        summary = action_result.update_summary({})
-        summary["total_objects"] = len(response["result_content"])
-        summary["msg"] = response.get("result_description", "")
+        try:
+            action_result.add_data({"endpoints": response["result_content"]})
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+            summary = action_result.update_summary({})
+            summary["total_objects"] = len(response["result_content"])
+            summary["msg"] = response.get("result_description", "")
+        except:
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved the list of configured security agents")
 
     def _handle_get_system_info(self, param):
         self.save_progress(
@@ -366,30 +378,31 @@ class TrendMicroApexOneConnector(BaseConnector):
         ip_hostname = param["ip_hostname"]
 
         endpoint = APEX_ONE_PRODUCT_AGENTS_ENDPOINT
-        qs = "?"
         if phantom.is_ip(ip_hostname):
-            qs += f"ip_address={ip_hostname}"
+            qs = f"?ip_address={ip_hostname}"
         else:
-            qs += f"host_name={ip_hostname}"
+            qs = f"?host_name={ip_hostname}"
 
         ret_val, response = self._make_rest_call(
-            endpoint + qs, action_result, params=None
+            "{0}{1}".format(endpoint, qs), action_result, params=None
         )
 
-        if phantom.is_fail(ret_val) or not response.get("result_content") or response.get("result_code") != 1:
-
-            if not response.get("result_content"):
-                action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
-
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.add_data(response["result_content"][0])
+        if response and (not response.get("result_content") or response.get("result_code") != 1):
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_RESPONSE_EMPTY_MSG)
 
-        summary = action_result.update_summary({})
-        summary["msg"] = response.get("result_description", "")
-        summary["total_objects"] = len(response["result_content"])
+        try:
+            action_result.add_data(response["result_content"][0])
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+            summary = action_result.update_summary({})
+            summary["msg"] = response.get("result_description", "")
+            summary["total_objects"] = len(response["result_content"])
+        except:
+            return action_result.set_status(phantom.APP_ERROR, APEX_ONE_ERR_SERVER_RES)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved the agent information")
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -422,17 +435,7 @@ class TrendMicroApexOneConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config["base_url"]
+        self._base_url = config["base_url"].strip("/")
         self._application_id = config["application_id"]
         self._api_key = config["api_key"]
 
