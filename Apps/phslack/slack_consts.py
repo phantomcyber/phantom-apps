@@ -115,6 +115,7 @@ SLACK_ERR_UNABLE_TO_PARSE_RESPONSE = "Error occurred while parsing the response"
 SLACK_ERR_QUESTION_RESPONSE_NOT_AVAILABLE = "Response to question not available"
 SLACK_ERR_NO_RESPONSE_FROM_SERVER = "Got no response from the Slack server"
 SLACK_ERR_INVALID_CHANNEL_TYPE = "Please provide a valid value in the 'channel_type' action parameter"
+SLACK_ERR_LENGTH_LIMIT_EXCEEDED = "Based on your asset_id length ({asset_length}), valid length for the 'confirmation' parameter is {valid_length}"
 
 SLACK_RESP_POLL_INTERVAL_KEY = "'How often to poll for a response (in seconds)' configuration"
 SLACK_TIMEOUT_KEY = "'Question timeout (in minutes)' configuration"
