@@ -1056,7 +1056,7 @@ class SlackConnector(phantom.BaseConnector):
         if len(callback_id) > 255:
             path_json['confirmation'] = ''
             valid_length = 255 - len(json.dumps(path_json))
-            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_LENGTH_LIMIT_EXCEEDED.format(asset_id=len(self.get_asset_id()), valid_length=valid_length))
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_LENGTH_LIMIT_EXCEEDED.format(asset_length=len(self.get_asset_id()), valid_length=valid_length))
 
         self.save_progress('Asking question with ID: {0}'.format(qid))
 
