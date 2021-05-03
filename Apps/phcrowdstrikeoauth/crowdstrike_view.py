@@ -213,6 +213,12 @@ def display_view(provides, all_app_runs, context):
     if provides == 'update indicator':
         return 'crowdstrike_update_indicator.html'
 
+    if provides == 'file reputation':
+        return 'crowdstrike_file_reputation.html'
+
+    if provides == 'url reputation':
+        return 'crowdstrike_url_reputation.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

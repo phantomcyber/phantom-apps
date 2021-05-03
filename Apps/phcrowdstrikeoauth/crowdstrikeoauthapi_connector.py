@@ -2069,6 +2069,163 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
 
+    def _paginate_endpoint(self, action_result, resource_id_list, endpoint):
+        id_list = list()
+        id_list.extend(resource_id_list)
+        resource_details_list = list()
+
+        while id_list:
+            # Endpoint creation
+            ids = id_list[:min(100, len(id_list))]
+            endpoint_param = ''
+            for resource in ids:
+                endpoint_param += "ids={}&".format(resource)
+
+            endpoint_param = endpoint_param.strip("&")
+
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
+
+            # Make REST call
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if response.get("resources"):
+                resource_details_list.extend(response.get("resources"))
+
+            del id_list[:min(100, len(id_list))]
+
+        if not resource_details_list:
+            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+
+        for report in resource_details_list:
+            action_result.add_data(report)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_file_reputation(self, param):
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        try:
+            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
+
+        file_hash = file_info['metadata']['sha256']
+        filter_query = f"sandbox.sha256:'{file_hash}'"
+        param['filter'] = filter_query
+
+        max_limit = 5000
+
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
+        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        resp = self._check_data(action_result, param, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+
+        if not resource_id_list:
+            return action_result.set_status(phantom.APP_ERROR, "File not found")
+
+        if param.get('detail_report'):
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+
+    def _handle_url_reputation(self, param):
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url = param['url']
+        if 'https' in url:
+            replaced_url = url.replace('https', 'hxxps')
+        elif 'http' in url:
+            replaced_url = url.replace('http', 'hxxp')
+        elif 'ftp' in url:
+            replaced_url = url.replace('ftp', 'fxp')
+
+        filter_query = f"sandbox.submit_url.raw:'{replaced_url}'"
+        param['filter'] = filter_query
+
+        max_limit = 5000
+
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
+        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        resp = self._check_data(action_result, param, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+
+        if not resource_id_list:
+            return action_result.set_status(phantom.APP_ERROR, "File not found")
+
+        if param.get('detail_report'):
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+
+    def _handle_download_report(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query_param = {
+            'id': param['artifact_id'],
+            'name': param.get('file_name', param['artifact_id'])
+        }
+        header = {
+            'Accept-Encoding': 'application/gzip'
+        }
+        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_detonate_file(self, param):
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        try:
+            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
+
+
+
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
@@ -2136,11 +2293,11 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
-                    if len(resp_json["resources"]) == 0 and len(resp_json["errors"]) != 0:
+                    if (resp_json["resources"] == None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
                             {0} Data from server: {1}".format(resp_json["errors"][0]["code"], self._handle_py_ver_compat_for_input_str(resp_json["errors"][0]["message"]))), None)
         except:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server")), None
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -2160,7 +2317,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_compressed_file_response(self, response, action_result):
+    def _process_compressed_file_response(self, response, action_result, type):
 
         guid = uuid.uuid4()
 
@@ -2179,7 +2336,17 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary vault folder.", self._get_error_message_from_exception(e))
 
         action_params = self.get_current_param()
-        filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
+
+        if type == 'compress':
+            filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
+        elif type == 'csv':
+            filename = "{0}.csv".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'json':
+            filename = "{0}.json".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'plain':
+            filename = "{0}.txt".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'png':
+            filename = "{0}.png".format(action_params.get('file_name', action_params['artifact_id']))
 
         compressed_file_path = "{0}/{1}".format(local_dir, filename)
 
@@ -2205,7 +2372,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_response(self, response, action_result):
+    def _process_response(self, response, action_result, is_download=False):
         """ This function is used to process html response.
 
         :param response: response data
@@ -2223,12 +2390,24 @@ class CrowdstrikeConnector(BaseConnector):
         if not response.text and 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, {})
 
+        if is_download:
+            if 'csv' in response.headers.get('Content-Type', ''):
+                return self._process_compressed_file_response(response, action_result, 'csv')
+
+            if 'plain' in response.headers.get('Content-Type', ''):
+                return self._process_compressed_file_response(response, action_result, 'plain')
+
+            if 'png' in response.headers.get('Content-Type', ''):
+                return self._process_compressed_file_response(response, action_result, 'png')
+
         # Process each 'Content-Type' of response separately
         if 'x-7z-compressed' in response.headers.get('Content-Type', ''):
-            return self._process_compressed_file_response(response, action_result)
+            return self._process_compressed_file_response(response, action_result, 'compress')
 
         # Process a json response
         if 'json' in response.headers.get('Content-Type', ''):
+            if is_download:
+                return self._process_compressed_file_response(response, action_result, 'json')
             return self._process_json_response(response, action_result)
 
         if 'text/javascript' in response.headers.get('Content-Type', ''):
@@ -2277,7 +2456,10 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json
 
-        return self._process_response(r, action_result)
+        is_download = False
+        if CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT in endpoint:
+            is_download = True
+        return self._process_response(r, action_result, is_download)
 
     def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json=None, method="get"):
         """ Function that helps setting REST call to the app.
@@ -2411,7 +2593,11 @@ class CrowdstrikeConnector(BaseConnector):
             'list_processes': self._handle_list_processes,
             'upload_iocs': self._handle_upload_iocs,
             'delete_iocs': self._handle_delete_iocs,
-            'update_iocs': self._handle_update_iocs
+            'update_iocs': self._handle_update_iocs,
+            'file_reputation': self._handle_file_reputation,
+            'url_reputation': self._handle_url_reputation,
+            'download_report': self._handle_download_report,
+            'detonate_file': self._handle_detonate_file
         }
 
         action = self.get_action_identifier()

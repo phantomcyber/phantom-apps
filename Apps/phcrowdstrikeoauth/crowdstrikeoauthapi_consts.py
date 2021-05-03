@@ -118,5 +118,11 @@ CROWDSTRIKE_GET_USER_INFO_ENDPOINT = "/users/entities/users/v1"
 CROWDSTRIKE_GET_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-user-uuid/v1"
 CROWDSTRIKE_GET_ROLE_ENDPOINT = "/user-roles/entities/user-roles/v1"
 CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-cid/v1"
+CROWDSTRIKE_QUERY_REPORT_ENDPOINT = "/falconx/queries/reports/v1"
+CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT = "/falconx/entities/report-summaries/v1"
+CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT = "/falconx/entities/reports/v1"
+CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT = "/falconx/entities/artifacts/v1"
+CROWDSTRIKE_UPLOAD_FILE_ENDPOINT = "/samples/entities/samples/v2"
+
 
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"

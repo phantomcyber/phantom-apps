@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.0.6",
+    "app_version": "2.1.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, January 21 2021, API version: v1, v2"
     ],
@@ -171,6 +171,13 @@
                     "data_type": "string",
                     "example_values": [
                         "i-058fca45cda978e00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.zone_group",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-east-1a"
                     ]
                 },
                 {
@@ -3402,6 +3409,73 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "CB-TEST-02"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tactic_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CSTA0001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SampleTemplateDetection"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.technique_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CST0001"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.fs_operation_blocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.bootup_safeguard_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.critical_process_disabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pattern_disposition_details.handle_operation_downgraded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.pattern_disposition_details.inddet_mask",
                     "data_type": "boolean",
                     "example_values": [
@@ -4314,6 +4388,20 @@
                     "data_type": "numeric",
                     "example_values": [
                         0.096319664
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061d7ff3b634e22b38274d64798"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.adjusted_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
                     ]
                 },
                 {
@@ -5648,6 +5736,27 @@
                     "data_type": "string",
                     "example_values": [
                         "2019-02-08T02:36:05.073298048Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cpu_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "329455"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.serial_number",
+                    "data_type": "string",
+                    "example_values": [
+                        "VMware-56 4d d8 11 42 ab 12 1a-b5 3d 4a e5 d1 a0 12 25"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reduced_functionality_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
                     ]
                 },
                 {
@@ -7928,6 +8037,1871 @@
                     ]
                 }
             ]
+        },
+        {
+            "action": "file reputation",
+            "description": "Queries CrowdStrike for the file info",
+            "type": "investigate",
+            "identifier": "file_reputation",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "data_type": "string",
+                    "description": "Vault ID of file",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum reports to be fetched",
+                    "order": 1,
+                    "default": 50
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 2,
+                    "value_list": [
+                        "verdict.asc",
+                        "verdict.desc",
+                        "created_timestamp.asc",
+                        "created_timestamp.desc",
+                        "threat_score.asc",
+                        "threat_score.desc",
+                        "environment_description.asc",
+                        "environment_description.desc",
+                        "submission_type.asc",
+                        "submission_type.desc"
+                    ]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "order": 3,
+                    "default": 0
+                },
+                "detail_report": {
+                    "data_type": "boolean",
+                    "order": 4,
+                    "description": "Get the detailed report",
+                    "default": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.quota.used",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.quota.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.quota.in_progress",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "b26ebb7a-7433-44df-be7c-a98a6b9b79e3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "falconx-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.006051928
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "30c5e524e975816fbce1d958150e394efc219772",
+                        "3625d01958241505e11605ea7b89b81df54b7638"
+                    ],
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_timestamp.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detail_report",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e_5cbc78f5cd4845fd8652896dde973397"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "quarantine"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.packer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft visual C# v7.0 / Basic .NET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "suspicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        224888
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE32 executable (console) Intel 80386 Mono/.Net assembly, for MS Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.incidents.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fingerprint"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3788
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "00064737-00003788"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKLM\\SYSTEM\\ControlSet001\\Control\\Session Manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "KeyHandle"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKLM\\SOFTWARE\\MICROSOFT\\RPC\\"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.operation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Open"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPUTERNAME"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "00000000010000002C000000160000001800000043006F006D00700075007400650072004E0061006D00650048004100500055004200570053002D00500043000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE_READ_DATA | FILE_EXECUTE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%WINDIR%\\SYSTEM32\\MSCOREE.DLL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "OPEN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.normalized_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.icon_artifact_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ],
+                    "example_values": [
+                        "6fc9590b42ff8dcbd51c4cddf7ec83bad13f08dcfc882dfbfae326a4c4d68e8d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Creates a writable file in a temporary directory"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "API Call"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "General"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.relevance",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "api-4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"<Input Sample>.exe\" created file \"%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level_human",
+                    "data_type": "string",
+                    "example_values": [
+                        "informative"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1116"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.submit_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.architecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "32 Bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_imports.*.module",
+                    "data_type": "string",
+                    "example_values": [
+                        "mscoree.dll"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.threat_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        41
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.version_info.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Translation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.version_info.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x0000 0x04b0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Persistence"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1215"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Kernel Modules and Extensions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "5ce220e1334193b403e937ecca0b406f"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AgileDotNetRT.dll"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "48c1d47e4a23ebfd739aa86830842d1ead7ced59"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%TEMP%\\329babfa-d618-4d17-a6b0-79fe02a2d94d\\AgileDotNetRT.dll"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        137741
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE32 executable (DLL) (GUI) Intel 80386, for MS Windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.runtime_process",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.threat_level_readable",
+                    "data_type": "string",
+                    "example_values": [
+                        "no specific threat"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.submission_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "file"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.environment_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7 32 bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.pcap_report_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "e5521d8c988e4fd8f4bff8d90e231ac71d5bde9710382a1a2ac14e9d004eabd8"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_bitness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_edition",
+                    "data_type": "string",
+                    "example_values": [
+                        "Professional"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.1 (build 7601)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.memory_strings_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "9e5ebb7847a684fe6b9f36bb6bfb36e03b4e2f71b010c67e131652b968695a30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_service_pack",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service Pack 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ansi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        ".http://www.digicert.com/ssl-cps-repository.htm0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Memory/File Scan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.bin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
+                    "data_type": "string",
+                    "example_values": [
+                        "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "suspicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.input",
+                    "data_type": "string",
+                    "example_values": [
+                        "c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "clean"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "b029f63374652c76e09b6443dd931774"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "8b50322f86d4bd5a7a5bc1d54d16ecfae8d4e693"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "clean"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "7b982b66433e1c89d094461d3d461eab90c93f72fbe676fcfc17c3c340c9a8b4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100144
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE32"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.first_seen_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-29T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.global_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.customer_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-10-26T09:26:12Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_csv_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "b735c285c7d4119254d7a4eac9734321cf2dee0a8925f0395df6592cce97f848"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_json_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "c4a90ac33e499f69fbccf4ca20cd8938a0e3a10055eececfefa99000a475dd7a"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_maec_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5a9703fb4d31b4fab70948332af17711b41d06f2fe46406f8abcd810eea8ca2b"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_stix_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2433d561ad70b9a30753bc3345bf1d9e986340e40dc59177f91e979d59b4f0f0"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_csv_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f54d63e91cafc2aa131d90bab6a60d7dfd0db05f984ebcf9394e4a1d7934c913"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_json_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7d80482e25d2e86867ea6b4b8c0bc9c1235f9e70dbd2a1754ffb86c950994532"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_maec_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "bf73276e6e07f6c02a242254e846f4ef8e6d12a3114ee8de0e144ee608491457"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_stix_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1f129239876f7eb8287bf112763dada414ee8792ce1ab81eda6adcf322327696"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "File Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "url reputation",
+            "description": "Queries CrowdStrike for the url info",
+            "type": "investigate",
+            "identifier": "url_reputation",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "data_type": "string",
+                    "description": "URL to query",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum reports to be fetched",
+                    "order": 1,
+                    "default": 50
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 2,
+                    "value_list": [
+                        "verdict.asc",
+                        "verdict.desc",
+                        "created_timestamp.asc",
+                        "created_timestamp.desc",
+                        "threat_score.asc",
+                        "threat_score.desc",
+                        "environment_description.asc",
+                        "environment_description.desc",
+                        "submission_type.asc",
+                        "submission_type.desc"
+                    ]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "order": 3,
+                    "default": 0
+                },
+                "detail_report": {
+                    "data_type": "boolean",
+                    "order": 4,
+                    "description": "Get the detailed report",
+                    "default": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "https://www.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_timestamp.asc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.detail_report",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e_3ab68d2aa2774ba3a35d6f17ae1a7c0b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "uiproxy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "no specific threat"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.incidents.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Network Behavior"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.submit_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "hxxps://www.gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.submission_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "page_url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.network_settings",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.environment_description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7 32 bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2b32e6795b344abba8925cce6782d128"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "no specific threat"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "philip.royer@phantom.us"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-29T02:49:16Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_csv_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_json_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_maec_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_broad_stix_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_csv_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_json_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_maec_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ioc_report_strict_stix_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2148
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "00065605-00002148"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "rundll32.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "3fa4912eb43fc304652d7b01f118589259861e2d628fa7c86193e54d5f987670"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.command_line",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"%WINDIR%\\System32\\ieframe.dll\",OpenURL C:\\3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af.url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.process_flags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reduced Monitoring"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.normalized_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%WINDIR%\\System32\\rundll32.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.icon_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "aa6f1a14d219555f2818f89dee06821824c872ae18279027baa0e160f61f049a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKCU\\Software\\Microsoft\\Internet Explorer\\Main\\WindowsSearch"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "KeyHandle"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "WPADDECISIONREASON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\INTERNET SETTINGS\\WPAD\\{0C70BB6D-CFA8-4734-A158-28619E142726}\\WPADDECISIONREASON"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "01000000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.operation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Write"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.parent_uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "00065605-00002148"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE_READ_ATTRIBUTES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CREATE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Contacts server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.type",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "Network Traffic"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "General"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.relevance",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "network-1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"216.58.195.69:443\"\n \"216.58.194.195:80\"\n \"172.217.164.100:443\"\n \"172.217.6.45:443\"\n \"172.217.6.67:443\"\n \"216.58.195.67:443\"\n \"172.217.164.110:443\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level_human",
+                    "data_type": "string",
+                    "example_values": [
+                        "informative"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.architecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "WINDOWS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "accounts.youtube.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "216.58.194.206"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "MarkMonitor, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_name_servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "NS1.GOOGLE.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_creation_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2005-02-15T00:00:00+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/6.1\nHost: ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "216.58.194.195"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        443
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "216.58.195.69"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3808
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "iexplore.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "cbd0581678fa40f0edcbc7c59e0cad10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ver2963.tmp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "a1463fbcc9b96a8929f8a335f75a89147b300715"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "159bd4343f344a08f6af3b716b6fa679859c1bd1d7030d26ff5ef0255b86e1d9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%LOCALAPPDATA%\\Microsoft\\Internet Explorer\\VersionManager\\ver2963.tmp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16339
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "XML 1.0 document, UTF-8 Unicode (with BOM) text, with CRLF line terminators"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.runtime_process",
+                    "data_type": "string",
+                    "example_values": [
+                        "iexplore.exe (PID: 3808)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.threat_level_readable",
+                    "data_type": "string",
+                    "example_values": [
+                        "no specific threat"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.pcap_report_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "04a091843e91c36357b2ec63a2a7ac8ad7d142d861759062520b0a925e9b875d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_bitness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_edition",
+                    "data_type": "string",
+                    "example_values": [
+                        "Professional"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "6.1 (build 7601)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.memory_strings_artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "4300381ecd2f3d62648cdc01d862f4765032f071bad272164c3580b7b6fb8840"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_service_pack",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service Pack 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ansi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "\"!\ufffd\ufffd\\\ufffd\ufffd\ufffd\ufffd|\ufffdA%K\ufffd\u2cf0#\ufffdB\ufffd\ufffdw\ufffdR\u0413\ufffd\ufffd@\ufffdJ\ufffdJ\ufffd>\u0213J\ufffd\ufffd\ufffd\ufffdZ\ufffd\ufffdY\ufffd\ufffd\ufffd_1+\ufffd8'\ufffdS\ufffd\ufffd/\ufffd\u024ay\ufffd\ufffd\ufffdw]\ufffd*e\ufffd\ufffd\ufffd\ufffd|H\ufffd9\ufffdl\ufffdN\ufffdk\ufffdrN\ufffd+\u0708\ufffd\ufffd \ufffd\ufffdUB\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdFT\ufffd\ufffd\ufffdv}\ufffd9,\ufffd\ufffd^%\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd,4\ufffd`pa\ufffd\ufffd\ufffd\ufffd\ufffd%m\ufffd\ufffd\ufffdl$\ufffd\ufffd\ufffd|OY\ufffd@`\ufffd^(\ufffd*\ufffd^B\ufffd2`\ufffd10\ufffdS\ufffd\ufffd\ufffd\ufffd\ufffd`\ufffd\ufffdj;H\ufffd#Uq\ufffd\ufffd\ufffd=\ufffd\ufffd?\ufffd\ufffd\ufffd9\ufffdb|\ufffd\ufffd\ufffd\ufffdZ\ufffdu\ufffdd\ufffdF\ufffd\ufffd0=h\ufffd\ufffd\ufffd\ufffd\ufffd]}ene\ufffd\ufffd\ufffd\ufffdJp\ufffd\u036c/w\ufffd\ufffd\u014c\ufffdd\ufffdR\ufffd(|\ufffddi\ufffdy:\ufffd\ufffdD[\ufffd\u00e4\ufffd\ufffd,\ufffdP \ufffdG\ufffd@<\ufffdbC\ufffdN\ufffd^*+f\ufffdn\ufffdr2\ufffd\ufffd\ufffd\ufffd\ufffdfq~\ufffd\ufffd6\ufffd\ufffd$\ufffd>\ufffd<\ufffd\ufffdqF\ufffdS9\ufffdW'+\ufffd\ufffdr\ufffd\ufffdG\ufffde\ufffdo\ufffd\ufffd\ufffdw8/\ufffd%\ufffdy\ufffd/\ufffd\ufffd\ufffdH\ufffd\ufffd1\ufffdc{\ufffd#\ufffd\ufffd|8\ufffd\ufffd3\ufffd~up\ufffdn\u079d\ufffd\ufffdOr\ufffd!\ufffd;r\ufffdJJ\ufffd3\ufffd\ufffdwb\ufffd\ufffd(\ufffd\ufffdG\ufffd\ufffd\ufffd\ufffd,\ufffd\ufffd\ufffd\ufffd\ufffd2\ufffd\ufffd-)\ufffd\ufffd,\ufffd^\u0743\ufffd\ufffd%td\ufffd\ufffd\ufffd\ufffdE\ufffdR\ufffd\ufffd\ufffd\u0737|\ufffd\ufffdD\ufffd\ufffd>\ufffd\ufffd#\ufffd\ufffd\ufffd\\\ufffd\ufffdEC\ufffd\ufffduk\ufffdOs[TwW\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd/\ufffd\ufffd\ufffdyh7px\ufffd\ufffd\ufffdt\u01b31\ufffd\ufffdv\ufffdvbH\ufffdvw\ufffd\ufffd\ufffd\u021b\ufffdY\ufffd\ufffd|\ufffd\ufffd:\ufffd\u06c2\u02d7C\ufffd\ufffd\ufffds\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdM\ufffdU\ufffdQh''w'\ufffd\ufffd\ufffd\ufffdQ\ufffd\ufffd}|\ufffdN\u0366q3,O\u05e3\u02fe['Go.4\ufffdG\ufffd\ufffd&,C\ufffdIYe\ufffd\ufffd.{kB\ufffd\ufffd\ufffd\u0444\ufffd\ufffdnA\ufffdp:c\ufffd\ufffd^\ufffd-V\ufffd\ufffdFOS\ufffd\ufffd\ufffdw|/(r9H\ufffd\ufffd\u079d)\ufffdh:\ufffd\ufffd\ufffd\u66d0Ql\ufffd i\ufffd\u0123c\ufffd\ufffdE\ufffd3\ufffdy&\"Pw\ufffd\ufffdy\ufffdG\ufffd\ufffd:n\ufffd\ufffd\ufffdq(|%\ufffd\ufffd\u0658|;|\u0625\ufffdJ>\ufffd(\ufffd\u03d0\ufffd\ufffd\ufffdo/.\ufffd\ufffd\ufffd\ufffd\ufffd/?~$\ufffd<'\u0414\ufffd<\ufffd\ufffdG?\u03c3\u0173\ufffd\ufffd\ufffd\ufffd \ufffd\u05afQ\ufffd\ufffd$~\ufffd\ufffdM\ufffd\ufffdp\ufffdE\ufffdpx\ufffdLc4\ufffd\ufffd\ufffd\ufffd\ufffd!\ufffd@yz&\ufffd,\ufffdu\ufffd\ufffdq\ufffd\ufffd\ufffdz\ufffd\ufffdB\ufffd\ufffd\ufffd\ufffd\ufffdU\ufffdbc\ufffdxk\ufffd>"
+                        ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Decrypted SSL Data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
+                    "data_type": "string",
+                    "example_values": [
+                        "iexplore.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.input",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://accounts.youtube.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "whitelisted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5bd"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "URL Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "download report",
+            "description": "To download the report of the provided artifact id",
+            "type": "investigate",
+            "identifier": "download_report",
+            "read_only": false,
+            "parameters": {
+                "artifact_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Get the zipped file",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                "file_name": {
+                    "data_type": "string",
+                    "description": "Filename to use for the file added to vault",
+                    "primary": true,
+                    "order": 1,
+                    "contains": [
+                        "filename"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ],
+                    "column_name": "Artifact ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "6fc9590b42ff8dcbd51c4cddf7ec83bad13f08dcfc882dfbfae326a4c4d68e8d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "column_name": "Filename",
+                    "column_order": 1,
+                    "example_values": [
+                        "test_file"
+                    ],
+                    "contains": [
+                        "filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Download Report",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "detonate file",
+            "description": "Upload a file to Crowd Strike and retrieve the analysis results",
+            "type": "investigate",
+            "identifier": "detonate_file",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "data_type": "string",
+                    "description": "Vault ID of file",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                "comment": {
+                    "data_type": "string",
+                    "description": "A descriptive comment to identify the file",
+                    "order": 1
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "Maximum reports to be fetched",
+                    "order": 2,
+                    "default": 50
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "Property to sort by",
+                    "order": 3,
+                    "value_list": [
+                        "verdict.asc",
+                        "verdict.desc",
+                        "created_timestamp.asc",
+                        "created_timestamp.desc",
+                        "threat_score.asc",
+                        "threat_score.desc",
+                        "environment_description.asc",
+                        "environment_description.desc",
+                        "submission_type.asc",
+                        "submission_type.desc"
+                    ]
+                },
+                "enviroment_id": {
+                    "data_type": "string",
+                    "description": "Sandbox enviroment to be used for analysis",
+                    "order": 4,
+                    "value_list": [
+                        "Linux Ubuntu 16.04, 64-bit",
+                        "Android (static analysis)",
+                        "Windows 10, 64-bit",
+                        "Windows 7, 64-bit",
+                        "Windows 7, 32-bit"
+                    ]
+                },
+                "action_script": {
+                    "data_type": "string",
+                    "order": 5,
+                    "description": "Runtime script for sandbox analysis",
+                    "value_list": [
+                        "default",
+                        "default_maxantievasion",
+                        "default_randomfiles",
+                        "default_randomtheme",
+                        "default_openie"
+                    ]
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "order": 6,
+                    "default": 0
+                },
+                "detail_report": {
+                    "data_type": "boolean",
+                    "order": 7,
+                    "description": "Get the detailed report",
+                    "default": false
+                },
+                "enable_tor": {
+                    "data_type": "boolean",
+                    "order": 8,
+                    "description": "To route the sandbox network traffic via TOR",
+                    "default": false
+                },
+                "is_confidential": {
+                    "data_type": "boolean",
+                    "order": 9,
+                    "description": "Defines visibility of the file in Falcon MalQuery",
+                    "default": true
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Detonate File",
+                "type": "custom",
+                "height": 5,
+                "view": "crowdstrike_view.display_view"
+            }
         }
     ]
 }
