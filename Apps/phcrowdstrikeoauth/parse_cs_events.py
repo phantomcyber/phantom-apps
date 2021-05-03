@@ -47,7 +47,7 @@ def _get_value(in_dict, in_key, def_val=None, strip_it=True):
         return def_val
 
     try:
-        if (type(in_dict[in_key]) != str) and (type(in_dict[in_key]) != unicode):
+        if (type(in_dict[in_key]) != str):
             return in_dict[in_key]
     except:
         if type(in_dict[in_key]) != str:

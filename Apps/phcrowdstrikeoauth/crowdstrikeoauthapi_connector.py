@@ -1779,7 +1779,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return parameter
 
-    def _on_poll(self, param):
+    def _on_poll(self, param):  # noqa: C901
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
