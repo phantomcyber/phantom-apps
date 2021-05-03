@@ -7,13 +7,13 @@
     "type": "investigative",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "main_module": "dnsdb_connector.py",
-    "app_version": "2.0.0",
-    "utctime_updated": "2018-12-07T01:51:25.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-05-03T06:41:46.000000Z",
     "product_vendor": "Farsight Security, Inc.",
     "product_name": "DNSDB",
     "contributors": [
         {
-          "name": "Farsight Security, Inc."
+            "name": "Farsight Security, Inc."
         }
     ],
     "python_version": "3",
@@ -487,7 +487,6 @@
                     "example_values": [
                         "A"
                     ]
-
                 },
                 {
                     "data_path": "action_result.data.*.time_last",
