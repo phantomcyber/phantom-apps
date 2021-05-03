@@ -1,0 +1,2127 @@
+{
+    "appid": "a7421a5c-6de4-45f5-874a-7269df7f2ef9",
+    "name": "DeepSight",
+    "description": "This app supports hunting and a variety of investigative actions, in addition to report ingestion, from the Accenture DeepSight Intelligence cyber security service",
+    "publisher": "Splunk",
+    "package_name": "phantom_accenturedeepsight",
+    "type": "reputation",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "main_module": "deepsight_connector.py",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-04-15T22:32:41.000000Z",
+    "product_vendor": "Accenture",
+    "product_name": "DeepSight",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "logo": "logo_accenture.svg",
+    "logo_dark": "logo_accenture_dark.svg",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "API V1, 2021-04-15"
+    ],
+    "configuration": {
+        "api_key": {
+            "data_type": "password",
+            "required": true,
+            "description": "API key",
+            "order": 0
+        },
+        "max_reports_first_ingestion": {
+            "value": "5",
+            "required": false,
+            "order": 1,
+            "data_type": "numeric",
+            "description": "Maximum latest reports to poll first time"
+        },
+        "download_report": {
+            "default": false,
+            "required": false,
+            "description": "Download report to vault if available",
+            "data_type": "boolean",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "type": "ingest",
+            "read_only": true,
+            "description": "Ingest reports",
+            "verbose": "<p>For the first poll, ingests the latest number of reports set in <b>max_reports_first_ingestion</b>. Subsequent polls ingest new reports. To ingest all current reports, set <b>max_reports_first_ingestion</b> to a number equal to or greater than the number of reports in DeepSight and set the poll interval large enough to allow all reports to be ingested. The poll interval can be adjusted after the first poll completes.<p><table><tbody><tr class='plain'><th>IOC</th><th>Artifact Name</th><th>CEF Field</th></tr><tr><td>Address IPv4</td><td>IP Artifact</td><td>deviceAddress</td></tr><tr><td>Email</td><td>Email Address Artifact</td><td>emailAddress</td></tr><tr><td>File</td><td>File Artifact</td><td>fileHashMd5, fileHashSha256, fileName, fileSize</td></tr><tr><td>Host</td><td>Domain Artifact</td><td>deviceHostName</td></tr><tr><td>URL</td><td>URL Artifact</td><td>requestURL</td></tr><td>ReportID</td><td>Report Artifact</td><td>deepsightReportId</td><tr></tr></tbody></table>",
+            "parameters": {
+                "container_id": {
+                    "description": "Comma separated report IDs",
+                    "data_type": "string",
+                    "order": 0,
+                    "allow_list": true
+                },
+                "start_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "required": false,
+                    "verbose": "If not specified, the default is past 10 days"
+                },
+                "artifact_count": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 2
+                },
+                "end_time": {
+                    "description": "Parameter ignored in this app",
+                    "data_type": "numeric",
+                    "order": 3,
+                    "required": false,
+                    "verbose": "If not specified, the default is now"
+                },
+                "container_count": {
+                    "description": "Maximum number of reports to ingest",
+                    "data_type": "numeric",
+                    "order": 4
+                }
+            },
+            "versions": "EQ(*)",
+            "output": []
+        },
+        {
+            "action": "domain reputation",
+            "read_only": true,
+            "description": "Get domain reputation",
+            "identifier": "domain_reputation",
+            "type": "investigate",
+            "parameters": {
+                "domain": {
+                    "required": true,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.custom_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar",
+                        "highdatabase.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-17T00:00:00Z",
+                        "2020-12-14T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-18T00:00:00Z",
+                        "2021-04-22T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.reputation",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.hostility",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300517,
+                        301245
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan",
+                        "Analysis of SolarWinds Supply-Chain Campaign's C&C Infrastructure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T22:10:59Z",
+                        "2021-01-20T02:34:18Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300517",
+                        "/v1/mati/reports/301245"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.person",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain Administrator"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "pw-1c817802f3542e0a1b465b1c87c86492@privacyguardian.org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "See Privacyguardian.Org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phoenix"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.postalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "85016"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-07T11:21:54Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-07T13:14:26Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.expires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-03-07T11:21:54Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.registrar",
+                    "data_type": "string",
+                    "example_values": [
+                        "Namesilo, Llc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.nameServers",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "NS2.UNDEVELOPED.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://highdatabase.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/urls/http://highdatabase.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Spam Site"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.behaviour",
+                    "data_type": "string",
+                    "example_values": [
+                        "Spam"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Domain referred to in unsolicited messages"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targetCountries",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.naics",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False, Last seen: 2016-11-18T00:00:00Z",
+                        "Whitelisted: False, Last seen: 2021-04-22T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar",
+                        "highdatabase.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reputation",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.hostility",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-18T00:00:00Z",
+                        "2021-04-22T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "file reputation",
+            "read_only": true,
+            "description": "Get file reputation",
+            "identifier": "file_reputation",
+            "type": "investigate",
+            "parameters": {
+                "file": {
+                    "required": true,
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "description": "File hash (MD5 or SHA256)",
+                    "data_type": "string",
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "File Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.custom_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.MD5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SHA256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "0fe84a1aba99ff4b20d138216b1bbe95de273f582cb9dec07da6a6aaa8f79ea7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300516
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "GozNym Threat Persists despite Researcher Disruption Efforts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T21:03:11Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300516"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reputation: Malicious, Total reports: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "0fe84a1aba99ff4b20d138216b1bbe95de273f582cb9dec07da6a6aaa8f79ea7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Malicious"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_reports",
+                    "data_type": "string",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "url reputation",
+            "read_only": true,
+            "description": "Get URL reputation",
+            "identifier": "url_reputation",
+            "type": "investigate",
+            "parameters": {
+                "url": {
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL to query",
+                    "data_type": "string",
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "URL Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.custom_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "file name"
+                    ],
+                    "example_values": [
+                        "http://eworldmagazine.org/reference/nfgsrcx.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "eworldmagazine.org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/eworldmagazine.org"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300527
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Armyworm Likely Responsible for November 2015 Compromise of Nuclear Fusion Research Center in Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-19T15:11:08Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300527"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.person",
+                    "data_type": "string",
+                    "example_values": [
+                        "Moto Sato"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "snowyowl@jpnsec.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Personal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Suginami-Ku"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.postalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "166-0013"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-06-17T10:33:26Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.updated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.whois.expires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-06-17T10:33:26Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.registrar",
+                    "data_type": "string",
+                    "example_values": [
+                        "Gmo Internet, Inc. D/B/A Onamae.Com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whois.nameServers",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "NS12.VALUE-DOMAIN.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.behaviour",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetCountries",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.naics",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "example_values": [
+                        "http://eworldmagazine.org/reference/nfgsrcx.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.last_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "ip reputation",
+            "read_only": true,
+            "description": "Get IP reputation",
+            "identifier": "ip_reputation",
+            "type": "investigate",
+            "parameters": {
+                "ip": {
+                    "required": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "primary": true
+                }
+            },
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "IP Reputation",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.custom_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-03-29T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-28T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.reputation",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.reputationValues.hostility",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300524
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery Activity Observed in the Middle East"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-16T21:53:48Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.matiReports.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300524"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Dedicated Servers"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organization.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.naics",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.isic",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.network.carrier",
+                    "data_type": "string",
+                    "example_values": [
+                        "Uab Cherry Servers"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.asn",
+                    "data_type": "numeric",
+                    "example_values": [
+                        16125
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.lineSpeed",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.ipRouting",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fixed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.anonymizerStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Private"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.proxyType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.proxyLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Elite"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.network.proxyLastDetected",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-05-18T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.geolocation.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "Lithuania"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.geolocation.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vilnius"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.geolocation.latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        54.6872
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.geolocation.longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        25.2797
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.behaviour",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.behaviours.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.urls.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetCountries",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.naics",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.targetIndustries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Whitelisted: False, Last seen: 2020-01-28T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reputation",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.hostility",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.whitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.last_seen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-28T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ]
+        },
+        {
+            "action": "hunt file",
+            "description": "Look for information about a file",
+            "type": "investigate",
+            "identifier": "hunt_file",
+            "read_only": true,
+            "parameters": {
+                "file": {
+                    "required": true,
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "description": "File hash to hunt",
+                    "data_type": "string",
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Hunt File",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.display_mati_report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300524
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-16T21:53:48Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery Activity Observed in the Middle East"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300524"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.threatDomains",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cyber Espionage"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.yaraSignature.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.yaraSignature.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.snortSignature.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.snortSignature.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.adversaries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.adversaries.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.adversaries.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.ips.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.ips.*.classifications",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.ips.*.relatedDomains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.ips.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.ips.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/ips/46.166.161.29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.domains.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/feteh-asefa.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.domains.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "feteh-asefa.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.domains.*.classifications",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.domains.*.relatedIps",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.domains.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.from",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.content",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.relatedFileHashes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.emails.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "03af83e3ca033b4811f507cb68468865"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/files/d55601473131f78b0ec0d7d6b5714322e8946fe9f41a84478efe31db849975e1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "d55601473131f78b0ec0d7d6b5714322e8946fe9f41a84478efe31db849975e1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.isMalicious",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.detectionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Revokery"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "example_values": [
+                        "NTnghNgIMtRngWB.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "5697816"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.parentMd5s",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "ec6c6334946cb48bb2fd646a1966edf9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.childMd5s",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.exploitedVulnerabilities.*.cve",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.exploitedVulnerabilities.*.bid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.exploitedVulnerabilities.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.relatedIps",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "46.166.161.29"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.relatedDomains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.files.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.campaigns.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.campaigns.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.sources.regions.*.regionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.sources.regions.*.subregions.*.countries.*.iso",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.sources.regions.*.subregions.*.countries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.sources.regions.*.subregions.*.subregionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.regions.*.regionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.countries.*.iso",
+                    "data_type": "string",
+                    "example_values": [
+                        "sau"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.countries.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Saudi Arabia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.regions.*.subregions.*.subregionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Western Asia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.industries.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Educational Services"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.industries.*.naics",
+                    "data_type": "numeric",
+                    "example_values": [
+                        611
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_data.targets.industries.*.percentage",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total reports: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "03af83e3ca033b4811f507cb68468865"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_reports",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Get report details",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "verbose": "It has been noticed that report availability from API might lag the Accenture DeepSight database.",
+            "parameters": {
+                "mati_id": {
+                    "required": true,
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "description": "Report ID to query",
+                    "order": 0,
+                    "data_type": "string",
+                    "primary": true
+                },
+                "download_report": {
+                    "description": "Download PDF report to vault if available",
+                    "data_type": "boolean",
+                    "order": 1,
+                    "required": false,
+                    "default": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Report Details",
+                "type": "custom",
+                "height": 5,
+                "view": "deepsight_view.custom_view"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.schemaVersion",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threatDomains",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cybercrime"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.yaraSignature.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.yaraSignature.*.signature",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.snortSignature.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.snortSignature.*.signature",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.adversaries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.adversaries.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.adversaries.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "31.42.175.188"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/ips/31.42.175.188"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.classifications",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.relatedDomains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ips.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "example_values": [
+                        "kurtmiguens.com.ar"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/domains/kurtmiguens.com.ar"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.classifications",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.relatedIps",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "200.58.120.18"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fwd: \u53f0\u98a8\u5bfe\u7b56\u306b\u3064\u3044\u3066"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.from",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "samoto@yahoo.co.jp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-11-14T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.content",
+                    "data_type": "string",
+                    "example_values": [
+                        "\u5bfe\u7b56\u4f5c\u696d\u3092\u958b\u59cb\u3057\u3066\u3044\u308b\u3068\u601d\u3044\u307e\u3059\u304c\u3001\u69cb\u9020\u7269\u7b49\u306e\u88ab\u707d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.relatedFileHashes",
+                    "data_type": "string",
+                    "example_values": [
+                        "30cd449bba4614c2b0f2adc1984275f6"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "example_values": [
+                        "2016.9.28n\u00ef\u00bd\u00b0595323766doc.zip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.size",
+                    "data_type": "string",
+                    "example_values": [
+                        "569856"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.isMalicious",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "example_values": [
+                        "a27f6b871202fbad98eedf20088d3a15"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "c7a2bc376d6ddfc678e7c7b3324b021edf19c896a80ab1ec7c2f36bc004ef29e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/files/c7a2bc376d6ddfc678e7c7b3324b021edf19c896a80ab1ec7c2f36bc004ef29e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.detectionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan.Gen"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.parentMd5s",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.childMd5s",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.exploitedVulnerabilities.*.cve",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.exploitedVulnerabilities.*.bid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.exploitedVulnerabilities.*.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.relatedIps",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.relatedDomains",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.files.*.relatedUrls",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.campaigns.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaigns.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.regions.*.regionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.regions.*.subregions.*.subregionName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.regions.*.subregions.*.countries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.regions.*.subregions.*.countries.*.iso",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targets.industries.*.naics",
+                    "data_type": "numeric",
+                    "example_values": [
+                        52
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.industries.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Finance and Insurance"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.industries.*.percentage",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.targets.regions.*.regionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Asia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.regions.*.subregions.*.subregionName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Eastern Asia"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.regions.*.subregions.*.countries.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.regions.*.subregions.*.countries.*.iso",
+                    "data_type": "string",
+                    "example_values": [
+                        "jpn"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_summary_data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        300517
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_summary_data.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "/v1/mati/reports/300517"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_summary_data.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2016-12-01T22:10:59Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_summary_data.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.report_summary_data.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "DeepSight Intelligence observed a spam operation using a Japanese-language template and delivering the URLZone malware from a Cutwail bot between September 2016 and November 2016. The URLZone payload downloaded additional malware executables, including an ISFB sample that uses web injects targeting Japanese banks. Over the past three months, detections of distinct URLZone infections dropped significantly in November, but infections in Japan continue to account for the vast majority of URLZone activity. This operation has demonstrated a clear focus on Japanese targets, and it is likely that URLZone activity will continue to heavily target Japan in spam campaigns using language and themes relevant to its people."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.vault.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault.action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vault.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault.app_run_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.vault.report_file_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Summary title: Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.mati_id",
+                    "data_type": "string",
+                    "contains": [
+                        "deepsight report id"
+                    ],
+                    "example_values": [
+                        "300517"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.download_report",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.summary_title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cutwail, URLZone, and ISFB Campaign Targets Japan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.pdf_availability",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
