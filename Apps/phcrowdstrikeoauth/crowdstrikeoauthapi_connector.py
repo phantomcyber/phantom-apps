@@ -2224,8 +2224,6 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
 
-
-
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
@@ -2293,7 +2291,7 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
-                    if (resp_json["resources"] == None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
+                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
                             {0} Data from server: {1}".format(resp_json["errors"][0]["code"], self._handle_py_ver_compat_for_input_str(resp_json["errors"][0]["message"]))), None)
         except:
