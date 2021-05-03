@@ -681,7 +681,7 @@ class CybereasonConnector(BaseConnector):
         self._password = config.get('password')
         self._verify_server_cert = config.get('verify_server_cert', False)
         self._headers = {'Content-Type': 'application/json'}
-
+        self._headers.update({'User-Agent': 'CybereasonPhantom/2.0.1 (target=unknown)'})
         return phantom.APP_SUCCESS
 
     def get_state(self):
