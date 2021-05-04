@@ -1,0 +1,265 @@
+<!-- File: readme.html
+  Copyright (c) 2016-2021 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+  <body>
+    <p><h2>Description of Action Parameters</h2>
+        <ol>
+          <h3 class="lowercase"><li>Test Connectivity (Action Workflow)</li></h3>
+            <ul>
+              <li>This action will test the connectivity with the dnsdb server using the provided API key value through the rate_limit API.[https://api.dnsdb.info/dnsdb/v2/rate_limit]</li>
+              <li>The action also validates the required asset parameter values and based on the value API response will be displayed.</li>
+              <li>For successful test connectivity, the query quota details would be shown.<br>
+                  For example: “Test succeeded. Query quota is 1000 with 987 queries remaining. Resets 1618531200”</li>
+            </ul>
+            <br>
+
+          <h3 class="lowercase"><li>RDATA Name Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - name</b>
+                <ul>
+                  <li>The value is a DNS domain name in presentation format ("www.example.com"), or a left-hand (“.example.com”) or right-hand (“www.example.”) wildcard domain name.</li>
+                  <li>Example: www.farsightsecurity.io</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. The default value of limit is ‘200’</li>
+                  <li>For limit=0 , maximum number of results will retrieved.[ here max = results_max of rate_limit].</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3 class="lowercase"><li>RDATA IP Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - ip</b>
+                <ul>
+                  <li>The value is one of an IPv4 or IPv6 single address, with a prefix length, or with an address range.</li>
+                  <li>Example: 192.18.12.01</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. The default value of limit is ‘200’</li>
+                  <li>For limit=0 , maximum number of results will retrieved.[ here max = results_max of rate_limit].</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - network prefix</b>
+                <ul>
+                  <li>Network prefix is a numeric parameter which is used to search out the rdata within the network prefix range.</li>
+                  <li>Example: 192.0. 2.0/24 , 2001:db8::/128
+                      If ip = 192.0.2.0 then network prefix = 24
+                  </li>
+                </ul>
+              </li>
+              <li><b>Note: </b> If a prefix is provided, the delimiter between the network address and prefix length is a single comma (“,”) character rather than the usual slash (“/”) character to avoid clashing with the HTTP URI path name separator.</li>
+            </ul>
+          <br>
+          <h3 class="lowercase"><li>RDATA Raw Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - raw rdata</b>
+                <ul>
+                  <li>The value is an even number of hexadecimal digits specifying a raw octet string.</li>
+                  <li>Example: 0366736902696f00</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. The default value of limit is ‘200’</li>
+                  <li>For limit=0 , maximum number of results will retrieved.[ here max = results_max of rate_limit].</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3 class="lowercase"><li>RRSET Lookup</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - owner name</b>
+                <ul>
+                  <li>The value is a DNS owner name in presentation format (www.example.com) or wildcards as described below.</li>
+                  <li>Wildcards are one of two forms: a left-hand (*.example.com) or right-hand (www.example.*) wildcard domain name.</li>
+                  <li>Example: www.farsightsecurity.com</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - type</b>
+                <ul>
+                  <li>Type is a different DNS record type. The supported types are listed below this section. For more information check out the dnsdb API documentation.</li>
+                  <li>Default value for ‘type’ is ‘ANY’.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - bailiwick</b>
+                <ul>
+                  <li>A bailiwick is an enclosing zone for a nameserver that serves the RRset or the name of the zone containing the RRset.</li>
+                  <li>Example: 
+                  owner name = farsightsecurity.com.
+                  bailiwick = com.
+                  </li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of results returned via these lookup methods. The default value of limit is ‘200’.</li>
+                  <li>For limit=0 , maximum number of results will retrieved.[ here max = results_max of rate_limit].</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3 class="lowercase"><li>Flex Search</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - query</b>
+                <ul>
+                    <li>Query is a string type of parameter for searching out the specific pattern in rrnames or rdata.</li>
+                  <li>Example: ^[1-3]*.*.com , ns[0-9]*.net.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - type</b>
+                <ul>
+                    <li>Type parameter is used for what to search for provided query value.Supported type values: rrnames, rdata.</li>
+                    <li>rrnames type search in rrnames, supports “forward” searches based on the owner name of an RRset.</li>
+                    <li>rdata type search in rdata, supports “inverse” searches based on RData record values.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - search type</b>
+                <ul>
+                  <li>Two search method supported namely for flex search namely,</li>
+                  <ol>
+                    <li>‘regex’ - FCRE supported regex search</li>
+                    <li>‘glob’ - Advanced form of wildcard searches</li>
+                  </ol>
+                  <li>For more information: <a href="https://docs.dnsdb.info/dnsdb-flex-reference-guide" target="_blank">https://docs.dnsdb.info/dnsdb-flex-reference-guide</a></li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - exclude</b>
+                <ul>
+                  <li>The “exclude” parameter is used to exclude (i.e. filter-out) results that match it.
+                      Its value is a regular expression or glob, depending upon the search_method.</li>
+                  <li>Example: The query value ‘^fsi\.io’  will search out all the data start with fsi and proceed with ‘.io’ [‘fsi.io.’ , ‘fsi.iota.ca’] but the exclude= ‘\.(com|site|bid|net|io)\.’ will exclude the [‘fsi.io.’] values.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - limit</b>
+                <ul>
+                  <li>Limit for the number of unique rrnames or rdata value results returned via these search methods.
+                      The default limit is set at 10,000.</li>
+                  <li>For limit=0 , maximum number of results will retrieved.[ here max = results_max of rate_limit]</li>
+                </ul>
+              </li>
+              <li><b><u>Note</u>​</b>
+                <ul>
+                  <li>The maximum length of the QUERY path component and the exclude parameter value are 4096 characters each before URL encoding.</li>
+                </ul>
+              </li>
+              <li>To know more about regex and glob search,  visit: 
+                  <a href="https://docs.dnsdb.info/dnsdb-flex-reference-guide/#regex-search" target="_blank">https://docs.dnsdb.info/dnsdb-flex-reference-guide/#regex-search</a>
+              </li>
+            </ul>
+          <br>
+        </ol>
+        <ul>
+          <h3><li>Time Fencing parameters</li></h3>
+            <ul>
+              <li><b><u>Action Parameter</u>​ - time_first_before</b>
+                <ul>
+                  <li>Provide results before the defined timestamp for when the DNS record was first observed. For example, the URL parameter “time_first_before=1420070400” will only provide matching DNS records that were first observed before (or older than) January 1, 2015.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_first_after</b>
+                <ul>
+                  <li>Provide results after the defined timestamp for when the DNS record was first observed. For example, the URL parameter “time_first_after=-31536000” will only provide results that were first observed within the last year.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_last_before</b>
+                <ul>
+                  <li>Provide results before the defined timestamp for when the DNS record was last observed. For example, the URL parameter “time_last_before=1356998400” will only provide results for DNS records that were last observed before 2013.</li>
+                </ul>
+              </li>
+              <li><b><u>Action Parameter</u>​ - time_last_after</b>
+                <ul>
+                  <li>Provide results after the defined timestamp for when the DNS record was last observed. For example, the URL parameter “time_last_after=-2678400” will only provide results that were last observed after 31 days ago</li>
+                </ul>
+              </li>
+              <li><b><u>Note: </u>​</b>
+                <ul>
+                  <li>Combinations of the time parameters may be used to strictly provide or exclude results for specific time-ranges. For example, to only have results when the first observed date and the last observed date are both only in 2015, you can use “time_first_after=1420070399” combined with “time_last_before=1451606400”. As another time combination example, to get DNS records that were first observed before 2012 and last observed within the last month (recently-observed records which have not changed in a very long time), use “time_first_before=1325376000” and relative “time_last_after=-2678400”.</li>
+                </ul>
+              </li>
+            </ul>
+          <br>
+          <h3><li>For 'Type' action parameter in RDATA Raw Lookup and RRSET Lookup</li></h3>
+            <ul>
+              <li>Supported DNS record <b>types</b>:
+                <br>
+                <ul>
+                  <li>ANY</li>
+                  <li>A</li>
+                  <li>A6</li>
+                  <li>AAAA</li>
+                  <li>AFSDB</li>
+                  <li>CNAME</li>
+                  <li>DNAME</li>
+                  <li>HINFO</li>
+                  <li>ISDN</li>
+                  <li>KX</li>
+                  <li>NAPTR</li>
+                  <li>NXT</li>
+                  <li>MB</li>
+                  <li>MD</li>
+                  <li>MF</li>
+                  <li>MG</li>
+                  <li>MINFO</li>
+                  <li>MR</li>
+                  <li>MX</li>
+                  <li>NS</li>
+                  <li>PTR</li>
+                  <li>PX</li>
+                  <li>RP</li>
+                  <li>RT</li>
+                  <li>SIG</li>
+                  <li>SOA</li>
+                  <li>SRV</li>
+                  <li>TXT</li>
+                  <li>ANY-DNSSEC</li>
+                  <li>DLV</li>
+                  <li>DNSKEY</li>
+                  <li>DS</li>
+                  <li>NSEC</li>
+                  <li>NSEC3</li>
+                  <li>NSEC3PARAM</li>
+                  <li>RRSIG</li>
+                </ul> 
+              <li>'ANY' returns records from types: A, A6, AAAA, AFSDB, CNAME, DNAME, HINFO, ISDN, KX, NAPTR, NXT, MB, MD, MF, MG, MINFO, MR, MX, NS, PTR, PX, RP, RT, SIG, SOA, SRV, TXT.</li>
+              <li>'ANY-DNSSEC' returns records from types: DLV, DNSKEY, DS, NSEC, NSEC3, NSEC3PARAM, RRSIG.</li>
+              <li>For types ANY and ANY-DNSSEC, low limit can leave out retrieval of some record types.</li>
+              <li>If no type is provide, then action will use 'ANY' as default</li>
+            </ul>
+          <br>
+        </ul>
+    </p>
+                                
+    <h2>Playbook Backward Compatibility</h2>
+      <p>
+        <ul>
+          <li>The existing action names and their parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+          <ul>
+            <li>Lookup IP - This action has been renamed to 'RDATA IP Lookup'.</li>
+            <ul>
+                <li>The parameters 'record seen after' and 'record seen below' have been removed.</li>
+                <li>New parameters 'time first after', 'time first before', 'time last after', and 'time last before' have been added</li>
+            </ul>
+            <li>Lookup Domain - This action has been renamed to 'RDATA Name Lookup'.</li>
+            <ul>
+                <li>The parameters 'domain', 'type', 'record seen after', and 'record seen below' have been removed.</li>
+                <li>New parameters 'name', 'time first after', 'time first before', 'time last after', and 'time last before' have been added</li>
+            </ul>
+          </ul>
+          <li>New actions have been added. Hence, it is requested to the end-user to please update their existing playbooks by inserting the corresponding action blocks for this action on the earlier versions of the app.</li>
+          <ul>
+            <li>Check Rate Limit</li>
+            <li>Flex Search</li>
+            <li>RRSET Lookup</li>
+            <li>RDATA Raw Lookup</li>
+          </ul>
+        </ul>
+      </p>
+  </body>
+</html>

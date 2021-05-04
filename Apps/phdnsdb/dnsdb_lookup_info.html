@@ -1,6 +1,10 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
+{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
+{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
+{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
+{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -9,92 +13,26 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!--
+<!-- 
 File: dnsdb_lookup_info.html
-Copyright (c) 2016-2020 Splunk Inc.
+Copyright (c) 2016-2021 Splunk Inc.
 
 Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
 <style>
 
+  td { padding: 7px }
 
-.dnsdb a:hover {
-  text-decoration:underline;
-}
-
-
-.dnsdb .wf-table-vertical {
-  width: initial;
-  font-size: 12px;
-}
-
-.dnsdb .wf-table-vertical td {
-  padding: 5px;
-  border: 1px solid;
-}
-
-.dnsdb .wf-table-vertical tr td:first-child {
-    font-weight: bold;
-}
-
-.dnsdb .wf-table-horizontal {
-  width: initial;
-  border: 1px solid;
-  font-size: 12px;
-}
-
-.dnsdb .wf-table-horizontal th {
-  text-align: center;
-  border: 1px solid;
-  text-transform: uppercase;
-  font-weight: normal;
-  padding: 5px;
-}
-
-.dnsdb .wf-table-horizontal td {
-  border: 1px solid;
-  padding: 5px;
-  padding-left: 4px;
-}
-
-.dnsdb .wf-h3-style {
-  font-size : 20px
-}
-
-.dnsdb .wf-h4-style {
-  font-size : 16px
-}
-
-.dnsdb .container {
-  padding: 0px;
-  margin: 0px;
-}
-
-.dnsdb .wf-table-div {
-  width: 50%;
-  float: left;
-  padding: 5px;
-}
-
-.dnsdb .wf-table-div .dataTables_wrapper .dataTables_filter {
-  float: none;
-}
-
-.dnsdb .wf-table-div .dataTables_wrapper .dataTables_info {
-  padding-top: 0;
-  margin-top: 0;
-}
-
-.dnsdb .wf-table-div .dataTables_filter {
-  text-align: right !important;
-  float: right;
-}
-
-.dnsdb .wf-table-div .dataTables_filter input{
-  border: 1px solid;
-  width: 150px;
-}
+  .dataTables_filter input {
+   border: 1px solid;
+  }
+  .dataTables_filter input:hover {
+   border: 1px solid;
+  }
+  .dataTables_filter input:focus {
+   border: 1px solid;
+  }
 
 </style>
 <div class="dnsdb" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
@@ -103,118 +41,54 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 <!------------------- For each Result ---------------------->
     {% if not result.data %}
-      <h4 class="wf-h4-style">No lookup information found</h4>
-    {% elif result.data.ip %}
+      <h4 class="wf-h2-style">No lookup information found</h4>
+    {% elif result.data.flex %}
       <h3 class="wf-h3-style">Info</h3>
       <table class="wf-table-vertical">
         <tr>
-          <td> IP </td>
-          <td>
-            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
-              {{ result.param.ip }}
-              &nbsp;
-              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a>
-          </td>
+          <td> Query </td>
+          <td> {{ result.param.query }} </td>
         </tr>
 
-        {% if result.param.network_prefix %}
+        {% if result.param.type %}
         <tr>
-          <td> Network prefix </td>
-          <td> {{ result.param.network_prefix }} </td>
-        </tr>
-        {% endif %}
-
-        {% if result.param.record_seen_after %}
-        <tr>
-          <td> Record seen after </td>
-          <td> {{ result.param.record_seen_after }} </td>
-        </tr>
-        {% endif %}
-
-        {% if result.param.record_seen_before %}
-        <tr>
-          <td> Record seen before </td>
-          <td> {{ result.param.record_seen_before }} </td>
-        </tr>
-        {% endif %}
-
-        {% if result.param.limit %}
-        <tr>
-          <td> Max record to return </td>
-          <td> {{ result.param.limit }} </td>
-        </tr>
-        {% endif %}
-
-        {% if result.summary.total_domains %}
-        <tr>
-          <td> Total results retrieved </td>
-          <td> {{ result.summary.total_domains }} </td>
-        </tr>
-        {% endif %}
-
-      </table>
-
-      <div class="wf-table-div">
-      <h3 class="wf-h3-style">IP Lookup</h3>
-      <table id="rrname_table" class="datatable wf-table-horizontal">
-        <thead>
-        <tr>
-          <th>Domain</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for curr_domain in result.data.ip.domains %}
-          <tr>
-            <td>
-              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
-                {{ curr_domain }}
-                &nbsp;
-                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-              </a>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      </div>
-
-    {% elif result.data.domain %}
-      <h3 class="wf-h3-style">Info</h3>
-      <table class="wf-table-vertical">
-        <tr>
-          <td> Domain </td>
-          <td>
-            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.domain }}' }], 0, {{ container.id }}, null, false);">
-              {{ result.param.domain }}
-              &nbsp;
-              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a>
-          </td>
-        </tr>
-        <tr>
-          <td> Type </td>
+          <td> DNS record type </td>
           <td> {{ result.param.type }} </td>
         </tr>
+        {% endif %}
 
-        {% if result.param.zone %}
+        {% if result.param.search_type %}
         <tr>
-          <td> Zone </td>
-          <td> {{ result.param.zone }} </td>
+          <td> Search type </td>
+          <td> {{ result.param.search_type }} </td>
         </tr>
         {% endif %}
 
-        {% if result.param.record_seen_after %}
+        {% if result.param.time_first_before %}
         <tr>
-          <td> Record seen after </td>
-          <td> {{ result.param.record_seen_after }} </td>
+          <td> Record first seen before </td>
+          <td> {{ result.param.time_first_before }} </td>
         </tr>
         {% endif %}
 
-        {% if result.param.record_seen_before %}
+        {% if result.param.time_first_after %}
         <tr>
-          <td> Record seen before </td>
-          <td> {{ result.param.record_seen_before }} </td>
+          <td> Record first seen after </td>
+          <td> {{ result.param.time_first_after }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_before %}
+        <tr>
+          <td> Record last seen before </td>
+          <td> {{ result.param.time_last_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_after %}
+        <tr>
+          <td> Record last seen after </td>
+          <td> {{ result.param.time_last_after }} </td>
         </tr>
         {% endif %}
 
@@ -231,13 +105,440 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <td> {{ result.summary.total_items }} </td>
         </tr>
         {% endif %}
-
       </table>
 
       <br>
-      <h3 class="wf-h3-style">Domain Lookup</h3>
+      <h3 class="wf-h3-style">Flex Search</h3>
       <br>
 
+      <div class="container">
+        <span> Type: &nbsp;</span>
+        <select id="rdata_type" class="wf-table-vertical" onchange="show_table(this)">
+          {% for curr_rrtype in result.data.flex %}
+            <option value="type_{{ curr_rrtype }}"> {{ curr_rrtype }} </option>
+          {% endfor %}
+        </select>
+      </div>
+      {% if result.param.type == 'RDATA' %}
+        {% for curr_rrtype in result.data.flex %}
+            <div class="wf-table-div" id="type_{{ curr_rrtype }}" style="{% if not forloop.first %} display:none;{% endif %} width:100%;">
+            <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
+              <thead>
+              <tr>
+                <th>RDATA <p class="lowercase" style="display:inline">(unique values only)</p></th>
+              </tr>
+              </thead>
+              <tbody>
+                {% for curr_rdata in result.data.flex|by_key:curr_rrtype %}
+                <tr>
+                  <td>
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rdata'], 'value': '{{ curr_rdata.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+                      {{ curr_rdata.rdata }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            </div>
+        {% endfor %}
+      {% elif result.param.type == 'RRNAMES' %}
+        {% for curr_rrtype in result.data.flex %}
+            <div class="wf-table-div" id="type_{{ curr_rrtype }}" style="{% if not forloop.first %} display:none;{% endif %} width:100%;">
+            <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
+              <thead>
+              <tr>
+                <th>RRNAME</th>
+              </tr>
+              </thead>
+              <tbody>
+                {% for curr_rrname in result.data.flex|by_key:curr_rrtype %}
+                <tr>
+                  <td>
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_rrname.rrname }}' }], 0, {{ container.id }}, null, false);">
+                      {{ curr_rrname.rrname }}
+                      &nbsp;
+                      <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            </div>
+        {% endfor %}
+      {% endif %}
+    {% elif result.data.ip %}
+      <h3 class="wf-h3-style">Info</h3>
+      <table class="wf-table-vertical">
+        {% if result.param.ip %}
+        <tr>
+          <td> IP </td>
+          <td>
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
+              {{ result.param.ip }}
+              &nbsp;
+              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a>
+          </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.name %}
+        <tr>
+          <td> Name </td>
+          <td>
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.name }}' }], 0, {{ container.id }}, null, false);">
+              {{ result.param.name }}
+              &nbsp;
+              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a>
+          </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.network_prefix %}
+        <tr>
+          <td> Network prefix </td>
+          <td> {{ result.param.network_prefix }} </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.time_first_before %}
+        <tr>
+          <td> Record first seen before </td>
+          <td> {{ result.param.time_first_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_first_after %}
+        <tr>
+          <td> Record first seen after </td>
+          <td> {{ result.param.time_first_after }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_before %}
+        <tr>
+          <td> Record last seen before </td>
+          <td> {{ result.param.time_last_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_after %}
+        <tr>
+          <td> Record last seen after </td>
+          <td> {{ result.param.time_last_after }} </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.limit %}
+        <tr>
+          <td> Max record to return </td>
+          <td> {{ result.param.limit }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.summary.total_domains %}
+        <tr>
+          <td> Total results retrieved </td>
+          <td> {{ result.summary.total_domains }} </td>
+        </tr>
+        {% endif %}
+        
+      </table>
+      
+      <div class="wf-table-div">
+      <h3 class="wf-h3-style">RDATA Lookup</h3>
+      <table id="rrname_table" class="datatable wf-table-horizontal">
+        <thead>
+        <tr>
+          <th>Domain <p class="lowercase" style="display:inline">(unique values only)</p></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for curr_domain in result.data.ip.domains %}        
+          <tr>
+            <td>
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
+                {{ curr_domain }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      
+      <div class="wf-table-div">
+      <h3 class="wf-h3-style">Detailed Information</h3>
+      <table id="rrname_table" class="datatable wf-table-horizontal">
+        <thead>
+        <tr>
+          <th>RRName</th>
+          <th>RRType</th>
+          <th>RData</th>
+          <th>Count</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for data in result.data.response %}        
+          <tr>
+            <td>
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
+                {{ data.rrname }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                {{ data.rrtype }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+            {% if result.param.name %}
+              {% for rdata in data.rdata %}
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                    {{ rdata }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              {% endfor %}
+            {% elif result.param.ip %}
+                <td>
+                  {% for rdata in data.rdata %} 
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'dnsdb ipv6'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                    {{ rdata }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                  {% endfor %}
+                </td>
+              {% endif %}
+            <td>
+                <a href="javascript:;">
+                  {{ data.count }}
+                   &nbsp;
+                </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      
+      {% elif result.param.raw_rdata %}
+      <h3 class="wf-h3-style">Info</h3>
+      <table class="wf-table-vertical">
+        <tr>
+          <td> Raw RDATA </td>
+          <td>
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rdata'],'value': '{{ result.param.raw_rdata }}' }], 0, {{ container.id }}, null, false);">
+              {{ result.param.raw_rdata }}
+              &nbsp;
+              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a>
+          </td>
+        </tr>
+        
+        {% if result.param.time_first_before %}
+        <tr>
+          <td> Record first seen before </td>
+          <td> {{ result.param.time_first_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_first_after %}
+        <tr>
+          <td> Record first seen after </td>
+          <td> {{ result.param.time_first_after }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_before %}
+        <tr>
+          <td> Record last seen before </td>
+          <td> {{ result.param.time_last_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_after %}
+        <tr>
+          <td> Record last seen after </td>
+          <td> {{ result.param.time_last_after }} </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.limit %}
+        <tr>
+          <td> Max record to return </td>
+          <td> {{ result.param.limit }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.summary.total_domains %}
+        <tr>
+          <td> Total results retrieved </td>
+          <td> {{ result.summary.total_domains }} </td>
+        </tr>
+        {% endif %}
+        
+      </table>
+      
+      <div class="wf-table-div">
+      <h3 class="wf-h3-style">Raw RDATA Lookup</h3>
+      <table id="rrname_table" class="datatable wf-table-horizontal">
+        <thead>
+        <tr>
+          <th>Result <p class="lowercase" style="display:inline">(unique values only)</p></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for curr_result in result.data.raw.domains %}
+          <tr>
+            <td>
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_result }}' }], 0, {{ container.id }}, null, false);">
+                {{ curr_result }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      <div class="wf-table-div">
+          <h3 class="wf-h3-style">Detailed Information</h3>
+          <table id="rrname_table" class="datatable wf-table-horizontal">
+            <thead>
+            <tr>
+              <th>RRName</th>
+              <th>RRType</th>
+              <th>RData</th>
+              <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for data in result.data.response %}        
+              <tr>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ data.rrname }}' }], 0, {{ container.id }}, null, false);">
+                    {{ data.rrname }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb rrtype'], 'value': '{{ data.rrtype }}' }], 0, {{ container.id }}, null, false);">
+                    {{ data.rrtype }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+                <td>
+                  {% for rdata in data.rdata %}
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ rdata }}' }], 0, {{ container.id }}, null, false);">
+                      {{ rdata }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  {% endfor %}
+                </td>
+                <td>
+                  <a href="javascript:;">
+                    {{ data.count }}
+                    &nbsp;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+    {% elif result.data.domain %}
+      <h3 class="wf-h3-style">Info</h3>
+      <table class="wf-table-vertical">
+        <tr>
+          <td> Domain </td>
+          <td>
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.owner_name }}' }], 0, {{ container.id }}, null, false);">
+              {{ result.param.owner_name }}
+              &nbsp;
+              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td> Type </td>
+          {% if result.param.type %}
+            <td> {{ result.param.type }} </td>
+          {% else %}
+            <td> ANY </td>
+          {% endif %}
+        </tr>
+        
+        {% if result.param.bailiwick %}
+        <tr>
+          <td> Bailiwick </td>
+          <td> {{ result.param.bailiwick }} </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.time_first_before %}
+        <tr>
+          <td> Record first seen before </td>
+          <td> {{ result.param.time_first_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_first_after %}
+        <tr>
+          <td> Record first seen after </td>
+          <td> {{ result.param.time_first_after }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_before %}
+        <tr>
+          <td> Record last seen before </td>
+          <td> {{ result.param.time_last_before }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.param.time_last_after %}
+        <tr>
+          <td> Record last seen after </td>
+          <td> {{ result.param.time_last_after }} </td>
+        </tr>
+        {% endif %}
+        
+        {% if result.param.limit %}
+        <tr>
+          <td> Max record to return </td>
+          <td> {{ result.param.limit }} </td>
+        </tr>
+        {% endif %}
+
+        {% if result.summary.total_items %}
+        <tr>
+          <td> Total results retrieved </td>
+          <td> {{ result.summary.total_items }} </td>
+        </tr>
+        {% endif %}
+      </table>
+      
+      <br>
+      <h3 class="wf-h3-style">RRSET Lookup</h3>
+      <br>
+      
       <div class="container">
         <span> Type: &nbsp;</span>
         <select id="rdata_type" class="wf-table-vertical" onchange="show_table(this)">
@@ -246,12 +547,15 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           {% endfor %}
         </select>
       </div>
-
+      
       {% for curr_rrtype in result.data.domain %}
         {% if curr_rrtype == 'SOA' %}
           <div class="wf-table-div" id="type_{{ curr_rrtype }}" style="{% if not forloop.first %} display:none;{% endif %} width:100%;">
           <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
             <thead>
+            <tr>
+                <td style="padding: 0px;border: 0px;color: #6c818b;">unique values only</td>
+            </tr>
             <tr>
               <th>Origin</th>
               <th>Mail Address</th>
@@ -278,7 +582,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
-                </td>
+                </td>                       
                 <td>{{ curr_rdata.rdata_serial }}</td>
                 <td>{{ curr_rdata.rdata_refresh }}</td>
                 <td>{{ curr_rdata.rdata_retry }}</td>
@@ -294,6 +598,9 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
             <thead>
             <tr>
+              <td style="padding: 0px;border: 0px;color: #6c818b;">unique values only</td>
+            </tr>
+            <tr>
               <th>Preference</th>
               <th>Mail Exchange</th>
             </tr>
@@ -308,7 +615,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                     &nbsp;
                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                   </a>
-                </td>
+                </td>                       
               </tr>
               {% endfor %}
             </tbody>
@@ -318,6 +625,9 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
           <div class="wf-table-div" id="type_{{ curr_rrtype }}" {% if not forloop.first %} style="display:none;" {% endif %}>
           <table id="rrtype_{{ curr_rrtype }}_table" class="datatable wf-table-horizontal">
             <thead>
+            <tr>
+              <td style="padding: 0px;border: 0px;color: #6c818b;">unique values only</td>
+            </tr>
             <tr>
               <th>{{ curr_rrtype }}</th>
             </tr>
@@ -333,7 +643,7 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                     </a>
                   {% elif curr_rrtype == 'AAAA' %}
-                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ipv6'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
+                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['dnsdb ipv6'], 'value': '{{ curr_rdata }}' }], 0, {{ container.id }}, null, false);">
                       {{ curr_rdata }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -378,12 +688,24 @@ Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
   });
   $.fn.DataTable.ext.pager.numbers_length = 5;
   $('.datatable').DataTable();
-
+  
   function show_table(e){
     var type = $(e).val();
     $('.wf-table-div').hide();
     $('#'+type).show();
   }
+  if (PHANTOM_THEME == "dark"){
+    let dt_info = document.getElementsByClassName("dataTables_info");
+    let dt_filter = document.getElementsByClassName("dataTables_filter");
 
+    for (let item of dt_info) {
+      item.style.color = "white";
+    }
+
+    for (let item of dt_filter) {
+      item.style.color = "white";
+    }
+  }
 </script>
 {% endblock %} <!-- Main Start Block -->
+
