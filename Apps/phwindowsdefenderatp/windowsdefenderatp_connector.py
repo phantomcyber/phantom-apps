@@ -65,7 +65,7 @@ def _load_app_state(asset_id, app_connector=None):
 
     app_dir = os.path.dirname(os.path.abspath(__file__))
     state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
-    real_state_file_path = os.path.realpath(state_file)
+    real_state_file_path = os.path.abspath(state_file)
     if not os.path.dirname(real_state_file_path) == app_dir:
         if app_connector:
             app_connector.debug_print('In _load_app_state: Invalid asset_id')
@@ -104,7 +104,7 @@ def _save_app_state(state, asset_id, app_connector):
     app_dir = os.path.split(__file__)[0]
     state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
 
-    real_state_file_path = os.path.realpath(state_file)
+    real_state_file_path = os.path.abspath(state_file)
     if not os.path.dirname(real_state_file_path) == app_dir:
         if app_connector:
             app_connector.debug_print('In _save_app_state: Invalid asset_id')
@@ -181,7 +181,7 @@ def _handle_rest_request(request, path_parts):
         if asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = '{0}/{1}_{2}'.format(app_dir, asset_id, DEFENDERATP_TC_FILE)
-            real_auth_status_file_path = os.path.realpath(auth_status_file_path)
+            real_auth_status_file_path = os.path.abspath(auth_status_file_path)
             if not os.path.dirname(real_auth_status_file_path) == app_dir:
                 return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=400)
             open(auth_status_file_path, 'w').close()
