@@ -2073,7 +2073,7 @@ class CrowdstrikeConnector(BaseConnector):
         id_list = list()
         id_list.extend(resource_id_list)
         resource_details_list = list()
-
+        summary_data = action_result.update_summary({})
         while id_list:
             # Endpoint creation
             ids = id_list[:min(100, len(id_list))]
@@ -2102,6 +2102,12 @@ class CrowdstrikeConnector(BaseConnector):
         for report in resource_details_list:
             action_result.add_data(report)
 
+        if len(resource_details_list) == 1 and 'verdict' in list(resource_details_list[0].keys()):
+            summary_data['verdict'] = resource_details_list[0]['verdict']
+            summary_data['total_reports'] = len(resource_details_list)
+        else:
+            summary_data['total_reports'] = len(resource_details_list)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_file_reputation(self, param):
@@ -2117,7 +2123,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
 
         file_hash = file_info['metadata']['sha256']
-        filter_query = f"sandbox.sha256:'{file_hash}'"
+        filter_query = "sandbox.sha256:'{}'".format(file_hash)
         param['filter'] = filter_query
 
         max_limit = 5000
@@ -2156,13 +2162,13 @@ class CrowdstrikeConnector(BaseConnector):
 
         url = param['url']
         if 'https' in url:
-            replaced_url = url.replace('https', 'hxxps')
+            url = url.replace('https', 'hxxps')
         elif 'http' in url:
-            replaced_url = url.replace('http', 'hxxp')
+            url = url.replace('http', 'hxxp')
         elif 'ftp' in url:
-            replaced_url = url.replace('ftp', 'fxp')
+            url = url.replace('ftp', 'fxp')
 
-        filter_query = f"sandbox.submit_url.raw:'{replaced_url}'"
+        filter_query = "sandbox.submit_url.raw:'{}'".format(url)
         param['filter'] = filter_query
 
         max_limit = 5000
@@ -2186,7 +2192,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
         if not resource_id_list:
-            return action_result.set_status(phantom.APP_ERROR, "File not found")
+            return action_result.set_status(phantom.APP_ERROR, "URL not found")
 
         if param.get('detail_report'):
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
@@ -2210,7 +2216,7 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Report downloaded successfully")
 
     def _handle_detonate_file(self, param):
         # Add an action result to the App Run
@@ -2219,10 +2225,34 @@ class CrowdstrikeConnector(BaseConnector):
             file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
+            file_path = file_info['path']
+            file_name = file_info['name']
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
+
+        query_param = {
+            'file_name': file_name
+        }
+
+        if param.get('comment'):
+            query_param['comment'] = param.get('comment')
+        if param.get('is_confidential'):
+            query_param['is_confidential'] = param.get('is_confidential')
+
+        try:
+            files = [('file', (file_name, open(file_path, 'rb'), 'application/octet-stream'))]
+        except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while reading file. {}'.format(error_message))
+
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_UPLOAD_FILE_ENDPOINT, files=files)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -2428,7 +2458,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call_oauth2(self, endpoint, action_result, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call_oauth2(self, endpoint, action_result, headers=None, params=None, files=None, data=None, json=None, method="get"):
         """ Function that makes the REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -2450,7 +2480,7 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
+            r = request_func(endpoint, json=json, data=data, headers=headers, params=params, files=files)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json
 
@@ -2459,7 +2489,7 @@ class CrowdstrikeConnector(BaseConnector):
             is_download = True
         return self._process_response(r, action_result, is_download)
 
-    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, files=None, json=None, method="get"):
         """ Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -2490,16 +2520,19 @@ class CrowdstrikeConnector(BaseConnector):
         if not headers.get('Content-Type'):
             headers['Content-Type'] = 'application/json'
 
-        ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
+        ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, files, data, json, method)
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
         if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'authorization failed' in msg or 'access denied' in msg:
             ret_val = self._get_token(action_result)
 
+            if not phantom.is_fail(ret_val):
+                action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
+
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._oauth_access_token)})
 
-            ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
+            ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, files, data, json, method)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
