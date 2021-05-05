@@ -1,5 +1,5 @@
 # File: checkpointreputation_consts.py
-# Copyright (c) Copyright (c) 2021 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -37,6 +37,9 @@ RESPONSE_RISK = "risk"
 RESPONSE_REPUTATION = "reputation"
 
 ERROR_HTTP = "Rest call returned an HTTP error: {response}"
-ERROR_JSON = "Failed to decode JSON response: {response}"
-ERROR_TIMEOUT = "Rest call timed out. Try again later."
+ERROR_JSON = "Failed to decode JSON response"
+ERROR_TIMEOUT = "Rest call timed out. Try again later"
 ERROR_OTHER = "Unknown error"
+ERROR_CODE_MSG = "Error code unavailable"
+ERROR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERROR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"

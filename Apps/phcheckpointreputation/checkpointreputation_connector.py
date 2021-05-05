@@ -1,5 +1,5 @@
 # File: checkpointreputation_connector.py
-# Copyright (c) Copyright (c) 2021 Splunk Inc.
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -25,12 +25,48 @@ class CheckpointReputationConnector(BaseConnector):
     def initialize(self):
         state = self.load_state()
         config = self.get_config()
-        self._python_version = int(sys.version_info[0])
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
 
         self._api_key = config[consts.CONFIG_API_KEY]
         self._token = state.get(consts.STATE_TOKEN, None)
 
         return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = consts.ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = consts.ERROR_CODE_MSG
+                error_msg = consts.ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = consts.ERROR_CODE_MSG
+            error_msg = consts.ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in consts.ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print(consts.PARSE_ERROR_MSG)
+            error_text = consts.PARSE_ERROR_MSG
+
+        return error_text
 
     def finalize(self):
         state = {
@@ -50,20 +86,20 @@ class CheckpointReputationConnector(BaseConnector):
 
         ret_val = self._get_reputation(params, consts.API_ENDPOINT_URL)
 
-        if ret_val == phantom.APP_ERROR:
+        if phantom.is_fail(ret_val):
             self.save_progress("Login to Check Point reputation API failed")
+            self.save_progress("Test Connectivity Failed")
         else:
             self.save_progress("Login to Check Point reputation API is successful")
-            self.save_progress("Test Connectivity passed")
+            self.save_progress("Test Connectivity Passed")
 
         return ret_val
 
     def _get_reputation(self, params, endpoint):
         """
-        Primary fonction that handles the action trigger and logging.
+        Primary function that handles the action trigger and logging.
         """
         action_result = self.add_action_result(ActionResult(dict(params)))
-
         rest_handler = self._reputation_rest_call
         rest_kwargs = {
             "endpoint": endpoint,
@@ -73,13 +109,17 @@ class CheckpointReputationConnector(BaseConnector):
         try:
             result = self._token_manager(rest_handler, rest_kwargs)
         except HTTPError as err:
-            return action_result.set_status(phantom.APP_ERROR, consts.ERROR_HTTP, err, response=err.response.text)
+            error = self._get_error_message_from_exception(err)
+            return action_result.set_status(phantom.APP_ERROR, f"{consts.ERROR_HTTP}. {error}", response=err.response.text)
         except json.JSONDecodeError as err:
-            return action_result.set_status(phantom.APP_ERROR, consts.ERROR_JSON, err, response=err.response.text)
+            error = self._get_error_message_from_exception(err)
+            return action_result.set_status(phantom.APP_ERROR, f"{consts.ERROR_JSON}. {error}")
         except Timeout as err:
-            return action_result.set_status(phantom.APP_ERROR, consts.ERROR_TIMEOUT, err)
+            error = self._get_error_message_from_exception(err)
+            return action_result.set_status(phantom.APP_ERROR, f"{consts.ERROR_TIMEOUT}. {error}")
         except BaseException as err:
-            return action_result.set_status(phantom.APP_ERROR, consts.ERROR_OTHER, err)
+            error = self._get_error_message_from_exception(err)
+            return action_result.set_status(phantom.APP_ERROR, f"{consts.ERROR_OTHER}. {error}")
 
         for response in result.get(consts.RESPONSE):
 
@@ -108,7 +148,7 @@ class CheckpointReputationConnector(BaseConnector):
 
     def _token_manager(self, rest_function, kwargs):
         """
-        Wrapper funtion that handles API token for an API rest call.
+        Wrapper function that handles API token for an API rest call.
         Checkpoint does not have a simple endpoint to check if a token is valid.
         It relies instead on returning an error 403. Which we catch to recreate a token
         and retry the call.
@@ -136,7 +176,7 @@ class CheckpointReputationConnector(BaseConnector):
         """
         self._token = None
 
-        full_url = consts.API_BASE_URL + consts.API_ENDPOINT_AUTH
+        full_url = f"{consts.API_BASE_URL}{consts.API_ENDPOINT_AUTH}"
 
         headers = {
             "accept": "*/*",
@@ -155,7 +195,7 @@ class CheckpointReputationConnector(BaseConnector):
         Raises an HTTPError on issue.
         Raises json.JSONDecodeError on invalid answer.
         """
-        full_url = consts.API_BASE_URL + endpoint
+        full_url = f"{consts.API_BASE_URL}{endpoint}"
         headers = {
             "accept": "application/json",
             "Content-Type": "application/json",
@@ -174,13 +214,13 @@ class CheckpointReputationConnector(BaseConnector):
 
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
-        if (action == consts.ACTION_ID_IP):
+        if action == consts.ACTION_ID_IP:
             ret_val = self._get_reputation(params, consts.API_ENDPOINT_IP)
-        elif (action == consts.ACTION_ID_URL):
+        elif action == consts.ACTION_ID_URL:
             ret_val = self._get_reputation(params, consts.API_ENDPOINT_URL)
-        elif (action == consts.ACTION_ID_FILE):
+        elif action == consts.ACTION_ID_FILE:
             ret_val = self._get_reputation(params, consts.API_ENDPOINT_FILE)
-        elif (action == consts.ACTION_ID_TEST):
+        elif action == consts.ACTION_ID_TEST:
             ret_val = self._handle_test_connectivity(params)
 
         return ret_val
@@ -189,7 +229,7 @@ class CheckpointReputationConnector(BaseConnector):
 if __name__ == '__main__':
     """ Code that is executed when run in standalone debug mode
     for .e.g:
-    python2.7 ./zendesk_connector.py /tmp/zendesk_test_create_ticket.json
+    python2.7 ./checkpointreputation_connector.py /tmp/checkpointreputation_test_url_reputation.json
         """
 
     # Imports
