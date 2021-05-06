@@ -71,8 +71,8 @@
                         "domain"
                     ],
                     "example_values": [
-                        "https://google.com",
-                        "google.com"
+                        "https://example.com",
+                        "example.com"
                     ]
                 },
                 {
@@ -393,7 +393,7 @@
                     "data_path": "action_result.data.*.context.as_owner",
                     "data_type": "string",
                     "example_values": [
-                        "Google LLC"
+                        "Example owner"
                     ]
                 },
                 {

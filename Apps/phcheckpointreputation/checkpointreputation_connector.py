@@ -25,10 +25,6 @@ class CheckpointReputationConnector(BaseConnector):
     def initialize(self):
         state = self.load_state()
         config = self.get_config()
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
 
         self._api_key = config[consts.CONFIG_API_KEY]
         self._token = state.get(consts.STATE_TOKEN, None)
