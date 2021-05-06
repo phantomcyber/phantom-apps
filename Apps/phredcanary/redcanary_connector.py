@@ -312,7 +312,7 @@ class RedCanaryConnector(BaseConnector):
         """Acknowledges a Red Canary detection"""
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        det_id = param.get('detection_id')
+        det_id = param['detection_id']
         # Validate 'detection_id' parameter
         ret_val, det_id = self._validate_integer(action_result, det_id, DETECTION_ID_KEY)
         if phantom.is_fail(ret_val):
@@ -336,7 +336,7 @@ class RedCanaryConnector(BaseConnector):
         """Updates remediation information associated with a RC detection"""
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        det_id = param.get('detection_id')
+        det_id = param['detection_id']
         # Validate 'detection_id' parameter
         ret_val, det_id = self._validate_integer(action_result, det_id, DETECTION_ID_KEY)
         if phantom.is_fail(ret_val):
@@ -345,7 +345,7 @@ class RedCanaryConnector(BaseConnector):
         self.save_progress("Updating remediation information for {}".format(det_id))
 
         http_params = dict()
-        http_params.update({'remediation_state': param.get('remediation_state')})
+        http_params.update({'remediation_state': param['remediation_state']})
         http_params.update({'comment': param.get('comment')})
 
         url = self._generate_base_api_url('detections/{}/update_remediation_state'.format(det_id))
