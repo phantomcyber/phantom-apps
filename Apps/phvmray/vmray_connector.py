@@ -49,7 +49,7 @@ from vmray_consts import (  # pylint: disable=wrong-import-order
     VMRAY_PARSE_ERR_MSG,
     VMRAY_ERR_SERVER_RES,
     VMRAY_NEGATIVE_INTEGER_ERR_MSG,
-    VMRAY_INVALID_INTEGER_ERR_MSG
+    VMRAY_INVALID_INTEGER_ERR_MSG,
 )
 
 from rest_api import (  # pylint: disable=wrong-import-order, import-error
@@ -61,42 +61,58 @@ from rest_cmds import SummaryV2, VMRay  # pylint: disable=wrong-import-order
 class VMRayConnector(BaseConnector):
     def __init__(self) -> None:
         # Call the BaseConnectors init first
-        super(VMRayConnector, self).__init__()
+        super().__init__()
         self._api: VMRay = None
 
-    def _validate_integer(self, action_result, parameter, key):
+    @staticmethod
+    def _validate_integer(action_result, parameter, key):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, VMRAY_INVALID_INTEGER_ERR_MSG.format(key)), None
+                    return (
+                        action_result.set_status(
+                            phantom.APP_ERROR, VMRAY_INVALID_INTEGER_ERR_MSG.format(key)
+                        ),
+                        None,
+                    )
 
                 parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, VMRAY_INVALID_INTEGER_ERR_MSG.format(key)), None
+            except Exception:  # pylint: disable=W0703
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR, VMRAY_INVALID_INTEGER_ERR_MSG.format(key)
+                    ),
+                    None,
+                )
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, VMRAY_NEGATIVE_INTEGER_ERR_MSG.format(key)), None
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR, VMRAY_NEGATIVE_INTEGER_ERR_MSG.format(key)
+                    ),
+                    None,
+                )
 
         return phantom.APP_SUCCESS, parameter
 
-    def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error messages from the exception.
-        :param e: Exception object
+    def _get_error_message_from_exception(self, exception):
+        """This method is used to get appropriate error messages from the exception.
+        :param exception: Exception object
         :return: error message
         """
 
         try:
-            if e.args:
-                if len(e.args) > 1:
-                    error_code = e.args[0]
-                    error_msg = e.args[1]
-                elif len(e.args) == 1:
+            if exception.args:
+                if len(exception.args) > 1:
+                    error_code = exception.args[0]
+                    error_msg = exception.args[1]
+                elif len(exception.args) == 1:
                     error_code = VMRAY_ERR_CODE_MSG
-                    error_msg = e.args[0]
+                    error_msg = exception.args[0]
             else:
                 error_code = VMRAY_ERR_CODE_MSG
                 error_msg = VMRAY_ERR_MSG_UNAVAILABLE
-        except:
+        except Exception:  # pylint: disable=W0703
             error_code = VMRAY_ERR_CODE_MSG
             error_msg = VMRAY_ERR_MSG_UNAVAILABLE
 
@@ -104,8 +120,10 @@ class VMRayConnector(BaseConnector):
             if error_code in VMRAY_ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-        except:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg
+                )
+        except Exception:  # pylint: disable=W0703
             self.debug_print("Error occurred while parsing error message")
             error_text = VMRAY_PARSE_ERR_MSG
 
@@ -127,13 +145,12 @@ class VMRayConnector(BaseConnector):
 
         try:
             VMRay(server, api_key, not disable_cert)
-        except VMRayRESTAPIError:
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
             self.save_progress(VMRAY_ERR_CONNECTIVITY_TEST)
-            return action_result.set_status(phantom.APP_ERROR, "Could not connect to server")
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            self.save_progress(VMRAY_ERR_CONNECTIVITY_TEST)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_CONNECTION.format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_CONNECTION.format(err)
+            )
 
         self.save_progress(VMRAY_SUCC_CONNECTIVITY_TEST)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -152,14 +169,12 @@ class VMRayConnector(BaseConnector):
         try:
             self._api = VMRay(server, api_key, not disable_cert)
             return (phantom.APP_SUCCESS, self._api)
-        except VMRayRESTAPIError:
+        except Exception as exc:  # pylint: disable=W0703
             self._api = None
-            action_result.set_status(phantom.APP_ERROR, "Could not connect to server")
-            return (action_result.get_status(), None)
-        except Exception as e:
-            self._api = None
-            err = self._get_error_message_from_exception(e)
-            action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {}".format(err))
+            err = self._get_error_message_from_exception(exc)
+            action_result.set_status(
+                phantom.APP_ERROR, "Error connecting to server. Details: {}".format(err)
+            )
             return (action_result.get_status(), None)
 
     @staticmethod
@@ -185,10 +200,16 @@ class VMRayConnector(BaseConnector):
         elif len(hsh) == 64:
             res = api.get_sample_by_sha256(hsh)
         else:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_UNSUPPORTED_HASH), []
+            return (
+                action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_UNSUPPORTED_HASH),
+                [],
+            )
 
         if len(res) == 0:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND), []
+            return (
+                action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND),
+                [],
+            )
 
         return phantom.APP_SUCCESS, res
 
@@ -220,24 +241,29 @@ class VMRayConnector(BaseConnector):
 
         try:
             status, res = self._get_sample_by_hash(action_result, api, hsh)
-        except VMRayRESTAPIError:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND)
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error occured while finding the samples. Details: {}".format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Error occurred: {VMRAY_ERR_SAMPLE_NOT_FOUND}. Details: {err}",
+            )
 
         if phantom.is_fail(status):
             return action_result.get_status()
 
         try:
             if "sample_id" not in res[0]:
-                return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND)
+                return action_result.set_status(
+                    phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND
+                )
 
             if res[0]["sample_is_multipart"]:
                 return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_MULTIPART)
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         self.save_progress("Downloading file")
 
@@ -256,7 +282,9 @@ class VMRayConnector(BaseConnector):
         except Exception as exc:  # pylint: disable=W0703
             os.remove(zip_file_location)
             err = self._get_error_message_from_exception(exc)
-            return action_result.set_status(phantom.APP_ERROR, f"{VMRAY_ERR_OPEN_ZIP}. {err}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"{VMRAY_ERR_OPEN_ZIP}. {err}"
+            )
 
         zf_names = zifi.namelist()
 
@@ -276,7 +304,9 @@ class VMRayConnector(BaseConnector):
             if os.path.exists(file_location):
                 os.remove(file_location)
             err = self._get_error_message_from_exception(exc)
-            return action_result.set_status(phantom.APP_ERROR, f"{VMRAY_ERR_MALFORMED_ZIP}. {err}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"{VMRAY_ERR_MALFORMED_ZIP}. {err}"
+            )
 
         finally:
             zifi.close()
@@ -305,9 +335,11 @@ class VMRayConnector(BaseConnector):
                     "contains": phantom_sampletypes,
                 },
             )
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         if not vlt_res["succeeded"]:
 
@@ -383,12 +415,11 @@ class VMRayConnector(BaseConnector):
 
         try:
             res = api.submit_file(file_path, params=params)
-        except VMRayRESTAPIError as exc:
+        except Exception as exc:  # pylint: disable=W0703
             err = self._get_error_message_from_exception(exc)
-            return action_result.set_status(phantom.APP_ERROR, f"{VMRAY_ERR_SUBMIT_FILE}. {err}")
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Could not submit file. Details: {}".format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR, f"{VMRAY_ERR_SUBMIT_FILE}. Details: {err}"
+            )
 
         try:
             if res["errors"]:
@@ -399,21 +430,27 @@ class VMRayConnector(BaseConnector):
 
             submission_id = res["submissions"][0]["submission_id"]
             submission_url = res["submissions"][0]["submission_webif_url"]
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         submission_finished = True
 
         iocs_only = param.get("ioc_only", True)
-        status, report = self._get_report(action_result, submission_id, DEFAULT_TIMEOUT, iocs_only)
+        status, report = self._get_report(
+            action_result, submission_id, DEFAULT_TIMEOUT, iocs_only
+        )
         if phantom.is_fail(status):
             if report:
                 error_msg, _exc = report
                 if error_msg == VMRAY_ERR_SUBMISSION_NOT_FINISHED:
                     submission_finished = False
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, f"{error_msg}, {_exc}")
+                    return action_result.set_status(
+                        phantom.APP_ERROR, f"{error_msg}, {_exc}"
+                    )
                 report = None
             else:
                 return action_result.get_status()
@@ -432,9 +469,11 @@ class VMRayConnector(BaseConnector):
                         "verdict": report["verdict"],
                     }
                 )
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         action_result.update_summary(
             {
@@ -468,12 +507,11 @@ class VMRayConnector(BaseConnector):
 
         try:
             res = api.submit_url(url, params=params)
-        except VMRayRESTAPIError as exc:
+        except Exception as exc:  # pylint: disable=W0703
             err = self._get_error_message_from_exception(exc)
-            return action_result.set_status(phantom.APP_ERROR, f"{VMRAY_ERR_SUBMIT_FILE}. {err}")
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Could not submit file. Details: {}".format(err))
+            return action_result.set_status(
+                phantom.APP_ERROR, f"{VMRAY_ERR_SUBMIT_FILE}. Details: {err}"
+            )
 
         try:
             if res["errors"]:
@@ -484,21 +522,27 @@ class VMRayConnector(BaseConnector):
 
             submission_id = res["submissions"][0]["submission_id"]
             submission_url = res["submissions"][0]["submission_webif_url"]
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         submission_finished = True
 
         iocs_only = param.get("ioc_only", True)
-        status, report = self._get_report(action_result, submission_id, DEFAULT_TIMEOUT, iocs_only)
+        status, report = self._get_report(
+            action_result, submission_id, DEFAULT_TIMEOUT, iocs_only
+        )
         if phantom.is_fail(status):
             if report:
                 error_msg, _exc = report
                 if error_msg == VMRAY_ERR_SUBMISSION_NOT_FINISHED:
                     submission_finished = False
                 else:
-                    return action_result.set_status(phantom.APP_ERROR, f"{error_msg}, {_exc}")
+                    return action_result.set_status(
+                        phantom.APP_ERROR, f"{error_msg}, {_exc}"
+                    )
                 report = None
             else:
                 return action_result.get_status()
@@ -517,9 +561,11 @@ class VMRayConnector(BaseConnector):
                         "verdict": report["verdict"],
                     }
                 )
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         action_result.update_summary(
             {
@@ -549,10 +595,8 @@ class VMRayConnector(BaseConnector):
             billing_type = submission["submission_billing_type"]
             self.save_progress("Getting results")
             analyses = api.get_analyses_by_submission_id(submission_id)
-        except VMRayRESTAPIError as exc:
+        except Exception as exc:  # pylint: disable=W0703
             return (phantom.APP_ERROR, (VMRAY_ERR_GET_SUBMISSION, exc))
-        except Exception as e:
-            return (phantom.APP_ERROR, (VMRAY_ERR_GET_SUBMISSION, e))
 
         try:
             for analysis in analyses:
@@ -568,33 +612,24 @@ class VMRayConnector(BaseConnector):
                         continue
 
                     analysis["summary"] = summary
-        except Exception as e:
-            return (phantom.APP_ERROR, ("Error processing server response", e))
+        except Exception as exc:  # pylint: disable=W0703
+            return (phantom.APP_ERROR, ("Error processing server response", exc))
 
         try:
             reputation_lookup = api.get_reputation_by_submission(submission_id)
-        except VMRayRESTAPIError:
-            self.save_progress("Reputation lookup failed")
-            reputation_lookup = None
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             self.save_progress("Reputation lookup failed")
             reputation_lookup = None
 
         try:
             verdict = api.get_verdict_by_submission_id(submission_id)
-        except VMRayRESTAPIError:
-            self.save_progress("Failed to fetch verdict")
-            verdict = "n/a"
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             self.save_progress("Failed to fetch verdict")
             verdict = "n/a"
 
         try:
             recursive_submission_ids = api.get_child_submissions(submission_id)
-        except VMRayRESTAPIError:
-            self.save_progess("Failed to fetch recursive submissions")
-            recursive_submission_ids = None
-        except Exception:
+        except Exception:  # pylint: disable=W0703
             self.save_progess("Failed to fetch recursive submissions")
             recursive_submission_ids = None
 
@@ -612,7 +647,9 @@ class VMRayConnector(BaseConnector):
 
     def _handle_get_report(self, param: Dict[str, Any]) -> bool:
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ret_val, submission_id = self._validate_integer(action_result, param["submission_id"], "'submission_id' action parameter")
+        ret_val, submission_id = self._validate_integer(
+            action_result, param["submission_id"], "'submission_id' action parameter"
+        )
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         timeout = self._get_timeout(param)
@@ -631,9 +668,11 @@ class VMRayConnector(BaseConnector):
             reputation_lookup = res["reputation_lookup"]
             verdict = res["verdict"]
             submission_url = res["submission_url"]
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         for analysis in analyses:
             action_result.add_data({"analysis": analysis})
@@ -664,10 +703,10 @@ class VMRayConnector(BaseConnector):
 
         try:
             status, res = self._get_sample_by_hash(action_result, api, param["hash"])
-        except VMRayRESTAPIError:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND)
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND)
+        except Exception:  # pylint: disable=W0703
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SAMPLE_NOT_FOUND
+            )
 
         if phantom.is_fail(status):
             return action_result.get_status()
@@ -676,16 +715,20 @@ class VMRayConnector(BaseConnector):
 
         try:
             sample_id = res[0]["sample_id"]
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err))
+        except Exception as exc:  # pylint: disable=W0703
+            err = self._get_error_message_from_exception(exc)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SERVER_RES.format(err)
+            )
 
         has_finished_submission = False
         seconds_waited = 0
         while True:
             submissions = api.call("GET", f"/rest/submission/sample/{sample_id}")
             if not submissions:
-                return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_NO_SUBMISSIONS)
+                return action_result.set_status(
+                    phantom.APP_ERROR, VMRAY_ERR_NO_SUBMISSIONS
+                )
 
             has_finished_submission = any(
                 [sub.get("submission_finished", False) for sub in submissions]
@@ -703,19 +746,23 @@ class VMRayConnector(BaseConnector):
             time.sleep(time_to_wait)
 
         if not has_finished_submission:
-            return action_result.set_status(phantom.APP_ERROR, VMRAY_ERR_SUBMISSION_NOT_FINISHED)
+            return action_result.set_status(
+                phantom.APP_ERROR, VMRAY_ERR_SUBMISSION_NOT_FINISHED
+            )
 
         try:
             sample_info = api.get_sample(sample_id)
-        except VMRayRESTAPIError as exc:
-            return action_result.set_status(phantom.APP_ERROR, (VMRAY_ERR_REST_API, exc))
-        except Exception as exc:
-            return action_result.set_status(phantom.APP_ERROR, (VMRAY_ERR_REST_API, exc))
+        except Exception as exc:  # pylint: disable=W0703
+            return action_result.set_status(
+                phantom.APP_ERROR, (VMRAY_ERR_REST_API, exc)
+            )
 
         try:
             recursive_sample_ids = api.get_recursive_samples(sample_id)
-        except VMRayRESTAPIError as exc:
-            return action_result.set_status(phantom.APP_ERROR, (VMRAY_ERR_REST_API, exc))
+        except Exception as exc:  # pylint: disable=W0703
+            return action_result.set_status(
+                phantom.APP_ERROR, (VMRAY_ERR_REST_API, exc)
+            )
 
         # convert serverity to verdict
         if "sample_verdict" not in sample_info:
