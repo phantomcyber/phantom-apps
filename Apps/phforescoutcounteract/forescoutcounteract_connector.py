@@ -1,5 +1,5 @@
 # File: forescoutcounteract_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -16,6 +16,7 @@ import requests
 import json
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
+from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -37,12 +38,66 @@ class ForescoutCounteractConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = FS_ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = FS_ERR_CODE_MSG
+                error_msg = FS_ERR_MSG_UNAVAILABLE
+        except:
+            error_code = FS_ERR_CODE_MSG
+            error_msg = FS_ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in FS_ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = FS_PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, ERR_VALID_INT_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_NON_NEG_INT_MSG.format(key)), None
+
+            if parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, ERR_POSITIVE_INTEGER_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(
+            action_result.set_status(
+                phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)
+            ), None
+        )
 
     def _process_html_response(self, response, action_result):
 
@@ -51,6 +106,9 @@ class ForescoutCounteractConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -71,7 +129,8 @@ class ForescoutCounteractConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(err), None))
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -79,7 +138,7 @@ class ForescoutCounteractConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                r.status_code, unquote(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -89,7 +148,8 @@ class ForescoutCounteractConnector(BaseConnector):
         try:
             resp_xml = ET.fromstring(r.text)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse XML response. Error: {0}".format(err), None))
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -164,8 +224,8 @@ class ForescoutCounteractConnector(BaseConnector):
         self.save_progress("Creating JWT for Web API call")
 
         url = self._base_url + FS_WEB_LOGIN
-        header = { 'Content-Type': 'application/x-www-form-urlencoded' }
-        body = { 'username': config['web_username'], 'password': config['web_password']}
+        header = {'Content-Type': 'application/x-www-form-urlencoded'}
+        body = {'username': config['web_username'], 'password': config['web_password']}
 
         try:
             response = requests.post(url, headers=header, data=body, verify=config.get('verify_server_cert', False))
@@ -190,21 +250,21 @@ class ForescoutCounteractConnector(BaseConnector):
         if module == 'dex':
             status, msg = self._verify_dex_allowed(action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
 
-            auth = (config['dex_username'] + '@' + config['dex_account'], config['dex_password'])
-            headers = { 'Content-Type': 'application/xml' }
+            auth = ("{}@{}".format(config['dex_username'], config['dex_account']).encode('utf-8'), config['dex_password'])
+            headers = {'Content-Type': 'application/xml'}
 
         if module == 'web':
             status, msg = self._verify_web_allowed(action_result)
 
-            if (phantom.is_fail(status)):
+            if phantom.is_fail(status):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, msg), None)
 
             ret_val, token = self._get_web_jwt_token(action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, token), None)
 
             headers = {
@@ -213,7 +273,7 @@ class ForescoutCounteractConnector(BaseConnector):
             }
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(
@@ -222,8 +282,15 @@ class ForescoutCounteractConnector(BaseConnector):
                             headers=headers,
                             verify=config.get('verify_server_cert', False),
                             **kwargs)
+        except requests.exceptions.InvalidSchema:
+            error_message = "Error connecting to server. No connection adapters were found for %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error connecting to server. Connection Refused from the Server for invalid URL %s" % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err), resp_json))
 
         return self._process_response(r, action_result)
 
@@ -235,6 +302,10 @@ class ForescoutCounteractConnector(BaseConnector):
         dex_credentials = config.get('dex_account') and config.get('dex_username') and config.get('dex_password')
         web_credentials = config.get('web_username') and config.get('web_password')
 
+        if not dex_credentials and not web_credentials:
+            self.save_progress("Test Connectivity Failed")
+            return action_result.set_status(phantom.APP_ERROR, "The credential of DEX or Web API must be provided")
+
         if dex_credentials:
             # Test connectivity for DEX
             self.save_progress("Connecting to endpoint {} to test DEX connectivity".format(FS_DEX_HOST_ENDPOINT))
@@ -244,7 +315,7 @@ class ForescoutCounteractConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress("Test Connectivity for DEX Failed")
                 return action_result.get_status()
 
@@ -260,7 +331,7 @@ class ForescoutCounteractConnector(BaseConnector):
             # make rest call
             ret_val, response = self._make_rest_call('web', FS_WEB_HOSTS, action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress("Test Connectivity for web Failed")
                 return action_result.get_status()
 
@@ -268,10 +339,6 @@ class ForescoutCounteractConnector(BaseConnector):
             self.save_progress("Test Connectivity for web Passed")
         else:
             self.save_progress("Credentials for web not supplied. Skipping test connectivity for web")
-
-        if not dex_credentials and not web_credentials:
-            self.save_progress("Test Connectivity Failed")
-            return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -284,7 +351,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', FS_WEB_HOSTS, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -308,7 +375,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', FS_WEB_POLICIES, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -329,13 +396,27 @@ class ForescoutCounteractConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        host_id = param['host_id']
-        url = FS_WEB_HOSTS + '/' + str(host_id)
+        host_id = param.get('host_id')
+        host_ip = param.get('host_ip')
+        host_mac = param.get('host_mac')
+
+        ret_val, host_id = self._validate_integer(action_result, host_id, HOST_ID_INT_PARAM)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if host_id:
+            url = '{}/{}'.format(FS_WEB_HOSTS, host_id)
+        elif host_ip:
+            url = '{}/ip/{}'.format(FS_WEB_HOSTS, host_ip)
+        elif host_mac:
+            url = '{}/mac/{}'.format(FS_WEB_HOSTS, host_mac)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, 'One of the following need to be provided: host_id, host_ip, or host_mac')
 
         # make rest call
         ret_val, response = self._make_rest_call('web', url, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -343,7 +424,9 @@ class ForescoutCounteractConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['host_ip'] = response['host']['ip']
+        summary['host_ip'] = response.get('host', {}).get('ip', 'missing')
+        summary['host_mac'] = response.get('host', {}).get('mac', 'missing')
+        summary['host_id'] = response.get('host', {}).get('id', 'missing')
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -359,13 +442,29 @@ class ForescoutCounteractConnector(BaseConnector):
 
         rule_id = param.get('rule_id')
         if rule_id:
-            params += "matchRuleId=" + ",".join([item.strip() for item in rule_id.split(',')])
+            rule_id_list = []
+            for item in rule_id.split(','):
+                item = item.strip()
+                if item:
+                    rule_id_list.append(item)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in 'rule_id' action parameter")
+            if rule_id_list:
+                params += "matchRuleId=" + ",".join(rule_id_list)
 
         prop_val = param.get('prop_val')
         if prop_val:
             if rule_id:
                 params += "&"
-            params += "&".join([item.strip() for item in prop_val.split(',')])
+            prop_val_list = []
+            for item in prop_val.split(','):
+                item = item.strip()
+                if item:
+                    prop_val_list.append(item)
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in 'prop_val' action parameter")
+            if prop_val_list:
+                params += "&".join(prop_val_list)
 
         url = FS_WEB_HOSTS
         if rule_id or prop_val:
@@ -374,7 +473,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('web', url, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -405,7 +504,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -444,7 +543,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_HOST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data({'host_key_name': host_key_name,
@@ -476,7 +575,7 @@ class ForescoutCounteractConnector(BaseConnector):
             list_body = '<LIST NAME="{}"></LIST>'.format(list_name)
         else:
             if not values:
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Values required"), None)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please provide values in 'values' action parameter"), None)
             list_of_values = "".join(["<VALUE>" + item.strip() + "</VALUE>" for item in values.split(',')])
             list_body = '<LIST NAME="{}">{}</LIST>'.format(list_name, list_of_values)
 
@@ -485,7 +584,7 @@ class ForescoutCounteractConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('dex', FS_DEX_LIST_ENDPOINT, action_result, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -579,8 +678,9 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            print("Accessing the Login page")
+            login_url = "{}/login".format(BaseConnector._get_phantom_base_url())
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -590,13 +690,13 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -612,6 +712,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
