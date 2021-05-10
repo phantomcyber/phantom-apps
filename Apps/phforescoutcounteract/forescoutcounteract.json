@@ -688,7 +688,8 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "forescout rule id"
+                        "forescout rule id",
+                        "forescout policy id"
                     ],
                     "order": 0
                 },
@@ -713,7 +714,8 @@
                         "7042988451856611698"
                     ],
                     "contains": [
-                        "forescout rule id"
+                        "forescout rule id",
+                        "forescout policy id"
                     ]
                 },
                 {
@@ -850,6 +852,9 @@
                     "description": "The property that will be added",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 },
                 "property_value": {
@@ -872,6 +877,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -944,6 +952,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1023,6 +1034,9 @@
                     "description": "The property that will be deleted",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 }
             },
@@ -1032,6 +1046,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_Test"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1060,6 +1077,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_Test"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1174,6 +1194,9 @@
                     "description": "The property that will be modified",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 },
                 "property_value": {
@@ -1231,6 +1254,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1280,6 +1306,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
