@@ -1,3 +1,6 @@
+# File: kasperskythreatintelligence_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 # -----------------------------------------
 # Kaspersky Threat Intelligence App Connector for Splunk Phantom
 # -----------------------------------------
@@ -7,6 +10,9 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+
+# Local imports
+from kasperskythreatintelligence_consts import *
 
 import requests
 import json
@@ -240,12 +246,44 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         url_output = url_output.replace("@", "%40")
         return url_output
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _process_empty_response(self, response, action_result):
         # process the empty response from KL TIP
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(status_code)), None)
 
     def _process_html_response(self, response, action_result):
         # An html response, treat it like an error
@@ -253,16 +291,20 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except Exception as e:
-            error_text = "Cannot parse error details: {0}".format(str(e))
+            err = self._get_error_message_from_exception(e)
+            error_text = "Cannot parse error details: {0}".format(err)
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -271,7 +313,8 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. {0}".format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -279,7 +322,7 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+                r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -299,13 +342,13 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         resp_json = None
 
-        url = self._base_url + endpoint
+        url = f"{self._base_url}{endpoint}"
         username = self._username
         password = self._password
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, u"Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
             r = request_func(
@@ -321,9 +364,8 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
             if '400' in str(r) or '404' in str(r):
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "No search result. Please check your request and try again later"), resp_json)
         except Exception as e:
-            os.unlink(self._key_tmp_name)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
-        os.unlink(self._key_tmp_name)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)), resp_json)
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
@@ -333,13 +375,18 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/api/domain/example.com?sections=Zone,LicenseInfo', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("Test Connectivity Failed.")
+        if phantom.is_fail(ret_val):
+            self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
         # Return success
         self.save_progress("Test Connectivity Passed")
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
+
         self.save_progress('_____________________________________________________________')
         self.save_progress('Day quota: ' + str(summary['DayQuota']))
         self.save_progress('Day requests: ' + str(summary['DayRequests']))
@@ -352,17 +399,21 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         domain = param['domain']
-        endpoint = "/api/domain/" + domain + "?sections=Zone,DomainGeneralInfo"
+        endpoint = f"/api/domain/{domain}?sections=Zone,DomainGeneralInfo"
         self.debug_print(domain)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -373,17 +424,21 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ip = param['ip']
-        endpoint = "/api/ip/" + ip + "?sections=Zone,IpGeneralInfo"
+        endpoint = f"/api/ip/{ip}?sections=Zone,IpGeneralInfo"
         self.debug_print(ip)
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -393,18 +448,22 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        hash = param['hash']
-        self.debug_print(hash)
-        endpoint = "/api/hash/" + hash + "?sections=Zone,FileGeneralInfo,DetectionsInfo"
+        hash_value = param['hash']
+        self.debug_print(hash_value)
+        endpoint = f"/api/hash/{hash_value}?sections=Zone,FileGeneralInfo,DetectionsInfo"
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -416,32 +475,35 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         url = param['url']
         self.debug_print(url)
-        endpoint = "/api/url/" + self._prepare_url(url) + "?sections=Zone,UrlGeneralInfo"
+        endpoint = f"/api/url/{self._prepare_url(url)}?sections=Zone,UrlGeneralInfo"
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def type_of_indicator(self, indicator):
-        import re
         i = re.search(r'^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})', indicator)
         if i:
-            return "/api/ip/" + indicator
+            return f"/api/ip/{indicator}"
         i = re.search(r'^([\da-fA-F]{32,64})', indicator)
         if i:
-            return "/api/hash/" + indicator
+            return f"/api/hash/{indicator}"
         i = re.search(r'^(\S+\:\/\/.*)', indicator)
         if i:
-            return "/api/url/" + self._prepare_url(indicator)
-        return "/api/domain/" + indicator
+            return f"/api/url/{self._prepare_url(indicator)}"
+        return f"/api/domain/{indicator}"
 
     def _handle_get_more_info(self, param):
         # get url reputation
@@ -450,18 +512,22 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         indicator = param['indicator']
         self.debug_print(indicator)
-        endpoint = self.type_of_indicator(indicator) + "?count=" + str(self._recordcount)
+        endpoint = f"{self.type_of_indicator(indicator)}?count={self._recordcount}"
         if param.get('sections'):
-            endpoint += '&sections=' + param.get('sections')
+            endpoint += f"&sections={param.get('sections')}"
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -474,14 +540,18 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         apt_id = param['apt_id']
         self.debug_print(apt_id)
-        endpoint = "/api/publications/get_one?publication_id=" + apt_id + "&include_info=all"
+        endpoint = f"/api/publications/get_one?publication_id={apt_id}&include_info=all"
 
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=None)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
-        summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        try:
+            summary = action_result.update_summary(self._extract_kaspersky_summary(response))
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, f"Error occurred while processing server response. {err}")
         self.debug_print(summary)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -489,10 +559,6 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         ret_val = phantom.APP_SUCCESS
 
         # Get the action that we are supposed to execute for this App Run
-        if not self._eula or not self._policy:
-            action_result = self.add_action_result(ActionResult(dict(param)))
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Please accept Terms and conditions and Privacy Policy"), None)
-
         action_id = self.get_action_identifier()
 
         self.debug_print("action_id", self.get_action_identifier())
@@ -527,26 +593,36 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
 
         config = self.get_config()
 
-        self._eula = config.get('accept the terms and conditions')
-        self._policy = config.get('accept Privacy Policy')
+        self._eula = config.get('accept_the_terms_and_conditions')
+        self._policy = config.get('accept_privacy_policy')
         self._base_url = 'https://tip.kaspersky.com'
         self._username = config.get('username')
         self._password = config.get('password')
-        self._recordcount = config.get('records count')
+        self._recordcount = config.get('records_count')
+
+        if not self._eula or not self._policy:
+            return self.set_status(phantom.APP_ERROR, "Please accept Terms and conditions and Privacy Policy")
+
         if hasattr(Vault, 'get_vault_tmp_dir'):
             temp_dir = Vault.get_vault_tmp_dir()
         else:
             temp_dir = "/opt/phantom/vault/tmp/"
 
-        self._tmp_pem_file = tempfile.NamedTemporaryFile(dir=temp_dir, mode='w+b', delete=False)
-        self._tmp_pem_file.write(str.encode(config.get('PEM key')))
-        self._key_tmp_name = self._tmp_pem_file.name
-        self._tmp_pem_file.close()
-        os.path.exists(self._tmp_pem_file.name)
+        try:
+            self._tmp_pem_file = tempfile.NamedTemporaryFile(dir=temp_dir, mode='w+b', delete=False)
+            self._tmp_pem_file.write(str.encode(config.get('pem_key')))
+            self._key_tmp_name = self._tmp_pem_file.name
+            self._tmp_pem_file.close()
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return self.set_status(phantom.APP_ERROR, err)
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
+        if os.path.exists(self._key_tmp_name):
+            os.unlink(self._key_tmp_name)
+
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
@@ -571,13 +647,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = KasperskyThreatIntelligenceConnector._get_phantom_base_url() + '/login'
 
@@ -609,7 +685,7 @@ if __name__ == '__main__':
         connector = KasperskyThreatIntelligenceConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
