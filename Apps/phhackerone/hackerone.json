@@ -4,17 +4,18 @@
     "description": "This app integrates with HackerOne to support various generic and investigative actions",
     "publisher": "Splunk Community",
     "type": "generic",
-    "main_module": "hackerone_connector.pyc",
-    "app_version": "1.5.0",
-    "utctime_updated": "2020-01-28T00:00:00.000000Z",
+    "main_module": "hackerone_connector.py",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-05-10T06:09:05.000000Z",
     "package_name": "phantom_hackerone",
     "product_vendor": "HackerOne",
     "product_name": "HackerOne",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "python_version": "3",
+    "min_phantom_version": "4.9.39220",
     "logo": "logo_hackerone.svg",
     "logo_dark": "logo_hackerone_dark.svg",
-    "license": "Copyright (c) 2020 Splunk Inc.",
+    "license": "Copyright (c) 2020-2021 Splunk Inc.",
     "configuration": {
         "api_identifier": {
             "description": "HackerOne Identifier",
@@ -332,7 +333,6 @@
                     "description": "Report State Filter",
                     "data_type": "string",
                     "order": 0
-
                 },
                 "assignment_filter": {
                     "description": "Report Assignment Filter",
@@ -342,8 +342,7 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2,
-                    "required": true
+                    "order": 2
                 }
             },
             "output": [
@@ -431,8 +430,7 @@
                 "full_comments": {
                     "description": "Collect comments for reports (much slower)",
                     "data_type": "boolean",
-                    "order": 2,
-                    "required": true
+                    "order": 2
                 },
                 "range": {
                     "description": "How many minutes back to get changed reports from",

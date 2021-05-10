@@ -1,8 +1,5 @@
-# File: victorops_connector.py
+# File: splunkoncall_connector.py
 # Copyright (c) 2018-2021 Splunk Inc.
-#
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.# File: victorops_connector.py
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -13,7 +10,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-from victorops_consts import INTEGRATION_URL_MISSING, UPDATE_INCIDENT_ERROR
+from splunkoncall_consts import INTEGRATION_URL_MISSING, UPDATE_INCIDENT_ERROR
 import requests
 import json
 from bs4 import BeautifulSoup

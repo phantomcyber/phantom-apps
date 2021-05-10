@@ -1,11 +1,11 @@
 {
     "appid": "623de41b-eac0-4a4a-970c-974e8d7ac2cb",
-    "name": "VictorOps",
-    "description": "This app implements various investigative actions using VictorOps",
+    "name": "Splunk On-Call",
+    "description": "Formerly known as VictorOps. This app implements various investigative actions using VictorOps",
     "type": "devops",
     "product_vendor": "VictorOps",
-    "logo": "victorops.svg",
-    "logo_dark": "victorops_dark.svg",
+    "logo": "logo_splunkoncall.svg",
+    "logo_dark": "logo_splunkoncall_dark.svg",
     "product_name": "VictorOps",
     "product_version_regex": ".*",
     "publisher": "Splunk",
@@ -14,10 +14,10 @@
     "latest_tested_versions": [
         "Cloud. API v1 tested on 2021-02-25"
     ],
-    "app_version": "2.0.0",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-03-02T04:54:12.000000Z",
     "package_name": "phantom_victorops",
-    "main_module": "victorops_connector.py",
+    "main_module": "splunkoncall_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
