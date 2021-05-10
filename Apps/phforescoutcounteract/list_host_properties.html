@@ -68,6 +68,9 @@
 .forescoutcounteract-app .wf-subheader-style {
   font-size : 12px
 }
+a.no-word-wrap {
+  text-decoration: None !important
+}
 
 
 </style>
@@ -83,31 +86,43 @@
             <tr>
               <td>IP</td>
               <td>
-                <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ items.ip }}' }], 0, {{ container.id }}, null, false);">
-                            {{ items.ip }}
-                            &nbsp;
-                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
+                {% if items.ip %}
+                  <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ items.ip }}' }], 0, {{ container.id }}, null, false);">
+                              {{ items.ip }}
+                              &nbsp;
+                              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                {% else %}
+                  None
+                {% endif %}
               </td>
             </tr>
             <tr>
               <td>Mac Address</td>
               <td>
+                {% if items.mac %}
                 <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout mac address', 'mac address'], 'value':'{{ items.mac }}' }], 0, {{ container.id }}, null, false);">
                             {{ items.mac }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                 </a>
+                {% else %}
+                  None
+                {% endif %}
               </td>
             </tr>
             <tr>
               <td>Host ID</td>
               <td>
+                {% if items.id %}
                 <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout host id'], 'value':'{{ items.id }}' }], 0, {{ container.id }}, null, false);">
                             {{ items.id }}
                             &nbsp;
                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                 </a>
+                {% else %}
+                  None
+                {% endif %}
               </td>
             </tr>
           </table>
