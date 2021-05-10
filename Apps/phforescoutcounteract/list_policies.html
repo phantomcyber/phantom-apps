@@ -83,7 +83,13 @@
           </tr>
           <tr>
             <td>Policy ID</td>
-            <td>{{ items.policyId }}</td>
+            <td>
+              <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout policy id'], 'value':'{{ tems.policyId }}' }], 0, {{ container.id }}, null, false);">
+                {{ items.policyId }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
           </tr>
         </table>
         <br>
@@ -97,7 +103,13 @@
               {% for rule in items.rules %}
                   <tr>
                     <td>{{ rule.name }}</td>
-                    <td>{{ rule.ruleId }}</td>
+                    <td>
+                      <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout rule id'], 'value':'{{ rule.ruleId }}' }], 0, {{ container.id }}, null, false);">
+                        {{ rule.ruleId }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                      </a>
+                    </td>
                     <td>{{ rule.description }}</td>
                   </tr>
               {% endfor %}
