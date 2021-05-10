@@ -105,7 +105,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "column_name": "MAC Address",
                     "column_order": 1
@@ -315,7 +316,8 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "order": 2
                 }
@@ -345,7 +347,8 @@
                     "data_path": "action_result.parameter.host_mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -365,7 +368,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -729,7 +733,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -836,6 +841,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -876,6 +882,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
@@ -914,6 +921,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ]
                 },
@@ -1006,6 +1014,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -1033,6 +1042,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
@@ -1155,6 +1165,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -1195,6 +1206,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
