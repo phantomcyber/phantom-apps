@@ -105,7 +105,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "column_name": "MAC Address",
                     "column_order": 1
@@ -315,7 +316,8 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "order": 2
                 }
@@ -345,7 +347,8 @@
                     "data_path": "action_result.parameter.host_mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -365,7 +368,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -684,7 +688,8 @@
                     "data_type": "string",
                     "primary": true,
                     "contains": [
-                        "forescout rule id"
+                        "forescout rule id",
+                        "forescout policy id"
                     ],
                     "order": 0
                 },
@@ -709,7 +714,8 @@
                         "7042988451856611698"
                     ],
                     "contains": [
-                        "forescout rule id"
+                        "forescout rule id",
+                        "forescout policy id"
                     ]
                 },
                 {
@@ -729,7 +735,8 @@
                     "data_path": "action_result.data.*.mac",
                     "data_type": "string",
                     "contains": [
-                        "forescout mac address"
+                        "forescout mac address",
+                        "mac address"
                     ],
                     "example_values": [
                         "00:50:56:8b:00"
@@ -836,6 +843,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -844,6 +852,9 @@
                     "description": "The property that will be added",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 },
                 "property_value": {
@@ -866,6 +877,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -876,6 +890,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
@@ -914,6 +929,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ]
                 },
@@ -936,6 +952,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1006,6 +1025,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -1014,6 +1034,9 @@
                     "description": "The property that will be deleted",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 }
             },
@@ -1023,6 +1046,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_Test"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1033,6 +1059,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
@@ -1050,6 +1077,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_Test"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1155,6 +1185,7 @@
                     "primary": true,
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "order": 1
@@ -1163,6 +1194,9 @@
                     "description": "The property that will be modified",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "forescout property name"
+                    ],
                     "order": 2
                 },
                 "property_value": {
@@ -1195,6 +1229,7 @@
                     ],
                     "contains": [
                         "forescout mac address",
+                        "mac address",
                         "ip"
                     ],
                     "column_name": "Host Key Value",
@@ -1219,6 +1254,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
@@ -1268,6 +1306,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Prop_String"
+                    ],
+                    "contains": [
+                        "forescout property name"
                     ]
                 },
                 {
