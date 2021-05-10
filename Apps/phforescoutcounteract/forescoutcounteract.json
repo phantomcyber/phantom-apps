@@ -11,7 +11,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2018-12-07T01:15:08.000000Z",
+    "utctime_updated": "2021-05-10T04:51:17.000000Z",
     "package_name": "phantom_forescoutcounteract",
     "main_module": "forescoutcounteract_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -1132,7 +1132,7 @@
         {
             "action": "update property",
             "description": "Update a property of a host",
-            "verbose": "This action requires DEX credential in asset configuration.<p>The created new host will be only seen on UI when the host value is in the range of IP segment configured in ForeScout CounterACT.</p><p>The property_name field is the Property Tag field of Property created in CounterACT. This action won’t support composite type of property.</p>",
+            "verbose": "This action requires DEX credential in asset configuration.<p>The created new host will be only seen on UI when the host value is in the range of IP segment configured in ForeScout CounterACT.</p><p>The property_name field is the Property Tag field of Property created in CounterACT. This action won\u2019t support composite type of property.</p>",
             "type": "correct",
             "identifier": "update_property",
             "read_only": false,
