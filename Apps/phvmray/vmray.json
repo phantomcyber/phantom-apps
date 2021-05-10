@@ -4,13 +4,15 @@
     "description": "This app enables you to detonate files and URLs, and perform investigative actions, using the VMRay Platform, thereby giving you automated analysis and advanced threat detection through an agentless hypervisor-based sandbox",
     "publisher": " VMRay",
     "contributors": [
-        "Jens Thom"
+        {
+            "name": "Jens Thom" 
+        }
     ],
     "package_name": "phantom_vmray",
     "type": "sandbox",
     "license": "Copyright (c) VMRay GmbH 2017-2021",
     "main_module": "vmray_connector.py",
-    "app_version": "1.0.5",
+    "app_version": "2.0.0",
     "min_phantom_version": "4.9.39220",
     "product_vendor": "VMRay GmbH",
     "product_name": "VMRay Platform",
@@ -209,41 +211,7 @@
                 {
                     "data_path": "action_result.parameter.vault_id",
                     "contains": [
-                        "apple script",
-                        "archive",
-                        "batch file",
-                        "compound binary file",
-                        "dll",
-                        "doc",
-                        "email",
-                        "flash",
-                        "hanword document",
-                        "html application",
-                        "html document",
-                        "jar",
-                        "java class",
-                        "jscript",
-                        "macos app",
-                        "macos installer",
-                        "macos executable",
-                        "mdb",
-                        "mhtml document",
-                        "mpp",
-                        "msi",
-                        "pdf",
-                        "pe file",
-                        "powershell",
-                        "ppt",
-                        "pub",
-                        "python script",
-                        "rtf",
-                        "shell script",
-                        "vault id",
-                        "vbscript",
-                        "vsd",
-                        "windows help file",
-                        "windows script file",
-                        "xls"
+                        "vault id"
                     ],
                     "data_type": "string"
                 },
