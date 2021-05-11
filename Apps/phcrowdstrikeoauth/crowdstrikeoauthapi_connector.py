@@ -2225,33 +2225,172 @@ class CrowdstrikeConnector(BaseConnector):
             file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
-            file_path = file_info['path']
-            file_name = file_info['name']
+            file_hash = file_info['metadata']['sha256']
         except IndexError:
             return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
 
+        file_hash = file_info['metadata']['sha256']
+        filter_query = "sandbox.sha256:'{}'".format(file_hash)
+        param['filter'] = filter_query
+
+        max_limit = 5000
+
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
+        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        resp = self._check_data(action_result, param, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+
+        if resource_id_list is None:
+            return self._upload_file(action_result, param, file_info=file_info)
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+
+        if not resource_id_list:
+            return self._upload_file(action_result, param, file_info=file_info)
+
+        if param.get('detail_report'):
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+
+    def _upload_file(self, action_result, param, file_info=None):
+
+        file_path = file_info['path']
+        file_name = file_info['name']
+
         query_param = {
-            'file_name': file_name
+            'file_name': file_name,
+            'is_confidential': param.get('is_confidential'),
+            'comment': param.get('comment')
         }
 
-        if param.get('comment'):
-            query_param['comment'] = param.get('comment')
-        if param.get('is_confidential'):
-            query_param['is_confidential'] = param.get('is_confidential')
+        with open(file_path, 'rb') as f:
+            data = f.read()
 
-        try:
-            files = [('file', (file_name, open(file_path, 'rb'), 'application/octet-stream'))]
-        except Exception as e:
-            error_message = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while reading file. {}'.format(error_message))
+        headers = {
+            'Content-Type': 'application/octet-stream'
+        }
 
-        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_UPLOAD_FILE_ENDPOINT, files=files)
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=headers,
+            endpoint=CROWDSTRIKE_UPLOAD_FILE_ENDPOINT, data=data, method='post')
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        sha256 = json_resp['resources'][0]['sha256']
+        return self._submit_resource_for_detonation(action_result, param, 'file', sha256=sha256)
+
+    def _submit_resource_for_detonation(self, action_result, param, resource_type, sha256=None, url=None):
+        environment_id_dict = {
+            'Linux Ubuntu 16.04, 64-bit': 300,
+            'Android (static analysis)': 200,
+            'Windows 10, 64-bit': 160,
+            'Windows 7, 64-bit': 110,
+            'Windows 7, 32-bit': 100
+        }
+
+        environment_id = param['environment_id']
+        action_script = param.get('action_script')
+        if environment_id not in list(environment_id_dict.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+
+        action_script_list = ['default', 'default_maxantievasion', 'default_randomfiles', 'default_randomtheme', 'default_openie']
+        if action_script is not None and action_script not in action_script_list:
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid action script')
+
+        user_tags = param.get('user_tags')
+        if user_tags is not None:
+            tag_list = [x.strip() for x in user_tags.split(',')]
+            tag_list = list(filter(None, tag_list))
+            if not tag_list:
+                return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing user tags parameter')
+
+        json_payload = {
+            'sandbox': [
+                {
+                    'environment_id': environment_id_dict[environment_id],
+                    'enable_tor': param['enable_tor'],
+                }
+            ]
+        }
+
+        # optional parameters
+        if sha256 is not None:
+            json_payload['sandbox'][0]['sha256'] = sha256
+        if url is not None:
+            json_payload['sandbox'][0]['url'] = url
+        if 'action_script' in param:
+            json_payload['sandbox'][0]['action_script'] = param.get('action_script')
+        if 'command_line' in param:
+            json_payload['sandbox'][0]['command_line'] = param.get('command_line')
+        if 'document_password' in param:
+            json_payload['sandbox'][0]['document_password'] = param.get('document_password')
+        if 'submit_name' in param:
+            json_payload['sandbox'][0]['submit_name'] = param.get('submit_name')
+        if 'system_date' in param:
+            json_payload['sandbox'][0]['system_date'] = param.get('system_date')
+        if 'system_time' in param:
+            json_payload['sandbox'][0]['system_time'] = param.get('system_time')
+        if 'user_tags' in param:
+            json_payload['user_tags'] = tag_list
+
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, json=json_payload, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT, method='post')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return self._poll_for_detonate_results(action_result, param, json_resp['resources'][0]['id'])
+
+    def _poll_for_detonate_results(self, action_result, param, resource_id):
+        counter = 0
+
+        while counter < 15:
+            query_param = {
+                'ids': resource_id
+            }
+            ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if 'resources' in json_resp and json_resp['resources'] is not None and len(json_resp['resources']) > 0 and \
+                    'state' in json_resp['resources'][0] and json_resp['resources'][0]['state'] == 'success':
+                return self._get_resource_report(action_result, param, resource_id)
+
+            if 'resources' in json_resp and json_resp['resources'] is not None and len(json_resp['resources']) > 0 and \
+                    'state' in json_resp['resources'][0] and json_resp['resources'][0]['state'] == 'error':
+                return action_result.set_status(phantom.APP_ERROR, 'Analysis of the report failed')
+
+            counter += 1
+            time.sleep(60)
+
+        return action_result.set_status(phantom.APP_ERROR, 'Reached max polling attempts. Try rerunning the action')
+
+    def _get_resource_report(self, action_result, param, resource_id):
+        endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+        if param.get('detail_report'):
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+
+        summary_data = action_result.update_summary({})
+        query_param = {
+            'ids': resource_id
+        }
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=endpoint)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        summary_data['verdict'] = json_resp['resources'][0]['verdict']
+        summary_data['total_reports'] = len(json_resp['resources'])
+        action_result.add_data(json_resp['resources'][0])
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _process_empty_response(self, response, action_result):
@@ -2527,8 +2666,10 @@ class CrowdstrikeConnector(BaseConnector):
         if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'authorization failed' in msg or 'access denied' in msg:
             ret_val = self._get_token(action_result)
 
-            if not phantom.is_fail(ret_val):
-                action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+            action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._oauth_access_token)})
 

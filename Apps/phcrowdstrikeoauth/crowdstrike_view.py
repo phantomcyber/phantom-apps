@@ -219,6 +219,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'url reputation':
         return 'crowdstrike_url_reputation.html'
 
+    if provides == 'detonate file':
+        return 'crowdstrike_detonate_file.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

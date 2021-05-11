@@ -123,6 +123,7 @@ CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT = "/falconx/entities/report-summaries/v1
 CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT = "/falconx/entities/reports/v1"
 CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT = "/falconx/entities/artifacts/v1"
 CROWDSTRIKE_UPLOAD_FILE_ENDPOINT = "/samples/entities/samples/v2"
-
+CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT = "/falconx/entities/submissions/v1"
+CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT = "/falconx/entities/submissions/v1"
 
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"

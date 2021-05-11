@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: crowdstrike_url_reputation.html
+<!-- File: crowdstrike_detonate_file.html
   Copyright (c) 2019-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -103,13 +103,13 @@
     <h3 class="wf-h3-style">Info</h3>
     {% if result.check_param %}
         <table class="wf-table-vertical">
-        {% if result.param.url %}
+        {% if result.param.vault_id %}
             <tr>
                 <td>Vault ID</td>
                 <td>
                     <a href="javascript:;"
-                                        onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ result.param.url }}' }], 0, {{ container.id }}, null, false);">
-                                        {{ result.param.url }}
+                                        onclick="context_menu(this, [{'contains': ['vault id'], 'value': '{{ result.param.vault_id }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ result.param.vault_id }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
@@ -145,7 +145,7 @@
         <h4 class="wf-h4-style">No action parameters provided</h4>
     {% endif %}
 
-    <h3 class="wf-h3-style">URL Reputation Info</h3>
+    <h3 class="wf-h3-style">Detonate File Info</h3>
     <div class="metadata_div">
         <!--Default View-->
         <div class="panel-group" id="server-information">
@@ -200,9 +200,9 @@
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
-                                    {% else %}
-                                        None
-                                    {% endif %}
+                                        {% else %}
+                                            None
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if item.ioc_report_broad_maec_artifact_id %}
@@ -213,8 +213,8 @@
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
                                         {% else %}
-                                        None
-                                    {% endif %}
+                                            None
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if item.ioc_report_broad_stix_artifact_id %}
@@ -225,8 +225,8 @@
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
                                         {% else %}
-                                        None
-                                    {% endif %}
+                                            None
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if item.ioc_report_strict_csv_artifact_id %}

@@ -9816,21 +9816,60 @@
                         "vault id"
                     ]
                 },
+                "environment_id": {
+                    "data_type": "string",
+                    "description": "Sandbox environment to be used for analysis",
+                    "order": 1,
+                    "required": true,
+                    "value_list": [
+                        "Linux Ubuntu 16.04, 64-bit",
+                        "Android (static analysis)",
+                        "Windows 10, 64-bit",
+                        "Windows 7, 64-bit",
+                        "Windows 7, 32-bit"
+                    ]
+                },
                 "comment": {
                     "data_type": "string",
                     "description": "A descriptive comment to identify the file",
-                    "order": 1
+                    "order": 2
                 },
                 "limit": {
                     "data_type": "numeric",
                     "description": "Maximum reports to be fetched",
-                    "order": 2,
+                    "order": 3,
                     "default": 50
+                },
+                "offset": {
+                    "data_type": "numeric",
+                    "description": "Starting index of overall result set from which to return ids (Defaults to 0)",
+                    "order": 4,
+                    "default": 0
+                },
+                "command_line": {
+                    "data_type": "string",
+                    "order": 5,
+                    "description": "Command line script passed to the submitted file at runtime (Max length: 2048 characters)"
+                },
+                "document_password": {
+                    "data_type": "string",
+                    "order": 6,
+                    "description": "Password of the document if password protected (Max length: 32 characters)"
+                },
+                "submit_name": {
+                    "data_type": "string",
+                    "order": 7,
+                    "description": "Name of the malware sample that's used for file type detection and analysis"
+                },
+                "user_tags": {
+                    "data_type": "string",
+                    "order": 8,
+                    "description": "Comma seperated list of user tags"
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 3,
+                    "order": 9,
                     "value_list": [
                         "verdict.asc",
                         "verdict.desc",
@@ -9844,21 +9883,9 @@
                         "submission_type.desc"
                     ]
                 },
-                "enviroment_id": {
-                    "data_type": "string",
-                    "description": "Sandbox enviroment to be used for analysis",
-                    "order": 4,
-                    "value_list": [
-                        "Linux Ubuntu 16.04, 64-bit",
-                        "Android (static analysis)",
-                        "Windows 10, 64-bit",
-                        "Windows 7, 64-bit",
-                        "Windows 7, 32-bit"
-                    ]
-                },
                 "action_script": {
                     "data_type": "string",
-                    "order": 5,
+                    "order": 10,
                     "description": "Runtime script for sandbox analysis",
                     "value_list": [
                         "default",
@@ -9868,28 +9895,22 @@
                         "default_openie"
                     ]
                 },
-                "offset": {
-                    "data_type": "numeric",
-                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
-                    "order": 6,
-                    "default": 0
-                },
                 "detail_report": {
                     "data_type": "boolean",
-                    "order": 7,
+                    "order": 11,
                     "description": "Get the detailed report",
                     "default": false
                 },
                 "enable_tor": {
                     "data_type": "boolean",
-                    "order": 8,
+                    "order": 12,
                     "description": "To route the sandbox network traffic via TOR",
                     "default": false
                 },
                 "is_confidential": {
                     "data_type": "boolean",
-                    "order": 9,
-                    "description": "Defines visibility of the file in Falcon MalQuery",
+                    "order": 13,
+                    "description": "Defines visibility of the file in Falcon MalQuery (Defaults to 0)",
                     "default": true
                 }
             },
