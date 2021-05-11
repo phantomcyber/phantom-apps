@@ -11,20 +11,20 @@
     "product_version_regex": ".*",
     "publisher": "Red Canary",
     "license": "Copyright (c) Red Canary, 2021",
-    "app_version": "1.0.3",
-    "utctime_updated": "2021-03-25T10:13:38.000000Z",
+    "app_version": "1.1.0",
+    "utctime_updated": "2021-05-11T06:58:58.000000Z",
     "package_name": "phantom_redcanary",
     "main_module": "redcanary_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
-        "URL": {
+        "url": {
             "description": "Red Canary instance URL (ex. https://domain.my.redcanary.co)",
             "data_type": "string",
             "required": true,
             "order": 0
         },
-        "API Key": {
+        "api_key": {
             "description": "Red Canary API authentication key",
             "data_type": "password",
             "required": true,
@@ -50,6 +50,175 @@
             "read_only": true,
             "parameters": {},
             "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "acknowledge detection",
+            "description": "Acknowledge a Red Canary detection",
+            "type": "generic",
+            "identifier": "ack_detection",
+            "read_only": false,
+            "parameters": {
+                "detection_id": {
+                    "description": "Unique Red Canary detection identifier",
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ],
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.detection_id",
+                    "data_type": "numeric",
+                    "column_name": "Detection ID",
+                    "column_order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remediate detection",
+            "description": "Update a detection's remediation state",
+            "type": "generic",
+            "identifier": "remediate",
+            "read_only": false,
+            "parameters": {
+                "detection_id": {
+                    "description": "Unique Red Canary detection identifier",
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ],
+                    "primary": true
+                },
+                "remediation_state": {
+                    "description": "Way in which the detection was remediated",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "remediated",
+                        "not_remediated_false_positive",
+                        "not_remediated_sanctioned_activity",
+                        "not_remediated_unwarranted"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment describing the reason why the detection was remediated in this manner",
+                    "data_type": "string",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.detection_id",
+                    "data_type": "numeric",
+                    "column_name": "Detection ID",
+                    "column_order": 0,
+                    "contains": [
+                        "redcanary detection id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remediation_state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]

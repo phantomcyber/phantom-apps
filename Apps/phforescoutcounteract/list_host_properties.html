@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: list_host_properties.html
-  Copyright (c) 2018-2019 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -33,8 +33,9 @@
 
 .forescoutcounteract-app .wf-table-horizontal  {
   margin-right: 10px;
-  width: initial;
+  width: 100%;
   border: 1px solid;
+  table-layout: fixed;
   font-size: 12px;
 }
 
@@ -50,6 +51,7 @@
   border: 1px solid;
   padding: 5px;
   padding-left: 4px;
+  word-wrap: break-word;
 }
 
 .forescoutcounteract-app .wf-h3-style {
@@ -66,6 +68,10 @@
 .forescoutcounteract-app .wf-subheader-style {
   font-size : 12px
 }
+a.no-word-wrap {
+  text-decoration: None !important
+}
+
 
 </style>
 <div class="forescoutcounteract-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
@@ -76,36 +82,80 @@
 
       {% if result.data %}
         {% for items in result.data %}
-          <table class="wf-table-horizontal">
+          <table class="wf-table-vertical">
             <tr>
               <td>IP</td>
-              <td>{{ items.ip }}</td>
+              <td>
+                {% if items.ip %}
+                  <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ items.ip }}' }], 0, {{ container.id }}, null, false);">
+                              {{ items.ip }}
+                              &nbsp;
+                              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                {% else %}
+                  None
+                {% endif %}
+              </td>
             </tr>
             <tr>
               <td>Mac Address</td>
-              <td>{{ items.mac }}</td>
+              <td>
+                {% if items.mac %}
+                <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout mac address', 'mac address'], 'value':'{{ items.mac }}' }], 0, {{ container.id }}, null, false);">
+                            {{ items.mac }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+                {% else %}
+                  None
+                {% endif %}
+              </td>
             </tr>
             <tr>
               <td>Host ID</td>
-              <td>{{ items.id }}</td>
+              <td>
+                {% if items.id %}
+                <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout host id'], 'value':'{{ items.id }}' }], 0, {{ container.id }}, null, false);">
+                            {{ items.id }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+                {% else %}
+                  None
+                {% endif %}
+              </td>
             </tr>
           </table>
           <br>
-          <table class="wf-table-horizontal">
-            <tr>
-              <th>Field</th>
-              <th>Value</th>
-              <th>Timestamp</th>
-            </tr>
-            {% for field, value in items.fields.iteritems %}
+          {% if items.fields %}
+            <table class="wf-table-horizontal">
               <tr>
-                <td>{{ field }}</td>
-                <td>{{ value.value }}</td>
-                <td>{{ value.timestamp }}</td>
+                <th>Field</th>
+                <th>Value</th>
+                <th>Timestamp</th>
               </tr>
-            {% endfor %}
-            </table>
+              {% for field, value in items.fields.items %}
+                {% if value.value %}
+                  <tr>
+                    <td>{{ field }}</td>
+                    <td>{{ value.value }}</td>
+                    <td>{{ value.timestamp }}</td>
+                  </tr>
+                {% else %}
+                  {% for each in value %}
+                    <tr>
+                      <td>{{ field }}</td>
+                      <td>{{ each.value }}</td>
+                      <td>{{ each.timestamp }}</td>
+                    </tr>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+              </table>
+            {% endif %}
         {% endfor %}
+      {% else %}
+        <h3 class="wf-h4-style">No data found</h3>
       {% endif %}
 
     <br>
