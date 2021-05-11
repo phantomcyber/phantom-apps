@@ -1,11 +1,11 @@
 {
   "appid": "9c859a3a-310a-43a2-9925-aaf84bc6abbf",
   "name": "Cyware CTIX",
-  "description": "Cyware Threat Intel eXchange is an intelligent client-server intelligence exchange that provides subscriber and full Threat Intel collection management from multiple internal and external sources.",
+  "description": "Cyware Threat Intel eXchange is an intelligent client-server intelligence exchange that provides subscriber and full Threat Intel collection management from multiple internal and external sources",
   "type": "Threat Intelligence",
   "main_module": "ctix_connector.py",
   "app_version": "1.0.0",
-  "min_phantom_version":"4.8.0",
+  "min_phantom_version":"4.9.39220",
   "product_vendor": "Cyware Labs",
   "product_name": "Cyware Threat Intel eXchange",
   "product_version_regex": ".*",
@@ -51,7 +51,7 @@
   "actions": [
     {
       "action": "test connectivity",
-      "description": "Validate the asset configuration for connectivity.",
+      "description": "Validate the asset configuration for connectivity",
       "type": "test",
       "identifier": "test_asset_connectivity",
       "read_only": true,
@@ -101,7 +101,7 @@
                     "data_path": "action_result.data.*.result.score",
                     "data_type": "numeric",
                     "column_name": "CTIX Score",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.result.created",
@@ -233,7 +233,7 @@
                     "data_path": "action_result.data.*.result.score",
                     "data_type": "numeric",
                     "column_name": "CTIX Score",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.result.created",
@@ -365,7 +365,7 @@
                     "data_path": "action_result.data.*.result.score",
                     "data_type": "numeric",
                     "column_name": "CTIX Score",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.result.created",
@@ -497,7 +497,7 @@
                     "data_path": "action_result.data.*.result.score",
                     "data_type": "numeric",
                     "column_name": "CTIX Score",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.result.created",
