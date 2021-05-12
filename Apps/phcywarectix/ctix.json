@@ -69,7 +69,8 @@
           "description": "Domain to run the Lookup on",
             "data_type": "string",
             "primary": true,
-            "required": true
+            "required": true,
+            "order": 0
         }
       },
       "render": {
@@ -201,7 +202,8 @@
           "description": "Hash to run the Lookup on",
             "data_type": "string",
             "primary": true,
-            "required": true
+            "required": true,
+            "order": 0
         }
       },
       "render": {
@@ -333,7 +335,8 @@
           "description": "IP Address to run the Lookup on",
             "data_type": "string",
             "primary": true,
-            "required": true
+            "required": true,
+            "order": 0
         }
       },
       "render": {
@@ -465,7 +468,8 @@
           "description": "URL to run the Lookup on",
             "data_type": "string",
             "primary": true,
-            "required": true
+            "required": true,
+            "order": 0
         }
       },
       "render": {
