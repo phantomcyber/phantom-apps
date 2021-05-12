@@ -442,7 +442,7 @@ class RedCanaryConnector(BaseConnector):
             self.save_progress("Failed to parse detection count")
             self.debug_print("Failed to parse detection count")
 
-            return action_result.set_status(ret_val, count)
+            return action_result.set_status(ret_val)
 
         # If there are no detections stop
         if count == 0:
