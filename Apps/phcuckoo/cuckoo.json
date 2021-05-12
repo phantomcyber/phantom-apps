@@ -10,15 +10,12 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2014-2021 Splunk Inc.",
-    "app_version": "2.0.4",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-02-05T09:37:02.000000Z",
     "package_name": "phantom_cuckoo",
     "main_module": "cuckoo_connector.py",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
-    "latest_tested_versions": [
-        "On prem, cuckoo-01 (version 2.0.7), February 4 2021"
-    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
