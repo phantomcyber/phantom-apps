@@ -26,7 +26,6 @@ from datetime import timedelta
 import time
 import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
-import sys
 import imp
 from _collections import defaultdict
 
@@ -60,22 +59,20 @@ class CrowdstrikeConnector(BaseConnector):
         # The headers, initialize them here once and use them for all other REST calls
         self._headers = {'Content-Type': 'application/json'}
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
-
         # Base URL
-        self._client_id = self._handle_py_ver_compat_for_input_str(config[CROWDSTRIKE_CLIENT_ID])
+        self._client_id = config[CROWDSTRIKE_CLIENT_ID]
         self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
-        self._base_url_oauth = self._handle_py_ver_compat_for_input_str(config[CROWDSTRIKE_JSON_URL_OAuth])
+        self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth]
+        self._poll_interval = self._validate_integers(self, config.get(CROWDSTRIKE_POLL_INTERVAL, 15), CROWDSTRIKE_POLL_INTERVAL)
+        if self._poll_interval is None:
+            return self.get_status()
+
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
 
         if self._base_url_oauth[-1] == '/':
             self._base_url_oauth = self._base_url_oauth[:-1]
 
-        app_id = self._handle_py_ver_compat_for_input_str(config.get('app_id', self.get_asset_id().replace('-', '')))
+        app_id = config.get('app_id', self.get_asset_id().replace('-', ''))
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
@@ -143,30 +140,7 @@ class CrowdstrikeConnector(BaseConnector):
             error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
             error_msg = CROWDSTRIKE_ERROR_MESSAGE
 
-        try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
-        except:
-            error_msg = CROWDSTRIKE_ERROR_MESSAGE
-
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _check_for_existing_container(self, container, time_interval, collate):
         # Even if the collate parameter is selected, the time mentioned in the merge_time_interval
@@ -438,7 +412,7 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _get_details(self, action_result, endpoint, param, method='get'):
 
-        list_ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        list_ids = param.get("ids")
 
         list_ids_details = list()
 
@@ -508,7 +482,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        detection_id = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_JSON_ID])
+        detection_id = param[CROWDSTRIKE_JSON_ID]
         to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
 
         detection_id = [x.strip() for x in detection_id.split(',')]
@@ -553,7 +527,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        fdid = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID])
+        fdid = param[CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID]
 
         api_data = {
             "ids": fdid
@@ -585,7 +559,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        fpid = self._handle_py_ver_compat_for_input_str(param.get(CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID, ''))
+        fpid = param.get(CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID, '')
 
         api_data = {
             "ids": fpid
@@ -672,7 +646,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -700,7 +674,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -760,7 +734,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Hold the values for the status
         statuses = {"new": 20, "reopened": 25, "in progress": 30, "closed": 40}
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -768,25 +742,25 @@ class CrowdstrikeConnector(BaseConnector):
         data = {"action_parameters": [], "ids": ids}
 
         if param.get("add_tag"):
-            add_tags = self._handle_py_ver_compat_for_input_str(param.get("add_tag"))
+            add_tags = param.get("add_tag")
             add_tags = [x.strip() for x in add_tags.split(',')]
             add_tags = list(filter(None, add_tags))
             for tag in add_tags:
                 data["action_parameters"].append({"name": "add_tag", "value": tag})
 
         if param.get("delete_tag"):
-            delete_tags = self._handle_py_ver_compat_for_input_str(param.get("delete_tag"))
+            delete_tags = param.get("delete_tag")
             delete_tags = [x.strip() for x in delete_tags.split(',')]
             delete_tags = list(filter(None, delete_tags))
             for tag in delete_tags:
                 data["action_parameters"].append({"name": "delete_tag", "value": tag})
 
         if param.get("update_name"):
-            name = self._handle_py_ver_compat_for_input_str(param.get("update_name"))
+            name = param.get("update_name")
             data["action_parameters"].append({"name": "update_name", "value": name})
 
         if param.get("update_description"):
-            description = self._handle_py_ver_compat_for_input_str(param.get("update_description"))
+            description = param.get("update_description")
             data["action_parameters"].append({"name": "update_description", "value": description})
 
         data_list = ["New", "Reopened", "In Progress", "Closed"]
@@ -797,7 +771,7 @@ class CrowdstrikeConnector(BaseConnector):
             data["action_parameters"].append({"name": "update_status", "value": str(statuses[status])})
 
         if param.get("add_comment"):
-            comment = self._handle_py_ver_compat_for_input_str(param.get("add_comment"))
+            comment = param.get("add_comment")
             data["action_parameters"].append({"name": "add_comment", "value": comment})
 
         endpoint = CROWDSTRIKE_UPDATE_INCIDENT_ENDPOINT
@@ -871,7 +845,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        list_ids = self._handle_py_ver_compat_for_input_str(param.get("role_id"))
+        list_ids = param.get("role_id")
         list_ids = [x.strip() for x in list_ids.split(',')]
         list_ids = list(filter(None, list_ids))
 
@@ -1155,8 +1129,8 @@ class CrowdstrikeConnector(BaseConnector):
     def _check_params(self, action_result, param):
 
         ids = list()
-        device_id = self._handle_py_ver_compat_for_input_str(param.get('device_id', ''))
-        hostname = self._handle_py_ver_compat_for_input_str(param.get("hostname"))
+        device_id = param.get('device_id', '')
+        hostname = param.get("hostname")
         device_id_flag, hostname_flag = False, False
         intermediate_device_ids = list()
         if not device_id and not hostname:
@@ -1593,7 +1567,7 @@ class CrowdstrikeConnector(BaseConnector):
                         sequence_id += 1
             # if errors occurred while executing the command
             elif len(resp_json.get('errors', [])):
-                errors = [self._handle_py_ver_compat_for_input_str(err.get('message')) for err in resp_json.get('errors')]
+                errors = [err.get('message') for err in resp_json.get('errors')]
                 return action_result.set_status(phantom.APP_ERROR, "Errors occurred while executing command: {}".format("\r\n".join(errors)))
 
             # wait 5 seconds and try again
@@ -1654,7 +1628,7 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
-            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            file_id = param['vault_id']
             success, message, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
         except IndexError:
@@ -1946,8 +1920,8 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_JSON_IOC])
-        fdid = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID])
+        ioc = param[CROWDSTRIKE_JSON_IOC]
+        fdid = param[CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID]
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
@@ -2114,7 +2088,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            file_id = param['vault_id']
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
         except IndexError:
@@ -2222,7 +2196,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
-            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            file_id = param['vault_id']
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
             file_hash = file_info['metadata']['sha256']
@@ -2355,7 +2329,7 @@ class CrowdstrikeConnector(BaseConnector):
     def _poll_for_detonate_results(self, action_result, param, resource_id):
         counter = 0
 
-        while counter < 15:
+        while counter < self._poll_interval:
             query_param = {
                 'ids': resource_id
             }
@@ -2432,7 +2406,7 @@ class CrowdstrikeConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -2462,7 +2436,7 @@ class CrowdstrikeConnector(BaseConnector):
                 if "errors" in list(resp_json.keys()):
                     if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
-                            {0} Data from server: {1}".format(resp_json["errors"][0]["code"], self._handle_py_ver_compat_for_input_str(resp_json["errors"][0]["message"]))), None)
+                            {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 
@@ -2470,14 +2444,14 @@ class CrowdstrikeConnector(BaseConnector):
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         # Show only error message if available
         if isinstance(resp_json.get('errors', []), list):
             msg = ""
             for error in resp_json.get('errors', []):
-                msg = "{} {}".format(msg, self._handle_py_ver_compat_for_input_str(error.get('message')))
+                msg = "{} {}".format(msg, error.get('message'))
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, msg)
         else:
             message = "Error from server. Status Code: {0}".format(response.status_code)
@@ -2522,9 +2496,22 @@ class CrowdstrikeConnector(BaseConnector):
             try:
                 with open(compressed_file_path, 'wb') as f:
                     f.write(response.content)
+            except IOError as e:
+                error_message = self._get_error_message_from_exception(e)
+                if "File name too long" in error_message:
+                    new_file_name = "ph_long_file_name_temp"
+                    compressed_file_path = "{0}/{1}".format(local_dir, new_file_name)
+                    self.debug_print('Original filename : {}'.format(filename))
+                    self.debug_print('Modified filename : {}'.format(new_file_name))
+                    with open(compressed_file_path, 'wb') as f:
+                        f.write(response.content)
+                else:
+                    return RetVal(
+                        action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+
             except Exception as e:
                 return RetVal(
-                    action_result.set_status(phantom.APP_ERROR, "Unable to write 7z file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+                    action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
             try:
                 vault_results = Vault.add_attachment(compressed_file_path, self.get_container_id(), filename)
@@ -2534,7 +2521,7 @@ class CrowdstrikeConnector(BaseConnector):
                     action_result.set_status(phantom.APP_ERROR, "Unable to store file in Phantom Vault. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         # You should process the error returned in the json
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -2592,7 +2579,7 @@ class CrowdstrikeConnector(BaseConnector):
             return self._process_empty_response(response, action_result)
 
         # everything else is actually an error at this point
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
