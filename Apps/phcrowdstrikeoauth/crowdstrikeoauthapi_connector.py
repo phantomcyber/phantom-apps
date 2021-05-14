@@ -50,6 +50,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._client_id = None
         self._client_secret = None
         self._oauth_access_token = None
+        self._poll_interval = None
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
