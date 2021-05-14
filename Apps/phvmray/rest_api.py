@@ -133,7 +133,7 @@ class VMRayRESTAPI():
         result = requests_func(self.server + api_path,
                             data=req_data,
                             params=req_params,
-                            headers={"Authorization": "api_key " + self.api_key},
+                            headers={"Authorization": "api_key {}".format(self.api_key)},
                             files=files,
                             verify=self.verify_cert,
                             stream=raw_data)
@@ -146,7 +146,7 @@ class VMRayRESTAPI():
         try:
             json_result = result.json()
         except ValueError:
-            raise ValueError("API returned invalid JSON: " + result.text)
+            raise ValueError("API returned invalid JSON: {}".format(result.text))
 
         # if there are no cached elements then return the data
         if "continuation_id" not in json_result:
@@ -158,7 +158,7 @@ class VMRayRESTAPI():
         while "continuation_id" in json_result:
             # send request to server
             result = requests.get("{}/rest/continuation/{}".format(self.server, json_result["continuation_id"]),
-                                  headers={"Authorization": "api_key " + self.api_key},
+                                  headers={"Authorization": "api_key {}".format(self.api_key)},
                                   verify=self.verify_cert)
             handle_rest_api_result(result)
 
@@ -166,7 +166,7 @@ class VMRayRESTAPI():
             try:
                 json_result = result.json()
             except ValueError:
-                raise ValueError("API returned invalid JSON: " + result.text)
+                raise ValueError("API returned invalid JSON: {}".format(result.text))
 
             data.extend(json_result["data"])
 
