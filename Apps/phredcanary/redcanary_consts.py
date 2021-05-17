@@ -12,8 +12,13 @@ STR_NOT_FOUND = "not_found"
 STR_PER_PAGE = "per_page="
 STR_SINCE = "since="
 STR_PAGE = "page="
+DETECTION_ID_KEY = "'detection_id' action"
 
-# Constants relating _get_error_message_from_exception
+# Constants related to _get_error_message_from_exception
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+# Constants related to _validate_integer
+INVALID_INTEGER_ERR_MSG = "Please provide a valid integer value in the {} parameter"
+NEGATIVE_INTEGER_ERR_MSG = "Please provide a valid non-negative integer value in the {} parameter"
