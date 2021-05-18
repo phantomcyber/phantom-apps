@@ -94,8 +94,8 @@ class CTIXConnector(BaseConnector):
                     err_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Parsing JSON response failed. {}".format(err_msg)), None
             except requests.exceptions.ConnectionError:
-                error_message = "Error connecting to server. Connection refused from the server"
-                return action_result.set_status(phantom.APP_ERROR, error_message), None
+                err_msg = "Error connecting to server. Connection refused from the server"
+                return action_result.set_status(phantom.APP_ERROR, err_msg), None
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, "GET request failed. {}".format(err_msg)), None
@@ -104,14 +104,6 @@ class CTIXConnector(BaseConnector):
 
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # get CTIX REST API base URL
-        if not self._baseurl:
-            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'baseurl'"))
-
-        # get Access ID and Secret Key
-        if not self._access_id or not self._secret_key:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a value in the 'access_id' and 'secret_key' parameters")
 
         self.save_progress("Checking connectivity with Cyware CTIX Platform")
 
@@ -143,8 +135,6 @@ class CTIXConnector(BaseConnector):
 
         # check for required input param
         domain = param["domain"]
-        if not domain:
-            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'domain'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
@@ -186,8 +176,6 @@ class CTIXConnector(BaseConnector):
 
         # check for required input param
         hashval = param["hash"]
-        if not hashval:
-            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'hash'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
@@ -229,8 +217,6 @@ class CTIXConnector(BaseConnector):
 
         # check for required input param
         ip = param["ip"]
-        if not ip:
-            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'ip'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
@@ -272,8 +258,6 @@ class CTIXConnector(BaseConnector):
 
         # check for required input param
         url = param["url"]
-        if not url:
-            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'url'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
