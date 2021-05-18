@@ -1,3 +1,8 @@
+# File: ctix_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -21,6 +26,51 @@ class CTIXConnector(BaseConnector):
         # Call the BaseConnectors init first
         super(CTIXConnector, self).__init__()
 
+    def initialize(self):
+        config = self.get_config()
+
+        # get authentication variables from Phantom Asset Config
+        self._access_id = config["access_id"]
+        self._secret_key = config["secret_key"]
+        self._baseurl = config["baseurl"].rstrip("/")
+        self._verify = config.get("verify_server_cert", True)
+        self._expires = int(time.time() + 20)  # expires in 20 seconds
+
+        return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = CYWARE_ERROR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = CYWARE_ERROR_CODE_MSG
+                error_msg = CYWARE_ERROR_MSG_UNAVAILABLE
+        except:
+            error_code = CYWARE_ERROR_CODE_MSG
+            error_msg = CYWARE_ERROR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in CYWARE_ERROR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg)
+        except:
+            self.debug_print(CYWARE_PARSE_ERROR_MSG)
+            error_text = CYWARE_PARSE_ERROR_MSG
+
+        return error_text
+
     def _generate_signature(self, access_id, secret_key, expires):
         to_sign = '{}\n{}'.format(access_id, expires)
         sig = base64.b64encode(
@@ -31,7 +81,7 @@ class CTIXConnector(BaseConnector):
         sig_enc = urllib.parse.quote_plus(sig)
         return sig_enc
 
-    def _make_request(self, method, target_url, verify):
+    def _make_request(self, method, target_url, verify, action_result):
 
         if method == "GET":
             try:
@@ -41,260 +91,223 @@ class CTIXConnector(BaseConnector):
                     response_json = r.json()
                     return rstatus, response_json
                 except Exception as e:
-                    self.save_progress("Parsing request status code or JSON response failed: {}".format(e))
-                    return result.set_status(phantom.APP_ERROR, "Parsing JSON response failed: {}".format(e))
+                    err_msg = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Parsing JSON response failed. {}".format(err_msg)), None
+            except requests.exceptions.ConnectionError:
+                error_message = "Error connecting to server. Connection refused from the server"
+                return action_result.set_status(phantom.APP_ERROR, error_message), None
             except Exception as e:
-                self.save_progress("GET request failed. Error Exception: {}".format(e))
-                return result.set_status(phantom.APP_ERROR, "GET request failed: {}".format(e))
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "GET request failed. {}".format(err_msg)), None
         else:
-            self.save_progress("Unsupported REST method. Error Exception: {}".format(e))
-            return result.set_status(phantom.APP_ERROR, "Unsupported REST method: Error Exception: {}".format(e))
+            return action_result.set_status(phantom.APP_ERROR, "Unsupported REST method"), None
 
     def _test_connectivity(self, param):
-        action_result = self.add_action_result(ActionResult())
-
-        # get authentication variables from Phantom Asset Config
-        config = self.get_config()
-        access_id = config.get("access_id")
-        secret_key = config.get("secret_key")
-        baseurl = config.get("baseurl")
-        verify = config.get("verify_server_cert")
-        expires = int(time.time() + 20)  # expires in 20 seconds
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         # get CTIX REST API base URL
-        if not baseurl:
-            self.save_progress("baseurl must be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "baseurl must be provided.. please retry.")
-            return self.get_status()
+        if not self._baseurl:
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'baseurl'"))
 
         # get Access ID and Secret Key
-        if not access_id or not secret_key:
-            self.save_progress("Access ID and Secret must both be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "Access ID and Secret must both be provided.. please retry.")
-            return self.get_status()
+        if not self._access_id or not self._secret_key:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a value in the 'access_id' and 'secret_key' parameters")
 
-        self.save_progress("Checking connectivity with Cyware CTIX Platform.")
+        self.save_progress("Checking connectivity with Cyware CTIX Platform")
+
         # REST endpoint for retrieving all Threat Intel sources from CTIX
-        endpoint = "/source/?Expires={}&AccessID={}&Signature={}&page_size=1".format(expires, access_id, self._generate_signature(access_id, secret_key, expires))
+        endpoint = "/source/?Expires={}&AccessID={}&Signature={}&page_size=1".format(
+            self._expires, self._access_id, self._generate_signature(self._access_id, self._secret_key, self._expires))
 
         # Attempt the GET request to CTIX instance and check for successful connection
         try:
-            status_code, response = self._make_request("GET", baseurl + endpoint, verify)
+            status_code, _ = self._make_request("GET", "{}{}".format(self._baseurl, endpoint), self._verify, action_result)
         except Exception as e:
-            self.save_progress("GET request failed with this Exception: {}".format(e))
-            self.set_status(phantom.APP_ERROR, CYWARE_ERR_SERVER_CONNECTION, e)
-            self.append_to_message(CYWARE_ERR_CONNECTIVITY_TEST)
-            return self.get_status()
+            err_msg = self._get_error_message_from_exception(e)
+            self.save_progress(CYWARE_ERR_CONNECTIVITY_TEST)
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_GET_REQ_FAILED.format(err_msg))
+
+        if phantom.is_fail(status_code):
+            self.save_progress(CYWARE_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
         if status_code == 200:
-            self.set_status(phantom.APP_SUCCESS)
-            return self.set_status_save_progress(phantom.APP_SUCCESS, CYWARE_SUCC_CONNECTIVITY_TEST)
+            self.save_progress(CYWARE_SUCC_CONNECTIVITY_TEST)
+            return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            return self.set_status_save_progress(phantom.APP_SUCCESS, "Test Connectivity Failed with this status_code: {}".format(status_code))
+            return action_result.set_status(phantom.APP_ERROR, "Test Connectivity Failed with status code: {}".format(status_code))
 
     def _handle_lookup_domain(self, param):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
-        # get authentication variables from Phantom Asset Config
-        config = self.get_config()
-        access_id = config.get("access_id")
-        secret_key = config.get("secret_key")
-        baseurl = config.get("baseurl")
-        verify = config.get("verify_server_cert")
-        expires = int(time.time() + 20)  # expires in 20 seconds
-
         # check for required input param
         domain = param["domain"]
         if not domain:
-            self.save_progress("domain value must be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "domain must be provided.. please retry.")
-            return self.get_status()
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'domain'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
         try:
             endpoint = "/search/?Expires={}&AccessID={}&Signature={}&domain={}".format(
-                expires, access_id, self._generate_signature(access_id, secret_key, expires), domain)
-            status_code, response = self._make_request("GET", baseurl + endpoint, verify)
+                self._expires, self._access_id, self._generate_signature(self._access_id, self._secret_key, self._expires), domain)
+            status_code, response = self._make_request("GET", "{}{}".format(self._baseurl, endpoint), self._verify, action_result)
         except Exception as e:
-            self.save_progress("GET request failed with this Exception: {}".format(e))
-            action_result.set_status(phantom.APP_ERROR, "Domain Lookup failed. Error Exception: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            self.save_progress(CYWARE_GET_REQ_FAILED.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, "Domain lookup failed. {}".format(err_msg))
+
+        if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        # check request reponse status_code
+        # check response status_code
         if status_code == 200:
-            if type(response) == list:
-                response = response[0]
-            if type(response) != dict:
-                return action_result.set_status(phantom.APP_ERROR, "Response from server was unexpectedly not JSON")
             try:
+                if type(response) == list:
+                    response = response[0]
+                if type(response) != dict:
+                    return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
                 action_result.add_data(response)
-                action_result.set_status(phantom.APP_SUCCESS, "Domain Lookup Successful.")
-                return self.set_status_save_progress(phantom.APP_SUCCESS, "Domain Lookup Successful.")
+                self.save_progress("Domain Lookup Successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "Domain Lookup Successful")
             except Exception as e:
-                self.save_progress("Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                action_result.set_status(phantom.APP_ERROR, "Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                return action_result.get_status()
+                err_msg = self._get_error_message_from_exception(e)
+                self.save_progress(CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
+                return action_result.set_status(phantom.APP_ERROR, CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
         else:
-            self.save_progress("GET request failed with non 200 status code: {}".format(status_code))
-            action_result.set_status(phantom.APP_ERROR, "GET request failed with non 200 status code: {}".format(status_code))
-            return action_result.get_status()
+            self.save_progress(CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
 
     def _handle_lookup_hash(self, param):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
-        # get authentication variables from Phantom Asset Config
-        config = self.get_config()
-        access_id = config.get("access_id")
-        secret_key = config.get("secret_key")
-        baseurl = config.get("baseurl")
-        verify = config.get("verify_server_cert")
-        expires = int(time.time() + 20)  # expires in 20 seconds
-
         # check for required input param
         hashval = param["hash"]
         if not hashval:
-            self.save_progress("hash value must be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "hash value must be provided.. please retry.")
-            return self.get_status()
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'hash'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
         try:
             endpoint = "/search/?Expires={}&AccessID={}&Signature={}&hash={}".format(
-                expires, access_id, self._generate_signature(access_id, secret_key, expires), hashval)
-            status_code, response = self._make_request("GET", baseurl + endpoint, verify)
+                self._expires, self._access_id, self._generate_signature(self._access_id, self._secret_key, self._expires), hashval)
+            status_code, response = self._make_request("GET", "{}{}".format(self._baseurl, endpoint), self._verify, action_result)
         except Exception as e:
-            self.save_progress("GET request failed with this Exception: {}".format(e))
-            action_result.set_status(phantom.APP_ERROR, "Hash Lookup failed. Error Exception: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            self.save_progress(CYWARE_GET_REQ_FAILED.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, "Hash Lookup failed. {}".format(err_msg))
+
+        if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        # check request reponse status_code
+        # check response status_code
         if status_code == 200:
-            if type(response) == list:
-                response = response[0]
-            if type(response) != dict:
-                return action_result.set_status(phantom.APP_ERROR, "Response from server was unexpectedly not JSON")
             try:
+                if type(response) == list:
+                    response = response[0]
+                if type(response) != dict:
+                    return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
                 action_result.add_data(response)
-                action_result.set_status(phantom.APP_SUCCESS, "Hash Lookup Successful.")
-                return self.set_status_save_progress(phantom.APP_SUCCESS, "Hash Lookup Successful.")
+                self.save_progress("Hash Lookup Successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "Hash Lookup Successful")
             except Exception as e:
-                self.save_progress("Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                action_result.set_status(phantom.APP_ERROR, "Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                return action_result.get_status()
+                err_msg = self._get_error_message_from_exception(e)
+                self.save_progress(CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
+                return action_result.set_status(phantom.APP_ERROR, CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
         else:
-            self.save_progress("GET request failed with non 200 status code: {}".format(status_code))
-            action_result.set_status(phantom.APP_ERROR, "GET request failed with non 200 status code: {}".format(status_code))
-            return action_result.get_status()
+            self.save_progress(CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
 
     def _handle_lookup_ip(self, param):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
-        # get authentication variables from Phantom Asset Config
-        config = self.get_config()
-        access_id = config.get("access_id")
-        secret_key = config.get("secret_key")
-        baseurl = config.get("baseurl")
-        verify = config.get("verify_server_cert")
-        expires = int(time.time() + 20)  # expires in 20 seconds
-
         # check for required input param
         ip = param["ip"]
         if not ip:
-            self.save_progress("IP value must be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "IP value must be provided.. please retry.")
-            return self.get_status()
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'ip'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
         try:
             endpoint = "/search/?Expires={}&AccessID={}&Signature={}&ip={}".format(
-                expires, access_id, self._generate_signature(access_id, secret_key, expires), ip)
-            status_code, response = self._make_request("GET", baseurl + endpoint, verify)
+                self._expires, self._access_id, self._generate_signature(self._access_id, self._secret_key, self._expires), ip)
+            status_code, response = self._make_request("GET", "{}{}".format(self._baseurl, endpoint), self._verify, action_result)
         except Exception as e:
-            self.save_progress("GET request failed with this Exception: {}".format(e))
-            action_result.set_status(phantom.APP_ERROR, "IP Lookup failed. Error Exception: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            self.save_progress(CYWARE_GET_REQ_FAILED.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, "IP Lookup failed. {}".format(err_msg))
+
+        if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        # check request reponse status_code
+        # check response status_code
         if status_code == 200:
-            if type(response) == list:
-                response = response[0]
-            if type(response) != dict:
-                return action_result.set_status(phantom.APP_ERROR, "Response from server was unexpectedly not JSON")
             try:
+                if type(response) == list:
+                    response = response[0]
+                if type(response) != dict:
+                    return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
                 action_result.add_data(response)
-                action_result.set_status(phantom.APP_SUCCESS, "IP Lookup Successful.")
-                return self.set_status_save_progress(phantom.APP_SUCCESS, "IP Lookup Successful.")
+                self.save_progress(phantom.APP_SUCCESS, "IP Lookup Successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "IP Lookup Successful")
             except Exception as e:
-                self.save_progress("Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                action_result.set_status(phantom.APP_ERROR, "Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                return action_result.get_status()
+                err_msg = self._get_error_message_from_exception(e)
+                self.save_progress(CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
+                return action_result.set_status(phantom.APP_ERROR, CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
         else:
-            self.save_progress("GET request failed with non 200 status code: {}".format(status_code))
-            action_result.set_status(phantom.APP_ERROR, "GET request failed with non 200 status code: {}".format(status_code))
-            return action_result.get_status()
+            self.save_progress(CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
 
     def _handle_lookup_url(self, param):
         action_result = ActionResult(dict(param))
         self.add_action_result(action_result)
 
-        # get authentication variables from Phantom Asset Config
-        config = self.get_config()
-        access_id = config.get("access_id")
-        secret_key = config.get("secret_key")
-        baseurl = config.get("baseurl")
-        verify = config.get("verify_server_cert")
-        expires = int(time.time() + 20)  # expires in 20 seconds
-
         # check for required input param
         url = param["url"]
         if not url:
-            self.save_progress("URL value must be provided.. please retry.")
-            action_result.set_status(phantom.APP_ERROR, "URL value must be provided.. please retry.")
-            return self.get_status()
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_EMPTY_PARAMETER_ERR_MSG.format("'url'"))
 
         # build full REST endpoint with Auth signature
         # make GET request to CTIX OpenAPI
         try:
             endpoint = "/search/?Expires={}&AccessID={}&Signature={}&url={}".format(
-                expires, access_id, self._generate_signature(access_id, secret_key, expires), url)
-            status_code, response = self._make_request("GET", baseurl + endpoint, verify)
+                self._expires, self._access_id, self._generate_signature(self._access_id, self._secret_key, self._expires), url)
+            status_code, response = self._make_request("GET", "{}{}".format(self._baseurl, endpoint), self._verify, action_result)
         except Exception as e:
-            self.save_progress("GET request failed with this Exception: {}".format(e))
-            action_result.set_status(phantom.APP_ERROR, "URL Lookup failed. Error Exception: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            self.save_progress(CYWARE_GET_REQ_FAILED.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, "URL Lookup failed. {}".format(err_msg))
+
+        if phantom.is_fail(status_code):
             return action_result.get_status()
 
-        # check request reponse status_code
+        # check response status_code
         if status_code == 200:
-            if type(response) == list:
-                response = response[0]
-            if type(response) != dict:
-                return action_result.set_status(phantom.APP_ERROR, "Response from server was unexpectedly not JSON")
             try:
+                if type(response) == list:
+                    response = response[0]
+                if type(response) != dict:
+                    return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
                 action_result.add_data(response)
-                action_result.set_status(phantom.APP_SUCCESS, "URL Lookup Successful.")
-                return self.set_status_save_progress(phantom.APP_SUCCESS, "URL Lookup Successful.")
+                self.save_progress(phantom.APP_SUCCESS, "URL Lookup Successful")
+                return action_result.set_status(phantom.APP_SUCCESS, "URL Lookup Successful")
             except Exception as e:
-                self.save_progress("Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                action_result.set_status(phantom.APP_ERROR, "Adding response JSON data to action_results Failed with this Exception: {}".format(e))
-                return action_result.get_status()
+                err_msg = self._get_error_message_from_exception(e)
+                self.save_progress(CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
+                return action_result.set_status(phantom.APP_ERROR, CYWARE_ADDING_RESP_DATA_TO_ACTION_RESULT_FAILED.format(err_msg))
         else:
-            self.save_progress("GET request failed with non 200 status code: {}".format(status_code))
-            action_result.set_status(phantom.APP_ERROR, "GET request failed with non 200 status code: {}".format(status_code))
-            return action_result.get_status()
+            self.save_progress(CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
+            return action_result.set_status(phantom.APP_ERROR, CYWARE_GET_REQ_FAILED_WITH_NON_200_STATUS.format(status_code))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
