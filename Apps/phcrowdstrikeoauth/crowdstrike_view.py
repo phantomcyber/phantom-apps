@@ -222,6 +222,9 @@ def display_view(provides, all_app_runs, context):
     if provides == 'detonate file':
         return 'crowdstrike_detonate_file.html'
 
+    if provides == 'detonate url':
+        return 'crowdstrike_detonate_url.html'
+
 
 def hunt_view(provides, all_app_runs, context):
 

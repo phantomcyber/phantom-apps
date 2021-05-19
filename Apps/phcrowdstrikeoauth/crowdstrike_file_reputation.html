@@ -155,6 +155,7 @@
                         <thead>
                             <tr>
                                 <th>Resource ID</th>
+                                <th>Environment Description</th>
                                 <th>Broad CSV Artifact ID</th>
                                 <th>Broad JSON Artifact ID</th>
                                 <th>Broad MAEC Artifact ID</th>
@@ -179,6 +180,15 @@
                                         {% else %}
                                             None
                                         {% endif %}
+                                    </td>
+                                    <td>
+                                        {% for analysis in item.sandbox %}
+                                        {% if analysis.environment_description%}
+                                            {{ analysis.environment_description }}
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                        {% endfor %}
                                     </td>
                                     <td>
                                         {% if item.ioc_report_broad_csv_artifact_id %}

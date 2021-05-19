@@ -2044,7 +2044,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
 
-    def _paginate_endpoint(self, action_result, resource_id_list, endpoint):
+    def _paginate_endpoint(self, action_result, resource_id_list, endpoint, param):
         id_list = list()
         id_list.extend(resource_id_list)
         resource_details_list = list()
@@ -2074,6 +2074,21 @@ class CrowdstrikeConnector(BaseConnector):
         if not resource_details_list:
             return action_result.set_status(phantom.APP_SUCCESS, "No data found")
 
+        sort_criteria = param.get('sort')
+        if sort_criteria is not None:
+            if sort_criteria == 'verdict.asc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['verdict'])
+            if sort_criteria == 'verdict.desc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['verdict'], reverse=True)
+            if sort_criteria == 'created_timestamp.asc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['created_timestamp'])
+            if sort_criteria == 'created_timestamp.desc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['created_timestamp'], reverse=True)
+            if sort_criteria == 'environment_description.asc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'])
+            if sort_criteria == 'environment_description.desc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'], reverse=True)
+
         for report in resource_details_list:
             action_result.add_data(report)
 
@@ -2099,21 +2114,29 @@ class CrowdstrikeConnector(BaseConnector):
 
         file_hash = file_info['metadata']['sha256']
         filter_query = "sandbox.sha256:'{}'".format(file_hash)
-        param['filter'] = filter_query
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
-        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
-        resp = self._check_data(action_result, param, max_limit, sort_data)
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort')
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
 
         if resource_id_list is None:
             return action_result.get_status()
@@ -2129,36 +2152,46 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
 
-        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_url_reputation(self, param):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url = param['url']
-        if 'https' in url:
-            url = url.replace('https', 'hxxps')
-        elif 'http' in url:
-            url = url.replace('http', 'hxxp')
-        elif 'ftp' in url:
-            url = url.replace('ftp', 'fxp')
+        if 'https://' in url:
+            url = url.replace('https://', 'hxxps://')
+        elif 'http://' in url:
+            url = url.replace('http://', 'hxxp://')
+        elif 'ftp://' in url:
+            url = url.replace('ftp://', 'fxp://')
 
         filter_query = "sandbox.submit_url.raw:'{}'".format(url)
-        param['filter'] = filter_query
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
-        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
-        resp = self._check_data(action_result, param, max_limit, sort_data)
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort')
+        if param_dict['sort'] == 'environment_description.asc' or param_dict['sort'] == 'environment_description.desc':
+            param_dict['sort'] = None
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
 
         if resource_id_list is None:
             return action_result.get_status()
@@ -2174,14 +2207,13 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
 
-        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_download_report(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         query_param = {
-            'id': param['artifact_id'],
-            'name': param.get('file_name', param['artifact_id'])
+            'id': param['artifact_id']
         }
         header = {
             'Accept-Encoding': 'application/gzip'
@@ -2192,6 +2224,68 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS, "Report downloaded successfully")
+
+    def _handle_detonate_url(self, param):
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url = param['url']
+        if 'https://' in url:
+            url = url.replace('https://', 'hxxps://')
+        elif 'http://' in url:
+            url = url.replace('http://', 'hxxp://')
+        elif 'ftp://' in url:
+            url = url.replace('ftp://', 'fxp://')
+
+        environment_id_dict = {
+            'Linux Ubuntu 16.04, 64-bit': 300,
+            'Android (static analysis)': 200,
+            'Windows 10, 64-bit': 160,
+            'Windows 7, 64-bit': 110,
+            'Windows 7, 32-bit': 100
+        }
+        if param['environment_id'] not in list(environment_id_dict.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+
+        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, environment_id_dict[param['environment_id']])
+
+        max_limit = 5000
+
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort')
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
+
+        if resource_id_list is None:
+            return self._submit_resource_for_detonation(action_result, param, url=param['url'])
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+
+        if not resource_id_list:
+            return self._submit_resource_for_detonation(action_result, param, url=param['url'])
+
+        if param.get('detail_report'):
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_detonate_file(self, param):
         # Add an action result to the App Run
@@ -2206,23 +2300,40 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
 
-        file_hash = file_info['metadata']['sha256']
-        filter_query = "sandbox.sha256:'{}'".format(file_hash)
-        param['filter'] = filter_query
+        environment_id_dict = {
+            'Linux Ubuntu 16.04, 64-bit': 300,
+            'Android (static analysis)': 200,
+            'Windows 10, 64-bit': 160,
+            'Windows 7, 64-bit': 110,
+            'Windows 7, 32-bit': 100
+        }
+        if param['environment_id'] not in list(environment_id_dict.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+
+        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, environment_id_dict[param['environment_id']])
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "threat_score.asc", "threat_score.desc",
-        "environment_description.asc", "environment_description.desc", "submission_type.asc", "submission_type.desc"]
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
-        resp = self._check_data(action_result, param, max_limit, sort_data)
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort')
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param)
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
 
         if resource_id_list is None:
             return self._upload_file(action_result, param, file_info=file_info)
@@ -2238,7 +2349,7 @@ class CrowdstrikeConnector(BaseConnector):
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
 
-        return self._paginate_endpoint(action_result, resource_id_list, endpoint)
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _upload_file(self, action_result, param, file_info=None):
 
@@ -2265,9 +2376,9 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         sha256 = json_resp['resources'][0]['sha256']
-        return self._submit_resource_for_detonation(action_result, param, 'file', sha256=sha256)
+        return self._submit_resource_for_detonation(action_result, param, sha256=sha256)
 
-    def _submit_resource_for_detonation(self, action_result, param, resource_type, sha256=None, url=None):
+    def _submit_resource_for_detonation(self, action_result, param, sha256=None, url=None):
         environment_id_dict = {
             'Linux Ubuntu 16.04, 64-bit': 300,
             'Android (static analysis)': 200,
@@ -2314,10 +2425,6 @@ class CrowdstrikeConnector(BaseConnector):
             json_payload['sandbox'][0]['document_password'] = param.get('document_password')
         if 'submit_name' in param:
             json_payload['sandbox'][0]['submit_name'] = param.get('submit_name')
-        if 'system_date' in param:
-            json_payload['sandbox'][0]['system_date'] = param.get('system_date')
-        if 'system_time' in param:
-            json_payload['sandbox'][0]['system_time'] = param.get('system_time')
         if 'user_tags' in param:
             json_payload['user_tags'] = tag_list
 
@@ -2459,7 +2566,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_compressed_file_response(self, response, action_result, type):
+    def _process_compressed_file_response(self, response, action_result, type, file_extension=None):
 
         guid = uuid.uuid4()
 
@@ -2486,7 +2593,10 @@ class CrowdstrikeConnector(BaseConnector):
         elif type == 'json':
             filename = "{0}.json".format(action_params.get('file_name', action_params['artifact_id']))
         elif type == 'plain':
-            filename = "{0}.txt".format(action_params.get('file_name', action_params['artifact_id']))
+            if file_extension == 'pcap':
+                filename = "{0}.pcap".format(action_params.get('file_name', action_params['artifact_id']))
+            else:
+                filename = "{0}.zip".format(action_params.get('file_name', action_params['artifact_id']))
         elif type == 'png':
             filename = "{0}.png".format(action_params.get('file_name', action_params['artifact_id']))
 
@@ -2550,7 +2660,9 @@ class CrowdstrikeConnector(BaseConnector):
                 return self._process_compressed_file_response(response, action_result, 'csv')
 
             if 'plain' in response.headers.get('Content-Type', ''):
-                return self._process_compressed_file_response(response, action_result, 'plain')
+                if 'pcap' in response.headers.get('Content-Disposition', ''):
+                    return self._process_compressed_file_response(response, action_result, 'plain', file_extension='pcap')
+                return self._process_compressed_file_response(response, action_result, 'plain', file_extension='zip')
 
             if 'png' in response.headers.get('Content-Type', ''):
                 return self._process_compressed_file_response(response, action_result, 'png')
@@ -2757,7 +2869,8 @@ class CrowdstrikeConnector(BaseConnector):
             'file_reputation': self._handle_file_reputation,
             'url_reputation': self._handle_url_reputation,
             'download_report': self._handle_download_report,
-            'detonate_file': self._handle_detonate_file
+            'detonate_file': self._handle_detonate_file,
+            'detonate_url': self._handle_detonate_url
         }
 
         action = self.get_action_identifier()
