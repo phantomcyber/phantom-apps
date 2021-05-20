@@ -1212,7 +1212,7 @@
                         "success"
                     ],
                     "column_name": "status",
-                    "column_order": 0
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.message",
@@ -1234,6 +1234,8 @@
                     "contains": [
                         "user name"
                     ],
+                    "column_name": "user",
+                    "column_order": 0,
                     "example_values": [
                         "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB",
                         "SVC-SPLUNK"
@@ -1242,6 +1244,8 @@
                 {
                     "data_path": "action_result.parameter.value",
                     "data_type": "string",
+                    "column_name": "new value",
+                    "column_order": 2,
                     "example_values": [
                         "svc_splunk@splunk.com"
                     ]
@@ -1251,11 +1255,15 @@
                     "data_type": "string",
                     "example_values": [
                         "REPLACE"
-                    ]
+                    ],
+                    "column_name": "action",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.attribute",
                     "data_type": "string",
+                    "column_name": "attribute",
+                    "column_order": 1,
                     "example_values": [
                         "mail"
                     ]
