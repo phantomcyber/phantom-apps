@@ -1,0 +1,1112 @@
+{
+    "appid": "623de41b-eac0-4a4a-970c-974e8d7ac2cb",
+    "name": "Splunk On-Call",
+    "description": "Formerly known as VictorOps. This app implements various investigative actions using VictorOps",
+    "type": "devops",
+    "product_vendor": "VictorOps",
+    "logo": "logo_splunkoncall.svg",
+    "logo_dark": "logo_splunkoncall_dark.svg",
+    "product_name": "VictorOps",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud. API v1 tested on 2021-02-25"
+    ],
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-03-02T04:54:12.000000Z",
+    "package_name": "phantom_victorops",
+    "main_module": "splunkoncall_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_id": {
+            "description": "API ID from the VictorOps Portal",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "description": "API Key from the VictorOps Portal",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "integration_url": {
+            "description": "Custom REST based Integration URL defined in VictorOps",
+            "verbose": "Populate this field if you plan to create, update, or resolve incidents. i.e https://alert.victorops.com/integrations/generic/20131114/alert/84d34810-7b78-4cb9-91a4-3425aeecce68",
+            "data_type": "string",
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list teams",
+            "identifier": "list_teams",
+            "description": "Get list of teams configured on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._membersUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api-public/v1/team/team-ClhQ5054yCuro0yW/members"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._policiesUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api-public/v1/team/team-ClhQ5054yCuro0yW/policies"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._selfUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api-public/v1/team/team-ClhQ5054yCuro0yW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isDefaultTeam",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Is Default Team",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.memberCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Member Count",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example"
+                    ],
+                    "column_name": "Team Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-ClhQ5054yCuro0yW"
+                    ],
+                    "column_name": "Slug",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_teams",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num teams: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "identifier": "list_users",
+            "description": "Get list of users configured on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._selfUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api-public/v1/user/hermanedwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-15T20:25:39Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@test.us"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.firstName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "First Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.lastName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Edwards"
+                    ],
+                    "column_name": "Last Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.passwordLastUpdated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-15T20:25:39Z"
+                    ],
+                    "column_name": "Password Last Updated",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "hermanedwards"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.verified",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Verified",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.num_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num users: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list incidents",
+            "identifier": "list_incidents",
+            "description": "Get list of incidents on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alertCount",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.currentPhase",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNACKED"
+                    ],
+                    "column_name": "Current Phase",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.entityDisplayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "SOS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entityId",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots2"
+                    ],
+                    "column_name": "Entity ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.entityState",
+                    "data_type": "string",
+                    "example_values": [
+                        "CRITICAL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entityType",
+                    "data_type": "string",
+                    "example_values": [
+                        "SERVICE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.incidentNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "7"
+                    ],
+                    "column_name": "Incident",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.lastAlertId",
+                    "data_type": "string",
+                    "example_values": [
+                        "8e97eae5-459e-4df0-b7fa-f93782127ec8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastAlertTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-23T19:29:05Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagedPolicies.*.policy.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "newpolicy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagedPolicies.*.policy.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "pol-TJyGjKj0Z42l8wtB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagedPolicies.*.team.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagedPolicies.*.team.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-PSXRfERISL1MzGCh"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.pagedTeams",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-PSXRfERISL1MzGCh"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.routingKey",
+                    "data_type": "string",
+                    "example_values": [
+                        "routingdefault"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.service",
+                    "data_type": "string",
+                    "example_values": [
+                        "SOS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.startTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-23T19:29:05Z"
+                    ],
+                    "column_name": "Start Time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.transitions.*.at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-23T03:24:22Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.transitions.*.by",
+                    "data_type": "string",
+                    "example_values": [
+                        "hedwards"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.transitions.*.manually",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.transitions.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACKED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_incidents",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num incidents: 0",
+                        "Num incidents: 7"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create incident",
+            "identifier": "create_incident",
+            "description": "Create incident on VictorOps",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "routing_key": {
+                    "description": "Name of Routing key defined in VictorOps. If left blank, default route will be used",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "message_type": {
+                    "description": "Behavior of the alert. CRITICAL: Triggers an incident, WARNING: May trigger an incident, depending on your settings",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "CRITICAL",
+                        "WARNING"
+                    ],
+                    "default": "CRITICAL",
+                    "order": 1
+                },
+                "entity_id": {
+                    "description": "ID of the Incident. This field is the identity of the incident and must remain the same throughout the life-cycle of an incident. If no entity_id is included, VictorOps will generate a random string",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "order": 2
+                },
+                "entity_display_name": {
+                    "description": "Display Name in the UI and Notifications. This field allows you to give custom, human-friendly, summary of your incidents without affecting the life-cycle workflow",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops display name"
+                    ],
+                    "order": 3,
+                    "primary": true
+                },
+                "state_message": {
+                    "description": "Verbose message field. This field has a high character limit and is intended for a long, verbose, explanation of the problem. This field will be included in notifications (full content in email, truncated version in push/phone/SMS notifications) Any URL links included in this field will be rendered as clickable links in email notifications",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "state_start_time": {
+                    "description": "Time this issue began [Number] (Linux/Unix time). The time this entity entered its current state (seconds since epoch). Defaults to the time alert is received",
+                    "data_type": "numeric",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entity_display_name",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops display name"
+                    ],
+                    "example_values": [
+                        "robots taking over"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entity_id",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots taking over id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CRITICAL"
+                    ],
+                    "column_name": "Type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.routing_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "example"
+                    ],
+                    "column_name": "Routing Key",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.state_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "hello"
+                    ],
+                    "column_name": "State Message",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.state_start_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1534994534
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entity_id",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots taking over id"
+                    ],
+                    "column_name": "Entity ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Result",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.entity_id",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "data_type": "string",
+                    "example_values": [
+                        "robots taking over id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Entity id: robots taking over id"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list oncalls",
+            "identifier": "list_oncalls",
+            "description": "Get all on-call users/teams on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.oncallNow.*.escalationPolicy.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example"
+                    ],
+                    "column_name": "Escalation Policy",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.oncallNow.*.escalationPolicy.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-ClhQ5054yCuro0yW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.oncallNow.*.users.*.onCalluser.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "hermanedwards"
+                    ],
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.team.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example"
+                    ],
+                    "column_name": "Team Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.team.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-ClhQ5054yCuro0yW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_teams_oncall",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num teams oncall: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "identifier": "list_policies",
+            "description": "Get list of policies configured on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policy.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy11"
+                    ],
+                    "column_name": "Policy Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.policy.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "pol-UJJQLazeWQmJWa6c"
+                    ],
+                    "column_name": "Policy Slug",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.team.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "team11111"
+                    ],
+                    "column_name": "Team Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.team.slug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-qMw1DMLn56oCh1Yw"
+                    ],
+                    "column_name": "Team Slug",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.num_policies",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num policies: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list routing",
+            "identifier": "list_routing",
+            "description": "Get list of routing keys and associated teams on VictorOps",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isDefault",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.routingKey",
+                    "data_type": "string",
+                    "example_values": [
+                        "key2222"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.*._teamUrl",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api-public/v1/team/team-ClhQ5054yCuro0yW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.*.policyName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targets.*.policySlug",
+                    "data_type": "string",
+                    "example_values": [
+                        "team-ClhQ5054yCuro0yW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_routing_keys",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num routing keys: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "victorops_view.display_list_routing",
+                "title": "List Routing"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update incident",
+            "identifier": "update_incident",
+            "description": "Update timeline of existing incident in VictorOps",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "routing_key": {
+                    "description": "Name of Routing key defined in VictorOps. If left blank, default route will be used",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "message_type": {
+                    "description": "Behavior of the alert. INFO: Creates a timeline event but does not trigger an incident. RECOVERY: Resolves an incident",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "INFO",
+                        "RECOVERY"
+                    ],
+                    "order": 1
+                },
+                "entity_id": {
+                    "description": "The entity_id of an existing incident. If not included, an update will be posted on timeline",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "order": 2
+                },
+                "entity_display_name": {
+                    "description": "Display Name in the UI and Notifications. This field allows you to give custom, human-friendly, summary of your incidents without affecting the life-cycle workflow",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops display name"
+                    ],
+                    "order": 3,
+                    "primary": true
+                },
+                "state_message": {
+                    "description": "Verbose message field. This field has a high character limit and is intended for a long, verbose, explanation of the problem. This field will be included in notifications (full content in email, truncated version in push/phone/SMS notifications) Any URL links included in this field will be rendered as clickable links in email notifications",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entity_display_name",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops display name"
+                    ],
+                    "example_values": [
+                        "robots taking over"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.entity_id",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots taking over id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "INFO"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.routing_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "example"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.state_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "we're coming for you"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entity_id",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots taking over id"
+                    ],
+                    "column_name": "Entity ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Result",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.entity_id",
+                    "data_type": "string",
+                    "contains": [
+                        "victorops id"
+                    ],
+                    "example_values": [
+                        "robots taking over id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Entity id: robots taking over id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

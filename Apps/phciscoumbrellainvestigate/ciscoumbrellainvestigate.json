@@ -4,8 +4,8 @@
     "description": "This app implements investigative actions by querying the Cisco Umbrella Investigate cloud service",
     "type": "reputation",
     "main_module": "ciscoumbrellainvestigate_connector.py",
-    "app_version": "1.0.0",
-    "utctime_updated": "2021-02-08T06:07:14.670889Z",
+    "app_version": "1.0.1",
+    "utctime_updated": "2021-05-04T05:01:54.000000Z",
     "product_vendor": "Cisco",
     "product_name": "Cisco Umbrella Investigate",
     "product_version_regex": ".*",
@@ -42,7 +42,7 @@
             "action": "domain reputation",
             "description": "Query Cisco Umbrella Investigate for domain info",
             "type": "investigate",
-            "identifier": "lookup_domain",
+            "identifier": "domain_reputation",
             "read_only": true,
             "parameters": {
                 "domain": {
@@ -118,7 +118,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.features.*.feature",
+                    "data_path": "action_result.data.*.indicators.*.indicator",
                     "data_type": "string",
                     "example_values": [
                         "Geo Popularity Score",
@@ -127,7 +127,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.features.*.normalizedScore",
+                    "data_path": "action_result.data.*.indicators.*.normalized_score",
                     "data_type": "numeric",
                     "example_values": [
                         2,
@@ -136,7 +136,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.features.*.score",
+                    "data_path": "action_result.data.*.indicators.*.score",
                     "data_type": "numeric",
                     "example_values": [
                         -3.610878170000002,
@@ -152,7 +152,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.riskScore",
+                    "data_path": "action_result.data.*.risk_score",
                     "data_type": "numeric",
                     "column_name": "Risk Score",
                     "column_order": 1,
@@ -376,7 +376,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.riskScore",
+                    "data_path": "action_result.summary.risk_score",
                     "data_type": "numeric",
                     "example_values": [
                         0,
@@ -435,7 +435,7 @@
             "action": "ip reputation",
             "description": "Query Cisco Umbrella Investigate for IP info",
             "type": "investigate",
-            "identifier": "lookup_ip",
+            "identifier": "ip_reputation",
             "read_only": true,
             "parameters": {
                 "ip": {
