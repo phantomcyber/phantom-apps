@@ -1,0 +1,719 @@
+{
+    "appid": "9beb759a-d9b2-4f43-98a0-6c43ef6f5cd7",
+    "name": "Check Point Reputation Service",
+    "description": "Queries Check Point Reputation Service for IOC reputation",
+    "type": "investigative",
+    "main_module": "checkpointreputation_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-04-23T08:49:56.000000Z",
+    "product_vendor": "Check Point Software Technologies",
+    "product_name": "Check Point Reputation Service",
+    "product_version_regex": ".*",
+    "logo": "logo_checkpoint.svg",
+    "logo_dark": "logo_checkpoint_dark.svg",
+    "min_phantom_version": "4.9.39220",
+    "publisher": "Splunk Community",
+    "contributors": [
+        {
+            "name": "Mathieu A. Cormier"
+        }
+    ],
+    "package_name": "phantom_checkpointreputation",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "API v1.0.1 2021-04-23"
+    ],
+    "configuration": {
+        "api_key": {
+            "description": "API key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url reputation",
+            "description": "For a domain/URL returns the classification and risk in accessing the resource",
+            "type": "investigate",
+            "identifier": "url_reputation",
+            "read_only": true,
+            "parameters": {
+                "resource": {
+                    "description": "URL",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "example_values": [
+                        "https://example.com",
+                        "example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "domain"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Resource"
+                },
+                {
+                    "data_path": "action_result.data.*.risk",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        100
+                    ],
+                    "column_order": 1,
+                    "column_name": "Risk (0-100)"
+                },
+                {
+                    "data_path": "action_result.data.*.status.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2001,
+                        2002,
+                        2003
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "SUCCESS",
+                        "PARTIAL_SUCCESS",
+                        "FAILED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded to generate reputation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "Benign"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Classification"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A",
+                        "Low",
+                        "Medium",
+                        "High",
+                        "Critical"
+                    ],
+                    "column_order": 3,
+                    "column_name": "Severity"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.confidence",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Confidence"
+                },
+                {
+                    "data_path": "action_result.data.*.context.malware_family",
+                    "data_type": "string",
+                    "example_values": [
+                        "Upatre"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.protection_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan-Spy.Win32.Zbot.ufyx.TC.b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.vt_positives",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.malware_types.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Bot",
+                        "Trojan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.redirections.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.context.categories.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.categories.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "General",
+                        "Financial Services"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.indications.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Known good website",
+                        "A malware file communicated with this domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.related_ips.*.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.related_ips.*.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "Benign"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.related_ips.*.confidence",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Risk: 0, Classification: Benign, Confidence: High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "URL Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "For an IP address returns its classification and risk in accessing a resource hosted on it",
+            "type": "investigate",
+            "identifier": "ip_reputation",
+            "read_only": true,
+            "parameters": {
+                "resource": {
+                    "description": "IP address",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "8.8.8.8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Resource"
+                },
+                {
+                    "data_path": "action_result.data.*.risk",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        100
+                    ],
+                    "column_order": 1,
+                    "column_name": "Risk (0-100)"
+                },
+                {
+                    "data_path": "action_result.data.*.status.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2001,
+                        2002,
+                        2003
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "SUCCESS",
+                        "PARTIAL_SUCCESS",
+                        "FAILED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded to generate reputation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "Benign"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Classification"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A",
+                        "Low",
+                        "Medium",
+                        "High",
+                        "Critical"
+                    ],
+                    "column_order": 3,
+                    "column_name": "Severity"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.confidence",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Confidence"
+                },
+                {
+                    "data_path": "action_result.data.*.context.asn",
+                    "data_type": "numeric",
+                    "example_values": [
+                        15169
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.as_owner",
+                    "data_type": "string",
+                    "example_values": [
+                        "Example owner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.countryCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.countryName",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.region",
+                    "data_type": "string",
+                    "example_values": [
+                        "MA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Cambridge"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.postalCode",
+                    "data_type": "string",
+                    "example_values": [
+                        "02142"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        42.362595
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -71.0843
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.dma_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        506
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.area_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        617
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.location.metro_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        506
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Risk: 0, Classification: Benign, Confidence: High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "IP Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file reputation",
+            "description": "For a file digest (md5/sha1/sha256) returns the risk in downloading the file without the need to scan it",
+            "type": "investigate",
+            "identifier": "file_reputation",
+            "read_only": true,
+            "parameters": {
+                "resource": {
+                    "description": "File Digest",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "d1bb45fc25612d3d53f1450fb78264b320a101eb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resource",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha1",
+                        "sha256"
+                    ],
+                    "example_values": [
+                        "d1bb45fc25612d3d53f1450fb78264b320a101eb"
+                    ],
+                    "column_order": 0,
+                    "column_name": "Resource"
+                },
+                {
+                    "data_path": "action_result.data.*.risk",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0,
+                        100
+                    ],
+                    "column_order": 1,
+                    "column_name": "Risk (0-100)"
+                },
+                {
+                    "data_path": "action_result.data.*.status.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2001,
+                        2002,
+                        2003
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "SUCCESS",
+                        "PARTIAL_SUCCESS",
+                        "FAILED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded to generate reputation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "Benign"
+                    ],
+                    "column_order": 2,
+                    "column_name": "Classification"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A",
+                        "Low",
+                        "Medium",
+                        "High",
+                        "Critical"
+                    ],
+                    "column_order": 3,
+                    "column_name": "Severity"
+                },
+                {
+                    "data_path": "action_result.data.*.reputation.confidence",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "column_order": 4,
+                    "column_name": "Confidence"
+                },
+                {
+                    "data_path": "action_result.data.*.context.malware_family",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zbot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.protection_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Trojan-Spy.Win32.Zbot.ufyx.TC.b"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.malware_types.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "Bot",
+                        "Trojan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.metadata.company_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "MySQL, AB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.metadata.product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ShellExtension"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.metadata.copyright",
+                    "data_type": "string",
+                    "example_values": [
+                        "Copyright 2003-2013"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.context.metadata.original_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ShellExtension"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Risk: 0, Classification: Benign, Confidence: High"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "File Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
