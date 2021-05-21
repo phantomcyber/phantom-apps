@@ -620,7 +620,7 @@
         {
             "action": "deauthorize device",
             "description": "Deauthorize a device",
-            "verbose": "The user is signed out of the Code42 app. The Code42 service stops backing up, and users cannot access the Code42 app to restore data or change settings without signing in again",
+            "verbose": "The user is signed out of the Code42 app. The Code42 service stops backing up, and users cannot access the Code42 app to restore data or change settings without signing in again.",
             "type": "contain",
             "identifier": "deauthorize_device",
             "read_only": false,
@@ -5310,7 +5310,6 @@
         {
             "action": "get organization info",
             "description": "Retrieve Code42 organization info using the v3_user_token for the given username & password",
-            "verbose": "curl -X GET 'https://console.us.code42.com/c42api/v3/customer/my' --header 'Authorization: v3_user_token '$tkn' | python -m json.tool.",
             "type": "investigate",
             "identifier": "get_organization_info",
             "read_only": true,

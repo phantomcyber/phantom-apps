@@ -694,7 +694,7 @@ class Code42Connector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, status_message="{}. {}"
                                             .format(CODE42_USER_ALREADY_ACTIVATED_MSG, "User status is Unblocked"))
 
-        unblock_user = param[CODE42_JSON_UNBLOCK_USER]
+        unblock_user = param.get(CODE42_JSON_UNBLOCK_USER)
 
         params = {'unblockUser': unblock_user}
 
@@ -1550,7 +1550,7 @@ class Code42Connector(BaseConnector):
 
         # query for a device
         elif param.get(CODE42_JSON_QUERY):
-            query = param[CODE42_JSON_QUERY]
+            query = param.get(CODE42_JSON_QUERY)
 
             # For pagination, start from first page
             page_num = CODE42_PAGINATION
@@ -1820,7 +1820,7 @@ class Code42Connector(BaseConnector):
         departure_notes = param.get('departure_notes', '')
         cloud_username = []
         if param.get('cloud_usernames'):
-            cloud_username = param['cloud_usernames'].split(',')
+            cloud_username = param.get('cloud_usernames').split(',')
 
         url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
 
