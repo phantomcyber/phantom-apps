@@ -156,6 +156,7 @@
                             <tr>
                                 <th>Resource ID</th>
                                 <th>Environment Description</th>
+                                <th>Threat Score</th>
                                 <th>Broad CSV Artifact ID</th>
                                 <th>Broad JSON Artifact ID</th>
                                 <th>Broad MAEC Artifact ID</th>
@@ -185,6 +186,15 @@
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.environment_description%}
                                             {{ analysis.environment_description }}
+                                        {% else %}
+                                            None
+                                        {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for analysis in item.sandbox %}
+                                        {% if analysis.threat_score%}
+                                            {{ analysis.threat_score }}
                                         {% else %}
                                             None
                                         {% endif %}

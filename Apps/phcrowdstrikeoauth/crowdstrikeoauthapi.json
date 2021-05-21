@@ -8105,7 +8105,9 @@
                         "created_timestamp.asc",
                         "created_timestamp.desc",
                         "environment_description.asc",
-                        "environment_description.desc"
+                        "environment_description.desc",
+                        "threat_score.asc",
+                        "threat_score.desc"
                     ]
                 },
                 "offset": {
@@ -8592,7 +8594,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_path": "action_result.data.*.sandbox.*.environment",
                     "data_type": "numeric",
                     "example_values": [
                         100
@@ -9095,7 +9097,9 @@
                         "created_timestamp.asc",
                         "created_timestamp.desc",
                         "environment_description.asc",
-                        "environment_description.desc"
+                        "environment_description.desc",
+                        "threat_score.asc",
+                        "threat_score.desc"
                     ]
                 },
                 "offset": {
@@ -9265,7 +9269,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_path": "action_result.data.*.sandbox.*.environment",
                     "data_type": "numeric",
                     "example_values": [
                         100
@@ -10014,7 +10018,7 @@
                         "vault id"
                     ]
                 },
-                "environment_id": {
+                "environment": {
                     "data_type": "string",
                     "description": "Sandbox environment to be used for analysis",
                     "order": 1,
@@ -10072,7 +10076,9 @@
                         "verdict.asc",
                         "verdict.desc",
                         "created_timestamp.asc",
-                        "created_timestamp.desc"
+                        "created_timestamp.desc",
+                        "threat_score.asc",
+                        "threat_score.desc"
                     ]
                 },
                 "action_script": {
@@ -10119,7 +10125,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.environment_id",
+                    "data_path": "action_result.parameter.environment",
                     "data_type": "string",
                     "example_values": [
                         "Windows 10, 64-bit",
@@ -10533,7 +10539,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_path": "action_result.data.*.sandbox.*.environment",
                     "data_type": "numeric",
                     "example_values": [
                         160
@@ -11254,7 +11260,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.sandbox.*.environment_id",
+                    "data_path": "action_result.data.*.*.sandbox.*.environment",
                     "data_type": "numeric",
                     "example_values": [
                         160
@@ -11630,7 +11636,7 @@
                         "url"
                     ]
                 },
-                "environment_id": {
+                "environment": {
                     "data_type": "string",
                     "description": "Sandbox environment to be used for analysis",
                     "order": 1,
@@ -11683,7 +11689,9 @@
                         "verdict.asc",
                         "verdict.desc",
                         "created_timestamp.asc",
-                        "created_timestamp.desc"
+                        "created_timestamp.desc",
+                        "threat_score.asc",
+                        "threat_score.desc"
                     ]
                 },
                 "action_script": {
@@ -11723,7 +11731,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.environment_id",
+                    "data_path": "action_result.parameter.environment",
                     "data_type": "string",
                     "example_values": [
                         "Windows 10, 64-bit",
@@ -11873,7 +11881,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_path": "action_result.data.*.sandbox.*.environment",
                     "data_type": "numeric",
                     "example_values": [
                         160

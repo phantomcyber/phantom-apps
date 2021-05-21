@@ -98,14 +98,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         if script:
             try:  # Try to laod in script to preprocess artifacts
-                if self._python_version < 3:
-                    self._script_module = imp.new_module('preprocess_methods')
-                    exec(script, self._script_module.__dict__)
-                else:
-                    import importlib.util
-                    preprocess_methods = importlib.util.spec_from_loader('preprocess_methods', loader=None)
-                    self._script_module = importlib.util.module_from_spec(preprocess_methods)
-                    exec(script, self._script_module.__dict__)
+                import importlib.util
+                preprocess_methods = importlib.util.spec_from_loader('preprocess_methods', loader=None)
+                self._script_module = importlib.util.module_from_spec(preprocess_methods)
+                exec(script, self._script_module.__dict__)
             except Exception as e:
                 self.save_progress("Error loading custom script. Error: {}".format(str(e)))
                 return phantom.APP_ERROR
@@ -1754,7 +1750,37 @@ class CrowdstrikeConnector(BaseConnector):
 
         return parameter
 
-    def _on_poll(self, param):  # noqa: C901
+    def _validate_on_poll_config_params(self, action_result, config):
+        self.debug_print("Validating 'max_crlf' asset configuration parameter")
+        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT),
+                                           "max_crlf")
+
+        self.debug_print("Validating 'merge_time_interval' asset configuration parameter")
+        merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0),
+                                                      "merge_time_interval", allow_zero=True)
+
+        if self.is_poll_now():
+            # Manual Poll Now
+            try:
+                self.debug_print("Validating 'max_events_poll_now' asset configuration parameter")
+                max_events = self._validate_integers(action_result,
+                                                     config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT),
+                                                     "max_events_poll_now")
+            except:
+                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
+                max_events = DEFAULT_POLLNOW_EVENTS_COUNT
+        else:
+            # Scheduled and Interval Polling
+            try:
+                self.debug_print("Validating 'max_events' asset configuration parameter")
+                max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT),
+                                                     "max_events")
+            except:
+                max_events = DEFAULT_EVENTS_COUNT
+
+        return max_crlf, merge_time_interval, max_events
+
+    def _on_poll(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1768,35 +1794,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         config = self.get_config()
 
-        self.debug_print("Validating 'max_crlf' asset configuration parameter")
-        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT), "max_crlf")
-        if max_crlf is None:
-            return action_result.get_status()
+        max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
 
-        self.debug_print("Validating 'merge_time_interval' asset configuration parameter")
-        merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0), "merge_time_interval", allow_zero=True)
-        if merge_time_interval is None:
+        if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
-
-        if self.is_poll_now():
-            # Manual Poll Now
-            try:
-                self.debug_print("Validating 'max_events_poll_now' asset configuration parameter")
-                max_events = self._validate_integers(action_result, config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT), "max_events_poll_now")
-                if max_events is None:
-                    return action_result.get_status()
-            except:
-                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
-                max_events = DEFAULT_POLLNOW_EVENTS_COUNT
-        else:
-            # Scheduled and Interval Polling
-            try:
-                self.debug_print("Validating 'max_events' asset configuration parameter")
-                max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT), "max_events")
-                if max_events is None:
-                    return action_result.get_status()
-            except:
-                max_events = DEFAULT_EVENTS_COUNT
 
         lower_id = 0
         if not self.is_poll_now():
@@ -1840,8 +1841,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             for chunk in r.iter_content(chunk_size=None):
-                if self._python_version == 3:
-                    chunk = UnicodeDammit(chunk).unicode_markup
+                chunk = UnicodeDammit(chunk).unicode_markup
 
                 if not chunk:
                     # Done with all the event data for now
@@ -2076,6 +2076,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         sort_criteria = param.get('sort')
         if sort_criteria is not None:
+            sort_criteria = sort_criteria.lower()
             if sort_criteria == 'verdict.asc':
                 resource_details_list = sorted(resource_details_list, key=lambda x: x['verdict'])
             if sort_criteria == 'verdict.desc':
@@ -2088,6 +2089,10 @@ class CrowdstrikeConnector(BaseConnector):
                 resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'])
             if sort_criteria == 'environment_description.desc':
                 resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'], reverse=True)
+            if sort_criteria == 'threat_score.asc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0].get('threat_score', 0))
+            if sort_criteria == 'threat_score.desc':
+                resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0].get('threat_score', 0), reverse=True)
 
         for report in resource_details_list:
             action_result.add_data(report)
@@ -2117,9 +2122,12 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc"]
+        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc",
+        "threat_score.asc", "threat_score.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc']
 
         param_dict = {
             'filter': filter_query
@@ -2129,14 +2137,16 @@ class CrowdstrikeConnector(BaseConnector):
         if 'limit' in param:
             param_dict['limit'] = param.get('limit')
         if 'sort' in param:
-            param_dict['sort'] = param.get('sort')
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
 
         resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
 
         if resource_id_list is None:
             return action_result.get_status()
@@ -2174,6 +2184,8 @@ class CrowdstrikeConnector(BaseConnector):
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
+        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc']
+
         param_dict = {
             'filter': filter_query
         }
@@ -2182,9 +2194,9 @@ class CrowdstrikeConnector(BaseConnector):
         if 'limit' in param:
             param_dict['limit'] = param.get('limit')
         if 'sort' in param:
-            param_dict['sort'] = param.get('sort')
-        if param_dict['sort'] == 'environment_description.asc' or param_dict['sort'] == 'environment_description.desc':
-            param_dict['sort'] = None
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
 
         resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
@@ -2238,22 +2250,26 @@ class CrowdstrikeConnector(BaseConnector):
             url = url.replace('ftp://', 'fxp://')
 
         environment_id_dict = {
-            'Linux Ubuntu 16.04, 64-bit': 300,
-            'Android (static analysis)': 200,
-            'Windows 10, 64-bit': 160,
-            'Windows 7, 64-bit': 110,
-            'Windows 7, 32-bit': 100
+            'linux ubuntu 16.04, 64-bit': 300,
+            'android (static analysis)': 200,
+            'windows 10, 64-bit': 160,
+            'windows 7, 64-bit': 110,
+            'windows 7, 32-bit': 100
         }
-        if param['environment_id'] not in list(environment_id_dict.keys()):
-            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+        environment_param = param['environment'].lower()
 
-        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, environment_id_dict[param['environment_id']])
+        if environment_param not in list(environment_id_dict.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
+
+        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, environment_id_dict[environment_param])
 
         max_limit = 5000
 
         sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['threat_score.asc', 'threat_score.desc']
 
         param_dict = {
             'filter': filter_query
@@ -2263,7 +2279,9 @@ class CrowdstrikeConnector(BaseConnector):
         if 'limit' in param:
             param_dict['limit'] = param.get('limit')
         if 'sort' in param:
-            param_dict['sort'] = param.get('sort')
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
         resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
@@ -2301,22 +2319,25 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
 
         environment_id_dict = {
-            'Linux Ubuntu 16.04, 64-bit': 300,
-            'Android (static analysis)': 200,
-            'Windows 10, 64-bit': 160,
-            'Windows 7, 64-bit': 110,
-            'Windows 7, 32-bit': 100
+            'linux ubuntu 16.04, 64-bit': 300,
+            'android (static analysis)': 200,
+            'windows 10, 64-bit': 160,
+            'windows 7, 64-bit': 110,
+            'windows 7, 32-bit': 100
         }
-        if param['environment_id'] not in list(environment_id_dict.keys()):
-            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+        environment_param = param['environment'].lower()
+        if environment_param not in list(environment_id_dict.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
 
-        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, environment_id_dict[param['environment_id']])
+        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, environment_id_dict[environment_param])
 
         max_limit = 5000
 
         sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['threat_score.asc', 'threat_score.desc']
 
         param_dict = {
             'filter': filter_query
@@ -2326,14 +2347,16 @@ class CrowdstrikeConnector(BaseConnector):
         if 'limit' in param:
             param_dict['limit'] = param.get('limit')
         if 'sort' in param:
-            param_dict['sort'] = param.get('sort')
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
 
         resp = self._check_data(action_result, param_dict, max_limit, sort_data)
 
         if phantom.is_fail(resp):
             return action_result.get_status()
 
-        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
 
         if resource_id_list is None:
             return self._upload_file(action_result, param, file_info=file_info)
@@ -2380,17 +2403,19 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _submit_resource_for_detonation(self, action_result, param, sha256=None, url=None):
         environment_id_dict = {
-            'Linux Ubuntu 16.04, 64-bit': 300,
-            'Android (static analysis)': 200,
-            'Windows 10, 64-bit': 160,
-            'Windows 7, 64-bit': 110,
-            'Windows 7, 32-bit': 100
+            'linux ubuntu 16.04, 64-bit': 300,
+            'android (static analysis)': 200,
+            'windows 10, 64-bit': 160,
+            'windows 7, 64-bit': 110,
+            'windows 7, 32-bit': 100
         }
 
-        environment_id = param['environment_id']
-        action_script = param.get('action_script')
+        environment_id = param['environment'].lower()
+        action_script = None
+        if 'action_script' in param:
+            action_script = param.get('action_script').lower()
         if environment_id not in list(environment_id_dict.keys()):
-            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment id')
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
 
         action_script_list = ['default', 'default_maxantievasion', 'default_randomfiles', 'default_randomtheme', 'default_openie']
         if action_script is not None and action_script not in action_script_list:
@@ -2432,6 +2457,7 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        self.debug_print('Params are {}'.format(json_payload))
         return self._poll_for_detonate_results(action_result, param, json_resp['resources'][0]['id'])
 
     def _poll_for_detonate_results(self, action_result, param, resource_id):
