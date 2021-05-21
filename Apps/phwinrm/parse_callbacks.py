@@ -1,5 +1,5 @@
 # File: parse_callbacks.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -17,6 +17,12 @@ from collections import OrderedDict
 
 from builtins import str
 import six
+import json
+
+
+def clean_str(input_str):
+    return input_str.replace('\r', '').replace('\n', '')
+
 
 def basic(action_result, response):
     # Default one, just add the data to the action result
@@ -32,7 +38,8 @@ def basic(action_result, response):
 def check_exit(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     data = {}
     data['status_code'] = response.status_code
@@ -50,7 +57,8 @@ def check_exit_no_data(action_result, response):
             except:
                 pass
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -58,7 +66,8 @@ def check_exit_no_data(action_result, response):
 def check_exit_no_data2(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -67,13 +76,14 @@ def check_exit_no_data_stdout(action_result, response):
     # Same as above, but for when the error message appears in std_out instead of std_err
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_out))
         )
     return phantom.APP_SUCCESS
 
 
 def ensure_no_errors(action_result, response):
-    if response.status_code or response.std_err:
+    if response.status_code and response.std_err:
         return action_result.set_status(
             phantom.APP_ERROR, "Error running command: {}{}".format(
                 response.std_out,
@@ -87,26 +97,34 @@ def list_processes(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(clean_str(response.std_err))
         )
 
     output = response.std_out
-    lines = output.splitlines()
-    for line in lines[2:]:
-        process = {}
-        columns = line.split()
-        try:
-            process['handles'] = int(columns[0])
-            process['non_paged_memory_(K)'] = int(columns[1])
-            process['paged_memory_(K)'] = int(columns[2])
-            process['working_set_(K)'] = int(columns[3])
-            process['virtual_memory_(M)'] = int(columns[4])
-            process['processor_time_(s)'] = float(columns[5])
-            process['pid'] = int(columns[6])
-            process['name'] = columns[7]
-        except:
-            continue
-        action_result.add_data(process)
+    processes = json.loads(output)
+    if not processes:
+        summary = action_result.update_summary({})
+        summary['num_processes'] = 0
+        return action_result.set_status(phantom.APP_ERROR, "No processes found")
+    column_mapping = {
+        'Handles': 'handles',
+        'NPM': 'non_paged_memory',
+        'PM': 'paged_memory',
+        'WS': 'working_set',
+        'VM': 'virtual_memory',
+        'CPU': 'processor_time_(s)',
+        'Id': 'pid',
+        'SessionId': 'session_id',
+        'Name': 'name',
+    }
+
+    for process in processes:
+        data = { 'raw': process }
+        for key, value in process.items():
+            key = column_mapping.get(key)
+            if key:
+                data[key] = value
+        action_result.add_data(data)
 
     size = action_result.get_data_size()
     if size == 0:
@@ -121,7 +139,8 @@ def list_processes(action_result, response):
 def terminate_process(action_result, response):
     if response.std_err:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error terminating process: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error terminating process: {}".format(clean_str(response.std_err))
         )
     return phantom.APP_SUCCESS
 
@@ -130,7 +149,7 @@ def list_connections(action_result, response):
     if response.status_code != 0:
         return action_result.set_status(
             phantom.APP_ERROR,
-            "Error: Returned non-zero status code. stderr: {}".format(response.std_err)
+            "Error: Returned non-zero status code. stderr: {}".format(clean_str(response.std_err))
         )
 
     lines = response.std_out.splitlines()
@@ -156,7 +175,7 @@ def list_connections(action_result, response):
             connection['foreign_address_ip'] = foreign_address[0]
             connection['foreign_address_port'] = foreign_address[1]
             connection['state'] = columns[3]
-            connection['pid'] = columns[4]
+            connection['pid'] = int(columns[4])
         except:
             continue
         action_result.add_data(connection)
@@ -260,6 +279,8 @@ def list_firewall_rules(action_result, response, **kwargs):
     summary = action_result.update_summary({})
     summary['num_rules'] = size
 
+    if size == 0:
+        return action_result.set_status(phantom.APP_SUCCESS, "No firewall rule found for given parameters")
     return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved firewall rules")
 
 
@@ -278,7 +299,7 @@ def create_firewall_rule(action_result, response):
 def delete_firewall_rule(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_out)
+            phantom.APP_ERROR, "Error running command: {}".format(clean_str(response.std_out))
         )
 
     # action_result.add_data({'message': response.std_out})
@@ -368,7 +389,8 @@ def _parse_rule(rule):
 def list_applocker_policies(action_result, response):
     if response.status_code:
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
     try:
         # Get rid of all the linebreaks to prevent errors during reading
@@ -415,7 +437,8 @@ def decodeb64_add_to_vault(action_result, response, container_id, file_name):
         if isinstance(response.std_err, bytes):
             response.std_err = response.std_err.decode('UTF-8')
         return action_result.set_status(
-            phantom.APP_ERROR, "Error running command: {}".format(response.std_err)
+            phantom.APP_ERROR,
+            "Error running command: {}".format(clean_str(response.std_err))
         )
 
     b64string = response.std_out

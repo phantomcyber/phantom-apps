@@ -14,7 +14,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_host_reputation.html
-  Copyright (c) 2019 SlashNext Inc. (www.slashnext.com)
+  Copyright (c) 2019-2020 SlashNext Inc. (www.slashnext.com)
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -37,6 +37,7 @@ em{font-style: normal}
 .fs-17{font-size:17px!important}
 .fs-13{font-size:13px!important}
 .fs-11{font-size:11px!important}
+.wf-h4-style{font-size:16px}
 .br-top-3{border-top:3px solid #535454;}
 .br-gray{border:1px solid #D8D8D8;}
 .br-gray-bottom{border-bottom:1px solid #D8D8D8;}
@@ -99,60 +100,64 @@ div.mainCont h2 {font-size: 14px !important; line-height: 20px !important;}
 
 	{% for result in results %} <!-- Loop for each result -->
 
-	<section class="mb-20 mt-20">
-		<!-- Host Reputation section -->
-		<h2 class="mb-10">SlashNext Phishing Incident Response - Host Reputation</h2>
+		{% if not result.data %}
+			<h4 class="wf-h4-style">No data found</h4>
+		{% else %}
+			<section class="mb-20 mt-20">
+				<!-- Host Reputation section -->
+				<h2 class="mb-10">SlashNext Phishing Incident Response - Host Reputation</h2>
 
-		<h3 class="mb-5">action = host reputation</h3>
-		<h3 class="mb-5">host = {{result.param.host}}</h3>
+				<h3 class="mb-5">action = host reputation</h3>
+				<h3 class="mb-5">host = {{result.param.host}}</h3>
 
-		{% if result.data.errorNo == 0 %} <!-- Host reputation success condition -->
-		<div class="blockDiv">
-			<div class="blockHead blockHead2 bg-grey4">
-				{% if result.data.threatData.verdict == "Malicious" %}
-				<div><label>Host</label>
-					<span>
-						<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
-					</span>
-				</div>
-				<div><label>Verdict</label><span class="cr-red1">{{result.data.threatData.verdict}}</span></div>
-				{% elif result.data.threatData.verdict == "Benign" %}
-				<div><label>Host</label>
-					<span>
-						<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
-					</span>
-				</div>
-				<div><label>Verdict</label><span class="cr-green1">{{result.data.threatData.verdict}}</span></div>
-				{% elif result.data.threatData.verdict == "Suspicious" %}
-				<div><label>Host</label>
-					<span>
-						<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
-					</span>
-				</div>
-				<div><label>Verdict</label><span class="cr-orange1">{{result.data.threatData.verdict}}</span></div>
-				{% else %}
-				<div><label>Host</label>
-					<span>
-						<a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
-					</span>
-				</div>
-				<div><label>Verdict</label><span>{{result.data.threatData.verdict}}</span></div>
-				{% endif %}
-			</div>
-			<div class="blockRow blockRow5">
-				<div><label>Threat Status</label><span>{{result.data.threatData.threatStatus}}</span></div>
-				<div><label>Threat Name</label><span>{{result.data.threatData.threatName}}</span></div>
-				<div><label>Threat Type</label><span>{{result.data.threatData.threatType}}</span></div>
-				<div><label>First Seen</label><span>{{result.data.threatData.firstSeen}}</span></div>
-				<div><label>Last Seen</label><span>{{result.data.threatData.lastSeen}}</span></div>
-			</div>
-		</div>
-		{% else %} <!-- Host reputation error condition -->
-		<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
-        <h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
-        {% endif %} <!-- Host reputation success condition -->
+				{% if result.data.errorNo == 0 %} <!-- Host reputation success condition -->
+					<div class="blockDiv">
+						<div class="blockHead blockHead2 bg-grey4">
+							{% if result.data.threatData.verdict == "Malicious" %}
+								<div><label>Host</label>
+									<span>
+										<a class="cr-red1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
+									</span>
+								</div>
+								<div><label>Verdict</label><span class="cr-red1">{{result.data.threatData.verdict}}</span></div>
+							{% elif result.data.threatData.verdict == "Benign" %}
+								<div><label>Host</label>
+									<span>
+										<a class="cr-green1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
+									</span>
+								</div>
+								<div><label>Verdict</label><span class="cr-green1">{{result.data.threatData.verdict}}</span></div>
+							{% elif result.data.threatData.verdict == "Suspicious" %}
+								<div><label>Host</label>
+									<span>
+										<a class="cr-orange1" href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
+									</span>
+								</div>
+								<div><label>Verdict</label><span class="cr-orange1">{{result.data.threatData.verdict}}</span></div>
+							{% else %}
+								<div><label>Host</label>
+									<span>
+										<a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain', 'ip'], 'value': '{{ result.param.host|escapejs }}' }], 0, {{ container.id }}, null, false);">{{result.param.host}}</a>
+									</span>
+								</div>
+								<div><label>Verdict</label><span>{{result.data.threatData.verdict}}</span></div>
+							{% endif %}
+						</div>
+						<div class="blockRow blockRow5">
+							<div><label>Threat Status</label><span>{{result.data.threatData.threatStatus}}</span></div>
+							<div><label>Threat Name</label><span>{{result.data.threatData.threatName}}</span></div>
+							<div><label>Threat Type</label><span>{{result.data.threatData.threatType}}</span></div>
+							<div><label>First Seen</label><span>{{result.data.threatData.firstSeen}}</span></div>
+							<div><label>Last Seen</label><span>{{result.data.threatData.lastSeen}}</span></div>
+						</div>
+					</div>
+				{% else %} <!-- Host reputation error condition -->
+					<h3 class="mb-5 cr-red1">Error No: {{result.data.errorNo}}</h3>
+					<h3 class="mb-5 cr-red1">Error Message: {{result.data.errorMsg}}</h3>
+				{% endif %} <!-- Host reputation success condition -->
 
-	</section>
+			</section>
+		{% endif %}
 
 	{% endfor %} <!-- Loop for each result end -->
 

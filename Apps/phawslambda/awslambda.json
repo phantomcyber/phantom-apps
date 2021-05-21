@@ -9,15 +9,15 @@
     "product_name": "Lambda",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2020 Splunk Inc.",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2019-04-01T20:52:20.000000Z",
+    "utctime_updated": "2021-01-29T18:54:49.000000Z",
     "package_name": "phantom_awslambda",
     "main_module": "awslambda_connector.py",
-    "min_phantom_version": "4.6.19142",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, February 3, 2020"
+        "Cloud API, February 25, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -76,17 +76,15 @@
         "access_key": {
             "description": "Access Key",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "secret_key": {
             "description": "Secret Key",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "region": {
-            "description": "Region",
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -112,6 +110,12 @@
                 "AWS GovCloud (US)"
             ],
             "order": 2
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "default": false,
+            "order": 3
         }
     },
     "actions": [
@@ -119,7 +123,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -127,10 +130,190 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "remove permission",
+            "identifier": "remove_permission",
+            "description": "Revokes function-use permission from an AWS service or another account",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "function_name": {
+                    "description": "The name of the Lambda function, version, or alias. The following name formats are accepted: function name, function ARN, and partial ARN",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "lambda function name",
+                        "lambda function arn"
+                    ],
+                    "order": 0
+                },
+                "statement_id": {
+                    "description": "Statement identifier of the permission to remove",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "qualifier": {
+                    "description": "Specify a version or alias to remove permissions to a published version of the function",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "revision_id": {
+                    "description": "Only update the policy if the revision ID matches the ID that's specified. Use this option to avoid modifying a function policy that has changed since you last read it",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "50c47f67-ae1a-4c2a-9651-77f1ba1f3d37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fri, 26 Feb 2021 19:07:37 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
+                    "data_type": "string",
+                    "example_values": [
+                        "keep-alive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "50c47f67-ae1a-4c2a-9651-77f1ba1f3d37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        204
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully removed permission"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed permission"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.function_name",
+                    "data_type": "string",
+                    "contains": [
+                        "lambda function name",
+                        "lambda function arn"
+                    ],
+                    "example_values": [
+                        "myTestFunction1"
+                    ],
+                    "column_name": "Function Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.statement_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "statement1"
+                    ],
+                    "column_name": "Statement Id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.qualifier",
+                    "data_type": "string",
+                    "column_name": "Qualifier",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.revision_id",
+                    "data_type": "string",
+                    "column_name": "Revision Id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
+            }
+        },
+        {
             "action": "invoke lambda",
             "identifier": "invoke_lambda",
             "description": "Invoke an AWS Lambda function",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -148,8 +331,6 @@
                 "invocation_type": {
                     "description": "Invocation type",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "RequestResponse",
                         "Event",
@@ -161,8 +342,6 @@
                 "log_type": {
                     "description": "Set to 'Tail' to include the execution log in the response",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "value_list": [
                         "None",
                         "Tail"
@@ -173,23 +352,26 @@
                 "client_context": {
                     "description": "The JSON that you want to provide to your Lambda function in the context object",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "payload": {
                     "description": "The JSON that you want to provide to your Lambda function as input",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 },
                 "qualifier": {
                     "description": "Specify a version or alias to invoke a published version of the function",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 5
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 6
                 }
             },
             "output": [
@@ -197,12 +379,23 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.client_context",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.function_name",
@@ -281,6 +474,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.Payload.statusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
                     "data_type": "string",
                     "example_values": [
@@ -307,8 +507,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Tue, 19 Feb 2019 21:17:06 GMT",
-                        "Tue, 19 Feb 2019 21:26:49 GMT",
-                        "Tue, 19 Feb 2019 22:24:49 GMT"
+                        "Tue, 19 Feb 2019 21:26:49 GMT"
                     ]
                 },
                 {
@@ -385,7 +584,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "",
                         "Status: Successfully invoked lambda"
                     ]
                 },
@@ -417,15 +615,12 @@
             "action": "list functions",
             "identifier": "list_functions",
             "description": "List available AWS Lambda functions, with the version-specific configuration for each",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
                 "function_version": {
                     "description": "Set to 'ALL' to include entries for all published versions of each function",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "next_token": {
@@ -434,16 +629,22 @@
                     "contains": [
                         "lambda next token"
                     ],
-                    "required": false,
                     "primary": true,
                     "order": 1
                 },
                 "max_items": {
                     "description": "A value between 1 and 50 to limit the number of functions to be returned",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 2
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 3
                 }
             },
             "output": [
@@ -451,14 +652,39 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.Functions.*.TracingConfig.Mode",
+                    "data_path": "action_result.parameter.credentials",
                     "data_type": "string",
                     "example_values": [
-                        "PassThrough"
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.function_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.max_items",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.next_token",
+                    "data_type": "string",
+                    "contains": [
+                        "lambda next token"
+                    ],
+                    "example_values": [
+                        "1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe1234abcd12abab12ab12123456abcdef/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc+Qq9u3+IYyk7smjCWpIY371RST1llX0KIVaZkBn+agQ6cVvSAmBrKVEdtAzHROaivow8IdH2YG8FxvGmI5HkwSTf60OBM3jFrxw7v5OjCoId/ao6LBGYkuSAPF6YvgvwBdpgZeRmXfx9Iop3eaCNyLeGtKzLqVSOUwazScYgfAk="
                     ]
                 },
                 {
@@ -469,13 +695,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.Functions.*.Description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.Functions.*.CodeSize",
                     "data_type": "numeric",
                     "example_values": [
@@ -483,18 +702,8 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.Functions.*.RevisionId",
-                    "data_type": "string",
-                    "example_values": [
-                        "1234abcd-12ab-ab12-ab12-123456abcdef"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.MemorySize",
-                    "data_type": "numeric",
-                    "example_values": [
-                        128
-                    ]
+                    "data_path": "action_result.data.*.Functions.*.Description",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.Functions.*.FunctionArn",
@@ -509,50 +718,6 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.Functions.*.Version",
-                    "data_type": "string",
-                    "example_values": [
-                        "$LATEST"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.Role",
-                    "data_type": "string",
-                    "example_values": [
-                        "arn:aws:iam::123456789012:role/service-role/test-role"
-                    ],
-                    "column_name": "Role",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.Timeout",
-                    "data_type": "numeric",
-                    "example_values": [
-                        3
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.LastModified",
-                    "data_type": "string",
-                    "example_values": [
-                        "2019-03-05T09:59:00.351+0000"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.Handler",
-                    "data_type": "string",
-                    "example_values": [
-                        "lambda_function.lambda_handler"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.Runtime",
-                    "data_type": "string",
-                    "example_values": [
-                        "ruby2.5"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.Functions.*.FunctionName",
                     "data_type": "string",
                     "contains": [
@@ -565,6 +730,75 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data.*.Functions.*.Handler",
+                    "data_type": "string",
+                    "example_values": [
+                        "lambda_function.lambda_handler"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.LastModified",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-03-05T09:59:00.351+0000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.MemorySize",
+                    "data_type": "numeric",
+                    "example_values": [
+                        128
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.RevisionId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.Role",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:iam::123456789012:role/service-role/test-role"
+                    ],
+                    "column_name": "Role",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.Runtime",
+                    "data_type": "string",
+                    "example_values": [
+                        "ruby2.5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.Timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.TracingConfig.Mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "PassThrough"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.Version",
+                    "data_type": "string",
+                    "example_values": [
+                        "$LATEST"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.Functions.*.VpcConfig.VpcId",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.NextMarker",
                     "data_type": "string",
                     "contains": [
@@ -575,24 +809,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
-                    "data_type": "numeric",
-                    "example_values": [
-                        200
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
                     "data_type": "string",
                     "example_values": [
-                        "1234abcd-12ab-ab12-ab12-123456abcdef"
+                        "keep-alive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "1925"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/json"
                     ]
                 },
                 {
@@ -610,52 +844,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
-                    "data_type": "string",
-                    "example_values": [
-                        "keep-alive"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
-                    "data_type": "string",
-                    "example_values": [
-                        "application/json"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
-                    "data_type": "string",
-                    "example_values": [
-                        "1925"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Next token: 1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo1234abcd-12ab-ab12-ab12-123456abcdefuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs=, Num functions: 1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.max_items",
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
                     "data_type": "numeric",
                     "example_values": [
-                        1
+                        200
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.function_version",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
+                    ]
                 },
                 {
-                    "data_path": "action_result.parameter.next_token",
-                    "data_type": "string",
-                    "contains": [
-                        "lambda next token"
-                    ],
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
                     "example_values": [
-                        "1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo66iQPTMpVOHZgANewpgGgFGGr4pVjd6VgLUO6qPe1234abcd12abab12ab12123456abcdef/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc+Qq9u3+IYyk7smjCWpIY371RST1llX0KIVaZkBn+agQ6cVvSAmBrKVEdtAzHROaivow8IdH2YG8FxvGmI5HkwSTf60OBM3jFrxw7v5OjCoId/ao6LBGYkuSAPF6YvgvwBdpgZeRmXfx9Iop3eaCNyLeGtKzLqVSOUwazScYgfAk="
+                        0
                     ]
                 },
                 {
@@ -676,6 +882,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Next token: 1234abcd12abab12ab12123456abcdef/c3sgqk3eiDRMkct7D8EmptWfHSXssPdS7Bo1234abcd-12ab-ab12-ab12-123456abcdefuNDBjUTxm8z6N28yhlUwEmKbrAV/m0k5qVzizwoxFwvyruMbuMx9kADFACSslcabxXl3/jDI4rfFnIsUVdzTLBgPF1hzwrE1f3lcdkBvUp+QgY+Pn3w5QuJmwsp/di8COzFemY89GgOHbLNqsrBsgR/ee2eXoJp0ZkKM4EcBK3HokqBzefLfgR02PnfNOdXwqTlhkSPW0TKiKGIYu3Bw7lSNrLd+q3+wBGNLTnq7RWa21Xjxe5me9SyEscOWAwjnLEf9QpeMhWc/irQe4ijLbCnEZbkbt3hmecsTkxYE/lu3VsPd27PAdH4m+u1lfY5PZHNIkqx2ocEw2Ya797ov+QmFZmKBzimXcyNnbWoE7Hp+nZOKcr2BiQK9SSuBCi2Y/wi1dQ0S5F0u/cv42hTH+ak59mYaNJQOl9NZ+wWD72kMC9GUEYigQs=, Num functions: 1"
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -688,13 +901,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.Functions.*.VpcConfig.VpcId",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
                 }
             ],
             "render": {
@@ -705,8 +911,8 @@
         {
             "action": "add permission",
             "identifier": "add_permission",
+            "undo": "remove permission",
             "description": "Grants an AWS service or another account permission to use a function",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -725,57 +931,53 @@
                     "description": "A statement identifier that differentiates the statement from others in the same policy",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 1
                 },
                 "action": {
                     "description": "The action that the principal can use on the function. For example, lambda:InvokeFunction or lambda:GetFunction",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 },
                 "principal": {
                     "description": "The AWS service or account that invokes the function. If you specify a service, use SourceArn or SourceAccount to limit who can invoke the function through that service",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 3
                 },
                 "source_arn": {
                     "description": "For AWS services, the ARN of the AWS resource that invokes the function. For example, an Amazon S3 bucket or Amazon SNS topic",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 },
                 "source_account": {
                     "description": "For AWS services, the ID of the account that owns the resource. Use this instead of SourceArn to grant permission to resources that are owned by another account (for example, all of an account's Amazon S3 buckets). Or use it together with SourceArn to ensure that the resource is owned by the specified account. For example, an Amazon S3 bucket could be deleted by its owner and recreated by another account",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 },
                 "event_source_token": {
                     "description": "For Alexa Smart Home functions, a token that must be supplied by the invoker",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 6
                 },
                 "qualifier": {
                     "description": "Specify a version or alias to add permissions to a published version of the function",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 7
                 },
                 "revision_id": {
                     "description": "Only accepts the function's $LATEST revision ID. Use this option to avoid modifying a function policy that has changed since you last read it",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 8
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 9
                 }
             },
             "output": [
@@ -783,7 +985,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -791,6 +994,16 @@
                     "data_type": "string",
                     "example_values": [
                         "lambda:InvokeFunction"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2020-12-09 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 },
                 {
@@ -922,7 +1135,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "",
                         "Status: Successfully added permission"
                     ]
                 },

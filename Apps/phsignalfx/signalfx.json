@@ -1,0 +1,1211 @@
+{
+    "appid": "045338a7-bd8b-4014-b516-27391505c71b",
+    "name": "SignalFx",
+    "description": "This App uses the Splunk Infrastructure Monitoring (SignalFx) API to retrieve and send data",
+    "type": "endpoint",
+    "product_vendor": "Splunk",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "product_name": "SignalFx",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "latest_tested_versions": [
+        "Cloud, API api.eu0.signalfx.com, March 25, 2021"
+    ],
+    "contributors": [
+        {
+            "name": "Andreas Buis"
+        },
+        {
+            "name": "Angelo Brancato"
+        }
+    ],
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.4",
+    "utctime_updated": "2021-04-07T12:16:15.000000Z",
+    "package_name": "phantom_signalfx",
+    "main_module": "signalfx_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Splunk Infrastructure Monitoring (SignalFx) URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://api.eu0.signalfx.com",
+            "order": 0
+        },
+        "token": {
+            "description": "Go to SignalFx My Profile -> Access Tokens",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "Retrieves dimensions based on a query",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "'Dimension name' or 'name and value' to search for (e.g: aws_region:region_name)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "signalfx query"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws_region:region_name"
+                    ],
+                    "contains": [
+                        "signalfx query"
+                    ],
+                    "column_name": "Query",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        33
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWSUniqueId"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0872664e6358a5483_us-west-2_102730102752"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.created",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1612448904607
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.creator",
+                    "data_type": "string",
+                    "example_values": [
+                        "EtJfNWZAEAE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.lastUpdated",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1614953320349
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.lastUpdatedBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "AAAAAAAAAAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:ec2:us-west-2:102730102752:instance/i-0872664e6358a5483"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "{Code: 80,Name: stopped}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_image_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ami-0bc06212a56393ee1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_tag_Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tag Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "102730102752"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_hypervisor",
+                    "data_type": "string",
+                    "example_values": [
+                        "xen"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_instance_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "i-0872664e6358a5483"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_launch_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "Fri Mar 05 08:36:59 UTC 2021"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_architecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "x86_64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_state_reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "{Code: Client.UserInitiatedShutdown,Message: Client.UserInitiatedShutdown: User initiated shutdown}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_instance_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "t3.xlarge"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_reservation_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "r-05d593207e739e6cb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_public_dns_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ec2-52-27-24-63.us-west-2.compute.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_private_dns_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "ip-10-0-1-5.us-west-2.compute.internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_root_device_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ebs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_availability_zone",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_public_ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "52.27.24.63"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_iops",
+                    "data_type": "string",
+                    "example_values": [
+                        "100"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_size",
+                    "data_type": "string",
+                    "example_values": [
+                        "8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_encrypted",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_volume_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "vol-0a327b9f8122ee07e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_create_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "Thu Feb 11 08:35:13 UTC 2021"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_snapshot_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "snap-0fddcbbd358fbd48c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_volume_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "gp2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_attachment_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "attached"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_delete_on_termination",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_cluster_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "myFirstEKS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_service_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "service1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_cluster_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACTIVE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_queue_arn",
+                    "data_type": "string",
+                    "example_values": [
+                        "arn:aws:sqs:us-west-2:102730102752:cloud-attackrange-trail-SQS-Deadletter"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_queue_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://sqs.us-west-2.amazonaws.com/102730102752/cloud-attackrange-trail-SQS-Deadletter"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_fifo_queue",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "1605092933"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_visibility_timeout",
+                    "data_type": "string",
+                    "example_values": [
+                        "30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.results.*.customProperties.aws_maximum_message_size",
+                    "data_type": "string",
+                    "example_values": [
+                        "262144"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total results: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "clear incident",
+            "description": "Clears a specified incident",
+            "verbose": "This action clears (resolves) a specific incident that is identified by the parameter incidentid.",
+            "type": "generic",
+            "identifier": "clear_incident",
+            "read_only": false,
+            "parameters": {
+                "incidentid": {
+                    "description": "The ID of the incident to be cleared",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.incidentid",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "column_name": "Incident ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Already resolved"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Resolved Incident successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get incident",
+            "description": "Get details of a specified incident",
+            "verbose": "This action pulls details of a specific incident that is identified by the parameter incidentid.",
+            "type": "investigate",
+            "identifier": "get_incident",
+            "read_only": true,
+            "parameters": {
+                "incidentid": {
+                    "description": "The ID of the incident to get details about",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.incidentid",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Critical",
+                        "Major"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.anomalyState",
+                    "data_type": "string",
+                    "example_values": [
+                        "MANUALLY_RESOLVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "EtNvxe4AEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectLabel",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectorName",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_changed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayBody",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2a t3.xlarge 102730102752 us-west-2 743229228294 instance.state_change Linux aws started t3 Shared EC2.Instances"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isMuted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggeredWhileMuted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggeredNotificationSent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.duration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2169890345
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidentId",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ev9ClaiAEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "started"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.sf_metric",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance.state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_tenancy",
+                    "data_type": "string",
+                    "example_values": [
+                        "Shared"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "102730102752"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.cloud_provider",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_instance_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "t3.xlarge"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_instance_family",
+                    "data_type": "string",
+                    "example_values": [
+                        "t3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_availability_zone",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_master_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "743229228294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.cloud_provider_service",
+                    "data_type": "string",
+                    "example_values": [
+                        "EC2.Instances"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S2.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S3.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Critical"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1615203470345
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "EtNvxe4AEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.incidentId",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectLabel",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.anomalyState",
+                    "data_type": "string",
+                    "example_values": [
+                        "MANUALLY_RESOLVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectorName",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_changed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Incident details fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "signalfx_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list incidents",
+            "description": "List all incidents",
+            "verbose": "This action can return incidents up to index 10000.",
+            "type": "investigate",
+            "identifier": "list_incidents",
+            "read_only": true,
+            "parameters": {
+                "include_resolved": {
+                    "description": "Whether to fetch resolved incidents",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 0
+                },
+                "limit": {
+                    "description": "Number of results to be returned",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.include_resolved",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.incidentId",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Critical",
+                        "Major"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.anomalyState",
+                    "data_type": "string",
+                    "example_values": [
+                        "MANUALLY_RESOLVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "EtNvxe4AEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectLabel",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectorName",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_changed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayBody",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2a t3.xlarge 102730102752 us-west-2 743229228294 instance.state_change Linux aws started t3 Shared EC2.Instances"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isMuted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggeredWhileMuted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.triggeredNotificationSent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ev9ClaiAEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "started"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.sf_metric",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance.state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_region",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_tenancy",
+                    "data_type": "string",
+                    "example_values": [
+                        "Shared"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_platform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "102730102752"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.cloud_provider",
+                    "data_type": "string",
+                    "example_values": [
+                        "aws"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_instance_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "t3.xlarge"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_instance_family",
+                    "data_type": "string",
+                    "example_values": [
+                        "t3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_availability_zone",
+                    "data_type": "string",
+                    "example_values": [
+                        "us-west-2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.aws_master_account_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "743229228294"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.key.cloud_provider_service",
+                    "data_type": "string",
+                    "example_values": [
+                        "EC2.Instances"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S1.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S2.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.inputs._S3.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Critical"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.timestamp",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1615203470345
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectorId",
+                    "data_type": "string",
+                    "example_values": [
+                        "EtNvxe4AEAA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.incidentId",
+                    "data_type": "string",
+                    "contains": [
+                        "signalfx incidentid"
+                    ],
+                    "example_values": [
+                        "Et6d4doAIAg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectLabel",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_state_change"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.anomalyState",
+                    "data_type": "string",
+                    "example_values": [
+                        "MANUALLY_RESOLVED"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.detectorName",
+                    "data_type": "string",
+                    "example_values": [
+                        "instance_changed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.duration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2169890345
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total incidents: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_incidents",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "view": "signalfx_view.display_view"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

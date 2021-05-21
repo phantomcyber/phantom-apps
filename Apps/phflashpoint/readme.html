@@ -1,0 +1,384 @@
+<!-- File: redme.html
+
+    Copyright (c) Flashpoint, 2020
+
+    This unpublished material is proprietary to Flashpoint.
+    All rights reserved. The methods and
+    techniques described herein are considered trade secrets
+    and/or confidential. Reproduction or distribution, in whole
+    or in part, is forbidden except by express written permission
+    of Flashpoint.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
+-->
+<html>
+    <body>
+        <p><h2>Explanation of Asset Configuration Parameters</h2>
+            The asset configuration parameters affect [test connectivity] and all the other actions of the application. Below are the explanation and usage of all those parameters.
+            <ul>
+                <li>
+                    <b>Base URL - </b> The URL to connect to the Flashpoint server.
+                </li>
+                <li>
+                    <b>API Token - </b> The API token of the user.
+                </li>
+                <li>
+                    <b>Retry Wait Period (in seconds) - </b> The value of this parameter defines the waiting period in seconds for which to hold the current execution of the action on receiving the “500 Internal Server Error” and then, retry the same API call after the waiting period is exhausted. This ensures that the integration provides a mechanism of attempting to overcome the intermittent “500 Internal Server Error”. It allows only non-zero positive integer values as input. The default value is 5 seconds.
+                </li>
+                <li>
+                    <b>Number Of Retries - </b>  The value of this parameter defines the number of attempts for which the action will keep on retrying if the Flashpoint API continuously returns the “500 Internal Server Error”. If the intermittent error gets eliminated before the number of retries gets exhausted, then, the action execution will continue along its workflow with the next set of API calls and if the intermittent error is still persistent and all the number of retries are exhausted, then, the action will fail with the latest error message being displayed. It allows only zero or positive integer values as input. The default value is 1 retry.
+                </li>
+                <li>
+                    <b>Session Timeout - </b> This is an optional asset configuration parameter. The value of this parameter will be used as the session timeout value in the ‘Get Compromised Credentials’ and ‘Run Query’ actions while using the session scrolling pagination. The default value is 2 minutes and the maximum allowed value is 60 minutes.
+                </li>
+            </ul>
+        </p>
+
+        <p><h2>Steps to generate API Token</h2>
+            <ol>
+                <li>Go to <a href="https://fp.tools/" target="_blank">Flashpoint</a>.</li>
+                <li>Select <b>APIs & Integrations</b> from the left side panel.</li>
+                <li>Under the <b>FLASHPOINT API</b> section, select <b>Manage API Tokens</b>.</li>
+                <li>Click on the <b>GENERATE TOKEN</b>.</li>
+                <li>Enter a <b>Token Label</b> and your current FPTools credentials in the <b>Username</b> and <b>Password</b> fields in the appeared <b>Generate API Token</b> prompt.</li>
+                <li>Click on the <b>GENERATE</b> button.</li>
+                <li>This will generate a new API token and will display it in the <b>GENERATE API TOKEN</b> section on the page.</li>
+            </ol>
+            &emsp;<b>Note-</b> Save your generated API token somewhere secure, as you will no longer be able to retrieve this key after leaving this page.
+        </p>
+
+        <p><h2>Explanation of Flashpoint Actions' Parameters</h2>
+            <ol>
+                <h3><li>Test Connectivity (Action Workflow Details)</li></h3>
+                    <ul>
+                        <li> This action will test the connectivity of the Phantom server to the Flashpoint instance by making an initial API call to the Indicators API using the provided asset configuration parameters.</li>
+                        <li> The action validates the provided asset configuration parameters. Based on the API call response, the appropriate success and failure message will be displayed when the action gets executed.</li>
+                    </ul>
+                <br>
+
+                <h3><li>List Indicators</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Attribute Types</b>
+                            <ul>
+                                <li>This parameter enables search by attribute types. It is an optional action parameter. It supports the comma-separated list of attribute types values. Each value from the provided comma-separated list must correspond to one of the MISP types, a list of which can be found <a href="https://www.circl.lu/doc/misp/categories-and-types/#types" target="_blank">here</a>.</li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Get recent md5, sha1, or source IP indicators
+                                            <ul style="list-style-type:none;">
+                                                <li>Attribute Types = md5,sha1,ip-src </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u>​ - Query</b>
+                            <ul>
+                                <li>This parameter will be used for free text searching. It is an optional parameter. You can also provide different queries to filter out indicators results.</li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Filtering results based on the field value
+                                            <ul style="list-style-type:none;">
+                                                <li>Query = category:”Payload Delivery”</li>
+                                            </ul>
+                                        </li>
+                                        <li>Free text search(when using multiple words, use a + instead of space, and for specific word search use “test text” (inverted double quotes) in the query action parameter.)
+                                            <ul style="list-style-type:none;">
+                                                <li> Query = gandcrab+ransomware </li>
+                                                <li> Query = “test text” </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u> - Limit</b>
+                            <ul>
+                                <li>This parameter is used to limit the number of indicator results. The default value is 500. If the limit is not provided, it will fetch by default 500 indicator results.</li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li>
+                            <b><u>Notes</u>-</b> The user will have to provide URL value in the "Attribute Types" action parameter and the URL value enclosed in double-quotes in the "Query" parameter if they want to search for an IoC having a specific URL value. This does not work correctly if the user provides the URL value without double-quotes in the "Query" parameter. This is based on the current API behavior of the Flashpoint.
+                        </li>
+                    </ul>
+                <br>
+
+                <h3><li>Search Indicators</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Attribute Type and Attribute Value</b>
+                            <ul>
+                                <li>These parameters are required parameters. They will be used to retrieve specific indicator results based on the provided values.</li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li> Get indicator matching a specific hash value
+                                            <ul style="list-style-type:none;">
+                                                <li>Attribute Type = md5 (any of md5,sha1,sha256, etc.)</li>
+                                                <li>Attribute Value= 16139ce9025274a388a4281fef65049e</li>
+                                            </ul>
+                                        </li>
+                                        <br>
+                                        <li> Get indicator matching a specific filename
+                                            <ul style="list-style-type:none;">
+                                                <li>Attribute Type = filename</li>
+                                                <li>Attribute Value= "PLEASE-CHECK”</li>
+                                            </ul>
+                                            <u>Note</u>- In the above example, without the double quotes around the filename, it will search for every filename that matches 'PLEASE'. The hyphen/space will be considered as the end of the search value and it will search for indicators matching the value until the first encountered hyphen/space.
+                                        </li>
+                                        <br>
+                                        <li> Get indicator matching a specific source IP Address
+                                            <ul style="list-style-type:none;">
+                                                <li>Attribute Type = ip-src</li>
+                                                <li>Attribute Value = 111.255.198.92</li>
+                                            </ul>
+                                        </li>
+                                        <br>
+                                        <li> Get indicator matching a specific URL value
+                                            <ul style="list-style-type:none;">
+                                                <li>Attribute Type = url</li>
+                                                <li>Attribute Value= http://ww1.gadmobs.com/?subid1=bf5b0786-272c-11e9-b8c7-e15edf920d61</li>
+                                            </ul>
+                                            <u>Note</u>- Internally, this URL value passed within the inverted comma(for ad-hoc fixation) in the request parameters. Because without the inverted comma, the server responded with the Internal Server Error unnecessarily.
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u>​ - Limit</b>
+                            <ul>
+                                <li>This parameter is used to limit the number of indicator results. The default value is 500. If the limit is not provided, it will fetch by default 500 indicator results.</li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li>
+                            <b><u>Notes</u>-</b> This action is not working with the valid value of IoC type which consists of pipe symbol(|) in its name. In case of searching the IoC of that type, you can use [run query] or [list indicators] actions by providing an appropriate query in the "Query" action parameter. Below are the examples:
+                            
+                            <p><u>For [run query] action</u>:
+                                <br><br>Search for IoC value which consists of pipe symbol(|) in the IoC attribute type
+                                    <ul><u>Usage</u>:
+                                        <li>Query = +basetypes:indicator_attribute +type:"&lt;ioc_type&gt;" +value.\*:&lt;ioc_value&gt;</li>
+                                    </ul>
+                                    <br>
+                                    <ul><u>Example</u>:
+                                        <li> Query = +basetypes:indicator_attribute +type:"ip-dst|port" +value.\*:5.79.68.110|80</li>
+                                    </ul>
+                            </p>
+
+                            <p><u>For [list indicators] action</u>:
+                                <br><br>Search for IoC value which consists of pipe symbol(|) in the IoC attribute type
+                                    <ul><u>Usage</u>:
+                                        <li> Attribute Types = &lt;ioc_type&gt; </li>
+                                        <li> Query = +value.\*:&lt;ioc_value&gt; </li>
+                                    </ul>
+                                    <br>
+                                    <ul><u>Example</u>:
+                                        <li> Attribute Types = ip-dst|port </li>
+                                        <li> Query = +value.\*:"5.79.68.110|80"</li>
+                                    </ul>
+                            </p>
+                        </li>
+                    </ul>
+                <br>
+
+                <h3><li>List Reports</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Limit</b>
+                            <ul>
+                                <li>This is an optional parameter. It is used to limit the number of fetched intelligence reports. The default value is 500. If the limit is not provided, it will fetch by default 500 intelligence reports.</li>
+                            </ul>
+                        </li>
+                        <br>
+                        <b><U>Note</U>-</b> Based on the current API analysis, the endpoint for this action fetches a huge set of data. Hence, the action run might take more time for a larger limit value.
+                    </ul>
+                <br>
+
+                <h3><li>Get Report</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Report ID</b>
+                            <ul>
+                                <li>This is a required parameter. It is a Flashpoint intelligence report ID.</li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Fetch an intelligence report having the provided report ID value
+                                            <ul style="list-style-type:none;">
+                                                <li> Report ID = wrh9BCZETzu3AO3CUopOlw </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                <br>
+
+                <h3><li>List Related Reports</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Report ID</b>
+                            <ul>
+                                <li>This is a required parameter. It is a Flashpoint intelligence report ID.</li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Fetch default 500 related intelligence reports for the provided report ID
+                                            <ul style="list-style-type:none;">
+                                                <li> Report ID = wrh9BCZETzu3AO3CUopOlw </li>
+                                                <li> Limit = Keep it empty </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u>​ - Limit</b>
+                            <ul>
+                                <li>This is an optional parameter. It is used to limit the number of fetched intelligence reports. The default value is 500. If the limit is not provided, it will fetch by default 500 intelligence reports.</li>
+                            </ul>
+                        </li>
+                        <br>
+                        <b><U>Note</U>-</b> Based on the current API analysis, the endpoint for this action fetches a huge set of data. Hence, the action run might take more time for a larger limit value.
+                    </ul>
+                <br>
+
+                <h3><li>Get Compromised Credentials</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Filter</b>
+                            <ul>
+                                <li>This parameter will be used for filtering the data of credentials sightings on the Flashpoint instance. It is an optional parameter. If not given, it will get all the compromised credentials. A few sample values of the filter action parameter are listed below.
+                                    <ul>
+                                        <li>+is_fresh:true (search for only new credential sightings)</li>
+                                        <li>+breach.first_observed_at.date-time:[now-30d TO now]  (search for credential sightings which are discovered in the last month based on the date provided from the source of this credential sightings data) </li>
+                                        <li>+breach.fpid:nIbeDs_VXyKedBmuhFEaGQ (search for all credential sightings in a Breach)</li>
+                                        <li>+email:username (search for a username)</li>
+                                        <li>+email.keyword:username@domain.com (search for an email address)</li>
+                                        <li>+domain.keyword:domain.com (search for credentials sightings data of a particular domain)</li>
+                                    </ul>
+                                </li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Search for credential sightings of the given domain and that are discovered in the last month based on the date provided from the source of this credential sightings data
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +domain.keyword:domain.com+breach.first_observed_at.date-time:[now-30d TO now] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for credential sightings of the given domain and that are discovered in the last month based on the date of indexing of the data into the Flashpoint server
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +domain.keyword:domain.com+header_.indexed_at:[now-30d TO now] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for credential sightings which are discovered in the last month based on the date of indexing of the data into the Flashpoint server
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +header_.indexed_at:[now-30d TO now] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for credential sightings which are discovered in between the provided timestamps based on the date provided from the source of this credential sightings data
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +breach.first_observed_at.timestamp:[1234567890 TO 1234567890] </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><b>Usage:</b>
+                                    <ul>
+                                        <li>For making filter parameter value
+                                            <ul style="list-style-type:none;">
+                                                <li> Query= +basetypes:credential-sighting&lt;filter&gt;  </li>
+                                            </ul>
+                                            Here, the filter is any supported values by the search API endpoint.
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u>​ - Limit</b>
+                            <ul>
+                                <li>This parameter is used to limit the number of fetched compromised credentials. The default value is 500. If the limit is not provided, it will fetch by default 500 compromised credentials. The internal pagination logic for fetching a large number of compromised credentials implements the scrolling session-based Credentials All Search APIs.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                <br>
+
+                <h3><li>Run Query</li></h3>
+                    <ul>
+                        <li><b><u>Action Parameter</u>​ - Query</b>
+                            <ul>
+                                <li>This parameter will be used to search across all fields in the marketplace data by appending terms to it or limit searches to individual fields by appending &lt;field name&gt;:&lt;value&gt; to the ‘Query’ parameter. The queries supported by action are listed below.
+                                    <ul>
+                                        <li>Credential breach queries (+basetypes:breach)</li>
+                                        <li>CVE queries (+basetypes:cve)</li>
+                                        <li>Card queries (+basetypes:card)</li>
+                                        <li>Paste queries (+basetypes:paste)</li>
+                                        <li>Chat queries (+basetypes:generic-product)</li>
+                                        <li>Indicator attribute queries (+basetypes:indicator_attribute)</li>
+                                        <li>Credential sightings queries (+basetypes:credential-sighting)</li>
+                                        <li>Vulnerability queries (+basetypes:vulnerability)</li>
+                                        <li>Conversation queries (+basetypes:conversation)</li>
+                                        <li>Chan queries (+basetypes:chan)</li>
+                                        <li>Blog queries (+basetypes:blog)</li>
+                                        <li>Reddit queries (+basetypes:reddit)</li>
+                                        <li>Forum queries (+basetypes:forum)</li>
+                                    </ul>
+                                </li>
+                                <li><b>Examples:</b>
+                                    <ul>
+                                        <li>Search for "Analyst Research" breaches
+                                            <ul style="list-style-type:none;">
+                                                <li> Query= +basetypes:breach+source_type:"Analyst Research" </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for "testing" across all free-form fields (message body, channel profile, channel name, and user name) for chat queries
+                                            <ul style="list-style-type:none;">
+                                                <li> Query = +basetypes:chat+testing </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for credential sightings of the given domain and that are discovered in the last month based on the date provided from the source of this credential sightings data
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +basetypes:credential-sighting+domain.keyword:domain.com+breach.first_observed_at.date-time:[now-30d TO now] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Search for all search results which are discovered in the last month based on the date of indexing of the data into the Flashpoint server
+                                            <ul style="list-style-type:none;">
+                                                <li> Filter = +header_.indexed_at:[now-30d TO now] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Filter all search results by ISO date/time range based on the date provided from the source of this search data
+                                            <ul style="list-style-type:none;">
+                                                <li> Query = +created_at.date-time:["2018-10-24T10:05:10+00:00" TO "2018-10-26T10:05:10+00:00"] </li>
+                                            </ul>
+                                        </li>
+                                        <li>Filter results by Unix time for all paste results based on the date provided from the source of this paste search data
+                                            <ul style="list-style-type:none;">
+                                                <li> Query = +basetypes:paste+created_at.timestamp:[1234567890 TO 1234567890] </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><b>Usage:</b>
+                                    <ul>
+                                        <li>For making query parameter value
+                                            <ul style="list-style-type:none;">
+                                                <li> Query= &lt;basetypes_query&gt;&lt;search_filter&gt; </li>
+                                            </ul>
+                                            Here, basetypes_query and search_filter are any supported values by the search API endpoint.
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+                        <br>
+                        <li><b><u>Action Parameter</u>​ - Limit</b>
+                            <ul>
+                                <li>This parameter is used to limit the number of fetched all search data. The default value is 500. If the limit is not provided, it will fetch by default 500 search items. The internal pagination logic for fetching a large number of search items implements the scrolling session-based All Search APIs.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                <br>
+            </ol>        
+        </p>
+
+    </body>
+</html>

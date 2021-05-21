@@ -1,5 +1,5 @@
 # File: awslambda_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -10,7 +10,7 @@ from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
 from awslambda_consts import *
-from boto3 import client
+from boto3 import client, Session
 from datetime import datetime
 from botocore.config import Config
 import botocore.response as br
@@ -19,6 +19,7 @@ import requests
 import json
 import base64
 import six
+import ast
 
 
 class RetVal(tuple):
@@ -37,6 +38,7 @@ class AwsLambdaConnector(BaseConnector):
         self._region = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._proxy = None
 
     def _sanitize_data(self, cur_obj):
@@ -100,11 +102,31 @@ class AwsLambdaConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, self._sanitize_data(resp_json)
 
-    def _create_client(self, action_result):
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
+    def _create_client(self, action_result, param):
 
         boto_config = None
         if self._proxy:
             boto_config = Config(proxies=self._proxy)
+
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Failed to get temporary credentials:{0}".format(e))
 
         try:
             if self._access_key and self._secret_key:
@@ -114,6 +136,7 @@ class AwsLambdaConnector(BaseConnector):
                     region_name=self._region,
                     aws_access_key_id=self._access_key,
                     aws_secret_access_key=self._secret_key,
+                    aws_session_token=self._session_token,
                     config=boto_config)
             else:
                 self.debug_print("Creating boto3 client without API keys")
@@ -133,13 +156,13 @@ class AwsLambdaConnector(BaseConnector):
 
         self.save_progress("Querying AWS to check credentials")
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
-        # make rest call
+        # make boto3 call
         ret_val, resp_json = self._make_boto_call(action_result, 'list_functions', MaxItems=1)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed.")
             return action_result.get_status()
 
@@ -156,7 +179,7 @@ class AwsLambdaConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         function_name = param['function_name']
@@ -187,10 +210,10 @@ class AwsLambdaConnector(BaseConnector):
         if invocation_type == 'Event' or invocation_type == 'DryRun':
             empty_payload = True
 
-        # make rest call
+        # make boto3 call
         ret_val, response = self._make_boto_call(action_result, 'invoke', False, empty_payload, **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -213,7 +236,7 @@ class AwsLambdaConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         function_version = param.get('function_version')
@@ -228,10 +251,10 @@ class AwsLambdaConnector(BaseConnector):
         if max_items is not None:
             args['MaxItems'] = int(max_items)
 
-        # make rest call
+        # make boto3 call
         ret_val, response = self._make_boto_call(action_result, 'list_functions', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if response.get('error', None) is not None:
@@ -255,7 +278,7 @@ class AwsLambdaConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         function_name = param['function_name']
@@ -285,10 +308,10 @@ class AwsLambdaConnector(BaseConnector):
         if revision_id:
             args['RevisionId'] = revision_id
 
-        # make rest call
+        # make boto3 call
         ret_val, response = self._make_boto_call(action_result, 'add_permission', **args)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -297,6 +320,45 @@ class AwsLambdaConnector(BaseConnector):
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['status'] = "Successfully added permission"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_remove_permission(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not self._create_client(action_result, param):
+            return action_result.get_status()
+
+        function_name = param['function_name']
+        statement_id = param['statement_id']
+        qualifier = param.get('qualifier')
+        revision_id = param.get('revision_id')
+
+        args = {
+            'FunctionName': function_name,
+            'StatementId': statement_id,
+        }
+
+        if qualifier:
+            args['Qualifier'] = qualifier
+        if revision_id:
+            args['RevisionId'] = revision_id
+
+        # make boto3 call
+        ret_val, response = self._make_boto_call(action_result, 'remove_permission', **args)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(response)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['status'] = "Successfully removed permission"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -321,6 +383,9 @@ class AwsLambdaConnector(BaseConnector):
         elif action_id == 'add_permission':
             ret_val = self._handle_add_permission(param)
 
+        elif action_id == 'remove_permission':
+            ret_val = self._handle_remove_permission(param)
+
         return ret_val
 
     def initialize(self):
@@ -332,11 +397,6 @@ class AwsLambdaConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        if LAMBDA_JSON_ACCESS_KEY in config:
-            self._access_key = config.get(LAMBDA_JSON_ACCESS_KEY)
-        if LAMBDA_JSON_SECRET_KEY in config:
-            self._secret_key = config.get(LAMBDA_JSON_SECRET_KEY)
-
         self._region = LAMBDA_REGION_DICT.get(config[LAMBDA_JSON_REGION])
 
         self._proxy = {}
@@ -345,6 +405,22 @@ class AwsLambdaConnector(BaseConnector):
             self._proxy['http'] = env_vars['HTTP_PROXY']['value']
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, EC2_ROLE_CREDENTIALS_FAILURE_MSG)
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get(LAMBDA_JSON_ACCESS_KEY)
+        self._secret_key = config.get(LAMBDA_JSON_SECRET_KEY)
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, LAMBDA_BAD_ASSET_CONFIG_MSG)
 
         return phantom.APP_SUCCESS
 
@@ -374,13 +450,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print("Accessing the Login page")
@@ -411,7 +487,7 @@ if __name__ == '__main__':
         connector = AwsLambdaConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
