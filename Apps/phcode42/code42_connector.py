@@ -227,6 +227,23 @@ class Code42Connector(BaseConnector):
 
         return True
 
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, CODE42_ERR_INVALID_INTEGER_VALUE.format(msg="", param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, CODE42_ERR_INVALID_INTEGER_VALUE.format(msg="", param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, CODE42_ERR_INVALID_INTEGER_VALUE.format(msg="non-negative", param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, CODE42_ERR_INVALID_INTEGER_VALUE.format(msg="non-zero positive", param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _make_rest_call(self, endpoint, action_result, timeout=None, params=None, data=None, method="get"):
         """ Function that makes the REST call to the app.
 
@@ -497,27 +514,6 @@ class Code42Connector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return None
             return org_id
-
-    @staticmethod
-    def _verify_device_int_param(input_value):
-        """ This function is used to check that the input for device_id is positive integer.
-        For e.g. if user passes 5 it will passed as an integer, but if user passes random
-        string it will be passed as an string.
-
-        :param input_value: Input parameter
-        :return: phantom.APP_SUCCESS/phantom.APP_ERROR, ID of the User
-        """
-
-        if isinstance(input_value, str) and not input_value.isdigit():
-            return phantom.APP_ERROR
-
-        if isinstance(input_value, float):
-            return phantom.APP_ERROR
-
-        if isinstance(input_value, int) and input_value <= 0:
-            return phantom.APP_ERROR
-
-        return phantom.APP_SUCCESS
 
     def _check_status(self, endpoint, id, action_result):
         """ This function is used to check the status of a given user or device.
@@ -832,11 +828,10 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         device_id = param[CODE42_JSON_DEVICE_ID]
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         endpoint = CODE42_BLOCK_DEVICE_ENDPOINT.format(device_id=device_id)
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
 
         status, response = self._check_status(CODE42_DEVICES_ENDPOINT, device_id, action_result)
 
@@ -872,11 +867,10 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         device_id = param[CODE42_JSON_DEVICE_ID]
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         endpoint = CODE42_BLOCK_DEVICE_ENDPOINT.format(device_id=device_id)
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
 
         status, response = self._check_status(CODE42_DEVICES_ENDPOINT, device_id, action_result)
 
@@ -912,11 +906,10 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         device_id = param[CODE42_JSON_DEVICE_ID]
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         endpoint = CODE42_DEACTIVATE_DEVICE_ENDPOINT.format(device_id=device_id)
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
 
         status, response = self._check_status(CODE42_DEVICES_ENDPOINT, device_id, action_result)
 
@@ -951,11 +944,10 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         device_id = param[CODE42_JSON_DEVICE_ID]
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         endpoint = CODE42_DEACTIVATE_DEVICE_ENDPOINT.format(device_id=device_id)
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
 
         status, response = self._check_status(CODE42_DEVICES_ENDPOINT, device_id, action_result)
 
@@ -990,11 +982,10 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         device_id = param[CODE42_JSON_DEVICE_ID]
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         endpoint = CODE42_DEAUTHORIZE_DEVICE_ENDPOINT.format(device_id=device_id)
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
 
         status, response = self._check_status(CODE42_DEVICES_ENDPOINT, device_id, action_result)
 
@@ -1150,10 +1141,9 @@ class Code42Connector(BaseConnector):
 
         # Input parameter device_id
         device_id = param[CODE42_JSON_DEVICE_ID]
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Get details for the given device_id
         endpoint_device = "{}/{}".format(CODE42_DEVICES_ENDPOINT, device_id)
@@ -1198,10 +1188,9 @@ class Code42Connector(BaseConnector):
 
         # Input parameter device_id
         device_id = param[CODE42_JSON_DEVICE_ID]
-
-        if not self._verify_device_int_param(device_id):
-            self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
+        ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Get details for the given device_id
         endpoint_device = "{}/{}".format(CODE42_DEVICES_ENDPOINT, device_id)
@@ -1238,6 +1227,33 @@ class Code42Connector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _paginator(self, action_result, filter_dict, endpoint, limit):
+        next_token = ""
+        list_items = []
+
+        while True:
+            filter_dict['pgToken'] = next_token
+
+            request_status, request_response = self._make_rest_call(endpoint=endpoint,
+                                                                    method="post", action_result=action_result,
+                                                                    data=filter_dict)
+
+            if phantom.is_fail(request_status):
+                return action_result.get_status(), None
+
+            if not request_response.get('fileEvents', []):
+                break
+
+            list_items.extend(request_response.get('fileEvents', []))
+
+            if limit and len(list_items) >= limit:
+                return phantom.APP_SUCCESS, list_items
+
+            next_token = request_response.get("nextPgToken", "")
+            if not next_token:
+                break
+        return phantom.APP_SUCCESS, list_items
+
     def _handle_hunt_file(self, param):
         """ This function is used to hunt the file.
 
@@ -1249,6 +1265,10 @@ class Code42Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         file_hash = param[CODE42_JSON_FILE_HASH]
+        limit = param.get(MAX_RESULTS_KEY, CODE42_DEFAULT_PAGE_SIZE)
+        ret_val, limit = self._validate_integer(action_result, limit, MAX_RESULTS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         url_determined = self._determine_forensic_search_url(action_result=action_result)
 
@@ -1269,25 +1289,12 @@ class Code42Connector(BaseConnector):
             ]
         }
 
-        page_num = CODE42_PAGINATION
-        while True:
-            filter_dict['pgNum'] = page_num
-            request_status, request_response = self._make_rest_call(endpoint=CODE42_FORENSIC_SEARCH_ENDPOINT,
-                                                                    method="post", action_result=action_result,
-                                                                    data=filter_dict)
+        ret_val, list_items = self._paginator(action_result, filter_dict, CODE42_FORENSIC_SEARCH_ENDPOINT, limit)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-            if phantom.is_fail(request_status):
-                return action_result.get_status()
-
-            if not request_response.get('fileEvents', []):
-                break
-
-            for item in request_response['fileEvents']:
-                action_result.add_data(item)
-            page_num += CODE42_PAGINATION
-
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, status_message='No events found')
+        for item in list_items:
+            action_result.add_data(item)
 
         summary = action_result.update_summary({})
         summary['total_events'] = action_result.get_data_size()
@@ -1341,7 +1348,10 @@ class Code42Connector(BaseConnector):
         private_ip = param.get(CODE42_JSON_PRIVATE_IP)
         public_ip = param.get(CODE42_JSON_PUBLIC_IP)
         query = param.get(CODE42_JSON_QUERY)
-        limit = param.get(CODE42_MAX_RESULTS, CODE42_DEFAULT_PAGE_SIZE)
+        limit = param.get(MAX_RESULTS_KEY, CODE42_DEFAULT_PAGE_SIZE)
+        ret_val, limit = self._validate_integer(action_result, limit, MAX_RESULTS_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # If query parameter is present, ignore other parameters
         if query:
@@ -1481,32 +1491,12 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(url_determined):
             return action_result.get_status()
 
-        next_token = ""
-        list_items = []
+        ret_val, list_items = self._paginator(action_result, filter_dict, CODE42_FORENSIC_SEARCH_ENDPOINT, limit)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        while True:
-            filter_dict['pgToken'] = next_token
-
-            request_status, request_response = self._make_rest_call(endpoint=CODE42_FORENSIC_SEARCH_ENDPOINT,
-                                                                    method="post", action_result=action_result,
-                                                                    data=filter_dict)
-
-            if phantom.is_fail(request_status):
-                return action_result.get_status()
-
-            if not request_response.get('fileEvents', []):
-                break
-
-            list_items.extend(request_response.get('fileEvents', []))
-
-            if limit and len(list_items) >= limit:
-                for item in list_items[:limit]:
-                    action_result.add_data(item)
-                break
-
-            next_token = request_response.get("nextPgToken", "")
-            if not next_token:
-                break
+        for item in list_items:
+            action_result.add_data(item)
 
         summary = action_result.update_summary({})
         summary['total_events'] = action_result.get_data_size()
@@ -1532,9 +1522,9 @@ class Code42Connector(BaseConnector):
         # get specific device
         device_id = param.get(CODE42_JSON_DEVICE_ID)
         if device_id:
-            if not self._verify_device_int_param(device_id):
-                self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
-                return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
+            ret_val, device_id = self._validate_integer(action_result, device_id, CODE42_JSON_DEVICE_ID)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
             endpoint = "{}/{}".format(CODE42_DEVICES_ENDPOINT, device_id)
 
             request_status, request_response = self._make_rest_call(endpoint=endpoint, action_result=action_result)
@@ -1843,10 +1833,11 @@ class Code42Connector(BaseConnector):
 
         ret_val, user_id = self.is_valid_identifier(departing_user, action_result, True)
         if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            self.debug_print(CODE42_INVALID_USER_ID_MSG)
+            return action_result.set_status(phantom.APP_ERROR, CODE42_INVALID_USER_ID_MSG)
 
         # create detection profile
-        url = "{}{}".format(param['departing_employee_url'], CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT)
+        url = "{}{}".format(departing_employee_url, CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT)
         body = {
             'tenantId': tenant_id,
             'userName': departing_user,
@@ -1904,8 +1895,11 @@ class Code42Connector(BaseConnector):
                             message += "Notes updated. "
             elif 'pop-bulletin' in r:
                 return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
-            else:
+            elif 200 <= r.status_code < 399:
                 message += "Detection list profile created. "
+            else:
+                message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
+                return action_result.set_status(phantom.APP_ERROR, message)
 
             body = {
                 'tenantId': tenant_id,

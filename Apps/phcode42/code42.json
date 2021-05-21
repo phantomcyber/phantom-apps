@@ -4237,6 +4237,12 @@
                         "md5"
                     ],
                     "order": 0
+                },
+                "max_results": {
+                    "description": "Max results to return (Default: 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 1
                 }
             },
             "output": [
@@ -4248,6 +4254,13 @@
                     ],
                     "contains": [
                         "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -4765,7 +4778,6 @@
                 "max_results": {
                     "description": "Max results to return (Default: 100)",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 100,
                     "order": 10
                 },

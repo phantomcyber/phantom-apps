@@ -51,6 +51,7 @@ CODE42_JSON_QUERY = 'query'
 CODE42_MAX_RESULTS = 'max_results'
 CODE42_JSON_RESTORE_ID = 'restore_id'
 CODE42_JSON_WEB_RESTORE_SESSION_ID = "web_restore_session_id"
+MAX_RESULTS_KEY = "max_results"
 CODE42_TIMEOUT = 30
 CODE42_PAGINATION = 1
 CODE42_DEFAULT_PAGE_SIZE = 100
@@ -106,6 +107,9 @@ ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
 TYPE_ERR_MSG = "Error occurred while connecting to the Code42 Server. Please check the asset configuration and|or the action parameters"
+
+# Constants for _validate_integer method
+CODE42_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value in the "{param}" action parameter'
 
 # value list for file_event parameter in run query action
 FILE_EVENT_LIST = [
