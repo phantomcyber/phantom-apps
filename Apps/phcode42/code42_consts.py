@@ -1,8 +1,8 @@
 # File: code42_consts.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 CODE42_CONFIG_USERNAME = 'username'
 CODE42_CONFIG_PASSWORD = 'password'
@@ -27,6 +27,11 @@ CODE42_ACCESS_LOCK_ENDPOINT = '/c42api/v3/AccessLock'
 CODE42_ORGANIZATION_INFO_ENDPOINT = '/c42api/v3/customer/my'
 CODE42_DEPARTING_EMPLOYEE_ENDPOINT = '/svc/api/v1/departingemployee/create'
 CODE42_FORENSIC_SEARCH_ENDPOINT = '/forensic-search/queryservice/api/v1/fileevent'
+CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT = '/svc/api/v2/user/create'
+CODE42_DEPARTING_EMPLOYEE_V2_ENDPOINT = '/svc/api/v2/departingemployee/add'
+CODE42_GET_PROFILE_BY_USERNAME = '/svc/api/v2/user/getbyusername'
+CODE42_UPDATE_CLOUD_USERNAMES = '/svc/api/v2/user/addcloudusernames'
+CODE42_UPDATE_NOTES = '/svc/api/v2/user/updatenotes'
 CODE42_JSON_DEVICE_ID = 'device_id'
 CODE42_JSON_DATA = 'data'
 CODE42_JSON_USER = 'user'
@@ -43,6 +48,7 @@ CODE42_JSON_HOST_NAME = 'hostname'
 CODE42_JSON_PUBLIC_IP = 'public_ip'
 CODE42_JSON_PRIVATE_IP = 'private_ip'
 CODE42_JSON_QUERY = 'query'
+CODE42_MAX_RESULTS = 'max_results'
 CODE42_JSON_RESTORE_ID = 'restore_id'
 CODE42_JSON_WEB_RESTORE_SESSION_ID = "web_restore_session_id"
 CODE42_TIMEOUT = 30
@@ -89,6 +95,22 @@ CODE42_CONNECTION_MSG = 'Querying endpoint to verify the credentials provided'
 CODE42_TOKEN_SUCCESS_MSG = 'Token generated'
 CODE42_TEST_CONNECTIVITY_FAILED_MSG = 'Test connectivity failed'
 CODE42_TEST_CONNECTIVITY_PASSED_MSG = 'Test connectivity passed'
-CODE42_DEVICE_TOKEN_GENERATION_FAILED = 'Failed to generate DataKeyToken. See error message for details.'
-CODE42_RESTORE_SESSION_CREATION_FAILED = 'Failed to create WebRestoreSession. See error message for details.'
-CODE42_RESTORE_NO_PATHS_SUPPLIED = 'Either \"files\" or \"directories\" parameters must be supplied! Please fill at least one of these parameters and execute the action again.'
+CODE42_DEVICE_TOKEN_GENERATION_FAILED = 'Failed to generate DataKeyToken. See error message for details'
+CODE42_RESTORE_SESSION_CREATION_FAILED = 'Failed to create WebRestoreSession. See error message for details'
+CODE42_RESTORE_NO_PATHS_SUPPLIED = 'Either \"files\" or \"directories\" parameters must be supplied! Please fill at least one of these parameters and execute the action again'
+CODE42_FILE_EVENT_INVALID = "Please provide a valid 'file_event' parameter"
+CODE42_CONNECTION_FAILED = "Unable to connect to server"
+
+# Constants relating to '_get_error_message_from_exception'
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Code42 Server. Please check the asset configuration and|or the action parameters"
+
+# value list for file_event parameter in run query action
+FILE_EVENT_LIST = [
+                    "",
+                    "New file",
+                    "Modified",
+                    "No longer observed"
+                ]

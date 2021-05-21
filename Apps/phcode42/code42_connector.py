@@ -1,8 +1,8 @@
 # File: code42_connector.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 import json
 import ipaddress
@@ -40,8 +40,39 @@ class Code42Connector(BaseConnector):
         self._forensic_search_url = None
         self._auth_token = None
 
-    @staticmethod
-    def _process_empty_response(response, action_result):
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
+    def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: response data
@@ -77,6 +108,9 @@ class Code42Connector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text.encode('utf-8')
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -104,8 +138,7 @@ class Code42Connector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _process_json_response(response, action_result):
+    def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: response data
@@ -119,8 +152,9 @@ class Code42Connector(BaseConnector):
             if response.text:
                 resp_json = response.json()
         except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(str(e))), None)
+                                                   format(err_msg)), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -187,7 +221,7 @@ class Code42Connector(BaseConnector):
         ip_address_input = input_ip_address
 
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            ipaddress.ip_address(ip_address_input)
         except:
             return False
 
@@ -229,7 +263,7 @@ class Code42Connector(BaseConnector):
         # we are getting them here
         try:
             self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
-            self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+            self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
         except:
             self.debug_print('Error while encoding username or server URL')
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error while encoding username or server URL"),
@@ -253,8 +287,9 @@ class Code42Connector(BaseConnector):
                 auth_response = session.get(url=access_auth_url, auth=(self._username, self._password))
 
             except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
-                                                       format(str(e))), resp_json)
+                                                       format(err_msg)), resp_json)
 
             # Check for failed cases of auth_response
             if not(200 <= auth_response.status_code < 399):
@@ -267,9 +302,10 @@ class Code42Connector(BaseConnector):
                     v3_user_token = json.loads(auth_response.content)["data"]["v3_user_token"]
                     headers.update({"Authorization": "v3_user_token {}".format(v3_user_token)})
                 except Exception as e:
+                    err_msg = self._get_error_message_from_exception(e)
                     return RetVal(action_result.set_status(phantom.APP_ERROR,
                                                            "Error generating v3 user token. Details: {0}".
-                                                           format(str(e))), resp_json)
+                                                           format(err_msg)), resp_json)
 
             # Request using session
             try:
@@ -282,8 +318,9 @@ class Code42Connector(BaseConnector):
                 request_response = request_func(session, url, timeout=timeout, json=data, headers=headers,
                                                 params=params)
             except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
-                                                       format(str(e))), resp_json)
+                                                       format(err_msg)), resp_json)
         else:
             if self._auth_token:
                 # Update header with required auth token
@@ -305,9 +342,10 @@ class Code42Connector(BaseConnector):
                 # It was throwing exception on str(e) in some cases,
                 # So if it throws exception while handling the exception,
                 # return message without using exception message
+                err_msg = self._get_error_message_from_exception(e)
                 try:
                     return RetVal(action_result.set_status(phantom.APP_ERROR,
-                                                           "Error Connecting to server. Details: {0}".format(str(e))),
+                                                           "Error Connecting to server. Details: {0}".format(err_msg)),
                                   resp_json)
                 except:
                     return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server"), resp_json)
@@ -359,7 +397,7 @@ class Code42Connector(BaseConnector):
         self.save_progress(CODE42_TEST_CONNECTIVITY_PASSED_MSG)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def is_valid_identifier(self, input_value, action_result):
+    def is_valid_identifier(self, input_value, action_result, isUserUid=False):
         """ This function is used to check whether for a given input value, appropriate user_id is available.
 
         :param input_value: Input parameter
@@ -387,7 +425,10 @@ class Code42Connector(BaseConnector):
             # Iterate through all the users
             for user in response['data']['users']:
                 if user['username'].lower() == input_value.lower():
-                    user_id = user['userId']
+                    if isUserUid:
+                        user_id = user['userUid']
+                    else:
+                        user_id = user['userId']
                     return phantom.APP_SUCCESS, user_id
 
             # Increment page number
@@ -467,7 +508,7 @@ class Code42Connector(BaseConnector):
         :return: phantom.APP_SUCCESS/phantom.APP_ERROR, ID of the User
         """
 
-        if isinstance(input_value, basestring) and not input_value.isdigit():
+        if isinstance(input_value, str) and not input_value.isdigit():
             return phantom.APP_ERROR
 
         if isinstance(input_value, float):
@@ -606,8 +647,8 @@ class Code42Connector(BaseConnector):
                 # Increment page number
                 page_num += CODE42_PAGINATION
 
-                summary = action_result.update_summary({})
-                summary['total_users'] = action_result.get_data_size()
+        summary = action_result.update_summary({})
+        summary['total_users'] = action_result.get_data_size()
 
         if action_result.get_data_size() == 0:
             return action_result.set_status(phantom.APP_ERROR, CODE42_USER_NOT_FOUND_MSG.format(user_name=user))
@@ -1279,7 +1320,7 @@ class Code42Connector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _handle_run_query(self, param):
+    def _handle_run_query(self, param): # noqa
         """ This function is used to handle the run query action.
 
         :param param: Dictionary of input parameters
@@ -1300,11 +1341,16 @@ class Code42Connector(BaseConnector):
         private_ip = param.get(CODE42_JSON_PRIVATE_IP)
         public_ip = param.get(CODE42_JSON_PUBLIC_IP)
         query = param.get(CODE42_JSON_QUERY)
+        limit = param.get(CODE42_MAX_RESULTS, CODE42_DEFAULT_PAGE_SIZE)
 
         # If query parameter is present, ignore other parameters
         if query:
             try:
                 filter_dict = json.loads(query)
+                if 'pgNum' in filter_dict:
+                    del filter_dict['pgNum']
+                if 'pgSize' in filter_dict:
+                    del filter_dict['pgSize']
             except:
                 return action_result.set_status(phantom.APP_ERROR, status_message="Invalid JSON in parameter 'query'")
         else:
@@ -1358,17 +1404,20 @@ class Code42Connector(BaseConnector):
             })
 
             if file_event:
-                event_mapping = {
-                    "New file": "CREATED",
-                    "Modified": "MODIFIED",
-                    "No longer observed": "DELETED"
-                }
+                if file_event in FILE_EVENT_LIST:
+                    event_mapping = {
+                        "New file": "CREATED",
+                        "Modified": "MODIFIED",
+                        "No longer observed": "DELETED"
+                    }
 
-                filters_list.append({
-                    "operator": "IS",
-                    "term": "eventType",
-                    "value": event_mapping[file_event]
-                })
+                    filters_list.append({
+                        "operator": "IS",
+                        "term": "eventType",
+                        "value": event_mapping[file_event]
+                    })
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_FILE_EVENT_INVALID)
 
             if file_hash:
                 filters_list.append({
@@ -1432,11 +1481,11 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(url_determined):
             return action_result.get_status()
 
-        page_num = CODE42_PAGINATION
+        next_token = ""
+        list_items = []
 
         while True:
-
-            filter_dict['pgNum'] = page_num
+            filter_dict['pgToken'] = next_token
 
             request_status, request_response = self._make_rest_call(endpoint=CODE42_FORENSIC_SEARCH_ENDPOINT,
                                                                     method="post", action_result=action_result,
@@ -1448,13 +1497,16 @@ class Code42Connector(BaseConnector):
             if not request_response.get('fileEvents', []):
                 break
 
-            for item in request_response['fileEvents']:
-                action_result.add_data(item)
+            list_items.extend(request_response.get('fileEvents', []))
 
-            page_num += CODE42_PAGINATION
+            if limit and len(list_items) >= limit:
+                for item in list_items[:limit]:
+                    action_result.add_data(item)
+                break
 
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, status_message='No events found')
+            next_token = request_response.get("nextPgToken", "")
+            if not next_token:
+                break
 
         summary = action_result.update_summary({})
         summary['total_events'] = action_result.get_data_size()
@@ -1478,9 +1530,12 @@ class Code42Connector(BaseConnector):
             return action_result.get_status()
 
         # get specific device
-        if param.get(CODE42_JSON_DEVICE_ID):
-            device_id = param[CODE42_JSON_DEVICE_ID]
-            endpoint = CODE42_DEVICES_ENDPOINT + "/{}".format(device_id)
+        device_id = param.get(CODE42_JSON_DEVICE_ID)
+        if device_id:
+            if not self._verify_device_int_param(device_id):
+                self.debug_print(CODE42_INVALID_DEVICE_ID_MSG)
+                return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_DEVICE_ID_MSG)
+            endpoint = "{}/{}".format(CODE42_DEVICES_ENDPOINT, device_id)
 
             request_status, request_response = self._make_rest_call(endpoint=endpoint, action_result=action_result)
 
@@ -1568,7 +1623,7 @@ class Code42Connector(BaseConnector):
 
         dirs = param.get('directories', '')
 
-        if not files and not dirs:
+        if not (files or dirs):
             return action_result.set_status(phantom.APP_ERROR, CODE42_RESTORE_NO_PATHS_SUPPLIED)
 
         # nothing supplied, default will be C:
@@ -1707,7 +1762,7 @@ class Code42Connector(BaseConnector):
             # add to action result data
             action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Retrieved restore info successfully")
 
     def _handle_get_organization_info(self, param):
         """
@@ -1721,39 +1776,34 @@ class Code42Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         config = self.get_config()
-        self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
+        self._username = config[CODE42_CONFIG_USERNAME].encode("utf-8")
         self._password = config[CODE42_CONFIG_PASSWORD]
-        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
 
-        url = self._server_url + CODE42_V3_TOKEN_AUTH_ENDPOINT
+        url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
 
         try:
             r = requests.get(url, auth=(self._username, self._password))
-            v3_user_token = r.json()['data']['v3_user_token'].encode('utf-8')
+            v3_user_token = r.json().get('data', {}).get('v3_user_token')
 
             headers = {"Authorization": "v3_user_token {}".format(v3_user_token)}
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Exception while generating v3_user_token: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, CODE42_CONNECTION_FAILED)
 
         try:
-            url2 = self._server_url + CODE42_ORGANIZATION_INFO_ENDPOINT
+            url2 = "{}{}".format(self._server_url, CODE42_ORGANIZATION_INFO_ENDPOINT)
             r = requests.get(url2, headers=headers).json()
 
             action_result.add_data(r['data'])
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS, "Retrieved organization info successfully")
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Exception while retrieving Organization Info: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Exception while retrieving Organization Info: {}".format(err_msg))
 
     def _handle_add_departing_employee(self, param):
-        """
-        Add Departing Employee to Code42 Organization
-        Example cURL:
-        curl -X POST --header 'Content-Type: application/json' --header 'Authorization: v3_user_token '$tkn
-        https://ecm-east.us.code42.com/svc/api/v1/departingemployee/create''
-        --data " {'userName': 'username@domain.com', 'tenantId': 'x', 'alertsEnabled': true, 'notes': '' }
-        """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1761,65 +1811,136 @@ class Code42Connector(BaseConnector):
         config = self.get_config()
         self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
         self._password = config[CODE42_CONFIG_PASSWORD]
-        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/').encode('utf-8')
+        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
 
-        url = self._server_url + CODE42_V3_TOKEN_AUTH_ENDPOINT
+        departing_employee_url = param['departing_employee_url'].strip('/')
+        departing_user = param['departing_user']
+        tenant_id = param['tenant_id']
+        departure_date = param.get('departure_date')
+        departure_notes = param.get('departure_notes', '')
+        cloud_username = []
+        if param.get('cloud_usernames'):
+            cloud_username = param['cloud_usernames'].split(',')
+
+        url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
 
         try:
             r = requests.get(url, auth=(self._username, self._password))
-            v3_user_token = r.json()['data']['v3_user_token'].encode('utf-8')
+            v3_user_token = r.json()['data']['v3_user_token']
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Exception: {}".format(e))
-
-        url = param['departing_employee_url'] + CODE42_DEPARTING_EMPLOYEE_ENDPOINT
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, CODE42_CONNECTION_FAILED)
 
         headers = {
             'Authorization': 'v3_user_token {}'.format(v3_user_token),
-            'Content-type': 'application/json',
-            'User-Agent': 'python2.7'
+            'Content-type': 'application/json'
         }
 
-        if 'cloud_usernames' in param:
+        ret_val_token = self._generate_token(action_result=action_result)
+        if phantom.is_fail(ret_val_token):
+            return action_result.get_status()
 
-            payload = {
-                'tenantId': param['tenant_id'],
-                'userName': param['departing_user'],
-                'notes': param['departure_notes'],
-                'departureDate': param['departure_date'],
-                'alertsEnabled': param['alerts_enabled'],
-                'cloudUsernames': param['cloud_usernames'].split(',')
-            }
+        ret_val, user_id = self.is_valid_identifier(departing_user, action_result, True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        else:
+        # create detection profile
+        url = "{}{}".format(param['departing_employee_url'], CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT)
+        body = {
+            'tenantId': tenant_id,
+            'userName': departing_user,
+            'notes': departure_notes,
+            'cloudUsernames': cloud_username
+        }
 
-            payload = {
-                'tenantId': param['tenant_id'],
-                'userName': param['departing_user'],
-                'notes': param['departure_notes'],
-                'departureDate': param['departure_date'],
-                'alertsEnabled': param['alerts_enabled'],
-                'cloudUsernames': []
-            }
-
+        message = ""
         try:
-            r = requests.post(url, data=json.dumps(payload), headers=headers).json()
+            # create user profile for detection list
+            r = requests.post(url, json=body, headers=headers).json()
+            if 'pop-bulletin' in r and 'User already exists' in r['pop-bulletin']['reason']:
+                if departure_notes or cloud_username:
+                    body = {
+                        "tenantId": tenant_id,
+                        "username": departing_user
+                    }
+                    url = "{}{}".format(departing_employee_url, CODE42_GET_PROFILE_BY_USERNAME)
+                    r = requests.post(url, json=body, headers=headers).json()
+                    if 'pop-bulletin' in r:
+                        return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+
+                    # adding cloudusername in the profile
+                    if departing_user not in cloud_username:
+                        cloud_username.append(departing_user)
+                    if len(cloud_username) > 1 and not set(r['cloudUsernames']) == set(cloud_username):
+                        body = {
+                            "tenantId": tenant_id,
+                            "userId": r['userId'],
+                            "cloudUsernames": cloud_username
+                        }
+                        url = "{}{}".format(departing_employee_url, CODE42_UPDATE_CLOUD_USERNAMES)
+                        r = requests.post(url, json=body, headers=headers).json()
+                        if 'pop-bulletin' in r:
+                            return action_result.set_status(phantom.APP_ERROR, "{}. Code42 Server Error: {}".format(len(cloud_username), str(r)))
+                        else:
+                            message += "Cloud Usernames added. "
+
+                    # updating notes
+                    if departure_notes and (r['notes'] != departure_notes):
+                        body = {
+                            "tenantId": tenant_id,
+                            "userId": r['userId'],
+                            "notes": departure_notes
+                        }
+                        url = "{}{}".format(departing_employee_url, CODE42_UPDATE_NOTES)
+                        r = requests.post(url, json=body, headers=headers).json()
+                        if 'pop-bulletin' in r:
+                            if message:
+                                status_message = "{} Code42 Server Error: {}".format(message, str(r))
+                            else:
+                                status_message = "Code42 Server Error: {}".format(str(r))
+                            return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+                        else:
+                            message += "Notes updated. "
+            elif 'pop-bulletin' in r:
+                return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+            else:
+                message += "Detection list profile created. "
+
+            body = {
+                'tenantId': tenant_id,
+                'userId': user_id,
+                'departureDate': departure_date
+            }
+
+            # adding departing employee
+            url = "{}{}".format(departing_employee_url, CODE42_DEPARTING_EMPLOYEE_V2_ENDPOINT)
+            r = requests.post(url, json=body, headers=headers).json()
 
             if 'pop-bulletin' in r:
-                return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+                if message:
+                    status_message = "{} Code42 Server Error: {}".format(message, str(r))
+                else:
+                    status_message = "Code42 Server Error: {}".format(str(r))
+                return action_result.set_status(phantom.APP_ERROR, status_message)
 
             if 'createdAt' in r:
                 # SUCCESS
                 action_result.add_data(r)
                 summary = action_result.update_summary({})
-                summary['message'] = "Departing Employee Addition was Successful - Case ID: {} - Created Time: {}".format(r['caseId'], r['createdAt'])
+                departing_message = "Departing Employee Addition was Successful - Created Time: {}".format(r['createdAt'])
+                if message:
+                    summary['message'] = "{} {}".format(message, departing_message)
+                else:
+                    summary['message'] = departing_message
                 return action_result.set_status(phantom.APP_SUCCESS)
 
             else:
-                return action_result.set_status(phantom.APP_ERROR, "Unexpected Response: {}".format(r))
+                return action_result.set_status(phantom.APP_ERROR, "{} Unexpected Response: {}".format(message, r))
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Exception while making POST request: {}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "{} Exception while making POST request: {}".format(message, err_msg))
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
@@ -1859,7 +1980,7 @@ class Code42Connector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
 
@@ -1896,7 +2017,7 @@ class Code42Connector(BaseConnector):
             ip_address_input = input_ip_address.split('%')[0]
 
         try:
-            ipaddress.ip_address(unicode(ip_address_input))
+            ipaddress.ip_address(ip_address_input)
         except:
             return False
 
@@ -1945,7 +2066,7 @@ if __name__ == '__main__':
     if username and password:
         try:
             login_url = BaseConnector._get_phantom_base_url() + "login"
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1958,15 +2079,15 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {}".format(str(e)))
+            print("Unable to get session id from the platform. Error: {}".format(str(e)))
             exit(1)
 
     if len(sys.argv) < 2:
-        print ("No test json specified as input")
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -1981,6 +2102,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
