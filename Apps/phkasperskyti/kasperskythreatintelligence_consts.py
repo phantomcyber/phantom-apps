@@ -6,3 +6,6 @@
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
 PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+
+# Integer validation msg
+RECORD_COUNT_KEY = "'record_count' configuration parameter"
