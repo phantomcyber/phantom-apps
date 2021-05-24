@@ -26,7 +26,6 @@ from datetime import timedelta
 import time
 import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
-import imp
 from _collections import defaultdict
 
 
@@ -2122,12 +2121,12 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc",
-        "threat_score.asc", "threat_score.desc"]
+        sort_data = [ 'created_timestamp.asc', 'created_timestamp.desc', 'environment_description.asc', 'environment_description.desc',
+        'threat_score.asc', 'threat_score.desc']
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
-        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc']
+        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc', 'verdict.desc', 'verdict.asc']
 
         param_dict = {
             'filter': filter_query
@@ -2154,9 +2153,6 @@ class CrowdstrikeConnector(BaseConnector):
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        if not resource_id_list:
-            return action_result.set_status(phantom.APP_ERROR, "File not found")
-
         if param.get('detail_report'):
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
         else:
@@ -2180,7 +2176,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc", "environment_description.asc", "environment_description.desc"]
+        sort_data = ['verdict.desc', 'verdict.asc', 'created_timestamp.asc', 'created_timestamp.desc', 'environment_description.asc', 'environment_description.desc']
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
@@ -2210,9 +2206,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
-
-        if not resource_id_list:
-            return action_result.set_status(phantom.APP_ERROR, "URL not found")
 
         if param.get('detail_report'):
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
@@ -2265,7 +2258,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
+        sort_data = ['verdict.desc', 'verdict.asc', 'created_timestamp.asc', 'created_timestamp.desc']
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
@@ -2333,11 +2326,11 @@ class CrowdstrikeConnector(BaseConnector):
 
         max_limit = 5000
 
-        sort_data = ["verdict.desc", "verdict.asc", "created_timestamp.asc", "created_timestamp.desc"]
+        sort_data = [ 'created_timestamp.asc', 'created_timestamp.desc']
         if param.get('sort') == '--':
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
 
-        custom_list = ['threat_score.asc', 'threat_score.desc']
+        custom_list = ['threat_score.asc', 'threat_score.desc', 'verdict.desc', 'verdict.asc']
 
         param_dict = {
             'filter': filter_query
