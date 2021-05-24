@@ -153,9 +153,9 @@ class CTIXConnector(BaseConnector):
         # check response status_code
         if status_code == 200:
             try:
-                if type(response) == list:
+                if isinstance(response, list):
                     response = response[0]
-                if type(response) != dict:
+                if not isinstance(response, dict):
                     return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
@@ -194,9 +194,9 @@ class CTIXConnector(BaseConnector):
         # check response status_code
         if status_code == 200:
             try:
-                if type(response) == list:
+                if isinstance(response, list):
                     response = response[0]
-                if type(response) != dict:
+                if not isinstance(response, dict):
                     return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
@@ -235,9 +235,9 @@ class CTIXConnector(BaseConnector):
         # check response status_code
         if status_code == 200:
             try:
-                if type(response) == list:
+                if isinstance(response, list):
                     response = response[0]
-                if type(response) != dict:
+                if not isinstance(response, dict):
                     return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
@@ -276,9 +276,9 @@ class CTIXConnector(BaseConnector):
         # check response status_code
         if status_code == 200:
             try:
-                if type(response) == list:
+                if isinstance(response, list):
                     response = response[0]
-                if type(response) != dict:
+                if not isinstance(response, dict):
                     return action_result.set_status(phantom.APP_ERROR, CYWARE_RESP_FROM_SERVER_NOT_JSON)
                 # commit action_result
                 action_result.set_summary({"message": response['message']})
