@@ -1,7 +1,7 @@
 {
     "appid": "2492d30e-9c79-4905-abab-9359d78e85bc",
     "name": "Kaspersky Threat Intelligence",
-    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications. Now you can mitigate and respond to threats more effectively, defending your system against attacks even before they are launched",
+    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications",
     "type": "reputation",
     "product_vendor": "Kaspersky Lab",
     "logo": "logo_kasperskythreatintelligence.svg",
@@ -46,14 +46,12 @@
         "accept_the_terms_and_conditions": {
             "description": "I understand and accept the Terms and Conditions",
             "data_type": "boolean",
-            "required": true,
             "default": false,
             "order": 4
         },
         "accept_privacy_policy": {
             "description": "I understand and accept Privacy Policy",
             "data_type": "boolean",
-            "required": true,
             "default": false,
             "order": 5
         }

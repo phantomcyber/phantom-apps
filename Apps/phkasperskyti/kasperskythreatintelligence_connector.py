@@ -246,6 +246,21 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         url_output = url_output.replace("@", "%40")
         return url_output
 
+    def _validate_integer(self, action_result, parameter, key):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid integer value in the {}".format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid non-negative integer value in the {}".format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error messages from the exception.
         :param e: Exception object
@@ -599,6 +614,10 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         self._username = config.get('username')
         self._password = config.get('password')
         self._recordcount = config.get('records_count')
+        # Validate 'self._recordcount' configuration parameter
+        ret_val, self._recordcount = self._validate_integer(self, self._recordcount, RECORD_COUNT_KEY)
+        if phantom.is_fail(ret_val):
+            return self.get_status()
 
         if not self._eula or not self._policy:
             return self.set_status(phantom.APP_ERROR, "Please accept Terms and conditions and Privacy Policy")
@@ -620,7 +639,7 @@ class KasperskyThreatIntelligenceConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def finalize(self):
-        if os.path.exists(self._key_tmp_name):
+        if self._key_tmp_name and os.path.exists(self._key_tmp_name):
             os.unlink(self._key_tmp_name)
 
         # Save the state, this data is saved across actions and app upgrades
