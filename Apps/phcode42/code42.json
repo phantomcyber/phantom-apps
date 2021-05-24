@@ -620,7 +620,7 @@
         {
             "action": "deauthorize device",
             "description": "Deauthorize a device",
-            "verbose": "The user is signed out of the Code42 app. The Code42 service stops backing up, and users cannot access the Code42 app to restore data or change settings without signing in again.",
+            "verbose": "The current user is signed out of the Code42 app. The Code42 service stops backing up, and users cannot access the Code42 app to restore data or change settings without signing in again.",
             "type": "contain",
             "identifier": "deauthorize_device",
             "read_only": false,
@@ -701,7 +701,6 @@
             "description": "Activate a user",
             "type": "correct",
             "identifier": "activate_user",
-            "undo": "deactivate user",
             "read_only": false,
             "parameters": {
                 "user": {
@@ -796,7 +795,6 @@
             "description": "Deactivate a user",
             "type": "contain",
             "identifier": "deactivate_user",
-            "undo": "activate user",
             "read_only": false,
             "parameters": {
                 "user": {
@@ -2618,7 +2616,7 @@
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "ID of the device",
+                    "description": "ID of the device to lock",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -2733,7 +2731,7 @@
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "ID of the device",
+                    "description": "ID of the device to unlock",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -2912,7 +2910,7 @@
         {
             "action": "get device",
             "description": "Get information for a specific device",
-            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details.",
+            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details. Please provide atleast one of the <b>device_id</b> or <b>query</b> parameter.",
             "type": "investigate",
             "identifier": "get_device",
             "read_only": true,
@@ -2939,6 +2937,7 @@
                 "most_recent_only": {
                     "description": "Forces action to return one result, being the most recently connected device",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 2
                 }
             },
@@ -3516,7 +3515,7 @@
         {
             "action": "push restore",
             "description": "Push a restore on a device",
-            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). If neither <b>files</b> nor <b>directories</b> params are supplied, the action will fail.",
+            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). Please provide atleast one of the <b>files</b> or <b>directories</b> parameter.",
             "type": "correct",
             "identifier": "push_restore",
             "read_only": false,
@@ -3636,7 +3635,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.done",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.originalEndpointPlatform",
@@ -3648,7 +3651,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.providerDestination",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.restoreId",
@@ -3668,7 +3675,7 @@
                     "contains": [
                         "code42 web restore session id"
                     ],
-                    "column_name": "WebRestoreSessionID",
+                    "column_name": "Web Restore Session ID",
                     "column_order": 1
                 },
                 {
@@ -3775,7 +3782,7 @@
             "read_only": true,
             "parameters": {
                 "restore_id": {
-                    "description": "Unique ID for the restore record",
+                    "description": "Unique ID of the restore record",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -3796,13 +3803,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.acceptingComputerGuid",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.archiveGuid",
                     "data_type": "string"
                 },
@@ -3812,7 +3812,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.canceled",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.completedDate",
@@ -3862,7 +3866,7 @@
                     "contains": [
                         "code42 device guid"
                     ],
-                    "column_name": "Src Guid",
+                    "column_name": "Source Guid",
                     "column_order": 2
                 },
                 {
@@ -4704,7 +4708,6 @@
                     "data_type": "string",
                     "order": 2,
                     "value_list": [
-                        "",
                         "New file",
                         "Modified",
                         "No longer observed"
@@ -5413,7 +5416,7 @@
             "read_only": false,
             "parameters": {
                 "departing_employee_url": {
-                    "description": "BaseURL for DepartingEmployeeApiUrl",
+                    "description": "Base URL for Departing Employee API",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -5491,6 +5494,9 @@
                     "data_type": "string",
                     "column_name": "Username",
                     "column_order": 1,
+                    "contains": [
+                        "user name"
+                    ],
                     "example_values": [
                         "username@gmail.com"
                     ]
@@ -5552,10 +5558,6 @@
                     "example_values": [
                         "2020-08-28"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.alertsEnabled",
-                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",

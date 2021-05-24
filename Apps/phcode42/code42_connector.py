@@ -86,7 +86,7 @@ class Code42Connector(BaseConnector):
         if response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".forat(response.status_code)),
                       None)
 
     def _process_html_response(self, response, action_result):
@@ -103,7 +103,7 @@ class Code42Connector(BaseConnector):
         # Check if the given response is of type Internal Error and response contains a reason
         if status_code == 500 and response.reason:
             message = "Status Code: {0}. Data from server:{1}". \
-                format(status_code, json.loads(response.reason).get("description"))
+                format(status_code, json.loads(response).get("description"))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
         try:
@@ -175,7 +175,7 @@ class Code42Connector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, response, action_result):
-        """ This function is used to process html response.
+        """ This function is used to process the response.
 
         :param response: response data
         :param action_result: object of Action Result
@@ -211,23 +211,17 @@ class Code42Connector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _is_ipv6(self, input_ip_address):
-        """ Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """ This method is to check if the provided input parameter value
+            is a non-zero positive integer and returns the integer value of the parameter itself.
 
-        :param input_ip_address: IP address
-        :return: status (success/failure)
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: integer value of the parameter or None in case of failure
         """
 
-        ip_address_input = input_ip_address
-
-        try:
-            ipaddress.ip_address(ip_address_input)
-        except:
-            return False
-
-        return True
-
-    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         if parameter is not None:
             try:
                 if not float(parameter).is_integer():
@@ -266,24 +260,15 @@ class Code42Connector(BaseConnector):
             headers.update({'Accept': 'application/json'})
 
         # add custom User-Agent String
-        runtime_version = "{}.{}.{}".format(python_version.major, python_version.minor, python_version.micro)
-        headers['User-Agent'] = 'python/{runtime_version} Phantom/{phantom_version} Code42/{app_version}'.format(
-            runtime_version=runtime_version,
-            phantom_version=self.get_product_version(),
-            app_version=self.get_app_json().get('app_version')
-        )
-
-        config = self.get_config()
-
-        # If we use some chinese characters or other special characters,
-        # it may throw error in encoding and as we does not return error from initialize() method,
-        # we are getting them here
         try:
-            self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
-            self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
+            runtime_version = "{}.{}.{}".format(python_version.major, python_version.minor, python_version.micro)
+            headers['User-Agent'] = 'python/{runtime_version} Phantom/{phantom_version} Code42/{app_version}'.format(
+                runtime_version=runtime_version,
+                phantom_version=self.get_product_version(),
+                app_version=self.get_app_json().get('app_version')
+            )
         except:
-            self.debug_print('Error while encoding username or server URL')
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error while encoding username or server URL"),
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error while generating the headers"),
                           resp_json)
 
         if CODE42_FORENSIC_SEARCH_ENDPOINT in endpoint and self._forensic_search_url is not None:
@@ -356,16 +341,10 @@ class Code42Connector(BaseConnector):
                 request_response = request_func(url, timeout=timeout, json=data, auth=auth, headers=headers,
                                                 params=params)
             except Exception as e:
-                # It was throwing exception on str(e) in some cases,
-                # So if it throws exception while handling the exception,
-                # return message without using exception message
                 err_msg = self._get_error_message_from_exception(e)
-                try:
-                    return RetVal(action_result.set_status(phantom.APP_ERROR,
+                return RetVal(action_result.set_status(phantom.APP_ERROR,
                                                            "Error Connecting to server. Details: {0}".format(err_msg)),
                                   resp_json)
-                except:
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server"), resp_json)
 
         return self._process_response(request_response, action_result)
 
@@ -618,6 +597,7 @@ class Code42Connector(BaseConnector):
         except ValueError:
             # For pagination, start from first page
             page_num = CODE42_PAGINATION
+            flag = 0
             while True:
 
                 # Use page number as a param
@@ -637,9 +617,11 @@ class Code42Connector(BaseConnector):
                 for user_data in response['data']['users']:
                     # match parameter against username
                     if user_data.get('username', '') == user:
+                        flag = 1
                         action_result.add_data(user_data)
                         break
-
+                if flag:
+                    break
                 # Increment page number
                 page_num += CODE42_PAGINATION
 
@@ -690,7 +672,7 @@ class Code42Connector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, status_message="{}. {}"
                                             .format(CODE42_USER_ALREADY_ACTIVATED_MSG, "User status is Unblocked"))
 
-        unblock_user = param.get(CODE42_JSON_UNBLOCK_USER)
+        unblock_user = param.get(CODE42_JSON_UNBLOCK_USER, False)
 
         params = {'unblockUser': unblock_user}
 
@@ -747,7 +729,7 @@ class Code42Connector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS, status_message="{}. {}"
                                             .format(CODE42_USER_ALREADY_DEACTIVATED_MSG, "User status is Unblocked"))
 
-        block_user = param[CODE42_JSON_BLOCK_USER]
+        block_user = param.get(CODE42_JSON_BLOCK_USER, False)
 
         data = {
             "blockUser": block_user
@@ -1565,9 +1547,9 @@ class Code42Connector(BaseConnector):
                 if not response.get('data', {}).get('computers', []):
                     break
 
-                # Iterate through all the users
-                for user in response.get('data', {}).get('computers', []):
-                    device_info_list.append(user)
+                # Iterate through all the device
+                for device in response.get('data', {}).get('computers', []):
+                    device_info_list.append(device)
 
                 # Increment page number
                 page_num += CODE42_PAGINATION
@@ -1592,7 +1574,7 @@ class Code42Connector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS)
         # error
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Either device_id or query parameter must be supplied!")
+            return action_result.set_status(phantom.APP_ERROR, "Either device_id or query parameter must be supplied")
 
     def _handle_push_restore(self, param):
         """ This function is used to push a restore on a device.
@@ -1609,9 +1591,12 @@ class Code42Connector(BaseConnector):
         target_node_guid = param['target_node_guid']
 
         files = param.get('files', '')
-        files = files.split(',')
+        files = [x.strip() for x in files.split(',')]
+        files = list(filter(None, files))
 
         dirs = param.get('directories', '')
+        dirs = [x.strip() for x in dirs.split(',')]
+        dirs = list(filter(None, dirs))
 
         if not (files or dirs):
             return action_result.set_status(phantom.APP_ERROR, CODE42_RESTORE_NO_PATHS_SUPPLIED)
@@ -1619,8 +1604,6 @@ class Code42Connector(BaseConnector):
         # nothing supplied, default will be C:
         if not dirs:
             dirs = ['C:\\']
-        else:
-            dirs = dirs.split(',')
 
         # API expects certain format for each file path
         # {"type":"file", "path":"/home/joe/Desktop/PushRestoreTestAPI","selected":true}
@@ -1765,11 +1748,6 @@ class Code42Connector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        config = self.get_config()
-        self._username = config[CODE42_CONFIG_USERNAME].encode("utf-8")
-        self._password = config[CODE42_CONFIG_PASSWORD]
-        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
-
         url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
 
         try:
@@ -1798,11 +1776,6 @@ class Code42Connector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        config = self.get_config()
-        self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
-        self._password = config[CODE42_CONFIG_PASSWORD]
-        self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
-
         departing_employee_url = param['departing_employee_url'].strip('/')
         departing_user = param['departing_user']
         tenant_id = param['tenant_id']
@@ -1810,7 +1783,9 @@ class Code42Connector(BaseConnector):
         departure_notes = param.get('departure_notes', '')
         cloud_username = []
         if param.get('cloud_usernames'):
-            cloud_username = param.get('cloud_usernames').split(',')
+            cloud_username = param.get('cloud_usernames')
+            cloud_username = [x.strip() for x in cloud_username.split(',')]
+            cloud_username = list(filter(None, cloud_username))
 
         url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
 
@@ -1833,8 +1808,8 @@ class Code42Connector(BaseConnector):
 
         ret_val, user_id = self.is_valid_identifier(departing_user, action_result, True)
         if phantom.is_fail(ret_val):
-            self.debug_print(CODE42_INVALID_USER_ID_MSG)
-            return action_result.set_status(phantom.APP_ERROR, CODE42_INVALID_USER_ID_MSG)
+            self.debug_print(CODE42_INVALID_DEPARTING_USER_MSG)
+            return action_result.set_status(phantom.APP_ERROR, CODE42_INVALID_DEPARTING_USER_MSG)
 
         # create detection profile
         url = "{}{}".format(departing_employee_url, CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT)
@@ -1890,7 +1865,7 @@ class Code42Connector(BaseConnector):
                                 status_message = "{} Code42 Server Error: {}".format(message, str(r))
                             else:
                                 status_message = "Code42 Server Error: {}".format(str(r))
-                            return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+                            return action_result.set_status(phantom.APP_ERROR, status_message)
                         else:
                             message += "Notes updated. "
             elif 'pop-bulletin' in r:
@@ -1991,10 +1966,17 @@ class Code42Connector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
+        try:
+            self._username = config[CODE42_CONFIG_USERNAME].encode('utf-8')
+            self._server_url = config[CODE42_CONFIG_SERVER_URL].strip('/')
+        except:
+            self.debug_print('Error while encoding username or server URL')
+            return self.set_status(phantom.APP_ERROR, "Error while encoding username or server URL")
+
         self._password = config[CODE42_CONFIG_PASSWORD]
         self.set_validator('ip', self._is_ip)
 
-        self.set_validator('ipv6', self._is_ipv6)
+        self.set_validator('ipv6', self._is_ip)
 
         return phantom.APP_SUCCESS
 

@@ -174,7 +174,7 @@
                         <tr>
                             <td>Private IP</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'],
                                     'value':'{{ result.param.private_ip }}' }], 0,
                                     {{ container.id }}, null, false);">
                                         {{ result.param.private_ip }}
@@ -188,7 +188,7 @@
                         <tr>
                             <td>Public IP</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'],
                                     'value':'{{ result.param.public_ip }}' }], 0,
                                     {{ container.id }}, null, false);">
                                         {{ result.param.public_ip }}

@@ -57,6 +57,7 @@ CODE42_PAGINATION = 1
 CODE42_DEFAULT_PAGE_SIZE = 100
 CODE42_INVALID_DEVICE_ID_MSG = "Invalid value for parameter 'device_id'"
 CODE42_INVALID_USER_ID_MSG = "Invalid value for parameter 'user'"
+CODE42_INVALID_DEPARTING_USER_MSG = "Invalid value for parameter 'departing_user'"
 CODE42_INVALID_ORG_ID_MSG = "Invalid value for parameter 'organization'"
 CODE42_START_TIME_END_TIME_REQUIRED = "Parameters 'start_time' and 'end_time are required when parameter 'query' is " \
                                       "not provided"
@@ -113,7 +114,6 @@ CODE42_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value i
 
 # value list for file_event parameter in run query action
 FILE_EVENT_LIST = [
-                    "",
                     "New file",
                     "Modified",
                     "No longer observed"
