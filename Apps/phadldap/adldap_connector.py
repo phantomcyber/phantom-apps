@@ -603,13 +603,64 @@ class AdLdapConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_SUCCESS))
 
     def _handle_reset_password(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        user = param['user'].lower()
+
+        ar_data = {}
+        if param["use_samaccountname"]:
+            user_dn = self._sam_to_dn([user])   # _sam_to_dn requires a list.
+            if len(user_dn) == 0 or user_dn[user] is False:
+                return RetVal(action_result.set_status(
+                    phantom.APP_ERROR
+                ))
+
+            ar_data["user_dn"] = user_dn[user]
+            ar_data["samaccountname"] = user
+            user = user_dn[user]
+        else:
+            ar_data["user_dn"] = user
+
+        changes = {}
+        changes["pwdlastset"] = [(ldap3.MODIFY_REPLACE, [str(0)])]
+
+        if not self._ldap_bind():
+            return phantom.APP_ERROR
+
+        try:
+            self.debug_print("[DEBUG] mod_string = {}".format(changes))
+            ret = self._ldap_connection.modify(
+                dn=ar_data["user_dn"],
+                changes=changes
+            )
+            self.debug_print("[DEBUG] handle_reset_attribute, ret = {}".format(ret))
+        except Exception as e:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    str(e),
+                    None)
+            )
+
+        summary = action_result.update_summary({})
+        self.debug_print("[DEBUG] resp = {}".format(self._ldap_connection.response_to_json()))
+
+        if ret:
+            ar_data["reset"] = summary["reset"] = True
+            action_result.add_data(ar_data)
+            return RetVal(action_result.set_status(phantom.APP_SUCCESS))
+        else:
+            ar_data["reset"] = summary["reset"] = False
+            action_result.add_data(ar_data)
+            return RetVal(action_result.set_status(phantom.APP_ERROR))
+
+    def _handle_set_password(self, param):
         """
-        This method resets a users password.
+        This method sets a users password.
         """
         action_result = self.add_action_result(ActionResult(dict(param)))
         summary = action_result.update_summary({})
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-        self.debug_print("[DEBUG] handle_reset_password")
+        self.debug_print("[DEBUG] handle_set_password")
 
         user = param['user'].lower()
         pwd = param['password']
@@ -620,7 +671,7 @@ class AdLdapConnector(BaseConnector):
         ar_data = {}
 
         if not self._ldap_bind():
-            self.debug_print("[DEBUG] handle_reset_password - no bind")
+            self.debug_print("[DEBUG] handle_set_password - no bind")
             return RetVal(action_result.set_status(
                 phantom.APP_ERROR,
                 self._ldap_bind.result
@@ -640,24 +691,24 @@ class AdLdapConnector(BaseConnector):
             ar_data["user_dn"] = user
 
         try:
-            self.debug_print("[DEBUG] about to attempt password reset...")
+            self.debug_print("[DEBUG] about to attempt password set...")
             ret = self._ldap_connection.extend.microsoft.modify_password(user, pwd)
         except Exception as e:
-            self.debug_print("[DEBUG] handle_reset_password, e = {}".format(str(e)))
+            self.debug_print("[DEBUG] handle_set_password, e = {}".format(str(e)))
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    """{}: Make sure account in asset has permissions to Reset
+                    """{}: Make sure account in asset has permissions to Set
                     Password and password meets complexity requirements""".format(e.description),
                     None)
             )
-        self.debug_print("[DEBUG] handle_reset_password, ret = {}".format(ret))
+        self.debug_print("[DEBUG] handle_set_password, ret = {}".format(ret))
         if ret:
-            ar_data["reset"] = summary["reset"] = True
+            ar_data["set"] = summary["set"] = True
             action_result.add_data(ar_data)
             return RetVal(action_result.set_status(phantom.APP_SUCCESS))
         else:
-            ar_data["reset"] = summary["reset"] = False
+            ar_data["set"] = summary["set"] = False
             action_result.add_data(ar_data)
             return RetVal(action_result.set_status(phantom.APP_ERROR))
 
@@ -701,6 +752,9 @@ class AdLdapConnector(BaseConnector):
 
         elif action_id == "reset_password":
             ret_val = self._handle_reset_password(param)
+
+        elif action_id == "set_password":
+            ret_val = self._handle_set_password(param)
 
         return ret_val
 
