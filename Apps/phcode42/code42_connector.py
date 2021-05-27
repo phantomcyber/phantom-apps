@@ -1229,7 +1229,7 @@ class Code42Connector(BaseConnector):
             list_items.extend(request_response.get('fileEvents', []))
 
             if limit and len(list_items) >= limit:
-                return phantom.APP_SUCCESS, list_items
+                return phantom.APP_SUCCESS, list_items[:limit]
 
             next_token = request_response.get("nextPgToken", "")
             if not next_token:

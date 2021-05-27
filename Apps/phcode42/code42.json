@@ -701,6 +701,7 @@
             "description": "Activate a user",
             "type": "correct",
             "identifier": "activate_user",
+            "undo": "deactivate user",
             "read_only": false,
             "parameters": {
                 "user": {
@@ -795,6 +796,7 @@
             "description": "Deactivate a user",
             "type": "contain",
             "identifier": "deactivate_user",
+            "undo": "activate user",
             "read_only": false,
             "parameters": {
                 "user": {
