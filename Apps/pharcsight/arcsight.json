@@ -4,6 +4,11 @@
     "description": "This app implements creating and updating cases on ArcSight",
     "type": "siem",
     "publisher": "Splunk Community",
+    "contributors": [
+        {
+            "name": "Juliya Smith"
+        }
+    ],
     "package_name": "phantom_arcsight",
     "main_module": "arcsight_connector.pyc",
     "app_version": "1.2.36",
