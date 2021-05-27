@@ -1,7 +1,7 @@
 {
     "appid": "2492d30e-9c79-4905-abab-9359d78e85bc",
     "name": "Kaspersky Threat Intelligence",
-    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications. Now you can mitigate and respond to threats more effectively, defending your system against attacks even before they are launched",
+    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications",
     "type": "reputation",
     "product_vendor": "Kaspersky Lab",
     "logo": "logo_kasperskythreatintelligence.svg",
@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Kaspersky Lab",
     "license": "(c) 2019-2021 AO Kaspersky Lab. All Rights Reserved.",
-    "app_version": "2.0.0",
-    "utctime_updated": "2021-05-24T05:05:36.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-05-24T13:55:24.000000Z",
     "package_name": "phantom_kasperskythreatintelligence",
     "main_module": "kasperskythreatintelligence_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -46,14 +46,12 @@
         "accept_the_terms_and_conditions": {
             "description": "I understand and accept the Terms and Conditions",
             "data_type": "boolean",
-            "required": true,
             "default": false,
             "order": 4
         },
         "accept_privacy_policy": {
             "description": "I understand and accept Privacy Policy",
             "data_type": "boolean",
-            "required": true,
             "default": false,
             "order": 5
         }

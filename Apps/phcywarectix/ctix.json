@@ -1,0 +1,650 @@
+{
+    "appid": "9c859a3a-310a-43a2-9925-aaf84bc6abbf",
+    "name": "Cyware CTIX",
+    "description": "Cyware Threat Intel eXchange is an intelligent client-server intelligence exchange that provides subscriber with full Threat Intel collection management from multiple internal and external sources",
+    "type": "threat intel",
+    "main_module": "ctix_connector.py",
+    "app_version": "1.0.0",
+    "min_phantom_version": "4.9.39220",
+    "product_vendor": "Cyware Labs",
+    "product_name": "Cyware Threat Intel eXchange",
+    "product_version_regex": ".*",
+    "publisher": "Cyware Labs",
+    "contributors": [
+        {
+            "name": "Colin Blumer"
+        }
+    ],
+    "package_name": "phantom_cywarectix",
+    "python_version": "3",
+    "license": "Copyright (c) Cyware Corporation 2021",
+    "logo": "logo_ctix.svg",
+    "logo_dark": "logo_ctix_dark.svg",
+    "configuration": {
+        "access_id": {
+            "description": "Access ID",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "secret_key": {
+            "description": "Authentication Secret Key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "baseurl": {
+            "description": "Base URL for CTIX REST API",
+            "default": "https://<custom_domain>/ctixapi/openapi",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup domain",
+            "description": "Search IOCs in CTIX for matching Domain",
+            "type": "investigate",
+            "identifier": "lookup_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to run the lookup on",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "domain"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 1,
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result.score",
+                    "data_type": "numeric",
+                    "column_name": "CTIX Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.updated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.domain_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.package_count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.packages_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.stix_object_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.geoip_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Lookup Domain"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup hash",
+            "description": "Search IOCs in CTIX for matching Hash",
+            "type": "investigate",
+            "identifier": "lookup_hash",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "Hash to run the lookup on",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "hash"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "column_name": "Hash",
+                    "column_order": 1,
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result.score",
+                    "data_type": "numeric",
+                    "column_name": "CTIX Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.updated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.hash_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.package_count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.packages_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.stix_object_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.virus_total_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.mandiant_threat_intelligence_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.alien_vault_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.comodo_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Lookup Hash"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup ip",
+            "description": "Search IOCs in CTIX for matching IP Address",
+            "type": "investigate",
+            "identifier": "lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP Address to run the lookup on",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result.score",
+                    "data_type": "numeric",
+                    "column_name": "CTIX Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.updated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.hash_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.package_count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.packages_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.stix_object_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.virus_total_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.mandiant_threat_intelligence_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.alien_vault_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.comodo_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Lookup IP"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "lookup url",
+            "description": "Search IOCs in CTIX for matching URL",
+            "type": "investigate",
+            "identifier": "lookup_url",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to run the lookup on",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 1,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result.score",
+                    "data_type": "numeric",
+                    "column_name": "CTIX Score",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.result.created",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.updated",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result.hash_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.package_count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.packages_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.stix_object_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.virus_total_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.mandiant_threat_intelligence_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.misp_warninglist_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.alien_vault_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.cisco_umbrella_domain_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.zscaler_enrichment_malicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result.comodo_hash_report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Lookup URL"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
