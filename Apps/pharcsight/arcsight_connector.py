@@ -816,22 +816,77 @@ class ArcsightConnector(BaseConnector):
         return result
 
 
-if __name__ == '__main__':
 
-    import sys
+def main():
     import pudb
+    import argparse
 
     pudb.set_trace()
 
-    with open(sys.argv[1]) as f:
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument("input_test_json", help="Input Test JSON file")
+    argparser.add_argument("-u", "--username", help="username", required=False)
+    argparser.add_argument("-p", "--password", help="password", required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if username is not None and password is None:
+
+        # User specified a username but not a password, so ask
+        import getpass
+
+        password = getpass.getpass("Password: ")
+
+    csrftoken = None
+    headers = None
+    if username and password:
+        try:
+            login_url = ArcsightConnector._get_phantom_base_url() + "/login"
+
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies["csrftoken"]
+
+            data = dict()
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
+
+            headers = dict()
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies["sessionid"]
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = ArcsightConnector()
         connector.print_progress_message = True
-        result = connector._handle_action(json.dumps(in_json), None)
 
-        print result
+        if session_id is not None:
+            in_json["user_session_token"] = session_id
+            if csrftoken and headers:
+                connector._set_csrf_info(csrftoken, headers["Referer"])
+
+        json_string = json.dumps(in_json)
+        ret_val = connector._handle_action(json_string, None)
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
+
+
+if __name__ == "__main__":
+    main()
