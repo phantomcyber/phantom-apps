@@ -50,6 +50,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._client_secret = None
         self._oauth_access_token = None
         self._poll_interval = None
+        self._required_detonation = False
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -63,6 +64,7 @@ class CrowdstrikeConnector(BaseConnector):
         self._client_id = config[CROWDSTRIKE_CLIENT_ID]
         self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
         self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth]
+        self._required_detonation = False
         self._poll_interval = self._validate_integers(self, config.get(CROWDSTRIKE_POLL_INTERVAL, 15), CROWDSTRIKE_POLL_INTERVAL)
         if self._poll_interval is None:
             return self.get_status()
@@ -293,13 +295,14 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            for j, artifact in enumerate(artifacts):
-
-                # if it is the last artifact of the last container
-                if (j + 1) == len_artifacts:
-                    # mark it such that active playbooks get executed
-                    artifact['run_automation'] = True
-
+            # if there is only a single artifact, set it to run_automation = True
+            if len_artifacts == 1:
+                artifacts[0]['run_automation'] = True
+            # if there are more than 1 artifacts, set the second artifact to run_automation = True
+            elif len_artifacts > 1:
+                artifacts[1]['run_automation'] = True
+            # append container ID to each artifact for logging
+            for artifact in artifacts:
                 artifact['container_id'] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
@@ -364,6 +367,9 @@ class CrowdstrikeConnector(BaseConnector):
             if limit and len(list_ids) >= int(limit):
                 return list_ids[:int(limit)]
 
+            if self.get_action_identifier() in ['detonate_file', 'detonate_url']:
+                if total == 0:
+                    self._required_detonation = True
             if offset >= total:
                 return list_ids
 
@@ -2153,7 +2159,8 @@ class CrowdstrikeConnector(BaseConnector):
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        if param.get('detail_report'):
+        is_detail = param.get('detail_report', False)
+        if is_detail:
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
@@ -2207,7 +2214,8 @@ class CrowdstrikeConnector(BaseConnector):
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        if param.get('detail_report'):
+        is_detail = param.get('detail_report', False)
+        if is_detail:
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
@@ -2228,7 +2236,34 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Report downloaded successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, 'Report downloaded successfully')
+
+    def _handle_check_detonate_status(self, param):
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        query_param = {
+            'ids': param['resource_id']
+        }
+        header = {
+            'accept': 'application/json'
+        }
+
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if resp_json['resources'] is None or not resp_json['resources']:
+            return action_result.set_status(phantom.APP_SUCCESS, 'No data found')
+
+        summary_data = action_result.update_summary({})
+        if 'state' in list(resp_json['resources'][0].keys()):
+            summary_data['state'] = resp_json['resources'][0]['state']
+        else:
+            summary_data['state'] = 'No state found'
+
+        action_result.add_data(resp_json['resources'][0])
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_url(self, param):
         # Add an action result to the App Run
@@ -2283,15 +2318,16 @@ class CrowdstrikeConnector(BaseConnector):
         resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
 
         if resource_id_list is None:
-            return self._submit_resource_for_detonation(action_result, param, url=param['url'])
+            return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        if not resource_id_list:
+        if (not resource_id_list) and self._required_detonation:
             return self._submit_resource_for_detonation(action_result, param, url=param['url'])
 
-        if param.get('detail_report'):
+        is_detail = param.get('detail_report', False)
+        if is_detail:
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
@@ -2352,15 +2388,16 @@ class CrowdstrikeConnector(BaseConnector):
         resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
 
         if resource_id_list is None:
-            return self._upload_file(action_result, param, file_info=file_info)
+            return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
             return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
 
-        if not resource_id_list:
+        if (not resource_id_list) and self._required_detonation:
             return self._upload_file(action_result, param, file_info=file_info)
 
-        if param.get('detail_report'):
+        is_detail = param.get('detail_report', False)
+        if is_detail:
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
         else:
             endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
@@ -2374,7 +2411,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         query_param = {
             'file_name': file_name,
-            'is_confidential': param.get('is_confidential'),
+            'is_confidential': param.get('is_confidential', True),
             'comment': param.get('comment')
         }
 
@@ -2418,14 +2455,12 @@ class CrowdstrikeConnector(BaseConnector):
         if user_tags is not None:
             tag_list = [x.strip() for x in user_tags.split(',')]
             tag_list = list(filter(None, tag_list))
-            if not tag_list:
-                return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing user tags parameter')
 
         json_payload = {
             'sandbox': [
                 {
                     'environment_id': environment_id_dict[environment_id],
-                    'enable_tor': param['enable_tor'],
+                    'enable_tor': param.get('enable_tor', False)
                 }
             ]
         }
@@ -2445,17 +2480,18 @@ class CrowdstrikeConnector(BaseConnector):
             json_payload['sandbox'][0]['submit_name'] = param.get('submit_name')
         if 'user_tags' in param:
             json_payload['user_tags'] = tag_list
+            if not tag_list:
+                del param['user_tags']
 
         ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, json=json_payload, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT, method='post')
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        self.debug_print('Params are {}'.format(json_payload))
         return self._poll_for_detonate_results(action_result, param, json_resp['resources'][0]['id'])
 
     def _poll_for_detonate_results(self, action_result, param, resource_id):
         counter = 0
-
+        prev_resp = None
         while counter < self._poll_interval:
             query_param = {
                 'ids': resource_id
@@ -2464,6 +2500,7 @@ class CrowdstrikeConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
+            prev_resp = json_resp
             if 'resources' in json_resp and json_resp['resources'] is not None and len(json_resp['resources']) > 0 and \
                     'state' in json_resp['resources'][0] and json_resp['resources'][0]['state'] == 'success':
                 return self._get_resource_report(action_result, param, resource_id)
@@ -2475,11 +2512,15 @@ class CrowdstrikeConnector(BaseConnector):
             counter += 1
             time.sleep(60)
 
-        return action_result.set_status(phantom.APP_ERROR, 'Reached max polling attempts. Try rerunning the action')
+        if prev_resp is not None:
+            action_result.add_data(prev_resp['resources'][0])
+        return action_result.set_status(phantom.APP_SUCCESS, 'Timed out while waiting for the result. To know the status of submitted \
+            sample please run the check status action with {} resource id.'.format(resource_id))
 
     def _get_resource_report(self, action_result, param, resource_id):
         endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
-        if param.get('detail_report'):
+        is_detail = param.get('detail_report', False)
+        if is_detail:
             endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
 
         summary_data = action_result.update_summary({})
@@ -2716,7 +2757,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call_oauth2(self, endpoint, action_result, headers=None, params=None, files=None, data=None, json=None, method="get"):
+    def _make_rest_call_oauth2(self, endpoint, action_result, headers=None, params=None, data=None, json=None, method="get"):
         """ Function that makes the REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -2738,7 +2779,7 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, params=params, files=files)
+            r = request_func(endpoint, json=json, data=data, headers=headers, params=params)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json
 
@@ -2747,7 +2788,7 @@ class CrowdstrikeConnector(BaseConnector):
             is_download = True
         return self._process_response(r, action_result, is_download)
 
-    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, files=None, json=None, method="get"):
+    def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json=None, method="get"):
         """ Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -2778,7 +2819,7 @@ class CrowdstrikeConnector(BaseConnector):
         if not headers.get('Content-Type'):
             headers['Content-Type'] = 'application/json'
 
-        ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, files, data, json, method)
+        ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
@@ -2792,7 +2833,7 @@ class CrowdstrikeConnector(BaseConnector):
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._oauth_access_token)})
 
-            ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, files, data, json, method)
+            ret_val, resp_json = self._make_rest_call_oauth2(url, action_result, headers, params, data, json, method)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
@@ -2889,7 +2930,8 @@ class CrowdstrikeConnector(BaseConnector):
             'url_reputation': self._handle_url_reputation,
             'download_report': self._handle_download_report,
             'detonate_file': self._handle_detonate_file,
-            'detonate_url': self._handle_detonate_url
+            'detonate_url': self._handle_detonate_url,
+            'check_detonate_status': self._handle_check_detonate_status
         }
 
         action = self.get_action_identifier()

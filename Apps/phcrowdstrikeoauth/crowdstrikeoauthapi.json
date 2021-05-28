@@ -9,8 +9,13 @@
     "product_name": "CrowdStrike",
     "product_version_regex": ".*",
     "publisher": "Splunk",
+    "contributors": [
+        {
+            "name": "Harrison Smith"
+        }
+    ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.1.0",
+    "app_version": "3.0.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, January 21 2021, API version: v1, v2"
     ],
@@ -86,9 +91,9 @@
             "description": "Script with functions to preprocess containers and artifacts",
             "order": 10
         },
-        "poll_interval": {
+        "detonate_timeout": {
             "data_type": "numeric",
-            "description": "Number of minutes to poll for a detonation result (Default: 15)",
+            "description": "Timeout for detonation result in minutes (Default: 15 minutes)",
             "order": 11,
             "default": 15
         }
@@ -8151,7 +8156,7 @@
                     "data_path": "action_result.parameter.offset",
                     "data_type": "numeric",
                     "example_values": [
-                        "100"
+                        100
                     ]
                 },
                 {
@@ -8191,6 +8196,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e_5cbc78f5cd4845fd8652896dde973397"
+                    ],
+                    "contains": [
+                        "crowdstrike resource id"
                     ]
                 },
                 {
@@ -8313,6 +8321,9 @@
                     "data_type": "string",
                     "example_values": [
                         "b029f63374652c76e09b6443dd931774"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -8320,6 +8331,9 @@
                     "data_type": "string",
                     "example_values": [
                         "8b50322f86d4bd5a7a5bc1d54d16ecfae8d4e693"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -8333,6 +8347,9 @@
                     "data_path": "action_result.data.*.malquery.*.type",
                     "data_type": "string",
                     "example_values": [
+                        "sha256"
+                    ],
+                    "contains": [
                         "sha256"
                     ]
                 },
@@ -8421,6 +8438,48 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.217.13.67"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "iexplore.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.pid",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7284
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
@@ -8484,6 +8543,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.error_message",
                     "data_type": "string",
                     "example_values": [
@@ -8530,6 +8596,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5ce220e1334193b403e937ecca0b406f"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -8551,6 +8620,9 @@
                     "data_type": "string",
                     "example_values": [
                         "48c1d47e4a23ebfd739aa86830842d1ead7ced59"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -8558,6 +8630,9 @@
                     "data_type": "string",
                     "example_values": [
                         "c619f87556667f2c1799672d36d55172597f4fed158800d5622edc8abee930e8"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -8624,6 +8699,48 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.217.13.67"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.method",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.incidents.*.name",
                     "data_type": "string",
                     "example_values": [
@@ -8635,6 +8752,9 @@
                     "data_type": "string",
                     "example_values": [
                         "9e5ebb7847a684fe6b9f36bb6bfb36e03b4e2f71b010c67e131652b968695a30"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -8756,10 +8876,24 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.parent_uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "00079399-00003508"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.pid",
                     "data_type": "numeric",
                     "example_values": [
                         3788
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.process_flags.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reduced Monitoring"
                     ]
                 },
                 {
@@ -8795,6 +8929,9 @@
                     "data_type": "string",
                     "example_values": [
                         "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -8809,6 +8946,9 @@
                     "data_type": "string",
                     "example_values": [
                         "789356c7d6964b9b4b3d38ecadea3b1570893275013cabbd008900a32c2afd24"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -9182,6 +9322,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e_3ab68d2aa2774ba3a35d6f17ae1a7c0b"
+                    ],
+                    "contains": [
+                        "crowdstrike resource id"
                     ]
                 },
                 {
@@ -9189,6 +9332,9 @@
                     "data_type": "string",
                     "example_values": [
                         "6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9196,6 +9342,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9203,6 +9352,9 @@
                     "data_type": "string",
                     "example_values": [
                         "0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9210,6 +9362,9 @@
                     "data_type": "string",
                     "example_values": [
                         "653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9217,6 +9372,9 @@
                     "data_type": "string",
                     "example_values": [
                         "6ba1a1ab22f1c1fdea253934fd96364513f897a4f697df2058dd8a456dee2cc0"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9224,6 +9382,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3ccac07c025cc4aa4ce900530fb982371d878cf8c80ceeb9247024420b540fa4"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9231,6 +9392,9 @@
                     "data_type": "string",
                     "example_values": [
                         "0ee0e99a5a032a3c42799d01941938e5b10ed8f13e7452d930648d481af5d51e"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9238,6 +9402,9 @@
                     "data_type": "string",
                     "example_values": [
                         "653ebf60312387e4d519dba01da938294ac607f859b671f5d55980c02732f474"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9245,6 +9412,55 @@
                     "data_type": "string",
                     "example_values": [
                         "http://accounts.youtube.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        466
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTML"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.first_seen_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-05T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "cf83a54faef91aa5c3f9d89dba8a8b14"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "7fe4176691ffaf6df16090e19cbc36dc3f7ed041"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "80c4f85980efc903c8ae376cd6d88025465d49aec6f84901d41abcc384b99738"
                     ]
                 },
                 {
@@ -9381,6 +9597,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        160
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "The requested environment ID \"300\" and file type \"url\" have no available execution environment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLIENT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE_TYPE_BAD_ERROR"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.description",
                     "data_type": "string",
                     "example_values": [
@@ -9406,6 +9650,9 @@
                     "data_type": "string",
                     "example_values": [
                         "cbd0581678fa40f0edcbc7c59e0cad10"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -9427,6 +9674,9 @@
                     "data_type": "string",
                     "example_values": [
                         "a1463fbcc9b96a8929f8a335f75a89147b300715"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -9434,6 +9684,9 @@
                     "data_type": "string",
                     "example_values": [
                         "159bd4343f344a08f6af3b716b6fa679859c1bd1d7030d26ff5ef0255b86e1d9"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -9476,6 +9729,13 @@
                     "data_type": "string",
                     "example_values": [
                         "\"!\ufffd\ufffd\\\ufffd\ufffd\ufffd\ufffd|\ufffdA%K\ufffd\u2cf0#\ufffdB\ufffd\ufffdw\ufffdR\u0413\ufffd\ufffd@\ufffdJ\ufffdJ\ufffd>\u0213J\ufffd\ufffd\ufffd\ufffdZ\ufffd\ufffdY\ufffd\ufffd\ufffd_1+\ufffd8'\ufffdS\ufffd\ufffd/\ufffd\u024ay\ufffd\ufffd\ufffdw]\ufffd*e\ufffd\ufffd\ufffd\ufffd|H\ufffd9\ufffdl\ufffdN\ufffdk\ufffdrN\ufffd+\u0708\ufffd\ufffd \ufffd\ufffdUB\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdFT\ufffd\ufffd\ufffdv}\ufffd9,\ufffd\ufffd^%\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd,4\ufffd`pa\ufffd\ufffd\ufffd\ufffd\ufffd%m\ufffd\ufffd\ufffdl$\ufffd\ufffd\ufffd|OY\ufffd@`\ufffd^(\ufffd*\ufffd^B\ufffd2`\ufffd10\ufffdS\ufffd\ufffd\ufffd\ufffd\ufffd`\ufffd\ufffdj;H\ufffd#Uq\ufffd\ufffd\ufffd=\ufffd\ufffd?\ufffd\ufffd\ufffd9\ufffdb|\ufffd\ufffd\ufffd\ufffdZ\ufffdu\ufffdd\ufffdF\ufffd\ufffd0=h\ufffd\ufffd\ufffd\ufffd\ufffd]}ene\ufffd\ufffd\ufffd\ufffdJp\ufffd\u036c/w\ufffd\ufffd\u014c\ufffdd\ufffdR\ufffd(|\ufffddi\ufffdy:\ufffd\ufffdD[\ufffd\u00e4\ufffd\ufffd,\ufffdP \ufffdG\ufffd@<\ufffdbC\ufffdN\ufffd^*+f\ufffdn\ufffdr2\ufffd\ufffd\ufffd\ufffd\ufffdfq~\ufffd\ufffd6\ufffd\ufffd$\ufffd>\ufffd<\ufffd\ufffdqF\ufffdS9\ufffdW'+\ufffd\ufffdr\ufffd\ufffdG\ufffde\ufffdo\ufffd\ufffd\ufffdw8/\ufffd%\ufffdy\ufffd/\ufffd\ufffd\ufffdH\ufffd\ufffd1\ufffdc{\ufffd#\ufffd\ufffd|8\ufffd\ufffd3\ufffd~up\ufffdn\u079d\ufffd\ufffdOr\ufffd!\ufffd;r\ufffdJJ\ufffd3\ufffd\ufffdwb\ufffd\ufffd(\ufffd\ufffdG\ufffd\ufffd\ufffd\ufffd,\ufffd\ufffd\ufffd\ufffd\ufffd2\ufffd\ufffd-)\ufffd\ufffd,\ufffd^\u0743\ufffd\ufffd%td\ufffd\ufffd\ufffd\ufffdE\ufffdR\ufffd\ufffd\ufffd\u0737|\ufffd\ufffdD\ufffd\ufffd>\ufffd\ufffd#\ufffd\ufffd\ufffd\\\ufffd\ufffdEC\ufffd\ufffduk\ufffdOs[TwW\ufffd\ufffd\ufffd\ufffd\ufffd\ufffd/\ufffd\ufffd\ufffdyh7px\ufffd\ufffd\ufffdt\u01b31\ufffd\ufffdv\ufffdvbH\ufffdvw\ufffd\ufffd\ufffd\u021b\ufffdY\ufffd\ufffd|\ufffd\ufffd:\ufffd\u06c2\u02d7C\ufffd\ufffd\ufffds\ufffd\ufffd\ufffd\ufffd\ufffd\ufffdM\ufffdU\ufffdQh''w'\ufffd\ufffd\ufffd\ufffdQ\ufffd\ufffd}|\ufffdN\u0366q3,O\u05e3\u02fe['Go.4\ufffdG\ufffd\ufffd&,C\ufffdIYe\ufffd\ufffd.{kB\ufffd\ufffd\ufffd\u0444\ufffd\ufffdnA\ufffdp:c\ufffd\ufffd^\ufffd-V\ufffd\ufffdFOS\ufffd\ufffd\ufffdw|/(r9H\ufffd\ufffd\u079d)\ufffdh:\ufffd\ufffd\ufffd\u66d0Ql\ufffd i\ufffd\u0123c\ufffd\ufffdE\ufffd3\ufffdy&\"Pw\ufffd\ufffdy\ufffdG\ufffd\ufffd:n\ufffd\ufffd\ufffdq(|%\ufffd\ufffd\u0658|;|\u0625\ufffdJ>\ufffd(\ufffd\u03d0\ufffd\ufffd\ufffdo/.\ufffd\ufffd\ufffd\ufffd\ufffd/?~$\ufffd<'\u0414\ufffd<\ufffd\ufffdG?\u03c3\u0173\ufffd\ufffd\ufffd\ufffd \ufffd\u05afQ\ufffd\ufffd$~\ufffd\ufffdM\ufffd\ufffdp\ufffdE\ufffdpx\ufffdLc4\ufffd\ufffd\ufffd\ufffd\ufffd!\ufffd@yz&\ufffd,\ufffdu\ufffd\ufffdq\ufffd\ufffd\ufffdz\ufffd\ufffdB\ufffd\ufffd\ufffd\ufffd\ufffdU\ufffdbc\ufffdxk\ufffd>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PE32 executable (GUI) Intel 80386, for MS Windows, UPX compressed"
                     ]
                 },
                 {
@@ -9532,6 +9792,9 @@
                     "data_type": "string",
                     "example_values": [
                         "4300381ecd2f3d62648cdc01d862f4765032f071bad272164c3580b7b6fb8840"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9546,6 +9809,9 @@
                     "data_type": "string",
                     "example_values": [
                         "04a091843e91c36357b2ec63a2a7ac8ad7d142d861759062520b0a925e9b875d"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9602,6 +9868,9 @@
                     "data_type": "string",
                     "example_values": [
                         "aa6f1a14d219555f2818f89dee06821824c872ae18279027baa0e160f61f049a"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -9672,6 +9941,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3fa4912eb43fc304652d7b01f118589259861e2d628fa7c86193e54d5f987670"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -9686,6 +9958,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3cfc7f2806efb5b01deb01164fa00adb46eb73a0d24871a566051fb2204094af"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -9759,10 +10034,66 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.submit_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "http://ko.wikipedia.org/wiki/%EC%9C%84%ED%82%A4%EB%B0%B1%EA%B3%BC:%EB%8C%80%EB%AC%B8"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.submit_url",
                     "data_type": "string",
                     "example_values": [
                         "hxxps://www.gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown Traffic"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "104.100.79.92"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.sid",
+                    "data_type": "string",
+                    "example_values": [
+                        "2027390"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.threat_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
                     ]
                 },
                 {
@@ -9911,7 +10242,7 @@
                 "artifact_id": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "Get the zipped file",
+                    "description": "Artifact id to be downloaded",
                     "required": true,
                     "primary": true,
                     "contains": [
@@ -10004,7 +10335,7 @@
         {
             "action": "detonate file",
             "description": "Upload a file to Crowd Strike and retrieve the analysis results",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "detonate_file",
             "read_only": false,
             "parameters": {
@@ -10233,20 +10564,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.cid",
-                    "data_type": "string",
-                    "example_values": [
-                        "3061c7ff3b634e22b38274d4b586558e"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.created_timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2021-05-11T04:09:11Z"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.created_timestamp",
                     "data_type": "string",
                     "example_values": [
@@ -10258,13 +10575,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e_ca27f64601b74c1f8a25577007987606"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "string",
-                    "example_values": [
-                        "3061c7ff3b634e22b38274d4b586558e_11116e9972bd408eb8e5c346e7dcb5f4"
+                    ],
+                    "contains": [
+                        "crowdstrike resource id"
                     ]
                 },
                 {
@@ -10272,13 +10585,9 @@
                     "data_type": "string",
                     "example_values": [
                         "8a06e0e6a04696b16d8bcbe3b7952c6b0b48458f1168bf70ffa97b0993b9d115"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_broad_csv_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "f752b8c9fefd39320a183116dc2ee370f789d445c7d29d2a70efa9994fffea29"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10286,13 +10595,9 @@
                     "data_type": "string",
                     "example_values": [
                         "76dba8304fb398f192202a9dbbb39e259882ee7d9460afb4a07b8f2b8db8679a"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_broad_json_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "45fbd4ecb5fe88de42500f44aaebff3fb71410cd8a75f12bb1dbb519e55a4c29"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10300,13 +10605,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5391d132d841fe391d3132d2cab43cdf0d5a45c4f146e31cd65f51917dbf6820"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_broad_maec_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "214a09416cc7b3b35abb5e46e3d1533b43ea04e0464f0b2ee24d24de12e8ed46"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10314,13 +10615,9 @@
                     "data_type": "string",
                     "example_values": [
                         "aaab7615a82190cabdf6086fd818a5a3a5f65072363a7fa89c73e12bf115befd"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_broad_stix_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "f391d0d212e03aaeab0b4a73d02c44c29d29c63ebb48e62c14fd12eb3fae0e22"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10328,13 +10625,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3ebe2620f871109e7048bfb0c1638b8e011b5fb779d6229db7135668fc558208"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_strict_csv_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "cb46a844460c69fd2b9e6bb08b63d40de2b957c44c50562128a89dc387cb39df"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10342,13 +10635,9 @@
                     "data_type": "string",
                     "example_values": [
                         "097dc42503083de24bfb80b8964433348dfcb8b769f9abb491f5a97599666279"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_strict_json_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "3ec6d1d28ee3189fe231c567d8025bc4ebf49aff262f4ffb3e13e3443bb8ac3c"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10356,13 +10645,9 @@
                     "data_type": "string",
                     "example_values": [
                         "ccbc852e586f1348d83025a98a78398ba97c78d21fd8296676ef7da40852dc9a"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_strict_maec_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "f28c51baca2bf18ab39248f2e8e6d337f6b31ac47554a43c5b434a0237a1b98d"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10370,20 +10655,9 @@
                     "data_type": "string",
                     "example_values": [
                         "0967fd13eea5335645e8b2be13f2da7254a8401f1536bd2b939002d69a1af7f6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ioc_report_strict_stix_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "44af5fdb70c25349deda04e66764b89790a36034200fd89f7a1f72982da4d200"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.input",
-                    "data_type": "string",
-                    "example_values": [
-                        "1.6.0.0"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10401,31 +10675,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.file_size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        25970
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.malquery.*.resources.*.file_type",
                     "data_type": "string",
                     "example_values": [
                         "TEXT"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.file_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "TEXT"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.first_seen_timestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        "2017-08-10T00:00:00Z"
                     ]
                 },
                 {
@@ -10443,24 +10696,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.label",
-                    "data_type": "string",
-                    "example_values": [
-                        "unknown"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.malquery.*.resources.*.md5",
                     "data_type": "string",
                     "example_values": [
                         "c7c4bf6fc4e73a85e6ab36711bdd8a7f"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.md5",
-                    "data_type": "string",
-                    "example_values": [
-                        "c7c4bf6fc4e73a85e6ab36711bdd8a7f"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -10468,13 +10710,9 @@
                     "data_type": "string",
                     "example_values": [
                         "a21c5fbfa596efb30180f75062794f01952cf18e"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.sha1",
-                    "data_type": "string",
-                    "example_values": [
-                        "a21c5fbfa596efb30180f75062794f01952cf18e"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -10482,20 +10720,9 @@
                     "data_type": "string",
                     "example_values": [
                         "07c522146bddc664d077c2184e88e5cb17547f2501785506ce2f7b05eaf93af0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.resources.*.sha256",
-                    "data_type": "string",
-                    "example_values": [
-                        "07c522146bddc664d077c2184e88e5cb17547f2501785506ce2f7b05eaf93af0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.malquery.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "ip"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -10513,31 +10740,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.malquery.*.verdict",
-                    "data_type": "string",
-                    "example_values": [
-                        "whitelisted"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.origin",
                     "data_type": "string",
                     "example_values": [
                         "apigateway"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.origin",
-                    "data_type": "string",
-                    "example_values": [
-                        "apigateway"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.architecture",
-                    "data_type": "string",
-                    "example_values": [
-                        "Unknown"
                     ]
                 },
                 {
@@ -10555,13 +10761,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
-                    "data_type": "string",
-                    "example_values": [
-                        "205.185.216.10"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.name",
                     "data_type": "string",
                     "example_values": [
@@ -10569,31 +10768,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "iexplore.exe"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.pid",
                     "data_type": "numeric",
                     "example_values": [
                         7884
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.pid",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7564
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
-                    "data_type": "string",
-                    "example_values": [
-                        "United States"
                     ]
                 },
                 {
@@ -10611,13 +10789,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.port",
-                    "data_type": "numeric",
-                    "example_values": [
-                        80
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.protocol",
                     "data_type": "string",
                     "example_values": [
@@ -10625,17 +10796,52 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.protocol",
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "TCP"
+                        "172.217.164.99"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
+                    "data_type": "string",
                     "example_values": [
-                        160
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "fonts.gstatic.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_creation_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2008-02-11T00:00:00+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "MarkMonitor, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_name_servers",
+                    "data_type": "string",
+                    "example_values": [
+                        "NS1.GOOGLE.COM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Inc."
                     ]
                 },
                 {
@@ -10653,10 +10859,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.environment_description",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
                     "example_values": [
-                        "Windows 10 64 bit"
+                        160
                     ]
                 },
                 {
@@ -10688,24 +10894,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "XML 1.0 document, ASCII text, with CRLF line terminators"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
                     "data_type": "string",
                     "example_values": [
                         "%APPDATA%\\Microsoft\\Windows\\Recent\\CustomDestinations\\RB7520AO5Z28DRA0CR4G.temp"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
-                    "data_type": "string",
-                    "example_values": [
-                        "%TEMP%\\KnoA013.tmp"
                     ]
                 },
                 {
@@ -10716,24 +10908,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        90518
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.md5",
                     "data_type": "string",
                     "example_values": [
                         "da597791be3b6e732f0bc8b20e38ee62"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.md5",
-                    "data_type": "string",
-                    "example_values": [
-                        "002d5646771d31d1e7c57990cc020150"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -10744,13 +10925,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "KnoA013.tmp"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.runtime_process",
                     "data_type": "string",
                     "example_values": [
@@ -10758,24 +10932,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.runtime_process",
-                    "data_type": "string",
-                    "example_values": [
-                        "iexplore.exe (PID: 7564)"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha1",
                     "data_type": "string",
                     "example_values": [
                         "1125c45d285c360542027d7554a5c442288974de"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha1",
-                    "data_type": "string",
-                    "example_values": [
-                        "a28ec731f9106c252f313cca349a68ef94ee3de9"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -10783,20 +10946,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5b2c34b3c4e8dd898b664dba6c3786e2ff9869eff55d673aa48361f11325ed07"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha256",
-                    "data_type": "string",
-                    "example_values": [
-                        "1e2e25bf730ff20c89d57aa38f7f34be7690820e8279b20127d0014dd27b743f"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.threat_level_readable",
-                    "data_type": "string",
-                    "example_values": [
-                        "no specific threat"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -10814,20 +10966,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.filename",
-                    "data_type": "string",
-                    "example_values": [
-                        "verD34A.tmp"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
-                    "data_type": "string",
-                    "example_values": [
-                        "iexplore.exe"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
                     "data_type": "string",
                     "example_values": [
@@ -10842,31 +10980,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.source",
-                    "data_type": "string",
-                    "example_values": [
-                        "Runtime Data"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.type",
                     "data_type": "string",
                     "example_values": [
                         "Unicode"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "Unicode"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.value",
-                    "data_type": "string",
-                    "example_values": [
-                        "%LOCALAPPDATA%\\Microsoft\\Internet Explorer\\Recovery\\High\\Active\\{EAD6EFB1-2090-11E8-9BD7-0A00274B5076}.dat"
                     ]
                 },
                 {
@@ -10884,24 +11001,52 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.file_size",
+                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "SVG Scalable Vector Graphics image"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
+                    "data_type": "string",
+                    "example_values": [
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "ocsp.pki.goog"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.217.13.67"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_port",
                     "data_type": "numeric",
                     "example_values": [
-                        13155
+                        80
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.method",
                     "data_type": "string",
                     "example_values": [
-                        "SVG Scalable Vector Graphics image"
+                        "GET"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_path": "action_result.data.*.sandbox.*.http_requests.*.url",
                     "data_type": "string",
                     "example_values": [
-                        "SVG Scalable Vector Graphics image"
+                        "/gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D"
                     ]
                 },
                 {
@@ -10916,20 +11061,9 @@
                     "data_type": "string",
                     "example_values": [
                         "ba1b505d2495d9258817ae235fd12331ec1d6805543df5ff99c98168ff003af5"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.memory_strings_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "ffb8d98a4af764086349ce14dc862848b2f8a84c5bd4644b274905dd88f3ccec"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.attack_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "T1179"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -10944,20 +11078,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Persistence"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.tactic",
-                    "data_type": "string",
-                    "example_values": [
-                        "Persistence"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.technique",
-                    "data_type": "string",
-                    "example_values": [
-                        "Hooking"
                     ]
                 },
                 {
@@ -10975,24 +11095,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.network_settings",
-                    "data_type": "string",
-                    "example_values": [
-                        "default"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.pcap_report_artifact_id",
                     "data_type": "string",
                     "example_values": [
                         "cce20f960ed692d8cd1e82418d98133c54eeb0e989941545a25e17c13629c9a6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.pcap_report_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "6fb3bf0a8041d221189d397fc1526dfe3d71cf43b26043f6eca294de39cb3774"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11003,20 +11112,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.command_line",
-                    "data_type": "string",
-                    "example_values": [
-                        "C:\\b072131282f70da0f4468c0485a00875313cd45107bea01201d6ef1090a8789e.svg"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.mask",
-                    "data_type": "string",
-                    "example_values": [
-                        "GENERIC_READ | FILE_READ_ATTRIBUTES"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.mask",
                     "data_type": "string",
                     "example_values": [
@@ -11028,20 +11123,6 @@
                     "data_type": "string",
                     "example_values": [
                         "%WINDIR%\\apppatch\\sysmain.sdb"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.path",
-                    "data_type": "string",
-                    "example_values": [
-                        "%WINDIR%\\apppatch\\sysmain.sdb"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "CREATE"
                     ]
                 },
                 {
@@ -11059,20 +11140,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        156
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
-                    "data_type": "string",
-                    "example_values": [
-                        "\\Device\\CNG"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
                     "data_type": "string",
                     "example_values": [
@@ -11087,24 +11154,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "FileHandle"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.icon_artifact_id",
                     "data_type": "string",
                     "example_values": [
                         "eed07c63db692d7cb4af1daa44bdc5b03a63050290277d1e383601de95c05775"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.icon_artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "eed07c63db692d7cb4af1daa44bdc5b03a63050290277d1e383601de95c05775"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11112,20 +11168,6 @@
                     "data_type": "string",
                     "example_values": [
                         "iexplore.exe"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "iexplore.exe"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.normalized_path",
-                    "data_type": "string",
-                    "example_values": [
-                        "%PROGRAMFILES%\\internet explorer\\iexplore.exe"
                     ]
                 },
                 {
@@ -11143,24 +11185,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.parent_uid",
-                    "data_type": "string",
-                    "example_values": [
-                        "00101865-00007564"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.pid",
                     "data_type": "numeric",
                     "example_values": [
                         3508
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.pid",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7564
                     ]
                 },
                 {
@@ -11171,13 +11199,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.process_flags.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Network Activity"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.key",
                     "data_type": "string",
                     "example_values": [
@@ -11185,31 +11206,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.key",
-                    "data_type": "string",
-                    "example_values": [
-                        "LASTUPDATELOWDATETIME"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.operation",
                     "data_type": "string",
                     "example_values": [
                         "Write"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.operation",
-                    "data_type": "string",
-                    "example_values": [
-                        "Write"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
-                    "data_type": "string",
-                    "example_values": [
-                        "HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\EXT\\STATS\\{18DF081C-E8AD-4283-A596-FA578C2EBDC3}\\IEXPLORE\\TYPE"
                     ]
                 },
                 {
@@ -11237,13 +11237,6 @@
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.value",
                     "data_type": "string",
                     "example_values": [
-                        "03000000"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.value",
-                    "data_type": "string",
-                    "example_values": [
                         "C4110129"
                     ]
                 },
@@ -11252,13 +11245,9 @@
                     "data_type": "string",
                     "example_values": [
                         "8dea16e513f70e1a98be6ec48439b5499d2c740247716f6bcb990b7c305ec0a0"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.sha256",
-                    "data_type": "string",
-                    "example_values": [
-                        "8dea16e513f70e1a98be6ec48439b5499d2c740247716f6bcb990b7c305ec0a0"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -11269,31 +11258,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.processes.*.uid",
-                    "data_type": "string",
-                    "example_values": [
-                        "00101865-00007564"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.sha256",
                     "data_type": "string",
                     "example_values": [
                         "43e6a1253ebd103b93d50531ee05ba9cf7d87f043b6bca96a0edec311494d875"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.sha256",
-                    "data_type": "string",
-                    "example_values": [
-                        "b072131282f70da0f4468c0485a00875313cd45107bea01201d6ef1090a8789e"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.attack_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "T1010"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -11308,20 +11279,6 @@
                     "data_type": "string",
                     "example_values": [
                         "General"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.category",
-                    "data_type": "string",
-                    "example_values": [
-                        "General"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        "\"\\Sessions\\1\\BaseNamedObjects\\Local\\SM0:3508:304:WilStaging_02\"\n \"\\Sessions\\1\\BaseNamedObjects\\Local\\SM0:3508:120:WilError_01\"\n \"\\Sessions\\1\\BaseNamedObjects\\Local\\!BrowserEmulation!SharedMemory!Mutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\Local\\VERMGMTBlockListFileMutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\SmartScreen_AppRepSettings_Mutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\SmartScreen_ClientId_Mutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\CommunicationManager_Mutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\Local\\ZonesCacheCounterMutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\Local\\ZonesLockedCacheCounterMutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\IsoScope_db4_IE_EarlyTabStart_0x1cd0_Mutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\{5312EE61-79E3-4A24-BFE1-132B85B23C3A}\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_idx.db!rwWriterMutex\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_16.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_32.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_48.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_96.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_256.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_768.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_1280.db!dfMaintainer\"\n \"\\Sessions\\1\\BaseNamedObjects\\Global\\C::Users:%OSUSER%:AppData:Local:Microsoft:Windows:Explorer:iconcache_1920.db!dfMaintainer\""
                     ]
                 },
                 {
@@ -11339,24 +11296,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.identifier",
-                    "data_type": "string",
-                    "example_values": [
-                        "network-1"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.name",
                     "data_type": "string",
                     "example_values": [
                         "Creates mutants"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Contacts server"
                     ]
                 },
                 {
@@ -11367,13 +11310,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.origin",
-                    "data_type": "string",
-                    "example_values": [
-                        "Network Traffic"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.relevance",
                     "data_type": "numeric",
                     "example_values": [
@@ -11381,31 +11317,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.relevance",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level",
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.threat_level_human",
-                    "data_type": "string",
-                    "example_values": [
-                        "informative"
                     ]
                 },
                 {
@@ -11423,20 +11338,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.signatures.*.type",
-                    "data_type": "numeric",
-                    "example_values": [
-                        7
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.submission_type",
-                    "data_type": "string",
-                    "example_values": [
-                        "file"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.submission_type",
                     "data_type": "string",
                     "example_values": [
@@ -11451,10 +11352,45 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.submit_name",
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.category",
                     "data_type": "string",
                     "example_values": [
-                        "b072131282f70da0f4468c0485a00875313cd45107bea01201d6ef1090a8789e"
+                        "Unknown Traffic"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "104.105.84.21"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_port",
+                    "data_type": "numeric",
+                    "example_values": [
+                        80
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.sid",
+                    "data_type": "string",
+                    "example_values": [
+                        "2027390"
                     ]
                 },
                 {
@@ -11465,13 +11401,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.threat_score",
-                    "data_type": "numeric",
-                    "example_values": [
-                        81
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.verdict",
                     "data_type": "string",
                     "example_values": [
@@ -11479,31 +11408,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.verdict",
-                    "data_type": "string",
-                    "example_values": [
-                        "malicious"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.sandbox.*.windows_version_bitness",
                     "data_type": "numeric",
                     "example_values": [
                         64
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.windows_version_bitness",
-                    "data_type": "numeric",
-                    "example_values": [
-                        64
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.windows_version_edition",
-                    "data_type": "string",
-                    "example_values": [
-                        "Professional"
                     ]
                 },
                 {
@@ -11521,17 +11429,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sandbox.*.windows_version_name",
+                    "data_path": "action_result.data.*.sandbox.*.windows_version_service_pack",
                     "data_type": "string",
                     "example_values": [
-                        "Windows 10"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sandbox.*.windows_version_version",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.0 (build 16299)"
+                        "Service Pack 1"
                     ]
                 },
                 {
@@ -11556,17 +11457,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.verdict",
+                    "data_path": "action_result.data.*.user_uuid",
                     "data_type": "string",
                     "example_values": [
-                        "no specific threat"
+                        "b6330292-28e6-4198-994d-96f327c5b5bd"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.verdict",
                     "data_type": "string",
                     "example_values": [
-                        "malicious"
+                        "no specific threat"
                     ]
                 },
                 {
@@ -11622,7 +11523,7 @@
         {
             "action": "detonate url",
             "description": "Upload an url to Crowd Strike and retrieve the analysis results",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "detonate_url",
             "read_only": false,
             "parameters": {
@@ -11649,42 +11550,32 @@
                         "Windows 7, 32-bit"
                     ]
                 },
-                "comment": {
-                    "data_type": "string",
-                    "description": "A descriptive comment to identify the file",
-                    "order": 2
-                },
                 "limit": {
                     "data_type": "numeric",
                     "description": "Maximum reports to be fetched",
-                    "order": 3,
+                    "order": 2,
                     "default": 50
                 },
                 "offset": {
                     "data_type": "numeric",
                     "description": "Starting index of overall result set from which to return ids (Defaults to 0)",
-                    "order": 4,
+                    "order": 3,
                     "default": 0
-                },
-                "submit_name": {
-                    "data_type": "string",
-                    "order": 5,
-                    "description": "Name of the malware sample that's used for file type detection and analysis"
                 },
                 "document_password": {
                     "data_type": "string",
-                    "order": 6,
+                    "order": 4,
                     "description": "Password of the document if password protected (Max length: 32 characters)"
                 },
                 "user_tags": {
                     "data_type": "string",
-                    "order": 7,
+                    "order": 5,
                     "description": "Comma seperated list of user tags"
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 8,
+                    "order": 6,
                     "value_list": [
                         "verdict.asc",
                         "verdict.desc",
@@ -11696,7 +11587,7 @@
                 },
                 "action_script": {
                     "data_type": "string",
-                    "order": 9,
+                    "order": 7,
                     "description": "Runtime script for sandbox analysis",
                     "value_list": [
                         "default",
@@ -11708,13 +11599,13 @@
                 },
                 "detail_report": {
                     "data_type": "boolean",
-                    "order": 10,
+                    "order": 8,
                     "description": "Get the detailed report",
                     "default": false
                 },
                 "enable_tor": {
                     "data_type": "boolean",
-                    "order": 11,
+                    "order": 9,
                     "description": "To route the sandbox network traffic via TOR",
                     "default": false
                 }
@@ -11733,13 +11624,6 @@
                     "data_type": "string",
                     "example_values": [
                         "default"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.comment",
-                    "data_type": "string",
-                    "example_values": [
-                        "This is a test comment"
                     ]
                 },
                 {
@@ -11796,13 +11680,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.submit_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "test_file_name"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
@@ -11838,6 +11715,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e_5e2ec86aa5e444ac93d298df547e4d40"
+                    ],
+                    "contains": [
+                        "crowdstrike resource id"
                     ]
                 },
                 {
@@ -11845,6 +11725,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3b4ca1c6dd800fa60aaa4eb7154da76da7604067bcb3df160caa984ed7eabf3e"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11852,6 +11735,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5b7554048df30cb234d11a9d4d77a64e9f033dbe53265ee9a0e74fd7f803cf59"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11859,6 +11745,9 @@
                     "data_type": "string",
                     "example_values": [
                         "eefd76de04f16b6187d0f2b728dafec578e47cbfec140e7a6735f2f173d0cbcf"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11866,6 +11755,9 @@
                     "data_type": "string",
                     "example_values": [
                         "bb6089f7c2da27e70eb93447a724287572d3b4cac1c91e78edc264ee30dc401d"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11873,6 +11765,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3b4ca1c6dd800fa60aaa4eb7154da76da7604067bcb3df160caa984ed7eabf3e"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11880,6 +11775,9 @@
                     "data_type": "string",
                     "example_values": [
                         "5b7554048df30cb234d11a9d4d77a64e9f033dbe53265ee9a0e74fd7f803cf59"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11887,6 +11785,9 @@
                     "data_type": "string",
                     "example_values": [
                         "eefd76de04f16b6187d0f2b728dafec578e47cbfec140e7a6735f2f173d0cbcf"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11894,6 +11795,9 @@
                     "data_type": "string",
                     "example_values": [
                         "bb6089f7c2da27e70eb93447a724287572d3b4cac1c91e78edc264ee30dc401d"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -11901,6 +11805,62 @@
                     "data_type": "string",
                     "example_values": [
                         "http://mm.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.family",
+                    "data_type": "string",
+                    "example_values": [
+                        "Coinminer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2313692
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PCAP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.first_seen_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-26T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "4446a961902d0094397a071d75e4abf8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "cb1c5bb0d84e3efb978efede256ebec5308873c0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.malquery.*.resources.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "0091a4c5bc7bea90faadeee2ae71bd29e131d3f59f8ffb9f58ec7276953fafe5"
                     ]
                 },
                 {
@@ -12037,10 +11997,108 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "The requested environment ID \"300\" and file type \"url\" have no available execution environment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "CLIENT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.error_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "FILE_TYPE_BAD_ERROR"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "data"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%APPDATA%\\Adobe\\Acrobat\\11.0\\Security\\CRLCache\\0FDED5CEB68C302B1CDB2BDDD9D0000E76539CB0.crl"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        637
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "974e8536b8767ac5be204f35d16f73e8"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "0FDED5CEB68C302B1CDB2BDDD9D0000E76539CB0.crl"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.runtime_process",
+                    "data_type": "string",
+                    "example_values": [
+                        "AcroRd32.exe (PID: 4084)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "e847897947a3db26e35cb7d490c688e8c410dfb7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "d1bb4b163fe01acc368a92b385bb0bd3a9fc2340b6d485b77a20553a713166d3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_files.*.threat_level_readable",
+                    "data_type": "string",
+                    "example_values": [
+                        "no specific threat"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.filename",
                     "data_type": "string",
                     "example_values": [
                         "rundll32.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.process",
+                    "data_type": "string",
+                    "example_values": [
+                        "AcroRd32.exe"
                     ]
                 },
                 {
@@ -12062,6 +12120,20 @@
                     "data_type": "string",
                     "example_values": [
                         "\"%WINDIR%\\system32\\ieframe.dll\",OpenURL C:\\a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c.url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        690028
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PDF document, version 1.6"
                     ]
                 },
                 {
@@ -12104,6 +12176,9 @@
                     "data_type": "string",
                     "example_values": [
                         "/gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -12118,6 +12193,30 @@
                     "data_type": "string",
                     "example_values": [
                         "84626f942fc9dffdeb6facc2fb4a337bc8f52323a6a8be3e16d0c2ea57d30820"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1085"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rundll32"
                     ]
                 },
                 {
@@ -12132,6 +12231,9 @@
                     "data_type": "string",
                     "example_values": [
                         "506bc12accb770cdb032ad567ee478842a8cf1506ce9658f78f46d6b6cc65099"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -12142,10 +12244,55 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.mask",
+                    "data_type": "string",
+                    "example_values": [
+                        "GENERIC_READ | FILE_READ_ATTRIBUTES"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "%WINDIR%\\apppatch\\sysmain.sdb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.file_accesses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "CREATE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        176
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "\\Device\\CNG"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "FileHandle"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.icon_artifact_id",
                     "data_type": "string",
                     "example_values": [
                         "25f2b36dff5226562d05a905dae09c7e4ef627528e74dd5b95cc3575da3697dd"
+                    ],
+                    "contains": [
+                        "crowdstrike artifact id"
                     ]
                 },
                 {
@@ -12177,10 +12324,41 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "BLASTEXITNORMAL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.operation",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "HKLM\\SYSTEM\\ACROBATVIEWERCPP473\\"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "00000000"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.processes.*.sha256",
                     "data_type": "string",
                     "example_values": [
                         "b1e6a7a3e2597e51836277a32b2bc61aa781c8f681d44dfddea618b32e2bf2a6"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -12195,6 +12373,16 @@
                     "data_type": "string",
                     "example_values": [
                         "a3d7be9b5d8f9070d96789cdf7ee5ce2f1ee827f261faa0d43d4de605ad3194c"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1085"
                     ]
                 },
                 {
@@ -12268,10 +12456,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.submit_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "whatami"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.submit_url",
                     "data_type": "string",
                     "example_values": [
                         "hxxps://test.com"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.threat_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
                     ]
                 },
                 {
@@ -12342,11 +12547,39 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary.total_reports",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.verdict",
+                    "data_type": "string",
+                    "example_values": [
+                        "suspicious"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Verdict: no specific threat, Total reports: 1",
                         "Total reports: 6"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_valuess": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_valuess": [
+                        1
                     ]
                 }
             ],
@@ -12357,6 +12590,65 @@
                 "type": "custom",
                 "height": 5,
                 "view": "crowdstrike_view.display_view"
+            }
+        },
+        {
+            "action": "check status",
+            "description": "To check detonation status of the provided resource id",
+            "type": "investigate",
+            "identifier": "check_detonate_status",
+            "read_only": false,
+            "parameters": {
+                "resource_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Id of the resource",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike resource id"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.resource_id",
+                    "data_type": "string",
+                    "contains": [
+                        "crowdstrike resource id"
+                    ],
+                    "column_name": "Resource ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Check Status",
+                "type": "table",
+                "height": 5
             }
         }
     ]
