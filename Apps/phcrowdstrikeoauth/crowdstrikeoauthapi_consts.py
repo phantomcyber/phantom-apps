@@ -126,6 +126,13 @@ CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT = "/falconx/entities/reports/v1"
 CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT = "/falconx/entities/artifacts/v1"
 CROWDSTRIKE_UPLOAD_FILE_ENDPOINT = "/samples/entities/samples/v2"
 CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT = "/falconx/entities/submissions/v1"
-CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT = "/falconx/entities/submissions/v1"
 
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"
+
+CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
+    'linux ubuntu 16.04, 64-bit': 300,
+    'android (static analysis)': 200,
+    'windows 10, 64-bit': 160,
+    'windows 7, 64-bit': 110,
+    'windows 7, 32-bit': 100
+}

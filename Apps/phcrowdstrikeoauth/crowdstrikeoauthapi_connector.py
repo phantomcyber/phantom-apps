@@ -2118,9 +2118,9 @@ class CrowdstrikeConnector(BaseConnector):
             _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
         except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
+            return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
 
         file_hash = file_info['metadata']['sha256']
         filter_query = "sandbox.sha256:'{}'".format(file_hash)
@@ -2157,7 +2157,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
-            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
 
         is_detail = param.get('detail_report', False)
         if is_detail:
@@ -2212,7 +2212,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
-            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
 
         is_detail = param.get('detail_report', False)
         if is_detail:
@@ -2248,7 +2248,7 @@ class CrowdstrikeConnector(BaseConnector):
             'accept': 'application/json'
         }
 
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT)
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -2277,19 +2277,12 @@ class CrowdstrikeConnector(BaseConnector):
         elif 'ftp://' in url:
             url = url.replace('ftp://', 'fxp://')
 
-        environment_id_dict = {
-            'linux ubuntu 16.04, 64-bit': 300,
-            'android (static analysis)': 200,
-            'windows 10, 64-bit': 160,
-            'windows 7, 64-bit': 110,
-            'windows 7, 32-bit': 100
-        }
         environment_param = param['environment'].lower()
 
-        if environment_param not in list(environment_id_dict.keys()):
+        if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
 
-        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, environment_id_dict[environment_param])
+        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
 
         max_limit = 5000
 
@@ -2321,7 +2314,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
-            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
 
         if (not resource_id_list) and self._required_detonation:
             return self._submit_resource_for_detonation(action_result, param, url=param['url'])
@@ -2343,22 +2336,15 @@ class CrowdstrikeConnector(BaseConnector):
             file_info = list(file_info)[0]
             file_hash = file_info['metadata']['sha256']
         except IndexError:
-            return action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID")
+            return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Vault ID not valid: {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
 
-        environment_id_dict = {
-            'linux ubuntu 16.04, 64-bit': 300,
-            'android (static analysis)': 200,
-            'windows 10, 64-bit': 160,
-            'windows 7, 64-bit': 110,
-            'windows 7, 32-bit': 100
-        }
         environment_param = param['environment'].lower()
-        if environment_param not in list(environment_id_dict.keys()):
+        if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
 
-        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, environment_id_dict[environment_param])
+        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
 
         max_limit = 5000
 
@@ -2391,7 +2377,7 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         if not isinstance(resource_id_list, list):
-            return action_result.set_status(phantom.APP_ERROR, "Unknown response retrieved")
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
 
         if (not resource_id_list) and self._required_detonation:
             return self._upload_file(action_result, param, file_info=file_info)
@@ -2432,19 +2418,11 @@ class CrowdstrikeConnector(BaseConnector):
         return self._submit_resource_for_detonation(action_result, param, sha256=sha256)
 
     def _submit_resource_for_detonation(self, action_result, param, sha256=None, url=None):
-        environment_id_dict = {
-            'linux ubuntu 16.04, 64-bit': 300,
-            'android (static analysis)': 200,
-            'windows 10, 64-bit': 160,
-            'windows 7, 64-bit': 110,
-            'windows 7, 32-bit': 100
-        }
-
         environment_id = param['environment'].lower()
         action_script = None
         if 'action_script' in param:
             action_script = param.get('action_script').lower()
-        if environment_id not in list(environment_id_dict.keys()):
+        if environment_id not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
             return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
 
         action_script_list = ['default', 'default_maxantievasion', 'default_randomfiles', 'default_randomtheme', 'default_openie']
@@ -2459,7 +2437,7 @@ class CrowdstrikeConnector(BaseConnector):
         json_payload = {
             'sandbox': [
                 {
-                    'environment_id': environment_id_dict[environment_id],
+                    'environment_id': CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_id],
                     'enable_tor': param.get('enable_tor', False)
                 }
             ]
@@ -2496,7 +2474,7 @@ class CrowdstrikeConnector(BaseConnector):
             query_param = {
                 'ids': resource_id
             }
-            ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_CHECK_ANALYSIS_STATUS_ENDPOINT)
+            ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
@@ -2512,7 +2490,7 @@ class CrowdstrikeConnector(BaseConnector):
             counter += 1
             time.sleep(60)
 
-        if prev_resp is not None:
+        if prev_resp is not None and prev_resp['resources'] is not None and len(prev_resp['resources']) > 0:
             action_result.add_data(prev_resp['resources'][0])
         return action_result.set_status(phantom.APP_SUCCESS, 'Timed out while waiting for the result. To know the status of submitted \
             sample please run the check status action with {} resource id.'.format(resource_id))

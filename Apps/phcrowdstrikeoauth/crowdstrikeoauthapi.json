@@ -17,7 +17,7 @@
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "3.0.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, January 21 2021, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, May 31 2021, API version: v1, v2"
     ],
     "utctime_updated": "2021-01-22T11:36:11.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -8082,7 +8082,7 @@
             "description": "Queries CrowdStrike for the file info",
             "type": "investigate",
             "identifier": "file_reputation",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "vault_id": {
                     "data_type": "string",
@@ -9209,7 +9209,7 @@
             "description": "Queries CrowdStrike for the url info",
             "type": "investigate",
             "identifier": "url_reputation",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "url": {
                     "data_type": "string",
@@ -10237,7 +10237,7 @@
             "description": "To download the report of the provided artifact id",
             "type": "investigate",
             "identifier": "download_report",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "artifact_id": {
                     "data_type": "string",
@@ -10334,7 +10334,7 @@
         },
         {
             "action": "detonate file",
-            "description": "Upload a file to Crowd Strike and retrieve the analysis results",
+            "description": "Upload a file to CrowdStrike and retrieve the analysis results",
             "type": "generic",
             "identifier": "detonate_file",
             "read_only": false,
@@ -11522,7 +11522,7 @@
         },
         {
             "action": "detonate url",
-            "description": "Upload an url to Crowd Strike and retrieve the analysis results",
+            "description": "Upload an url to CrowdStrike and retrieve the analysis results",
             "type": "generic",
             "identifier": "detonate_url",
             "read_only": false,
@@ -12597,7 +12597,7 @@
             "description": "To check detonation status of the provided resource id",
             "type": "investigate",
             "identifier": "check_detonate_status",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "resource_id": {
                     "data_type": "string",
@@ -12617,9 +12617,7 @@
                         "success",
                         "failed"
                     ],
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 0
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.resource_id",
@@ -12628,7 +12626,7 @@
                         "crowdstrike resource id"
                     ],
                     "column_name": "Resource ID",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
@@ -12640,7 +12638,24 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_valuess": [
+                        "State: success"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_valuess": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_valuess": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)",

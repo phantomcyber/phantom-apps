@@ -47,10 +47,10 @@ def _get_value(in_dict, in_key, def_val=None, strip_it=True):
         return def_val
 
     try:
-        if (type(in_dict[in_key]) != str):
+        if not isinstance(in_dict[in_key], str):
             return in_dict[in_key]
     except:
-        if type(in_dict[in_key]) != str:
+        if not isinstance(in_dict[in_key], str):
             return in_dict[in_key]
 
     value = in_dict[in_key].strip() if (strip_it) else in_dict[in_key]
