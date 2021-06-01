@@ -56,9 +56,9 @@ CODE42_TIMEOUT = 30
 CODE42_PAGINATION = 1
 CODE42_DEFAULT_PAGE_SIZE = 100
 CODE42_INVALID_DEVICE_ID_MSG = "Invalid value for parameter 'device_id'"
-CODE42_INVALID_USER_ID_MSG = "Invalid value for parameter 'user'"
-CODE42_INVALID_DEPARTING_USER_MSG = "Invalid value for parameter 'departing_user'"
-CODE42_INVALID_ORG_ID_MSG = "Invalid value for parameter 'organization'"
+CODE42_INVALID_USER_ID_MSG = "Provided value of parameter 'user' is either invalid or not exist"
+CODE42_INVALID_DEPARTING_USER_MSG = "Provided value of parameter 'departing_user' is either invalid or not exist"
+CODE42_INVALID_ORG_ID_MSG = "Provided value of parameter 'organization' is either invalid or not exist"
 CODE42_START_TIME_END_TIME_REQUIRED = "Parameters 'start_time' and 'end_time are required when parameter 'query' is " \
                                       "not provided"
 CODE42_INVALID_START_TIME_MSG = "Invalid value for parameter 'start_time'"

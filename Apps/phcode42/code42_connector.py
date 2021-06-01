@@ -476,6 +476,8 @@ class Code42Connector(BaseConnector):
 
         if input_value.isdigit() and int(input_value) != 0:
             return input_value
+        elif type == 2:
+            return None
         else:
             try:
                 float(input_value)
@@ -1059,9 +1061,14 @@ class Code42Connector(BaseConnector):
         organization = param[CODE42_JSON_ORG]
         user = param[CODE42_JSON_USER]
 
+        # find the organization id using the given value
+        _, organization_id_from_name = self.is_valid_organization(organization, action_result)
+
+        # take a given value as a organization id
         organization_id = self._verify_param(organization, action_result, type=2)
 
-        if not organization_id:
+        # if both organization_id and organization_id_from_name not exist it's return error
+        if not organization_id and not organization_id_from_name:
             self.debug_print(CODE42_INVALID_ORG_ID_MSG)
             return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_INVALID_ORG_ID_MSG)
 
@@ -1078,31 +1085,48 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(request_org_status):
             return action_result.get_status()
 
-        if response_org_status.get('data', {}).get('orgId') == int(organization_id):
+        user_org_id = response_org_status.get('data', {}).get('orgId')
+
+        # if user already in the given organization, it's return error
+        if (organization_id and user_org_id == int(organization_id)) or organization_id_from_name and user_org_id == int(organization_id_from_name):
             return action_result.set_status(phantom.APP_SUCCESS, status_message=CODE42_ORG_ALREADY_SET_MSG)
 
         request_data = {
-            "userId": user_id,
-            "parentOrgId": organization_id
+            "userId": user_id
         }
+
+        is_org_id = True
+        if organization_id:
+            request_data["parentOrgId"] = organization_id
+        else:
+            is_org_id = False
+            request_data["parentOrgId"] = organization_id_from_name
 
         request_status, _ = self._make_rest_call(endpoint=CODE42_CHANGE_ORGANIZATION_ENDPOINT,
                                                  action_result=action_result, data=request_data, method='post')
 
         if phantom.is_fail(request_status):
-            return action_result.get_status()
+            if is_org_id and organization_id_from_name:
+                is_org_id = False
+                request_data["parentOrgId"] = organization_id_from_name
+                request_status, _ = self._make_rest_call(endpoint=CODE42_CHANGE_ORGANIZATION_ENDPOINT,
+                                                    action_result=action_result, data=request_data, method='post')
+                if phantom.is_fail(request_status):
+                    return action_result.get_status()
+            else:
+                return action_result.get_status()
 
         status_message = CODE42_CHANGE_ORGANIZATION_USERNAME_ORGNAME_SUCCESS_MSG.format(user=user, org=organization)
 
-        if user.isdigit() and organization.isdigit():
+        if user.isdigit() and is_org_id:
             status_message = CODE42_CHANGE_ORGANIZATION_USERID_ORGID_SUCCESS_MSG.\
-                format(user=user_id, org=organization_id)
+                format(user=user_id, org=request_data["parentOrgId"])
         elif user.isdigit():
             status_message = CODE42_CHANGE_ORGANIZATION_USERID_ORGNAME_SUCCESS_MSG. \
                 format(user=user_id, org=organization)
-        elif organization.isdigit():
+        elif is_org_id:
             status_message = CODE42_CHANGE_ORGANIZATION_USERNAME_ORGID_SUCCESS_MSG. \
-                format(user=user, org=organization_id)
+                format(user=user, org=request_data["parentOrgId"])
         return action_result.set_status(phantom.APP_SUCCESS, status_message=status_message)
 
     def _handle_lock_device(self, param):
@@ -1140,6 +1164,14 @@ class Code42Connector(BaseConnector):
         device_guid = request_response_device.get('data', {}).get('guid')
 
         endpoint = "{}/{}".format(CODE42_ACCESS_LOCK_ENDPOINT, device_guid)
+
+        status, response = self._check_status(CODE42_ACCESS_LOCK_ENDPOINT, device_guid, action_result)
+
+        if phantom.is_fail(status):
+            return action_result.get_status()
+
+        if response:
+            return action_result.set_status(phantom.APP_SUCCESS, status_message=CODE42_LOCK_ALREADY_ENABLED_MSG)
 
         request_status, request_response = self._make_rest_call(endpoint=endpoint, action_result=action_result,
                                                                 method='post')
@@ -1319,8 +1351,8 @@ class Code42Connector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        start_time = param.get(CODE42_JSON_START_TIME)
-        end_time = param.get(CODE42_JSON_END_TIME)
+        start_time = param.get(CODE42_JSON_START_TIME, '')
+        end_time = param.get(CODE42_JSON_END_TIME, '')
         file_event = param.get(CODE42_JSON_FILE_EVENT)
         file_hash = param.get(CODE42_JSON_FILE_HASH)
         file_name = param.get(CODE42_JSON_FILE_NAME)
@@ -1348,16 +1380,13 @@ class Code42Connector(BaseConnector):
         else:
 
             # If query is not provided, start_time and end_time are mandatory
-            if not (start_time and end_time):
+            if start_time == '' or end_time == '':
                 return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_START_TIME_END_TIME_REQUIRED)
 
             # Verify start_time
             try:
                 # API requires seconds in float, so convert start_time into the float
                 start_time = float(start_time)
-                if start_time < 0:
-                    raise Exception
-
                 start_time = datetime.utcfromtimestamp(start_time).isoformat()
                 if start_time[-3] != '.':
                     start_time = '{0}.00'.format(start_time)
@@ -1369,8 +1398,6 @@ class Code42Connector(BaseConnector):
             try:
                 # API requires seconds in float, so convert end_time into the float
                 end_time = float(end_time)
-                if end_time < 0:
-                    raise Exception
                 end_time = datetime.utcfromtimestamp(end_time).isoformat()
                 if end_time[-3] != '.':
                     end_time = '{0}.00'.format(end_time)
@@ -1823,7 +1850,8 @@ class Code42Connector(BaseConnector):
         message = ""
         try:
             # create user profile for detection list
-            r = requests.post(url, json=body, headers=headers).json()
+            res = requests.post(url, json=body, headers=headers)
+            r = res.json()
             if 'pop-bulletin' in r and 'User already exists' in r['pop-bulletin']['reason']:
                 if departure_notes or cloud_username:
                     body = {
@@ -1847,12 +1875,12 @@ class Code42Connector(BaseConnector):
                         url = "{}{}".format(departing_employee_url, CODE42_UPDATE_CLOUD_USERNAMES)
                         r = requests.post(url, json=body, headers=headers).json()
                         if 'pop-bulletin' in r:
-                            return action_result.set_status(phantom.APP_ERROR, "{}. Code42 Server Error: {}".format(len(cloud_username), str(r)))
+                            return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
                         else:
                             message += "Cloud Usernames added. "
 
                     # updating notes
-                    if departure_notes and (r['notes'] != departure_notes):
+                    if departure_notes and (r.get('notes') != departure_notes):
                         body = {
                             "tenantId": tenant_id,
                             "userId": r['userId'],
@@ -1867,7 +1895,7 @@ class Code42Connector(BaseConnector):
                                 status_message = "Code42 Server Error: {}".format(str(r))
                             return action_result.set_status(phantom.APP_ERROR, status_message)
                         else:
-                            message += "Notes updated. "
+                            message += "Notes added/updated. "
             elif 'pop-bulletin' in r:
                 return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
             elif 200 <= r.status_code < 399:
@@ -1907,9 +1935,9 @@ class Code42Connector(BaseConnector):
             else:
                 return action_result.set_status(phantom.APP_ERROR, "{} Unexpected Response: {}".format(message, r))
 
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "{} Exception while making POST request: {}".format(message, err_msg))
+        except Exception:
+            err_msg = "Unexpected API response "
+            return action_result.set_status(phantom.APP_ERROR, "{} Exception while making POST request: Status Code : {}. {}".format(message, r.status_code, err_msg))
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.

@@ -154,7 +154,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "This is notes"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.orgId",
@@ -897,7 +900,7 @@
                 {
                     "data_path": "action_result.data.*.osHostname",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "WIN-K9L52G75BKV"
                     ],
                     "contains": [
@@ -1200,6 +1203,7 @@
         {
             "action": "change organization",
             "description": "Move a user to a specific organization",
+            "verbose": "<b>Note:</b> For the similar value of organization ID and name, organization ID will be considered upon name value. For instance, if the ID is 8062 and the organization name is also 8062 then action will be executed upon ID value.",
             "type": "generic",
             "identifier": "change_organization",
             "read_only": false,
@@ -1454,6 +1458,20 @@
                     "data_type": "numeric",
                     "example_values": [
                         16
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "9066bb83-2794-410d-b6e4-237e0b0e65cd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentOrgGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "8scrk4m28ptrr8ch"
                     ]
                 },
                 {
@@ -2949,6 +2967,9 @@
                     "data_type": "numeric",
                     "contains": [
                         "code42 device id"
+                    ],
+                    "example_values": [
+                        123456
                     ]
                 },
                 {
@@ -3241,6 +3262,51 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.backingUp",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.connected",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.restoring",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.remainingBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.remainingFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.timeRemainingInMs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
                     ]
                 },
                 {
@@ -3587,6 +3653,9 @@
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
                     ]
                 },
                 {
@@ -3594,6 +3663,9 @@
                     "data_type": "string",
                     "contains": [
                         "file path"
+                    ],
+                    "example_values": [
+                        "C:/joe/Desktop/PushRestoreTestAPI"
                     ]
                 },
                 {
@@ -3601,6 +3673,9 @@
                     "data_type": "string",
                     "contains": [
                         "file path"
+                    ],
+                    "example_values": [
+                        "joe/Desktop/PushRestoreTestAPI/file.txt"
                     ]
                 },
                 {
@@ -3608,6 +3683,9 @@
                     "data_type": "string",
                     "contains": [
                         "file path"
+                    ],
+                    "example_values": [
+                        "C:/joe/Desktop/Restore"
                     ]
                 },
                 {
@@ -3615,6 +3693,9 @@
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
                     ]
                 },
                 {
@@ -3622,6 +3703,9 @@
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
                     ]
                 },
                 {
@@ -3629,11 +3713,18 @@
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.canceled",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.done",
@@ -3649,7 +3740,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.originalEndpointVersion",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.providerDestination",
@@ -3665,7 +3759,7 @@
                     "contains": [
                         "code42 restore id"
                     ],
-                    "example_value": [
+                    "example_values": [
                         "1006477040764847854"
                     ],
                     "column_name": "Restore ID",
@@ -3677,12 +3771,18 @@
                     "contains": [
                         "code42 web restore session id"
                     ],
+                    "example_values": [
+                        "0wyz741em1klr0epjn2czn4v9o"
+                    ],
                     "column_name": "Web Restore Session ID",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.sourceId",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targetEndpointPlatform",
@@ -3690,37 +3790,43 @@
                 },
                 {
                     "data_path": "action_result.data.*.targetEndpointVersion",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.userId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123452
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.originalEndpointOsName",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "win"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.acceptingEndpointOsName",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "win"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.originalEndpointOsVersion",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "10.0.14393"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.acceptingEndpointOsVersion",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "10.0.14393"
                     ]
                 },
@@ -3752,7 +3858,7 @@
                     "contains": [
                         "code42 restore id"
                     ],
-                    "example_value": [
+                    "example_values": [
                         "1006477040764847854"
                     ]
                 },
@@ -3802,15 +3908,24 @@
                     "column_order": 0,
                     "contains": [
                         "code42 restore id"
+                    ],
+                    "example_values": [
+                        "1007737744528508654"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.archiveGuid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "850661634311551096"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.byteCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.canceled",
@@ -3832,16 +3947,25 @@
                     "contains": [
                         "code42 device guid"
                     ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ],
                     "column_name": "Accepting Guid",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.failedChecksumCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fileCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.planUid",
@@ -3849,17 +3973,26 @@
                 },
                 {
                     "data_path": "action_result.data.*.problemCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.requestingUserId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        201234
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.restoreId",
                     "data_type": "string",
                     "contains": [
                         "code42 restore id"
+                    ],
+                    "example_values": [
+                        "1007737744528508654"
                     ]
                 },
                 {
@@ -3873,23 +4006,35 @@
                 },
                 {
                     "data_path": "action_result.data.*.sourceOrgId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2034
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sourceUserId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123454
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "string",
                     "column_name": "Start Date",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "2021-05-10T13:51:05.038Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targetComputerGuid",
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "456354724592"
                     ]
                 },
                 {
@@ -4073,7 +4218,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Notes"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.orgId",
@@ -4230,6 +4378,7 @@
         {
             "action": "hunt file",
             "description": "Hunt file on a forensic search",
+            "verbose": "The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100.",
             "type": "investigate",
             "identifier": "hunt_file",
             "read_only": true,
@@ -4447,6 +4596,9 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "e5833c443c3a78a2af058e4eb77d1ffada52e4d19e13e6b4a1f9e2987004faec"
                     ]
                 },
                 {
@@ -4462,6 +4614,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://test.com"
                     ]
                 },
                 {
@@ -4482,7 +4637,7 @@
                 {
                     "data_path": "action_result.data.*.trusted",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -4493,7 +4648,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.riskScore",
-                    "data_type": "string"
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailSender",
@@ -4505,7 +4663,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.processName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/Device/HarddiskVolume3/Program Files/Google/Chrome/Application/chrome.exe"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailSubject",
@@ -4514,8 +4675,8 @@
                 {
                     "data_path": "action_result.data.*.fileCategory",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
@@ -4524,22 +4685,31 @@
                 },
                 {
                     "data_path": "action_result.data.*.processOwner",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.riskSeverity",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "MODERATE"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.remoteActivity",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "UNKNOWN"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.destinationName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Uncategorized"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailRecipients",
@@ -4548,7 +4718,7 @@
                 {
                     "data_path": "action_result.data.*.mimeTypeByBytes",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/xml"
                     ]
                 },
@@ -4559,7 +4729,7 @@
                 {
                     "data_path": "action_result.data.*.mimeTypeMismatch",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -4567,14 +4737,14 @@
                 {
                     "data_path": "action_result.data.*.insertionTimestamp",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "2021-05-11T12:09:20.700054Z"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.outsideActiveHours",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -4585,7 +4755,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.destinationCategory",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailDlpPolicyNames",
@@ -4594,14 +4767,14 @@
                 {
                     "data_path": "action_result.data.*.fileCategoryByBytes",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.mimeTypeByExtension",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/octet-stream"
                     ]
                 },
@@ -4632,8 +4805,8 @@
                 {
                     "data_path": "action_result.data.*.fileCategoryByExtension",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
@@ -4690,18 +4863,18 @@
         {
             "action": "run query",
             "description": "Run query on a forensic search",
-            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are in logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If parameter <b>query</b> is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search API documentation for more details on query format. Pagination is implemented for this action so please use the <b>max_results</b> parameter for more data. If the query contains <b>pgNum</b> or <b>pgSize</b> then it's ignored those and default 100 latest data fetch. If you want more data then use <b>max_results</b> along with the <b>query</b> parameter.",
+            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If <b>query</b> parameter is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search API documentation for more details on query format. The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100. </br><b>Note:</b> The value of 'pgNum' or 'pgSize' parameter provided in the JSON query parameter will be ignored by default.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "start_time": {
-                    "description": "Start time in epoch",
+                    "description": "Start time in epoch(in seconds)",
                     "data_type": "numeric",
                     "order": 0
                 },
                 "end_time": {
-                    "description": "End time in epoch",
+                    "description": "End time in epoch(in seconds)",
                     "data_type": "numeric",
                     "order": 1
                 },
@@ -5081,6 +5254,9 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "e5833c443c3a78a2af058e4eb77d1ffada52e4d19e13e6b4a1f9e2987004faec"
                     ]
                 },
                 {
@@ -5119,7 +5295,7 @@
                 {
                     "data_path": "action_result.data.*.trusted",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -5130,7 +5306,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.riskScore",
-                    "data_type": "string"
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailSender",
@@ -5142,7 +5321,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.processName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "/Device/HarddiskVolume3/Program Files/Google/Chrome/Application/chrome.exe"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailSubject",
@@ -5151,8 +5333,8 @@
                 {
                     "data_path": "action_result.data.*.fileCategory",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
@@ -5161,22 +5343,31 @@
                 },
                 {
                     "data_path": "action_result.data.*.processOwner",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.riskSeverity",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "MODERATE"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.remoteActivity",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "UNKNOWN"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.destinationName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Uncategorized"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailRecipients",
@@ -5185,7 +5376,7 @@
                 {
                     "data_path": "action_result.data.*.mimeTypeByBytes",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/xml"
                     ]
                 },
@@ -5196,7 +5387,7 @@
                 {
                     "data_path": "action_result.data.*.mimeTypeMismatch",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -5204,14 +5395,14 @@
                 {
                     "data_path": "action_result.data.*.insertionTimestamp",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "2021-05-11T12:09:20.700054Z"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.outsideActiveHours",
                     "data_type": "boolean",
-                    "example_value": [
+                    "example_values": [
                         true,
                         false
                     ]
@@ -5222,7 +5413,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.destinationCategory",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.emailDlpPolicyNames",
@@ -5231,20 +5425,23 @@
                 {
                     "data_path": "action_result.data.*.fileCategoryByBytes",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.mimeTypeByExtension",
                     "data_type": "string",
-                    "example_value": [
+                    "example_values": [
                         "application/octet-stream"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.operatingSystemUser",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.detectionSourceAlias",
@@ -5269,8 +5466,8 @@
                 {
                     "data_path": "action_result.data.*.fileCategoryByExtension",
                     "data_type": "string",
-                    "example_value": [
-                        "Uncategorized"
+                    "example_values": [
+                        "Archive"
                     ]
                 },
                 {
@@ -5280,6 +5477,39 @@
                 {
                     "data_path": "action_result.data.*.removableMediaSerialNumber",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Title Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.urlError",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.titleError",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskIndicators.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.riskIndicators.*.weight",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -5334,11 +5564,18 @@
             "output": [
                 {
                     "data_path": "action_result.data.*.deploymentModel",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "PUBLIC"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.maintenanceMode",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.masterServicesAgreement",
@@ -5346,25 +5583,42 @@
                 },
                 {
                     "data_path": "action_result.data.*.masterServicesAgreement.acceptanceRequired",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.masterServicesAgreement.accepted",
-                    "data_type": "string"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
+                    "example_values": [
+                        "Parent org name"
+                    ],
                     "column_name": "Name",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.registrationKey",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "s49tk29t9mr7m665"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.tenantUid",
                     "data_type": "string",
+                    "example_values": [
+                        "s6512138-e9b5-0098-9fdd-99886f369765"
+                    ],
                     "column_name": "Tenant ID",
                     "column_order": 2
                 },
@@ -5412,7 +5666,7 @@
         {
             "action": "add departing employee",
             "description": "Add Departing Employee to Code42 Organization",
-            "verbose": "Action is divided into mainly two parts. First, create a departing employee profile and the second part is to add a departing employee to the departing list. If the user's departing profile is already created, action check the profile's 'cloud_usernames' and 'departure_notes'. If it's different from the input then updates it.",
+            "verbose": "Action is divided into mainly two parts. First, the user profile will be created for the specified user and second is used to add the user profile to the departing employee list. Also, it's update/add the departure_notes and cloud_username details for the already added user profile.",
             "type": "generic",
             "identifier": "add_departing_employee",
             "read_only": false,
@@ -5466,6 +5720,8 @@
                 {
                     "data_path": "action_result.parameter.departing_user",
                     "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
                     "example_values": [
                         "username@gmail.com"
                     ]
@@ -5494,8 +5750,6 @@
                 {
                     "data_path": "action_result.data.*.userName",
                     "data_type": "string",
-                    "column_name": "Username",
-                    "column_order": 1,
                     "contains": [
                         "user name"
                     ],
@@ -5521,7 +5775,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.type$",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "DEPARTING_EMPLOYEE_V2"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.notes",
@@ -5532,7 +5789,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.caseId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.tenantId",
@@ -5551,6 +5811,9 @@
                 {
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
+                    "example_values": [
+                        345623
+                    ],
                     "column_name": "User ID",
                     "column_order": 3
                 },
@@ -5586,8 +5849,9 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_value": "Departing Employee Addition was Successful - Created Time: 2021-05-20T10:29:03.7668618Z"
                 },
                 {
                     "data_path": "summary.total_objects",
