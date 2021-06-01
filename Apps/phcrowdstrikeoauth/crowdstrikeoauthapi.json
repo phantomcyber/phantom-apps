@@ -8117,7 +8117,7 @@
                 },
                 "offset": {
                     "data_type": "numeric",
-                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "description": "Starting index of overall result set from which to return ids (defaults to 0)",
                     "order": 3,
                     "default": 0
                 },
@@ -8361,69 +8361,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        10
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.offset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.powered_by",
-                    "data_type": "string",
-                    "example_values": [
-                        "falconx-api"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0.006051928
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.quota.in_progress",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.quota.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.quota.used",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.trace_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "b26ebb7a-7433-44df-be7c-a98a6b9b79e3"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.origin",
                     "data_type": "string",
                     "example_values": [
@@ -8441,7 +8378,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.13.67"
+                        "1XX.2XX.1X.6X"
                     ]
                 },
                 {
@@ -8462,7 +8399,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -8483,14 +8420,14 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "23.74.145.172"
+                        "2X.7X.1XX.1XX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -8716,7 +8653,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.13.67"
+                        "1XX.2XX.1X.6X"
                     ]
                 },
                 {
@@ -9244,7 +9181,7 @@
                 },
                 "offset": {
                     "data_type": "numeric",
-                    "description": "Starting index of overall result set from which to return ids. (Defaults to 0)",
+                    "description": "Starting index of overall result set from which to return ids (defaults to 0)",
                     "order": 3,
                     "default": 0
                 },
@@ -9411,7 +9348,7 @@
                     "data_path": "action_result.data.*.malquery.*.input",
                     "data_type": "string",
                     "example_values": [
-                        "http://accounts.youtube.com"
+                        "http://accounts.test.com"
                     ]
                 },
                 {
@@ -9495,7 +9432,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "216.58.195.69"
+                        "2XX.5X.1XX.6X"
                     ]
                 },
                 {
@@ -9516,7 +9453,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -9537,21 +9474,21 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "216.58.194.206"
+                        "2XX.5X.1XX.2XX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.domain",
                     "data_type": "string",
                     "example_values": [
-                        "accounts.youtube.com"
+                        "accounts.test.com"
                     ]
                 },
                 {
@@ -9756,7 +9693,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
                     "data_type": "string",
                     "example_values": [
-                        "216.58.194.195"
+                        "2XX.5X.1XX.1XX"
                     ]
                 },
                 {
@@ -9795,6 +9732,27 @@
                     ],
                     "contains": [
                         "crowdstrike artifact id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1085"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.tactic",
+                    "data_type": "string",
+                    "example_values": [
+                        "Execution"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.mitre_attacks.*.technique",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rundll32"
                     ]
                 },
                 {
@@ -9964,6 +9922,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.signatures.*.attack_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "T1085"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.category",
                     "data_type": "string",
                     "example_values": [
@@ -9974,7 +9939,7 @@
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "\"216.58.195.69:443\"\n \"216.58.194.195:80\"\n \"172.217.164.100:443\"\n \"172.217.6.45:443\"\n \"172.217.6.67:443\"\n \"216.58.195.67:443\"\n \"172.217.164.110:443\""
+                        "\"21X.5X.1XX.6X:4XX\"\n \"21X.5X.1XX.1XX:8X\"\n \"1XX.X1X.1XX.1XX:4XX\"\n \"1XX.2XX.X.4X:4XX\"\n \"1XX.2XX.X.6X:4XX\"\n \"2XX.5X.1XX.6X:4XX\"\n \"1XX.2XX.1XX.1XX:4XX\""
                     ]
                 },
                 {
@@ -10044,7 +10009,7 @@
                     "data_path": "action_result.data.*.sandbox.*.submit_url",
                     "data_type": "string",
                     "example_values": [
-                        "hxxps://www.gmail.com"
+                        "hxxps://www.test.com"
                     ]
                 },
                 {
@@ -10065,7 +10030,7 @@
                     "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_ip",
                     "data_type": "string",
                     "example_values": [
-                        "104.100.79.92"
+                        "1XX.XX0.7X.X2"
                     ]
                 },
                 {
@@ -10439,7 +10404,7 @@
                 "is_confidential": {
                     "data_type": "boolean",
                     "order": 13,
-                    "description": "Defines visibility of the file in Falcon MalQuery (Defaults to 0)",
+                    "description": "Defines visibility of the file in Falcon MalQuery (defaults to True)",
                     "default": true
                 }
             },
@@ -10664,7 +10629,7 @@
                     "data_path": "action_result.data.*.malquery.*.input",
                     "data_type": "string",
                     "example_values": [
-                        "1.6.0.0"
+                        "X.X.0.0"
                     ]
                 },
                 {
@@ -10757,7 +10722,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "23.33.180.61"
+                        "2X.3X.1XX.X1"
                     ]
                 },
                 {
@@ -10778,7 +10743,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -10799,14 +10764,14 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.164.99"
+                        "1X2.XX7.164.XX"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -10834,14 +10799,14 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_name_servers",
                     "data_type": "string",
                     "example_values": [
-                        "NS1.GOOGLE.COM"
+                        "NS1.TEST.COM"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_organization",
                     "data_type": "string",
                     "example_values": [
-                        "Google Inc."
+                        "Test Inc."
                     ]
                 },
                 {
@@ -10994,6 +10959,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.file_imports.*.module",
+                    "data_type": "string",
+                    "example_values": [
+                        "KERNEL32.dll"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.file_size",
                     "data_type": "numeric",
                     "example_values": [
@@ -11025,7 +10997,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.13.67"
+                        "1X2.2X7.13.67"
                     ]
                 },
                 {
@@ -11285,7 +11257,7 @@
                     "data_path": "action_result.data.*.sandbox.*.signatures.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "\"205.185.216.10:80\""
+                        "\"2XX.1XX.2XX.1X:8X\""
                     ]
                 },
                 {
@@ -11369,7 +11341,7 @@
                     "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.destination_ip",
                     "data_type": "string",
                     "example_values": [
-                        "104.105.84.21"
+                        "1X4.1XX.8X.21"
                     ]
                 },
                 {
@@ -11408,6 +11380,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.sandbox.*.version_info.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "LegalCopyright"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.version_info.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "Copyright (C) Test Corp. 1981-1998"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sandbox.*.windows_version_bitness",
                     "data_type": "numeric",
                     "example_values": [
@@ -11440,6 +11426,27 @@
                     "data_type": "string",
                     "example_values": [
                         "10.0 (build 16299)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.global_prevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "common"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threat_graph.indicators.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "7ef166e82439ea3cafcb28754245325bfbf73e4eb94041bd77fd5c961924709c"
                     ]
                 },
                 {
@@ -11567,15 +11574,20 @@
                     "order": 4,
                     "description": "Password of the document if password protected (Max length: 32 characters)"
                 },
-                "user_tags": {
+                "command_line": {
                     "data_type": "string",
                     "order": 5,
+                    "description": "Command line script passed to the submitted file at runtime (Max length: 2048 characters)"
+                },
+                "user_tags": {
+                    "data_type": "string",
+                    "order": 6,
                     "description": "Comma seperated list of user tags"
                 },
                 "sort": {
                     "data_type": "string",
                     "description": "Property to sort by",
-                    "order": 6,
+                    "order": 7,
                     "value_list": [
                         "verdict.asc",
                         "verdict.desc",
@@ -11587,7 +11599,7 @@
                 },
                 "action_script": {
                     "data_type": "string",
-                    "order": 7,
+                    "order": 8,
                     "description": "Runtime script for sandbox analysis",
                     "value_list": [
                         "default",
@@ -11599,13 +11611,13 @@
                 },
                 "detail_report": {
                     "data_type": "boolean",
-                    "order": 8,
+                    "order": 9,
                     "description": "Get the detailed report",
                     "default": false
                 },
                 "enable_tor": {
                     "data_type": "boolean",
-                    "order": 9,
+                    "order": 10,
                     "description": "To route the sandbox network traffic via TOR",
                     "default": false
                 }
@@ -11625,6 +11637,10 @@
                     "example_values": [
                         "default"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.command_line",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.detail_report",
@@ -11895,7 +11911,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "142.250.72.196"
+                        "1XX.2XX.7X.1XX"
                     ]
                 },
                 {
@@ -11916,7 +11932,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -11937,14 +11953,14 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.address",
                     "data_type": "string",
                     "example_values": [
-                        "104.26.4.9"
+                        "1XX.2X.X.X"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.country",
                     "data_type": "string",
                     "example_values": [
-                        "United States"
+                        "Test Name"
                     ]
                 },
                 {
@@ -12154,7 +12170,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.host_ip",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.6.67"
+                        "1XX.2XX.X.6X"
                     ]
                 },
                 {
@@ -12571,14 +12587,14 @@
                 {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
-                    "example_valuess": [
+                    "example_values": [
                         1
                     ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
-                    "example_valuess": [
+                    "example_values": [
                         1
                     ]
                 }
@@ -12633,27 +12649,146 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.cid",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-15T13:12:02Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e_48004b5623af49ce9442d4bafd8e7b3d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.origin",
+                    "data_type": "string",
+                    "example_values": [
+                        "uiproxy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.action_script",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.command_line",
+                    "data_type": "string",
+                    "example_values": [
+                        "taskkill /IM *"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.enable_tor",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.environment_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        160
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.network_settings",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "70641a2ef9a116fa7f5b1376654657926a91a2bed913837c62f5598c77a3e191"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.submit_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "example.csv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sandbox.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "hxxps://www.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "225bf5b4490348d9a1eacddc61501c09"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "b6330292-28e6-4198-994d-96f327c5b5bd"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "example_valuess": [
+                    "example_values": [
                         "State: success"
                     ]
                 },
                 {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
-                    "example_valuess": [
+                    "example_values": [
                         1
                     ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
-                    "example_valuess": [
+                    "example_values": [
                         1
                     ]
                 }

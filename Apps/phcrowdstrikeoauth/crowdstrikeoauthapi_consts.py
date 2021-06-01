@@ -128,7 +128,7 @@ CROWDSTRIKE_UPLOAD_FILE_ENDPOINT = "/samples/entities/samples/v2"
 CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT = "/falconx/entities/submissions/v1"
 
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"
-
+CROWDSTRIKE_FALCONX_API_LIMIT = 5000
 CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
     'linux ubuntu 16.04, 64-bit': 300,
     'android (static analysis)': 200,
