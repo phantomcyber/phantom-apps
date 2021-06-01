@@ -8462,7 +8462,7 @@
                     "data_path": "action_result.data.*.sandbox.*.dns_requests.*.registrar_organization",
                     "data_type": "string",
                     "example_values": [
-                        "Microsoft Corporation"
+                        "Test Corporation"
                     ]
                 },
                 {
@@ -8639,7 +8639,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -8726,7 +8726,7 @@
                     "data_path": "action_result.data.*.sandbox.*.packer",
                     "data_type": "string",
                     "example_values": [
-                        "Microsoft visual C# v7.0 / Basic .NET"
+                        "Test visual C# v7.0 / Basic .NET"
                     ]
                 },
                 {
@@ -8851,7 +8851,7 @@
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
                     "data_type": "string",
                     "example_values": [
-                        "HKLM\\SOFTWARE\\MICROSOFT\\RPC\\"
+                        "HKLM\\SOFTWARE\\Test\\RPC\\"
                     ]
                 },
                 {
@@ -9572,7 +9572,7 @@
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
                     "data_type": "string",
                     "example_values": [
-                        "%LOCALAPPDATA%\\Microsoft\\Internet Explorer\\VersionManager\\ver2963.tmp"
+                        "%LOCALAPPDATA%\\Test\\Internet Explorer\\VersionManager\\ver2963.tmp"
                     ]
                 },
                 {
@@ -9679,7 +9679,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/6.1\nHost: ocsp.pki.goog"
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/6.1\nHost: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -9811,7 +9811,7 @@
                     "data_path": "action_result.data.*.sandbox.*.processes.*.handles.*.path",
                     "data_type": "string",
                     "example_values": [
-                        "HKCU\\Software\\Microsoft\\Internet Explorer\\Main\\WindowsSearch"
+                        "HKCU\\Software\\Test\\Internet Explorer\\Main\\WindowsSearch"
                     ]
                 },
                 {
@@ -9884,7 +9884,7 @@
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
                     "data_type": "string",
                     "example_values": [
-                        "HKCU\\SOFTWARE\\MICROSOFT\\WINDOWS\\CURRENTVERSION\\INTERNET SETTINGS\\WPAD\\{0C70BB6D-CFA8-4734-A158-28619E142726}\\WPADDECISIONREASON"
+                        "HKCU\\SOFTWARE\\Test\\WINDOWS\\CURRENTVERSION\\INTERNET SETTINGS\\WPAD\\{0C70BB6D-CFA8-4734-A158-28619E142726}\\WPADDECISIONREASON"
                     ]
                 },
                 {
@@ -10023,7 +10023,7 @@
                     "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent"
+                        "ET USER_AGENTS Test Device Metadata Retrieval Client User-Agent"
                     ]
                 },
                 {
@@ -10862,7 +10862,7 @@
                     "data_path": "action_result.data.*.sandbox.*.extracted_files.*.file_path",
                     "data_type": "string",
                     "example_values": [
-                        "%APPDATA%\\Microsoft\\Windows\\Recent\\CustomDestinations\\RB7520AO5Z28DRA0CR4G.temp"
+                        "%APPDATA%\\Test\\Windows\\Recent\\CustomDestinations\\RB7520AO5Z28DRA0CR4G.temp"
                     ]
                 },
                 {
@@ -10955,7 +10955,7 @@
                     "data_path": "action_result.data.*.sandbox.*.extracted_interesting_strings.*.value",
                     "data_type": "string",
                     "example_values": [
-                        "%LOCALAPPDATA%\\Microsoft\\Internet Explorer\\Recovery\\High\\Active\\{EAD6EFB1-2090-11E8-9BD7-0A00274B5076}.dat"
+                        "%LOCALAPPDATA%\\Test\\Internet Explorer\\Recovery\\High\\Active\\{EAD6EFB1-2090-11E8-9BD7-0A00274B5076}.dat"
                     ]
                 },
                 {
@@ -10983,7 +10983,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -11188,7 +11188,7 @@
                     "data_path": "action_result.data.*.sandbox.*.processes.*.registry.*.path",
                     "data_type": "string",
                     "example_values": [
-                        "HKCU\\SOFTWARE\\MICROSOFT\\INTERNET EXPLORER\\VERSIONMANAGER\\LASTUPDATELOWDATETIME"
+                        "HKCU\\SOFTWARE\\Test\\INTERNET EXPLORER\\VERSIONMANAGER\\LASTUPDATELOWDATETIME"
                     ]
                 },
                 {
@@ -11334,7 +11334,7 @@
                     "data_path": "action_result.data.*.sandbox.*.suricata_alerts.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "ET USER_AGENTS Microsoft Device Metadata Retrieval Client User-Agent"
+                        "ET USER_AGENTS Test Device Metadata Retrieval Client User-Agent"
                     ]
                 },
                 {
@@ -11918,7 +11918,7 @@
                     "data_path": "action_result.data.*.sandbox.*.contacted_hosts.*.associated_runtime.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "microsoftedgecp.exe"
+                        "Testedgecp.exe"
                     ]
                 },
                 {
@@ -12156,7 +12156,7 @@
                     "data_path": "action_result.data.*.sandbox.*.http_requests.*.header",
                     "data_type": "string",
                     "example_values": [
-                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Microsoft-CryptoAPI/10.0\nHost: ocsp.pki.goog"
+                        "GET /gsr2/ME4wTDBKMEgwRjAJBgUrDgMCGgUABBTgXIsxbvr2lBkPpoIEVRE6gHlCnAQUm%2BIHV2ccHsBqBt5ZtJot39wZhi4CDQHjtJqhjYqpgSVpULg%3D HTTP/1.1\nConnection: Keep-Alive\nAccept: */*\nUser-Agent: Test-CryptoAPI/10.0\nHost: ocsp.pki.goog"
                     ]
                 },
                 {
@@ -12541,7 +12541,7 @@
                     "data_path": "action_result.data.*.user_name",
                     "data_type": "string",
                     "example_values": [
-                        "philip.royer@phantom.us"
+                        "Test user"
                     ]
                 },
                 {
