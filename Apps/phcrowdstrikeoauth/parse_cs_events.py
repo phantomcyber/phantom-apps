@@ -282,7 +282,7 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
     input_list = input_dict[key_name]
 
     # make it into a list
-    if type(input_list) != list:
+    if not isinstance(input_list, list):
         input_list = [input_list]
 
     artifact_name = _get_artifact_name(key_name)

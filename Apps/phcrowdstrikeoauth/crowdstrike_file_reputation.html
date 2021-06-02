@@ -188,22 +188,26 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.environment_description%}
-                                            {{ analysis.environment_description }}
+                                        <li style="list-style-type: none;">{{ analysis.environment_description }}</li>
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.threat_score%}
-                                            {{ analysis.threat_score }}
+                                        <li style="list-style-type: none;">{{ analysis.threat_score }}</li>
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
                                         {% if item.ioc_report_broad_csv_artifact_id %}
@@ -302,75 +306,93 @@
                                         {% endif %}
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.pcap_report_artifact_id %}
+                                        <li style="list-style-type: none;">
                                         <a href="javascript:;"
                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.pcap_report_artifact_id }}' }], 0, {{ container.id }}, null, false);">
                                             {{ analysis.pcap_report_artifact_id }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
+                                        </li>
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.memory_strings_artifact_id %}
+                                        <li style="list-style-type: none;">
                                         <a href="javascript:;"
                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ analysis.memory_strings_artifact_id }}' }], 0, {{ container.id }}, null, false);">
                                             {{ analysis.memory_strings_artifact_id }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
+                                        </li>
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.processes %}
                                         {% for process in analysis.processes%}
                                         {% if process.icon_artifact_id %}
+                                        <li style="list-style-type: none;">
                                         <a href="javascript:;"
                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ process.icon_artifact_id }}' }], 0, {{ container.id }}, null, false);">
                                             {{ process.icon_artifact_id }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
+                                        </li>
                                         {% endif %}
                                         {% endfor %}
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox %}
                                         {% if analysis.screenshots_artifact_ids %}
                                         {% for screenshot_artifact_id in analysis.screenshots_artifact_ids%}
+                                        <li style="list-style-type: none;">
                                         <a href="javascript:;"
                                         onclick="context_menu(this, [{'contains': ['crowdstrike artifact id'], 'value': '{{ screenshot_artifact_id }}' }], 0, {{ container.id }}, null, false);">
                                             {{ screenshot_artifact_id }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                         </a>
+                                        </li>
                                         {% endfor %}
                                         {% else %}
-                                            None
+                                        <li style="list-style-type: none;">None</li>
                                         {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                     <td>
+                                        <ul>
                                         {% for analysis in item.sandbox%}
                                             {% if analysis.error_message %}
-                                                {{ analysis.error_message }}
+                                            <li style="list-style-type: none;">{{ analysis.error_message }}</li>
                                             {% else %}
-                                                None
+                                            <li style="list-style-type: none;">None</li>
                                             {% endif %}
                                         {% endfor %}
+                                        </ul>
                                     </td>
                                 </tr>
                             {% endfor %}
