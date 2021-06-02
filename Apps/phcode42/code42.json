@@ -163,7 +163,7 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2324
                     ],
                     "contains": [
                         "code42 org id"
@@ -227,7 +227,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -246,7 +246,7 @@
                     "data_path": "action_result.data.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "ph_test"
+                        "phtest@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -333,7 +333,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ]
                 },
                 {
@@ -354,7 +354,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 5 unblocked successfully"
+                        "Device with ID 369425 unblocked successfully"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -410,7 +410,7 @@
                         "code42 device id"
                     ],
                     "example_values": [
-                        13
+                        369425
                     ],
                     "column_name": "Device ID",
                     "column_order": 0
@@ -433,7 +433,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 13 blocked successfully"
+                        "Device with ID 369425 blocked successfully"
                     ],
                     "column_order": 2,
                     "column_name": "Message"
@@ -491,7 +491,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ]
                 },
                 {
@@ -512,7 +512,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 5 deactivated successfully"
+                        "Device with ID 369425 deactivated successfully"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -570,7 +570,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ]
                 },
                 {
@@ -591,7 +591,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 5 activated successfully"
+                        "Device with ID 369425 activated successfully"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -649,7 +649,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ]
                 },
                 {
@@ -670,7 +670,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 5 deauthorized successfully"
+                        "Device with ID 369425 deauthorized successfully"
                     ],
                     "column_name": "Message",
                     "column_order": 2
@@ -746,7 +746,8 @@
                     "column_name": "User",
                     "column_order": 0,
                     "example_values": [
-                        "13"
+                        "test@gmail.com",
+                        "234323"
                     ]
                 },
                 {
@@ -767,7 +768,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 activated successfully"
+                        "User with ID 234323 activated successfully"
                     ]
                 },
                 {
@@ -839,7 +840,8 @@
                         "user name"
                     ],
                     "example_values": [
-                        "3"
+                        "test@gmail.com",
+                        "234321"
                     ],
                     "column_name": "User",
                     "column_order": 0
@@ -862,7 +864,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 deactivated successfully"
+                        "User with ID 234321 deactivated successfully"
                     ]
                 },
                 {
@@ -1036,7 +1038,7 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1081,7 +1083,7 @@
                     "data_path": "action_result.data.*.parentComputerId",
                     "data_type": "numeric",
                     "example_values": [
-                        12
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -1138,7 +1140,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -1253,7 +1255,8 @@
                         "user name"
                     ],
                     "example_values": [
-                        "3"
+                        "test@gmail.com",
+                        "234323"
                     ],
                     "column_name": "User",
                     "column_order": 0
@@ -1276,7 +1279,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 moved to organization with ID 3 successfully"
+                        "User with ID 5 moved to organization with ID 234323 successfully"
                     ]
                 },
                 {
@@ -1602,7 +1605,7 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1682,7 +1685,7 @@
                     "data_path": "action_result.data.*.parentOrgId",
                     "data_type": "numeric",
                     "example_values": [
-                        1
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1731,7 +1734,7 @@
                     "data_path": "action_result.data.*.reporting.orgManagers.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "test.user"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -2653,7 +2656,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -2715,7 +2718,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 13 locked successfully"
+                        "Device with ID 369425 locked successfully"
                     ]
                 },
                 {
@@ -2768,7 +2771,7 @@
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        13
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -2900,7 +2903,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values":[
-                        "Device with ID 13 unlocked successfully"
+                        "Device with ID 369425 unlocked successfully"
                     ]
                 },
                 {
@@ -3337,7 +3340,7 @@
                     "column_name": "Computer ID",
                     "column_order": 0,
                     "example_values": [
-                        3344
+                        369425
                     ]
                 },
                 {
@@ -3462,7 +3465,7 @@
                     "data_path": "action_result.data.*.parentComputerId",
                     "data_type": "numeric",
                     "example_values": [
-                        12
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -3519,7 +3522,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3628
+                        362824
                     ]
                 },
                 {
@@ -4001,6 +4004,9 @@
                     "contains": [
                         "code42 device guid"
                     ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ],
                     "column_name": "Source Guid",
                     "column_order": 2
                 },
@@ -4034,7 +4040,7 @@
                         "code42 device guid"
                     ],
                     "example_values": [
-                        "456354724592"
+                        "1005741054493870472"
                     ]
                 },
                 {
@@ -4114,7 +4120,8 @@
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com",
+                        "234323"
                     ],
                     "contains": [
                         "code42 user id",
@@ -4227,7 +4234,6 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
                         1393
                     ],
                     "contains": [
@@ -4294,8 +4300,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3,
-                        3628
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -4315,7 +4320,6 @@
                     "data_path": "action_result.data.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "ph_test",
                         "user@example.com"
                     ],
                     "contains": [
@@ -4455,7 +4459,7 @@
                     "data_path": "action_result.data.*.deviceUserName",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -4506,7 +4510,7 @@
                     "data_path": "action_result.data.*.fileOwner",
                     "data_type": "string",
                     "example_values": [
-                        "Administrators"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -5069,7 +5073,7 @@
                     "data_path": "action_result.parameter.username",
                     "data_type": "string",
                     "example_values": [
-                        "test_user"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -5112,7 +5116,7 @@
                     "data_path": "action_result.data.*.deviceUserName",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -5163,7 +5167,7 @@
                     "data_path": "action_result.data.*.fileOwner",
                     "data_type": "string",
                     "example_values": [
-                        "Administrators"
+                        "test@gmail.coms"
                     ],
                     "contains": [
                         "user name"
