@@ -171,10 +171,7 @@ def _convert_to_cef_dict(output_dict, input_dict):
 
     time_keys = list()
     # convert any remaining keys in the event_details to follow the cef naming conventions
-    try:
-        input_dict_items = input_dict.iteritems()
-    except:
-        input_dict_items = input_dict.items()
+    input_dict_items = input_dict.items()
     for k, v in input_dict_items:
         new_key_name = k[:1].lower() + k[1:]
         output_dict[new_key_name] = v
@@ -198,11 +195,7 @@ def _convert_to_cef_dict(output_dict, input_dict):
 def _set_cef_types(artifact, cef):
 
     cef_types = dict()
-
-    try:
-        cef_items = cef.iteritems()
-    except:
-        cef_items = cef.items()
+    cef_items = cef.items()
     for k, v in cef_items:
 
         if k.lower().endswith('filename'):
@@ -213,10 +206,7 @@ def _set_cef_types(artifact, cef):
             cef_types[k] = ['domain']
             continue
 
-        try:
-            util_items = ph_utils.CONTAINS_VALIDATORS.iteritems()
-        except:
-            util_items = ph_utils.CONTAINS_VALIDATORS.items()
+        util_items = ph_utils.CONTAINS_VALIDATORS.items()
         for contains, function in util_items:
             if contains in IGNORE_CONTAINS_VALIDATORS:
                 continue
