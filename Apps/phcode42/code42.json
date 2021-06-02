@@ -11,12 +11,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "1.0.25",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-09-14T17:35:56.000000Z",
     "package_name": "phantom_code42",
     "main_module": "code42_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
+    "latest_tested_versions": [
+        "Cloud endpoint, v8.6.0.1059"
+    ],
     "configuration": {
         "server_url": {
             "description": "Server URL (e.g. https://example.code42.com)",

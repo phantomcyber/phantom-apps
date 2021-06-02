@@ -86,7 +86,7 @@ class Code42Connector(BaseConnector):
         if response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".forat(response.status_code)),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Empty response and no information in the header".format(response.status_code)),
                       None)
 
     def _process_html_response(self, response, action_result):
