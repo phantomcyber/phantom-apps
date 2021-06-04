@@ -14,7 +14,7 @@ Please ensure your pull request (PR) adheres to the following guidelines:
 - [ ] Please don't use the `next` branch of the forked repo. Create separate feature branch for raising the PR.
 - [ ] Please do not submit updates to dependencies unless it fixes an issue.
 - [ ] Please limit your pull request to one application, submit multiple pull requests if needed.
-## Pull request type
+## Pull Request Type
 
 #### Please check the type of change your PR introduces:
 - [ ] New App
