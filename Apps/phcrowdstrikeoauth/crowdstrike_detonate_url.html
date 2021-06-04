@@ -118,7 +118,14 @@
         {% endif %}
         {% if result.param.environment %}
         <td>Environment Description </td>
-        <td> {{ result.param.environment }} </td>
+        <td>
+            <a href="javascript:;"
+            onclick="context_menu(this, [{'contains': ['crowdstrike environment'], 'value': '{{ result.param.environment }}' }], 0, {{ container.id }}, null, false);">
+                {{ result.param.environment }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a> 
+        </td>
         {% endif %}
         {% if result.param.sort %}
             <tr>

@@ -9,11 +9,6 @@
     "product_name": "CrowdStrike",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "contributors": [
-        {
-            "name": "Harrison Smith"
-        }
-    ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "3.0.0",
     "latest_tested_versions": [
@@ -10132,26 +10127,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Verdict: no verdict, Total reports: 1",
-                        "Total reports: 6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary",
                     "data_type": "string"
                 },
@@ -10325,6 +10300,9 @@
                         "Windows 10, 64-bit",
                         "Windows 7, 64-bit",
                         "Windows 7, 32-bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 "comment": {
@@ -10362,7 +10340,7 @@
                 "user_tags": {
                     "data_type": "string",
                     "order": 8,
-                    "description": "Comma seperated list of user tags"
+                    "description": "Comma seperated list of user tags (Max length: 100 characters per tag)"
                 },
                 "sort": {
                     "data_type": "string",
@@ -10464,6 +10442,9 @@
                     "example_values": [
                         "Windows 10, 64-bit",
                         "Windows 7, 64-bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -10533,6 +10514,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2021-05-09T05:58:47Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -10651,6 +10635,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2017-08-10T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -10723,6 +10710,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2X.3X.1XX.X1"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -10765,6 +10755,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1X2.XX7.164.XX"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -10779,6 +10772,10 @@
                     "data_type": "string",
                     "example_values": [
                         "fonts.gstatic.com"
+                    ],
+                    "contains": [
+                        "domain",
+                        "url"
                     ]
                 },
                 {
@@ -10786,6 +10783,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2008-02-11T00:00:00+00:00"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -10821,6 +10821,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Windows 10 64 bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -10991,6 +10994,9 @@
                     "data_type": "string",
                     "example_values": [
                         "ocsp.pki.goog"
+                    ],
+                    "contains": [
+                        "hostname"
                     ]
                 },
                 {
@@ -10998,6 +11004,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1X2.2X7.13.67"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -11005,6 +11014,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -11342,6 +11354,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1X4.1XX.8X.21"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -11349,6 +11364,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -11464,6 +11482,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.user_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag1",
+                        "test_tag2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.user_uuid",
                     "data_type": "string",
                     "example_values": [
@@ -11476,10 +11502,6 @@
                     "example_values": [
                         "no specific threat"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_reports",
@@ -11555,6 +11577,9 @@
                         "Windows 10, 64-bit",
                         "Windows 7, 64-bit",
                         "Windows 7, 32-bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 "limit": {
@@ -11582,7 +11607,7 @@
                 "user_tags": {
                     "data_type": "string",
                     "order": 6,
-                    "description": "Comma seperated list of user tags"
+                    "description": "Comma seperated list of user tags (Max length: 100 characters per tag)"
                 },
                 "sort": {
                     "data_type": "string",
@@ -11671,6 +11696,9 @@
                     "example_values": [
                         "Windows 10, 64-bit",
                         "Windows 7, 64-bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -11724,6 +11752,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2021-05-14T10:03:35Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -11849,6 +11880,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2021-05-26T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -11863,6 +11897,9 @@
                     "data_type": "string",
                     "example_values": [
                         "4446a961902d0094397a071d75e4abf8"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -11870,6 +11907,9 @@
                     "data_type": "string",
                     "example_values": [
                         "cb1c5bb0d84e3efb978efede256ebec5308873c0"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -11877,6 +11917,9 @@
                     "data_type": "string",
                     "example_values": [
                         "0091a4c5bc7bea90faadeee2ae71bd29e131d3f59f8ffb9f58ec7276953fafe5"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -11912,6 +11955,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1XX.2XX.7X.1XX"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -11954,6 +12000,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1XX.2X.X.X"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -11968,6 +12017,10 @@
                     "data_type": "string",
                     "example_values": [
                         "www.test.com"
+                    ],
+                    "contains": [
+                        "domain",
+                        "url"
                     ]
                 },
                 {
@@ -11975,6 +12028,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2007-11-13T00:00:00+00:00"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -12010,6 +12066,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Windows 10 64 bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -12066,6 +12125,9 @@
                     "data_type": "string",
                     "example_values": [
                         "974e8536b8767ac5be204f35d16f73e8"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -12087,6 +12149,9 @@
                     "data_type": "string",
                     "example_values": [
                         "e847897947a3db26e35cb7d490c688e8c410dfb7"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -12094,6 +12159,9 @@
                     "data_type": "string",
                     "example_values": [
                         "d1bb4b163fe01acc368a92b385bb0bd3a9fc2340b6d485b77a20553a713166d3"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -12164,6 +12232,9 @@
                     "data_type": "string",
                     "example_values": [
                         "ocsp.pki.goog"
+                    ],
+                    "contains": [
+                        "hostname"
                     ]
                 },
                 {
@@ -12171,6 +12242,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1XX.2XX.X.6X"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -12545,6 +12619,14 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.user_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag1",
+                        "test_tag2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.user_uuid",
                     "data_type": "string",
                     "example_values": [
@@ -12557,10 +12639,6 @@
                     "example_values": [
                         "no specific threat"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_reports",
@@ -12642,7 +12720,10 @@
                         "crowdstrike resource id"
                     ],
                     "column_name": "Resource ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "3061c7ff3b634e22b38274d4b586558e_48004b5623af49ce9442d4bafd8e7b3d"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -12660,6 +12741,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2021-05-15T13:12:02Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -12667,6 +12751,9 @@
                     "data_type": "string",
                     "example_values": [
                         "3061c7ff3b634e22b38274d4b586558e_48004b5623af49ce9442d4bafd8e7b3d"
+                    ],
+                    "contains": [
+                        "crowdstrike resource id"
                     ]
                 },
                 {
@@ -12716,6 +12803,9 @@
                     "data_type": "string",
                     "example_values": [
                         "70641a2ef9a116fa7f5b1376654657926a91a2bed913837c62f5598c77a3e191"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -12730,6 +12820,9 @@
                     "data_type": "string",
                     "example_values": [
                         "hxxps://www.test.com"
+                    ],
+                    "contains": [
+                        "url"
                     ]
                 },
                 {
@@ -12759,10 +12852,6 @@
                     "example_values": [
                         "b6330292-28e6-4198-994d-96f327c5b5bd"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.state",

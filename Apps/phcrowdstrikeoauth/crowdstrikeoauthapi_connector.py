@@ -295,14 +295,13 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            # if there is only a single artifact, set it to run_automation = True
-            if len_artifacts == 1:
-                artifacts[0]['run_automation'] = True
-            # if there are more than 1 artifacts, set the second artifact to run_automation = True
-            elif len_artifacts > 1:
-                artifacts[1]['run_automation'] = True
-            # append container ID to each artifact for logging
-            for artifact in artifacts:
+            for j, artifact in enumerate(artifacts):
+
+                # if it is the last artifact of the last container
+                if (j + 1) == len_artifacts:
+                    # mark it such that active playbooks get executed
+                    artifact['run_automation'] = True
+
                 artifact['container_id'] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
