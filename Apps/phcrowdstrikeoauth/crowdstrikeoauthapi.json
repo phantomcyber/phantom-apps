@@ -8336,15 +8336,15 @@
                     "data_type": "string",
                     "example_values": [
                         "7b982b66433e1c89d094461d3d461eab90c93f72fbe676fcfc17c3c340c9a8b4"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.malquery.*.type",
                     "data_type": "string",
                     "example_values": [
-                        "sha256"
-                    ],
-                    "contains": [
                         "sha256"
                     ]
                 },
@@ -8374,6 +8374,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1XX.2XX.1X.6X"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -8402,6 +8405,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -8416,6 +8422,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2X.7X.1XX.1XX"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -8430,6 +8439,10 @@
                     "data_type": "string",
                     "example_values": [
                         "clientconfig.passport.net"
+                    ],
+                    "contains": [
+                        "domain",
+                        "ip"
                     ]
                 },
                 {
@@ -8437,6 +8450,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1994-08-01T00:00:00+00:00"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -8472,6 +8488,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Windows 7 32 bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -8642,6 +8661,10 @@
                     "data_type": "string",
                     "example_values": [
                         "ocsp.pki.goog"
+                    ],
+                    "contains": [
+                        "domain",
+                        "ip"
                     ]
                 },
                 {
@@ -8649,6 +8672,9 @@
                     "data_type": "string",
                     "example_values": [
                         "1XX.2XX.1X.6X"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -8656,6 +8682,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -9087,10 +9116,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_reports",
                     "data_type": "numeric",
                     "example_values": [
@@ -9365,6 +9390,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2021-05-05T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -9379,6 +9407,9 @@
                     "data_type": "string",
                     "example_values": [
                         "cf83a54faef91aa5c3f9d89dba8a8b14"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
@@ -9386,6 +9417,9 @@
                     "data_type": "string",
                     "example_values": [
                         "7fe4176691ffaf6df16090e19cbc36dc3f7ed041"
+                    ],
+                    "contains": [
+                        "sha1"
                     ]
                 },
                 {
@@ -9393,6 +9427,9 @@
                     "data_type": "string",
                     "example_values": [
                         "80c4f85980efc903c8ae376cd6d88025465d49aec6f84901d41abcc384b99738"
+                    ],
+                    "contains": [
+                        "sha256"
                     ]
                 },
                 {
@@ -9428,6 +9465,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2XX.5X.1XX.6X"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -9456,6 +9496,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         443
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -9484,6 +9527,10 @@
                     "data_type": "string",
                     "example_values": [
                         "accounts.test.com"
+                    ],
+                    "contains": [
+                        "domain",
+                        "ip"
                     ]
                 },
                 {
@@ -9491,6 +9538,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2005-02-15T00:00:00+00:00"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -9526,6 +9576,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Windows 7 32 bit"
+                    ],
+                    "contains": [
+                        "crowdstrike environment"
                     ]
                 },
                 {
@@ -9689,6 +9742,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2XX.5X.1XX.1XX"
+                    ],
+                    "contains": [
+                        "ip"
                     ]
                 },
                 {
@@ -9696,6 +9752,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -10033,6 +10092,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         80
+                    ],
+                    "contains": [
+                        "port"
                     ]
                 },
                 {
@@ -10125,10 +10187,6 @@
                     "example_values": [
                         "no specific threat"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_reports",
