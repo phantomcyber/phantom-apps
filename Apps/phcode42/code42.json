@@ -2936,7 +2936,7 @@
         {
             "action": "get device",
             "description": "Get information for a specific device",
-            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details. Please provide atleast one of the <b>device_id</b> or <b>query</b> parameter.",
+            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details. Please provide at least one of the <b>device_id</b> or <b>query</b> parameter.",
             "type": "investigate",
             "identifier": "get_device",
             "read_only": true,
@@ -3589,7 +3589,7 @@
         {
             "action": "push restore",
             "description": "Push a restore on a device",
-            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). Please provide atleast one of the <b>files</b> or <b>directories</b> parameter.",
+            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). Please provide at least one of the <b>files</b> or <b>directories</b> parameter.",
             "type": "correct",
             "identifier": "push_restore",
             "read_only": false,
@@ -4870,7 +4870,7 @@
         {
             "action": "run query",
             "description": "Run query on a forensic search",
-            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If <b>query</b> parameter is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search API documentation for more details on query format. The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100. </br><b>Note:</b> The value of 'pgNum' or 'pgSize' parameter provided in the JSON query parameter will be ignored by default.",
+            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If <b>query</b> parameter is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search <a href='https://support.code42.com/Administrator/Cloud/Monitoring_and_managing/Code42_API_resources/Forensic_Search_API'>API documentation</a> for more details on query format. The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100. </br><b>Note:</b> The value of 'pgNum' or 'pgSize' parameter provided in the JSON query parameter will be ignored by default.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
@@ -5673,8 +5673,9 @@
         {
             "action": "add departing employee",
             "description": "Add Departing Employee to Code42 Organization",
-            "verbose": "Action is divided into mainly two parts. First, the user profile will be created for the specified user and second is used to add the user profile to the departing employee list. Also, it's update/add the departure_notes and cloud_username details for the already added user profile.",
-            "type": "generic",
+            "verbose": "Action is divided into mainly two parts. First, the user profile will be created for the specified user and second is used to add the user profile to the departing employee list. Also, it will update/add the departure_notes and cloud_username details for the already added user profile.",
+            "type": "correct",
+            "undo": "remove departing employee",
             "identifier": "add_departing_employee",
             "read_only": false,
             "parameters": {
@@ -5858,7 +5859,102 @@
                 {
                     "data_path": "action_result.summary.message",
                     "data_type": "string",
-                    "example_value": "Departing Employee Addition was Successful - Created Time: 2021-05-20T10:29:03.7668618Z"
+                    "example_value": [
+                        "Departing Employee Addition was Successful - Created Time: 2021-05-20T10:29:03.7668618Z"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove departing employee",
+            "description": "Remove departing employee from the departing employee list",
+            "type": "contain",
+            "undo": "add departing employee",
+            "identifier": "remove_departing_employee",
+            "read_only": false,
+            "parameters": {
+                "departing_employee_url": {
+                    "description": "Base URL for Departing Employee API",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "tenant_id": {
+                    "description": "Tenant ID for Code42 organization",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "departing_user": {
+                    "description": "Code42 username of the departing employee",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.departing_employee_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tenant_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f6b12138-e9b5-4739-9fdd-99886f369654"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.departing_user",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
+                    "example_values": [
+                        "username@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed a user from departing list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",

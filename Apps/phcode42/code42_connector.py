@@ -288,6 +288,15 @@ class Code42Connector(BaseConnector):
                 # Store cookies of the session in auth_response
                 auth_response = session.get(url=access_auth_url, auth=(self._username, self._password))
 
+            except requests.exceptions.InvalidSchema:
+                err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+            except requests.exceptions.InvalidURL:
+                err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+            except requests.exceptions.ConnectionError:
+                err_msg = 'Error Details: Connection Refused from the Server'
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
@@ -340,13 +349,115 @@ class Code42Connector(BaseConnector):
             try:
                 request_response = request_func(url, timeout=timeout, json=data, auth=auth, headers=headers,
                                                 params=params)
+
+            except requests.exceptions.InvalidSchema:
+                err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+            except requests.exceptions.InvalidURL:
+                err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+            except requests.exceptions.ConnectionError:
+                err_msg = 'Error Details: Connection Refused from the Server'
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 return RetVal(action_result.set_status(phantom.APP_ERROR,
-                                                           "Error Connecting to server. Details: {0}".format(err_msg)),
-                                  resp_json)
+                                                           "Error Connecting to server. Details: {}".format(err_msg)),
+                                                            resp_json)
 
         return self._process_response(request_response, action_result)
+
+    def _generate_v3_token(self, action_result):
+        """ Generate a new v3_user_token.
+
+        :param action_result: object of ActionResult class
+        :return: status success/failure along with the v3_user_token
+        """
+
+        url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
+        try:
+            request_respon = requests.get(url, auth=(self._username, self._password))
+        except requests.exceptions.InvalidSchema:
+            err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except requests.exceptions.InvalidURL:
+            err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
+                                                       format(err_msg)), None)
+        if request_respon.content is not None:
+            try:
+                v3_user_token = json.loads(request_respon.content)["data"]["v3_user_token"]
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                                        "Error generating v3 user token. Details: {0}".
+                                                        format(err_msg)), None)
+        else:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "V3 user token not found"), None)
+
+        return phantom.APP_SUCCESS, v3_user_token
+
+    def _make_rest_call_v3(self, action_result, base_url, endpoint, body=None, method="post"):
+        """ Function that makes the REST call to the app.
+
+        :param action_result: object of ActionResult class
+        :param base_url: base url of the API request
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param body: request body
+        :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
+        response obtained by making an API call
+        """
+
+        ret_val, v3_user_token = self._generate_v3_token(action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        headers = {
+            'Authorization': 'v3_user_token {}'.format(v3_user_token),
+            'Content-type': 'application/json'
+        }
+
+        url = "{}{}".format(base_url, endpoint)
+        try:
+            request_func = getattr(requests, method)
+        except AttributeError:
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "Invalid method: {0}".format(method)),
+                None
+            )
+
+        try:
+            r = request_func(
+                url,
+                headers=headers,
+                json=body
+            )
+        except requests.exceptions.InvalidSchema:
+            err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except requests.exceptions.InvalidURL:
+            err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), None)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, "Error Connecting to server. {0}".format(err)
+                ), None
+            )
+
+        return self._process_response(r, action_result)
 
     def _generate_token(self, action_result):
         """ Generate a new access token.
@@ -583,7 +694,7 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(ret_val_token):
             return action_result.get_status()
 
-        user = param.get(CODE42_JSON_USER)
+        user = param[CODE42_JSON_USER]
 
         # if parameter is a number, use userId endpoint
         try:
@@ -1398,6 +1509,9 @@ class Code42Connector(BaseConnector):
             try:
                 # API requires seconds in float, so convert end_time into the float
                 end_time = float(end_time)
+                current_time = datetime.utcnow().timestamp()
+                if end_time > current_time:
+                    return action_result.set_status(phantom.APP_ERROR, status_message=CODE42_END_TIME_NOT_IN_FUTURE_MSG)
                 end_time = datetime.utcfromtimestamp(end_time).isoformat()
                 if end_time[-3] != '.':
                     end_time = '{0}.00'.format(end_time)
@@ -1775,30 +1889,19 @@ class Code42Connector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
+        ret_val, response = self._make_rest_call_v3(action_result, self._server_url, CODE42_ORGANIZATION_INFO_ENDPOINT, method="get")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        try:
-            r = requests.get(url, auth=(self._username, self._password))
-            v3_user_token = r.json().get('data', {}).get('v3_user_token')
-
-            headers = {"Authorization": "v3_user_token {}".format(v3_user_token)}
-
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, CODE42_CONNECTION_FAILED)
-
-        try:
-            url2 = "{}{}".format(self._server_url, CODE42_ORGANIZATION_INFO_ENDPOINT)
-            r = requests.get(url2, headers=headers).json()
-
-            action_result.add_data(r['data'])
-            return action_result.set_status(phantom.APP_SUCCESS, "Retrieved organization info successfully")
-
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Exception while retrieving Organization Info: {}".format(err_msg))
+        action_result.add_data(response['data'])
+        return action_result.set_status(phantom.APP_SUCCESS, "Retrieved organization info successfully")
 
     def _handle_add_departing_employee(self, param):
+        """ This function is used to add employee to departing list.
+
+        :param param: Dictionary of input parameters
+        :return: status(success/failure)
+        """
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1814,130 +1917,121 @@ class Code42Connector(BaseConnector):
             cloud_username = [x.strip() for x in cloud_username.split(',')]
             cloud_username = list(filter(None, cloud_username))
 
-        url = "{}{}".format(self._server_url, CODE42_V3_TOKEN_AUTH_ENDPOINT)
-
-        try:
-            r = requests.get(url, auth=(self._username, self._password))
-            v3_user_token = r.json()['data']['v3_user_token']
-
-        except Exception as e:
-            err_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, CODE42_CONNECTION_FAILED)
-
-        headers = {
-            'Authorization': 'v3_user_token {}'.format(v3_user_token),
-            'Content-type': 'application/json'
-        }
-
-        ret_val_token = self._generate_token(action_result=action_result)
-        if phantom.is_fail(ret_val_token):
-            return action_result.get_status()
-
         ret_val, user_id = self.is_valid_identifier(departing_user, action_result, True)
         if phantom.is_fail(ret_val):
             self.debug_print(CODE42_INVALID_DEPARTING_USER_MSG)
             return action_result.set_status(phantom.APP_ERROR, CODE42_INVALID_DEPARTING_USER_MSG)
 
-        # create detection profile
-        url = "{}{}".format(departing_employee_url, CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT)
+        message = ''
         body = {
             'tenantId': tenant_id,
             'userName': departing_user,
             'notes': departure_notes,
             'cloudUsernames': cloud_username
         }
-
-        message = ""
-        try:
-            # create user profile for detection list
-            res = requests.post(url, json=body, headers=headers)
-            r = res.json()
-            if 'pop-bulletin' in r and 'User already exists' in r['pop-bulletin']['reason']:
+        ret_val, _ = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT, body)
+        if phantom.is_fail(ret_val):
+            err_msg = action_result.get_message()
+            if 'User already exists' in err_msg:
                 if departure_notes or cloud_username:
                     body = {
                         "tenantId": tenant_id,
                         "username": departing_user
                     }
-                    url = "{}{}".format(departing_employee_url, CODE42_GET_PROFILE_BY_USERNAME)
-                    r = requests.post(url, json=body, headers=headers).json()
-                    if 'pop-bulletin' in r:
-                        return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+                    ret_val, response = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_GET_PROFILE_BY_USERNAME, body)
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
 
                     # adding cloudusername in the profile
                     if departing_user not in cloud_username:
                         cloud_username.append(departing_user)
-                    if len(cloud_username) > 1 and not set(r['cloudUsernames']) == set(cloud_username):
+                    if len(cloud_username) > 1 and not set(response['cloudUsernames']) == set(cloud_username):
                         body = {
                             "tenantId": tenant_id,
-                            "userId": r['userId'],
+                            "userId": response['userId'],
                             "cloudUsernames": cloud_username
                         }
-                        url = "{}{}".format(departing_employee_url, CODE42_UPDATE_CLOUD_USERNAMES)
-                        r = requests.post(url, json=body, headers=headers).json()
-                        if 'pop-bulletin' in r:
-                            return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
+                        ret_val, _ = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_UPDATE_CLOUD_USERNAMES, body)
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
                         else:
                             message += "Cloud Usernames added. "
 
                     # updating notes
-                    if departure_notes and (r.get('notes') != departure_notes):
+                    if departure_notes and (response.get('notes') != departure_notes):
                         body = {
                             "tenantId": tenant_id,
-                            "userId": r['userId'],
+                            "userId": response['userId'],
                             "notes": departure_notes
                         }
-                        url = "{}{}".format(departing_employee_url, CODE42_UPDATE_NOTES)
-                        r = requests.post(url, json=body, headers=headers).json()
-                        if 'pop-bulletin' in r:
+                        ret_val, _ = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_UPDATE_NOTES, body)
+                        if phantom.is_fail(ret_val):
+                            status_message = action_result.get_message()
                             if message:
-                                status_message = "{} Code42 Server Error: {}".format(message, str(r))
-                            else:
-                                status_message = "Code42 Server Error: {}".format(str(r))
+                                status_message = "Message: {} {}".format(message, status_message)
                             return action_result.set_status(phantom.APP_ERROR, status_message)
                         else:
                             message += "Notes added/updated. "
-            elif 'pop-bulletin' in r:
-                return action_result.set_status(phantom.APP_ERROR, "Code42 Server Error: {}".format(str(r)))
-            elif 200 <= r.status_code < 399:
-                message += "Detection list profile created. "
             else:
-                message = "Error from server. Status Code: {0} Data from server: {1}".format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
-                return action_result.set_status(phantom.APP_ERROR, message)
+                return action_result.get_status()
+        else:
+            message += "Detection list profile created. "
 
-            body = {
+        body = {
                 'tenantId': tenant_id,
                 'userId': user_id,
                 'departureDate': departure_date
             }
+        # adding departing employee
+        ret_val, response = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_DEPARTING_EMPLOYEE_V2_ENDPOINT, body)
+        if phantom.is_fail(ret_val):
+            status_message = action_result.get_message()
+            if message:
+                status_message = "Message: {} {}".format(message, status_message)
+            return action_result.set_status(phantom.APP_ERROR, status_message)
 
-            # adding departing employee
-            url = "{}{}".format(departing_employee_url, CODE42_DEPARTING_EMPLOYEE_V2_ENDPOINT)
-            r = requests.post(url, json=body, headers=headers).json()
-
-            if 'pop-bulletin' in r:
-                if message:
-                    status_message = "{} Code42 Server Error: {}".format(message, str(r))
-                else:
-                    status_message = "Code42 Server Error: {}".format(str(r))
-                return action_result.set_status(phantom.APP_ERROR, status_message)
-
-            if 'createdAt' in r:
-                # SUCCESS
-                action_result.add_data(r)
-                summary = action_result.update_summary({})
-                departing_message = "Departing Employee Addition was Successful - Created Time: {}".format(r['createdAt'])
-                if message:
-                    summary['message'] = "{} {}".format(message, departing_message)
-                else:
-                    summary['message'] = departing_message
-                return action_result.set_status(phantom.APP_SUCCESS)
-
+        if 'createdAt' in response:
+            # SUCCESS
+            action_result.add_data(response)
+            summary = action_result.update_summary({})
+            departing_message = "Departing Employee Addition was Successful - Created Time: {}".format(response['createdAt'])
+            if message:
+                summary['message'] = "{} {}".format(message, departing_message)
             else:
-                return action_result.set_status(phantom.APP_ERROR, "{} Unexpected Response: {}".format(message, r))
+                summary['message'] = departing_message
+            return action_result.set_status(phantom.APP_SUCCESS)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "{} Unexpected Response: {}".format(message, response))
 
-        except Exception:
-            err_msg = "Unexpected API response "
-            return action_result.set_status(phantom.APP_ERROR, "{} Exception while making POST request: Status Code : {}. {}".format(message, r.status_code, err_msg))
+    def _handle_remove_departing_employee(self, param):
+        """ This function is used to remove an employee from the departing list.
+
+        :param param: Dictionary of input parameters
+        :return: status(success/failure)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        departing_employee_url = param['departing_employee_url'].strip('/')
+        remove_departing_user = param['departing_user']
+        tenant_id = param['tenant_id']
+
+        ret_val, user_id = self.is_valid_identifier(remove_departing_user, action_result, True)
+        if phantom.is_fail(ret_val):
+            self.debug_print(CODE42_INVALID_DEPARTING_USER_MSG)
+            return action_result.set_status(phantom.APP_ERROR, CODE42_INVALID_DEPARTING_USER_MSG)
+
+        body = {
+            'tenantId': tenant_id,
+            'userId': user_id,
+        }
+        ret_val, _ = self._make_rest_call_v3(action_result, departing_employee_url, CODE42_REMOVE_EMPLOYEE_FROM_DEPARTING_LIST, body)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        status_message = "Successfully removed a user from departing list"
+        return action_result.set_status(phantom.APP_SUCCESS, status_message)
 
     def handle_action(self, param):
         """ This function gets current action identifier and calls member function of its own to handle the action.
@@ -1971,7 +2065,8 @@ class Code42Connector(BaseConnector):
             'hunt_file': self._handle_hunt_file,
             'run_query': self._handle_run_query,
             'get_organization_info': self._handle_get_organization_info,
-            'add_departing_employee': self._handle_add_departing_employee
+            'add_departing_employee': self._handle_add_departing_employee,
+            'remove_departing_employee': self._handle_remove_departing_employee,
         }
 
         action = self.get_action_identifier()

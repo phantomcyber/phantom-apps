@@ -28,6 +28,7 @@ CODE42_ORGANIZATION_INFO_ENDPOINT = '/c42api/v3/customer/my'
 CODE42_DEPARTING_EMPLOYEE_ENDPOINT = '/svc/api/v1/departingemployee/create'
 CODE42_FORENSIC_SEARCH_ENDPOINT = '/forensic-search/queryservice/api/v1/fileevent'
 CODE42_CREATE_DETECTION_LIST_PROFILE_ENDPOINT = '/svc/api/v2/user/create'
+CODE42_REMOVE_EMPLOYEE_FROM_DEPARTING_LIST = '/svc/api/v2/departingemployee/remove'
 CODE42_DEPARTING_EMPLOYEE_V2_ENDPOINT = '/svc/api/v2/departingemployee/add'
 CODE42_GET_PROFILE_BY_USERNAME = '/svc/api/v2/user/getbyusername'
 CODE42_UPDATE_CLOUD_USERNAMES = '/svc/api/v2/user/addcloudusernames'
@@ -63,6 +64,7 @@ CODE42_START_TIME_END_TIME_REQUIRED = "Parameters 'start_time' and 'end_time are
                                       "not provided"
 CODE42_INVALID_START_TIME_MSG = "Invalid value for parameter 'start_time'"
 CODE42_INVALID_END_TIME_MSG = "Invalid value for parameter 'end_time'"
+CODE42_END_TIME_NOT_IN_FUTURE_MSG = "Invalid 'end_time' parameter. 'end_time' should not be greater than the current time"
 CODE42_INVALID_TIME_RANGE = "Invalid time range. 'end_time' should be greater than 'start_time'."
 CODE42_USER_NOT_FOUND_MSG = "No user found with username {user_name}"
 CODE42_USER_DEACTIVATION_ID_SUCCESS_MSG = 'User with ID {user} deactivated successfully'
