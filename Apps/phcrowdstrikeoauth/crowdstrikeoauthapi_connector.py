@@ -2116,7 +2116,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_file_reputation(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
 
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -2175,7 +2175,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_url_reputation(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2234,7 +2234,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_download_report(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         query_param = {
@@ -2252,7 +2252,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, 'Report downloaded successfully')
 
     def _handle_check_detonate_status(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         query_param = {
@@ -2286,7 +2286,7 @@ class CrowdstrikeConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_detonate_url(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -2350,7 +2350,7 @@ class CrowdstrikeConnector(BaseConnector):
         return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
 
     def _handle_detonate_file(self, param):
-        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
