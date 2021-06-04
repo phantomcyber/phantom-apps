@@ -1,48 +1,45 @@
 
-Please ensure your pull request adheres to the following guidelines:
+Please ensure your pull request (PR) adheres to the following guidelines:
 
-<!-- Please refer to our contributing documentation for any questions on submitting a pull request, link: https://github.com/phantomcyber/phantom-apps/blob/master/.github/CONTRIBUTING.md -->
+- Please refer to our contributing documentation for any questions on submitting a pull request, link: [Contribution Guide](https://github.com/phantomcyber/phantom-apps/blob/master/.github/CONTRIBUTING.md)
 
-## Pull request checklist
+## Pull Request Checklist
 
-Please check if your PR fulfills the following requirements:
-- [ ] Testing for all the changes have been performed (for bug fixes / features)
-- [ ] The readme.html have been reviewed and added / updated if needed (for bug fixes / features)
-- [ ] Use the following format for PR description: `<App Name>: <PR Type> - <PR Description>`
-- [ ] Please provide release notes as part of the PR submission which describe high level points of changes for the upcoming GA release.
-- [ ] Please check the All checks pipeline is passing successfully.
-- [ ] Please don't use the next branch of forked repo. Create separate feature branch for raising PR.
-
+#### Please check if your PR fulfills the following requirements:
+- [ ] Testing of all the changes has been performed (for bug fixes / features)
+- [ ] The readme.html has been reviewed and added / updated if needed (for bug fixes / features)
+- [ ] Use the following format for the PR description: `<App Name>: <PR Type> - <PR Description>`
+- [ ] Provide release notes as part of the PR submission which describe high level points about the changes for the upcoming GA release.
+- [ ] Verify all checks are passing.
+- [ ] Please don't use the `next` branch of the forked repo. Create separate feature branch for raising the PR.
+- [ ] Please do not submit updates to dependencies unless it fixes an issue.
+- [ ] Please limit your pull request to one application, submit multiple pull requests if needed.
 ## Pull request type
-<!-- Please do not submit updates to dependencies unless it fixes an issue. --> 
-<!-- Please limit your pull request to one application, submit multiple pull requests if needed. --> 
 
-Please check the type of change your PR introduces:
+#### Please check the type of change your PR introduces:
 - [ ] New App
 - [ ] Bugfix
 - [ ] Feature
 - [ ] Code style update (formatting, renaming)
 - [ ] Refactoring (no functional changes, no api changes)
-- [ ] Documentation content changes
+- [ ] Documentation
 - [ ] Other (please describe): 
 
-## Release Notes
-<!-- Please provide release notes as part of the PR submission which describe high level points of changes for the upcoming GA release. -->
-- [ ] Mandatory Section
+## Release Notes (REQUIRED)
+- Provide release notes as part of the PR submission which describe high level points about the changes for the upcoming GA release.
 
-## What is the current behavior?
-<!-- Please describe the current behavior that you are modifying. -->
-- [ ] Optional Section
+## What is the current behavior? (OPTIONAL)
+- Describe the current behavior that you are modifying.
 
-## What is the new behavior?
-<!-- Please describe the behavior or changes that are being added by this PR. -->
-- [ ] Optional Section
+## What is the new behavior? (OPTIONAL)
+- Describe the behavior or changes that are being added by this PR.
 
-## Other information
-<!-- Any other information that is important to this PR such as screenshots of how the component looks before and after the change. -->
-- [ ] Optional Section
 
-## Pay close attention to
+## Other information (OPTIONAL)
+- Any other information that is important to this PR such as screenshots of how the component looks before and after the change.
+
+
+## Pay close attention to (OPTIONAL)
 
 ## Screenshots (if relevant)
 
