@@ -5623,6 +5623,9 @@
                 {
                     "data_path": "action_result.data.*.tenantUid",
                     "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
                     "example_values": [
                         "s6512138-e9b5-0098-9fdd-99886f369765"
                     ],
@@ -5683,18 +5686,27 @@
                     "description": "Base URL for Departing Employee API",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "url"
+                    ],
                     "order": 0
                 },
                 "tenant_id": {
                     "description": "Tenant ID for Code42 organization",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "code42 tenant id"
+                    ],
                     "order": 1
                 },
                 "departing_user": {
                     "description": "Code42 username of the departing employee",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "user name"
+                    ],
                     "order": 2
                 },
                 "departure_notes": {
@@ -5716,11 +5728,17 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.departing_employee_url",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tenant_id",
                     "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
                     "example_values": [
                         "f6b12138-e9b5-4739-9fdd-99886f369654"
                     ]
@@ -5730,6 +5748,9 @@
                     "data_type": "string",
                     "column_name": "Username",
                     "column_order": 1,
+                    "contains": [
+                        "user name"
+                    ],
                     "example_values": [
                         "username@gmail.com"
                     ]
@@ -5805,6 +5826,9 @@
                 {
                     "data_path": "action_result.data.*.tenantId",
                     "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
                     "example_values": [
                         "f6b12138-e9b5-4739-9fdd-99886f369654"
                     ]
@@ -5895,29 +5919,44 @@
                     "description": "Base URL for Departing Employee API",
                     "data_type": "string",
                     "required": true,
-                    "order": 0
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ]
                 },
                 "tenant_id": {
                     "description": "Tenant ID for Code42 organization",
                     "data_type": "string",
                     "required": true,
-                    "order": 1
+                    "order": 1,
+                    "contains": [
+                        "code42 tenant id"
+                    ]
                 },
                 "departing_user": {
                     "description": "Code42 username of the departing employee",
                     "data_type": "string",
                     "required": true,
-                    "order": 2
+                    "order": 2,
+                    "contains": [
+                        "user name"
+                    ]
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.parameter.departing_employee_url",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tenant_id",
                     "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
                     "example_values": [
                         "f6b12138-e9b5-4739-9fdd-99886f369654"
                     ]
@@ -5927,6 +5966,9 @@
                     "data_type": "string",
                     "column_name": "Username",
                     "column_order": 1,
+                    "contains": [
+                        "user name"
+                    ],
                     "example_values": [
                         "username@gmail.com"
                     ]
