@@ -345,7 +345,7 @@ class AwsCloudtrailConnector(BaseConnector):
         config = self.get_config()
 
         # Load required configs
-        self._region = AWS_CLOUDTRAIL_REGIONS.get(config['Region'])
+        self._region = AWS_CLOUDTRAIL_REGIONS.get(config['region'])
 
         # handle proxies
         self._proxy = {}
@@ -365,8 +365,8 @@ class AwsCloudtrailConnector(BaseConnector):
 
             return phantom.APP_SUCCESS
 
-        self._access_key = config.get('Access Key')
-        self._secret_key = config.get('Secret Key')
+        self._access_key = config.get('access_key')
+        self._secret_key = config.get('secret_key')
 
         if not (self._access_key and self._secret_key):
             return self.set_status(phantom.APP_ERROR, AWSCLOUDTRAIL_BAD_ASSET_CONFIG_MSG)

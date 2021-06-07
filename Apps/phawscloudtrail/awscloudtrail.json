@@ -21,18 +21,18 @@
         "Cloud tested on 10-02-2021"
     ],
     "configuration": {
-        "Access Key": {
-            "description": "AWS Access Key",
+        "access_key": {
+            "description": "Access Key",
             "data_type": "password",
             "order": 0
         },
-        "Secret Key": {
-            "description": "AWS Secret Key",
+        "secret_key": {
+            "description": "Secret Key",
             "data_type": "password",
             "order": 1
         },
-        "Region": {
-            "description": "AWS Region",
+        "region": {
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
