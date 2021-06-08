@@ -10,7 +10,7 @@
         }
     ],
     "package_name": "phantom_arcsight",
-    "main_module": "arcsight_connector.pyc",
+    "main_module": "arcsight_connector.py",
     "app_version": "1.2.36",
     "utctime_updated": "2019-03-04T22:02:20.000000Z",
     "product_vendor": "HPE",
@@ -62,7 +62,7 @@
         {
             "action": "create ticket",
             "description": "Create a case",
-            "verbose": "If the <b>parent_group</b> parameter is not specified, the action defaults to <i>/All Cases/All Cases</i>. ArcSight does not allow multiple cases with the same name to exist within the same group. This action will succeed if a case with the same name already exists within the given <b>parent_group</b>, however the data path <b>action_result.summary.case_created</b> will be set to <i>False</i> to denote that a case was not created.",
+            "verbose": "If the <b>parent_group</b> parameter is not specified, the action defaults to <i>/All Cases/All Cases</i>. ArcSight does not allow multiple cases with the same name to exist within the same group. This action will succeed if a case with the same name already exists within the given <b>parent_group</b>. However, the data path <b>action_result.summary.case_created</b> will be set to <i>False</i> to denote that a case was not created.",
             "type": "generic",
             "identifier": "create_ticket",
             "read_only": false,
@@ -333,7 +333,7 @@
         {
             "action": "update ticket",
             "description": "Update a case on ArcSight",
-            "verbose": "ArcSight uses a Resource ID (for example <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item, use a case's Resource ID as the <b>id</b> parameter value.<br>The <b>update_fields</b> parameter should be a valid JSON, the keys of which should contain the fields that need to be updated for the particular case. Note that the keys displayed in the ArcSight UI are different from the key names that should be specified in the <b>update_fields</b> parameters.<br>For example the <i>External ID</i> field is represented in the ArcSight system by the <i>externalID</i> key value. One way to figure the mapping is to connect to https://[arcsight_device]:8443/www/manager-service/services/CaseService?wsdl and look at the <i>Resource</i> and <i>Case</i> complexType values.<br>As an example, to set the <i>External ID</i> value of a case, use the <b>update_fields</b> parameter as <b>{\"externalID\": \"INC1231413\"}</b><br>The ArcSight API will not throw an error in case an invalid field is used in the <b>update_fields</b> JSON.",
+            "verbose": "ArcSight uses a Resource ID (for example, <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item. Use a case's Resource ID as the <b>id</b> parameter value.<br>The <b>update_fields</b> parameter should be a valid JSON, the keys of which should contain the fields that need to be updated for the particular case. Note that the keys displayed in the ArcSight UI are different from the key names that should be specified in the <b>update_fields</b> parameters.<br>For example, the <i>External ID</i> field is represented in the ArcSight system by the <i>externalID</i> key value. One way to figure the mapping is to connect to https://[arcsight_device]:8443/www/manager-service/services/CaseService?wsdl and look at the <i>Resource</i> and <i>Case</i> complexType values.<br>As an example, to set the <i>External ID</i> value of a case, use the <b>update_fields</b> parameter as <b>{\"externalID\": \"INC1231413\"}</b><br>The ArcSight API will not throw any error for the invalid field used in the <b>update_fields</b> JSON.",
             "type": "generic",
             "identifier": "update_ticket",
             "read_only": false,
@@ -688,7 +688,7 @@
         {
             "action": "get ticket",
             "description": "Get case information",
-            "verbose": "ArcSight uses a Resource ID (for example <i>7Vvj0W1UBABCbNut33qjiZw==</i> ) to represent a single resource item, use a case's Resource ID as the <b>id</b> parameter value.",
+            "verbose": "ArcSight uses a Resource ID (for example, <i>7Vvj0W1UBABCbNut33qjiZw==</i>) to represent a single resource item. Use a case's Resource ID as the <b>id</b> parameter value.",
             "type": "investigate",
             "identifier": "get_ticket",
             "read_only": true,
@@ -1033,7 +1033,7 @@
         {
             "action": "run query",
             "description": "Search for a text in resources",
-            "verbose": "This action implements the ArcSight console's search feature. It searches for the presence of text specified in the <b>query</b> parameter anywhere in the specified resource <b>type</b>.<br>Multiple search strings can be separated by spaces. Enclose the string in quotes to search for the exact string containing spaces. For example to search for resources containing <i>foo</i> <b>or</b> <i>bar</i>, use <b>foo bar</b>.<br>To search for the word foo followed by bar and separated by space, use the string <b>\"foo bar\"</b>.<br>ArcSight does searches on the <i>stem</i> of each word, for example, if the word searched is <i>going</i>, ArcSight will actually search for <i>go</i>. Same rules apply for phrases that are quoted, so if the <b>query</b> parameter is <b>\"going description\"</b>, the actual query executed will be <b>\"go descript\"</b>.<br>The action's widget displays the <b>Internal Query String</b> that ArcSight ends up using. Use this string to verify the text being searched. Using quotes around the query string makes the search more deterministic.<br>The Action Run dialog displays a drop-down list of possible values for the <b>type</b> parameter, however playbooks allow a user to specify values other than the one listed in the Action Run dialog.",
+            "verbose": "This action implements the ArcSight console's search feature. It searches for the text (specified in the <b>query</b> parameter) in the specified resource <b>type</b>.<br>Multiple search strings can be separated by spaces. Enclose the string in quotes to search for the exact string containing spaces. For example, to search for resources containing <i>foo</i> <b>or</b> <i>bar</i>, use <b>foo bar</b>.<br>To search for the word foo followed by bar and separated by space, use the string <b>\"foo bar\"</b>.<br>ArcSight executes searches on the <i>stem</i> of each word. For example, if the word searched is <i>going</i>, ArcSight will actually search for <i>go</i>. The same rules apply for quoted phrases. For example, if the <b>query</b> parameter is <b>\"going description\"</b>, the actual query executed will be <b>\"go descript\"</b>.<br>The action's widget displays the <b>Internal Query String</b> that ArcSight ends up using. Use this string to verify the text being searched. Using quotes around the query string makes the search more deterministic.<br>The Action Run dialog displays a drop-down list of possible values for the <b>type</b> parameter. However, playbooks allow a user to specify values other than the one listed in the Action Run dialog.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
