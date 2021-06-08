@@ -15,6 +15,7 @@ import json
 import re
 from boto3 import client, Session
 from botocore.config import Config
+import ast
 
 
 class RetVal(tuple):
@@ -66,11 +67,11 @@ class AthenaConnector(BaseConnector):
 
             return phantom.APP_SUCCESS
 
-        self._access_key = config.get(ATHENA_JSON_ACCESS_KEY)
-        self._secret_key = config.get(ATHENA_JSON_SECRET_KEY)
+        self._access_key = config.get(consts.ATHENA_JSON_ACCESS_KEY)
+        self._secret_key = config.get(consts.ATHENA_JSON_SECRET_KEY)
 
         if not (self._access_key and self._secret_key):
-            return self.set_status(phantom.APP_ERROR, ATHENA_BAD_ASSET_CONFIG_MSG)
+            return self.set_status(phantom.APP_ERROR, consts.ATHENA_BAD_ASSET_CONFIG_MSG)
 
         return phantom.APP_SUCCESS
 
