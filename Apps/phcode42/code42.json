@@ -705,6 +705,7 @@
         {
             "action": "activate user",
             "description": "Activate a user",
+            "verbose": "For the 'unblock_user' true value the user status will be changed to 'Activated' and 'Unblocked' and for the false value, the user status will only be changed to 'Activated'. <b>Note:</b> If the user is already active then it will ignore the 'unblock_user' parameter.",
             "type": "correct",
             "identifier": "activate_user",
             "undo": "deactivate user",
@@ -801,6 +802,7 @@
         {
             "action": "deactivate user",
             "description": "Deactivate a user",
+            "verbose": "For the 'block_user' true value the user status will be changed to 'Deactivated' and 'Blocked' and for the false value, the user status will only be changed to 'Deactivated'. <b>Note:</b> If the user is already deactive then it will ignore the 'block_user' parameter.",
             "type": "contain",
             "identifier": "deactivate_user",
             "undo": "activate user",

@@ -796,10 +796,17 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        message = CODE42_USER_ACTIVATION_USERNAME_SUCCESS_MSG.format(user=user)
+        msg = 'successfully'
+        if unblock_user:
+            if "Blocked" in response:
+                msg = "and unblock successfully"
+            else:
+                msg = "successfully and already unblock"
+
+        message = CODE42_USER_ACTIVATION_USERNAME_SUCCESS_MSG.format(user=user, msg=msg)
 
         if user.isdigit():
-            message = CODE42_USER_ACTIVATION_ID_SUCCESS_MSG.format(user=user_id)
+            message = CODE42_USER_ACTIVATION_ID_SUCCESS_MSG.format(user=user_id, msg=msg)
 
         return action_result.set_status(phantom.APP_SUCCESS, status_message=message)
 
@@ -854,10 +861,17 @@ class Code42Connector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        message = CODE42_USER_DEACTIVATION_USERNAME_SUCCESS_MSG.format(user=user)
+        msg = 'successfully'
+        if block_user:
+            if "Blocked" in response:
+                msg = "successfully and already blocked"
+            else:
+                msg = "and blocked successfully"
+
+        message = CODE42_USER_DEACTIVATION_USERNAME_SUCCESS_MSG.format(user=user, msg=msg)
 
         if user.isdigit():
-            message = CODE42_USER_DEACTIVATION_ID_SUCCESS_MSG.format(user=user_id)
+            message = CODE42_USER_DEACTIVATION_ID_SUCCESS_MSG.format(user=user_id, msg=msg)
 
         return action_result.set_status(phantom.APP_SUCCESS, status_message=message)
 
