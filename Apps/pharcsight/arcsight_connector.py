@@ -40,11 +40,6 @@ def _validate_range(input_range, action_result):
         return action_result.set_status(phantom.APP_ERROR,
                                         "Invalid range value, min_offset greater than max_offset")
 
-    """
-    if (maxi > ARCSIGHT_MAX_END_OFFSET_VAL):
-        return action_result.set_status(phantom.APP_ERROR, "Invalid range value. The max_offset value cannot be greater than {0}".format(EWSONPREM_MAX_END_OFFSET_VAL))
-    """
-
     return phantom.APP_SUCCESS
 
 
@@ -53,7 +48,7 @@ def _to_mac(input_mac):
     if not input_mac:
         return ''
 
-    input_mac = long(input_mac)
+    input_mac = int(input_mac)
 
     if input_mac == ARCSIGHT_64VAL_NOT_FILLED:
         return ''
@@ -70,7 +65,7 @@ def _to_ip(input_ip):
     if not input_ip:
         return ''
 
-    input_ip = long(input_ip)
+    input_ip = int(input_ip)
 
     if input_ip == ARCSIGHT_64VAL_NOT_FILLED:
         return ''
@@ -100,7 +95,7 @@ def _get_str_from_epoch(epoch_milli):
         return ''
 
     # 2015-07-21T00:27:59Z
-    return datetime.fromtimestamp(long(epoch_milli) / 1000.0).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    return datetime.fromtimestamp(int(epoch_milli) / 1000.0).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
 def _parse_error(response):
@@ -120,16 +115,15 @@ def _parse_error(response):
     except:
         pass
 
-    message = ARCSIGHT_ERR_FROM_SERVER.format(status=response.status_code, message=error_text)
+    if error_text:
+        message = f'API failed. Status Code: {response.status_code}. Message: {error_text}'
+    else:
+        message = f'API failed. Status Code: {response.status_code}'
 
     return message
 
 
 class ArcsightConnector(BaseConnector):
-    ACTION_ID_CREATE_TICKET = "create_ticket"
-    ACTION_ID_UPDATE_TICKET = "update_ticket"
-    ACTION_ID_GET_TICKET = "get_ticket"
-    ACTION_ID_RUN_QUERY = "run_query"
 
     def __init__(self):
 
@@ -144,9 +138,41 @@ class ArcsightConnector(BaseConnector):
         # Base URL
         config = self.get_config()
 
-        self._base_url = config[ARCSIGHT_JSON_BASE_URL]
+        self._base_url = config[ARCSIGHT_JSON_BASE_URL].rstrip('/')
 
         return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """
+        Get appropriate error message from the exception.
+
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {}".format(error_msg)
+            else:
+                error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _validate_version(self, action_result):
 
@@ -154,7 +180,7 @@ class ArcsightConnector(BaseConnector):
         ret_val, version = self._get_version(action_result)
 
         if phantom.is_fail(ret_val):
-            action_result.append_to_message("Product version validation failed.")
+            action_result.append_to_message("Product version validation failed")
             return action_result.get_status()
 
         # get the version of the device
@@ -175,7 +201,6 @@ class ArcsightConnector(BaseConnector):
 
         if not match:
             message = "Version validation failed for App supported version '{0}'".format(version_regex)
-            # self.save_progress(message)
             return action_result.set_status(phantom.APP_ERROR, message)
 
         self.save_progress("Version validation done")
@@ -203,7 +228,8 @@ class ArcsightConnector(BaseConnector):
         try:
             self._auth_token = resp['log.loginResponse']['log.return']
         except Exception as e:
-            self.debug_print("Handled exception while parsing auth token", e)
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(f"Handled exception while parsing auth token. {error_msg}")
             return action_result.set_status(phantom.APP_ERROR, "Error parsing login response")
 
         # validate the version
@@ -237,8 +263,7 @@ class ArcsightConnector(BaseConnector):
         if not request_func:
             action_result.set_status(phantom.APP_ERROR, ARCSIGHT_ERR_API_UNSUPPORTED_METHOD, method=method)
 
-        # self.save_progress("Connecting to {0}...".format(self._base_url))
-        url = self._base_url + endpoint
+        url = f'{self._base_url}{endpoint}'
 
         self.debug_print("Making REST Call {0} on {1}".format(method.upper(), url))
 
@@ -250,11 +275,15 @@ class ArcsightConnector(BaseConnector):
         try:
             response = request_func(url, params=params, data=data, json=json, headers=_headers,
                                     verify=config[phantom.APP_JSON_VERIFY])
-        except Exception as e:
-            self.debug_print("REST call Failed: ", e)
-            return action_result.set_status(phantom.APP_ERROR, ARCSIGHT_ERR_SERVER_CONNECTION, e), None
 
-        # self.debug_print('REST url: {0}'.format(response.url))
+        except requests.exceptions.ConnectionError as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            error_message = "Error connecting to server. Connection refused from server"
+            return action_result.set_status(phantom.APP_ERROR, error_message), None
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(f"REST call Failed: {error_msg}")
+            return action_result.set_status(phantom.APP_ERROR, f"{ARCSIGHT_ERR_SERVER_CONNECTION}. {error_msg}"), None
 
         if response.status_code != requests.codes.ok:  # pylint: disable=E1101
             message = _parse_error(response)
@@ -268,14 +297,16 @@ class ArcsightConnector(BaseConnector):
         try:
             response_dict = response.json()
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(f"Unable to parse response dict. {error_msg}")
             self.save_progress(ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY)
-            return action_result.set_status(phantom.APP_ERROR, ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY, e), None
+            return action_result.set_status(phantom.APP_ERROR, f"{ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY}. {error_msg}"), None
 
         return phantom.APP_SUCCESS, response_dict
 
     def _get_case_events(self, event_ids, action_result):
 
-        if not isinsance(event_ids, (list, tuple)):
+        if not isinstance(event_ids, (list, tuple)):
             event_ids = [event_ids]
 
         ret_val, events_details = self._get_events_details(event_ids, action_result)
@@ -283,7 +314,7 @@ class ArcsightConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
 
-        if not isistance(events_details, (list, tuple)):
+        if not isinstance(events_details, (list, tuple)):
             events_details = [events_details]
 
         return phantom.APP_SUCCESS, events_details
@@ -530,10 +561,11 @@ class ArcsightConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed")
+            self.save_progress("On Poll Action Failed")
             return action_result.get_status()
 
-        return self.set_status(phantom.APP_ERROR)
+        self.save_progress("On Poll Action Passed")
+        return action_result.set_status(phantom.APP_ERROR)
 
     def _test_connectivity(self, param):
 
@@ -598,13 +630,13 @@ class ArcsightConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Unable to Login")
+            self.save_progress(ARCSIGHT_ERR_UNABLE_TO_LOGIN)
             return action_result.get_status()
 
         parent_group = param.get(ARCSIGHT_JSON_PARENT_GROUP, ARCSIGHT_DEFAULT_PARENT_GROUP)
 
         if not parent_group.startswith('/'):
-            parent_group = '/' + parent_group
+            parent_group = f'/{parent_group}'
 
         parent_group = parent_group.rstrip('/')
 
@@ -639,7 +671,7 @@ class ArcsightConnector(BaseConnector):
             summary['case_created'] = False
             ret_val, case_details = self._get_case_details(case_id, action_result)
             if phantom.is_fail(ret_val):
-                action_result.append_to_message("Unable to get case information, cannot continue")
+                action_result.append_to_message(ARCSIGHT_ERR_UNABLE_TO_GET_CASE_INFO)
                 return action_result.get_status()
             case_id = case_details.get('resourceid')
 
@@ -684,7 +716,7 @@ class ArcsightConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Unable to Login")
+            self.save_progress(ARCSIGHT_ERR_UNABLE_TO_LOGIN)
             return action_result.get_status()
 
         # Validate the fields param json
@@ -694,15 +726,16 @@ class ArcsightConnector(BaseConnector):
         try:
             update_fields = json.loads(update_fields)
         except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR,
-                                            "Unable to load the input update_fields json. Error: {0}".format(str(e)))
+                                            f"Unable to load the input 'update_fields' json. {error_msg}")
 
         # Get the case info
         case_id = param[ARCSIGHT_JSON_CASE_ID]
         ret_val, case_details = self._get_case_details(case_id, action_result)
 
         if phantom.is_fail(ret_val):
-            action_result.append_to_message("Unable to get case information, cannot continue")
+            action_result.append_to_message(ARCSIGHT_ERR_UNABLE_TO_GET_CASE_INFO)
             return action_result.get_status()
 
         # update the dictionary that we got with the one that was inputted
@@ -735,7 +768,7 @@ class ArcsightConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Unable to Login")
+            self.save_progress(ARCSIGHT_ERR_UNABLE_TO_LOGIN)
             return action_result.get_status()
 
         # Get the case info
@@ -743,7 +776,7 @@ class ArcsightConnector(BaseConnector):
         ret_val, case_details = self._get_case_details(case_id, action_result)
 
         if phantom.is_fail(ret_val):
-            action_result.append_to_message("Unable to get case information, cannot continue")
+            action_result.append_to_message(ARCSIGHT_ERR_UNABLE_TO_GET_CASE_INFO)
             return action_result.get_status()
 
         action_result.add_data(case_details)
@@ -759,7 +792,7 @@ class ArcsightConnector(BaseConnector):
         ret_val = self._login(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress("Unable to Login")
+            self.save_progress(ARCSIGHT_ERR_UNABLE_TO_LOGIN)
             return action_result.get_status()
 
         query_string = param[ARCSIGHT_JSON_QUERY]
@@ -809,26 +842,24 @@ class ArcsightConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
-        """Function that handles all the actions
-
-        Args:
-
-        Return:
-            A status code
         """
+        Get current action identifier and call member function of its own to handle the action.
 
+        :param param: dictionary which contains information about the actions to be executed
+        :return: status success/failure
+        """
         result = None
         action = self.get_action_identifier()
 
         if action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             result = self._test_connectivity(param)
-        elif action == self.ACTION_ID_CREATE_TICKET:
+        elif action == ACTION_ID_CREATE_TICKET:
             result = self._create_ticket(param)
-        elif action == self.ACTION_ID_UPDATE_TICKET:
+        elif action == ACTION_ID_UPDATE_TICKET:
             result = self._update_ticket(param)
-        elif action == self.ACTION_ID_GET_TICKET:
+        elif action == ACTION_ID_GET_TICKET:
             result = self._get_ticket(param)
-        elif action == self.ACTION_ID_RUN_QUERY:
+        elif action == ACTION_ID_RUN_QUERY:
             result = self._run_query(param)
 
         return result
