@@ -323,13 +323,11 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            # if there is only a single artifact, set it to run_automation = True
-            if len_artifacts == 1:
+            
+            # Always set the very first artifact to run_automation = True to never have duplicate conflicts
+            if len_artifacts >= 1:
                 artifacts[0]['run_automation'] = True
-            # if there are more than 1 artifacts, set the second artifact to run_automation = True
-            elif len_artifacts > 1:
-                artifacts[1]['run_automation'] = True
-            # append container ID to each artifact for logging
+            # Useful for spawn.log file analysis
             for artifact in artifacts:
                 artifact['container_id'] = container_id
 
