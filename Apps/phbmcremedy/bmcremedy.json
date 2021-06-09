@@ -1,0 +1,2981 @@
+{
+    "appid": "856975fb-d46d-4b72-9f16-6a9330790f59",
+    "name": "BMC Remedy",
+    "description": "This app supports ticket management functions on incidents in BMC Remedy.",
+    "publisher": "Splunk",
+    "package_name": "phantom_bmcremedy",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "main_module": "bmcremedy_connector.pyc",
+    "type": "ticketing",
+    "app_version": "1.0.15",
+    "utctime_updated": "2018-01-27T21:16:19.000000Z",
+    "product_vendor": "BMC Software",
+    "product_name": "BMC Remedy",
+    "product_version_regex": ".*",
+    "min_phantom_version": "2.1.452",
+    "logo": "logo_bmc.svg",
+    "logo_dark": "logo_bmc_dark.svg",
+    "configuration": {
+        "url": {
+            "required": true,
+            "description": "Complete URL (e.g. http://mybmc.contoso.com:8008)",
+            "data_type": "string",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "default": false,
+            "order": 1,
+            "description": "Verify server certificate",
+            "data_type": "boolean"
+        },
+        "username": {
+            "required": true,
+            "description": "Username",
+            "data_type": "string",
+            "order": 2
+        },
+        "password": {
+            "required": true,
+            "description": "Password",
+            "data_type": "password",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create ticket",
+            "description": "Create incident",
+            "verbose": "Typically the following parameters are required, but this can be configured, therefore the action defines all parameters as optional and relies on the installation to validate the required parameters:<ul><li><b>first_name</b></li><li><b>last_name</b></li><li><b>description</b></li><li><b>reported_source</b></li><li><b>service_type</b></li></ul>If field value is provided individually as well as in <b>fields</b> parameter, then value in <b>fields</b> parameter will be used for creating the incident. For example, to create an incident using <b>fields</b> parameter and assign it to an assignee named Mary, set the <b>fields</b> parameter to {\"First_Name\": \"Customer First Name\", \"Last_Name\": \"Customer Last Name\", \"Description\": \"Incident Description\", \"Service_Type\": \"User Service Restoration\", \"Reported Source\": \"Direct Input\", \"Status\": \"Assigned\", \"Assignee Login ID\": \"Mary\", \"Assignee\": \"Mary Mann\"}<br>To add comment set <b>fields</b> parameter to {\"Work Log Type\": \"General Information\", \"Detailed Description\": \"Comment to add\"}.<br>To create an incident, <b>first_name</b> and <b>last_name</b> are those of the customer that exists in the system.<br>The <b>vault_id</b> parameter takes the vault ID of a file and attaches it to the incident.<br>The attachment should be placed in vault of the container from which the action will be executed, and it would appear in <b>Work Detail</b> section on BMC Remedy.<br>Typical (default installation) values for <b>impact</b> are:<ul><li>1-Extensive/Widespread</li><li>2-Significant/Large</li><li>3-Moderate/Limited</li><li>4-Minor/Localized</li></ul>Typical (default installation) values for <b>urgency</b> are:<ul><li>1-Critical</li><li>2-High</li><li>3-Medium</li><li>4-Low</li></ul>Typical (default installation) values for <b>status</b> are:<ul><li>New</li><li>Assigned</li><li>In Progress</li><li>Pending</li><li>Resolved</li><li>Closed</li><li>Cancelled</li></ul>Typical (default installation) values for <b>reported_source</b> are:<ul><li>Direct Input</li><li>Email</li><li>External Escalation</li><li>Fax</li><li>Self Service</li><li>Systems Management</li><li>Phone</li><li>Voice Mail</li><li>Walk In</li><li>Web</li><li>Other</li><li>BMC Impact Manager Event</li></ul>Typical (default installation) values for <b>service_type</b> are:<ul><li>User Service Restoration</li><li>User Service Request</li><li>Infrastructure Restoration</li><li>Infrastructure Event</li></ul>Typical (default installation) values for <b>work_info_type</b> are:<ul><li>Customer Inbound:<ul><li>Customer Communication</li><li>Customer Follow-up</li><li>Customer Status Update</li></ul></li><li>Customer Outbound<ul><li>Closure Follow Up</li><li>Detail Clarification</li><li>General Information</li><li>Resolution Communications</li><li>Satisfaction Survey</li><li>Status Update</li></ul></li><li>General<ul><li>Incident Task / Action</li><li>Problem Script</li><li>Working Log</li><li>Email System</li><li>Paging System</li><li>BMC Impact Manager Update</li><li>Chat</li></ul></li><li>Vendor<ul><li>Vendor Communication</li></ul></li></ul>Typical (default installation) values of <b>status_reason</b> for a given <b>status</b> are:<ul><li>Pending<ul><li>Automated Resolution Reported</li><li>Client Action Required</li><li>Client Hold</li><li>Future Enhancement</li><li>Infrastructure Change</li><li>Local Site Action Required</li><li>Monitoring Incident</li><li>Purchase Order Approval</li><li>Registration Approval</li><li>Request</li><li>Supplier Delivery</li><li>Support Contact Hold</li><li>Third Party Vendor Action Reqd</li></ul></li><li>Resolved<ul><li>Automated Resolution Reported</li><li>Customer Follow-Up Required</li><li>Future Enhancement</li><li>Monitoring Incident</li><li>No Further Action Required</li><li>Temporary Corrective Action</li></ul></li><li>Closed<ul><li>Automated Resolution Reported</li><li>Infrastructure Change Created</li></ul></li><li>Cancelled<ul><li>No longer a Causal CI</li></ul></li></ul>",
+            "type": "generic",
+            "identifier": "create_ticket",
+            "read_only": false,
+            "parameters": {
+                "first_name": {
+                    "description": "Customer First Name",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "bmcremedy first name"
+                    ],
+                    "primary": true
+                },
+                "last_name": {
+                    "description": "Customer Last Name",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "bmcremedy last name"
+                    ],
+                    "primary": true
+                },
+                "description": {
+                    "description": "Summary",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "impact": {
+                    "description": "Impact",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "urgency": {
+                    "description": "Urgency",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "status": {
+                    "description": "Status",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "reported_source": {
+                    "description": "Reported Source",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "service_type": {
+                    "description": "Incident Type",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 7
+                },
+                "work_info_type": {
+                    "description": "Work Info Type",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "status_reason": {
+                    "description": "Status Reason",
+                    "data_type": "string",
+                    "order": 9
+                },
+                "fields": {
+                    "description": "Fields (JSON format)",
+                    "data_type": "string",
+                    "order": 10
+                },
+                "vault_id": {
+                    "contains": [
+                        "vault id"
+                    ],
+                    "description": "Comma (,) separated vault ID (maximum 3)",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 11
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "title": "Create Ticket",
+                "view": "bmcremedy_view.create_ticket"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Extension_Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Unknown User",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CIUAAssignGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.root_incident_id_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Lookup Keyword",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.New.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.New.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Assigned.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Assigned.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.In Progress.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.In Progress.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Pending.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Pending.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Resolved.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Resolved.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Closed.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Closed.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Cancelled.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History.Cancelled.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Phone Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.policy_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Submitter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.SRMSAOIGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_View_Access",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Local Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Chat Session ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.use_case",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_ActivityDate_tab",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Corporate ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Auto Open Session",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Default Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.MaxRetries",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_SupportGroupID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D Permission Group List",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.ServiceCI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_SRMInteger",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Incident Number",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.Site ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.policy_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Mail Station",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D Permission Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Region",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Site Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Activity_Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Phone_Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.KMSGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact LoginID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact First Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.Modified Chat Session ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.root_component_id_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.cell_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Char02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Modified Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.VIP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Time Zone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Desk Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CC_Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.SRInstanceID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.DatasetId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D Char01",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Time Zone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.AppPassword",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_LocalNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned Group Shift Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_Extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.HPD_CI_FormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Resolution Method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_Phone_Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.AppLogin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Unavailability Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Site Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.last_name2",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.Extension Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Last Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.Created_By",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.State Province",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Zip/Postal Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.PortNumber",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Product Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.ReconciliationIdentity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CreatedFromBackEndSynchWI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned To",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Person Instance ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.HPD_TemplateName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.TemplateID2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Request ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z2AF_Act_Attachment_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z2AF_Act_Attachment_1.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z2AF_Act_Attachment_1.sizeBytes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z2AF_Act_Attachment_1.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Contact Login Id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assignee Login ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.BiiARS_02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.BiiARS_03",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Secure_Log",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.OptionForClosingIncident",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Command",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Site ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.BiiARS_04",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.BiiARS_05",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned Support Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Last Modified By",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_AreaCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.HPD_CI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Local Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.AppInterfaceForm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.ClientLocale",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Middle Initial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Last_Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_PersonInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Product Model/Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.status_reason2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Area Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Created_From_flag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Flag_Create_Request",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Internet E-mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.ServiceCI_ReconID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Mail Station",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.BiiARS_01",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Impact_OR_Root",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Contact_Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.status_incident",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.TemplateID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Service_Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.SRMS Registry Instance ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Manufacturer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CI_FormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Internet_Email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.AccessMode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CIUASupportCompany",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Resolution Category Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Resolution Category Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Resolution Category Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Ticket Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Region",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Global_OR_Custom_Mapping",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.CC Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Resolution",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Person_Match_Found",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Product Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Login_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.First_Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Local_Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_WorklogDetails",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_UAAssignmentMethod",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Client Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Detailed_Decription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Unavailability_Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Reported Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Person ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Categorization Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Categorization Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.bOrphanedRoot",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Categorization Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.AppInstanceServer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Phone_Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Desk Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Default City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Vendor Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Internet E-mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Middle Initial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Product Category Tier1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Product Category Tier2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Product Category Tier3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Product Categorization Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Product Categorization Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Product Categorization Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_Internet_Email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.SRID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Direct Contact Person ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_ConfirmGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Site",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact State/Province",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.InstanceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Priority Weight",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.values.DataTags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status History",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.zTmpEventGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.mc_ueid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CommunicationSource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.first_name2",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.Component_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Required Resolution DateTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.InfrastructureEventType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Short Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_CIUASupportOrg",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_DC_CountryCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.HPD_CI_ReconID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Corporate ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Status_Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Location Details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Area Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Assigned Support Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.CI Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Zip/Postal Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Site",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Closure Manufacturer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Generic Categorization Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Create Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Schema Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Product Model/Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Incident_Entry_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Reported Source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.z1D_Area_Business",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Client Sensitivity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.values.Direct Contact Country Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.first_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.last_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.reported_source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.work_info_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.service_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.incident_id",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update ticket",
+            "description": "Update an existing incident",
+            "verbose": "This action can be used to assign an incident to a user. Use the <b>fields</b> parameter to set the <b>Status</b>, <b>Assignee Login ID</b> and <b>Assignee</b> values. For example: To assign an incident to the user <b>Mary</b> set the <b>fields</b> parameter to {\"Status\": \"Assigned\", \"Assignee Login ID\": \"Mary\", \"Assignee\": \"Mary Mann\"}<br>To add comment set <b>fields</b> parameter to {\"Work Log Type\": \"General Information\", \"Detailed Description\": \"Comment to add\"}.<br>The attachment should be placed in vault of the container from which the action will be executed, and it would appear in <b>Work Detail</b> section on BMC Remedy.<br>Typical (default installation) values for <b>work_info_type</b> are:<ul><li>Customer Inbound:<ul><li>Customer Communication</li><li>Customer Follow-up</li><li>Customer Status Update</li></ul></li><li>Customer Outbound<ul><li>Closure Follow Up</li><li>Detail Clarification</li><li>General Information</li><li>Resolution Communications</li><li>Satisfaction Survey</li><li>Status Update</li></ul></li><li>General<ul><li>Incident Task / Action</li><li>Problem Script</li><li>Working Log</li><li>Email System</li><li>Paging System</li><li>BMC Impact Manager Update</li><li>Chat</li></ul></li><li>Vendor<ul><li>Vendor Communication</li></ul></li></ul>",
+            "type": "generic",
+            "identifier": "update_ticket",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ],
+                    "primary": true,
+                    "order": 0
+                },
+                "work_info_type": {
+                    "description": "Work Info Type",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "fields": {
+                    "description": "Fields (JSON format)",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "vault_id": {
+                    "contains": [
+                        "vault id"
+                    ],
+                    "description": "Comma (',') separated vault ID (maximum 3)",
+                    "data_type": "string",
+                    "allow_list": true,
+                    "order": 3
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Incident Details"
+            },
+            "output": [
+                {
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Incident ID",
+                    "column_order": 0,
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.work_info_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ticket",
+            "description": "Get incident information",
+            "type": "generic",
+            "identifier": "get_ticket",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "bmcremedy incident id"
+                    ],
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "title": "Get Ticket",
+                "view": "bmcremedy_view.display_ticket_details"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Detailed Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Disable Worklog Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char15",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Multi-language",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.WorkLog Action Completed",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Status History",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Permission Group List",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Submit Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Submit Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_PrefixHolder",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Lastcount02",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Permission Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.AttachmentSourceGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Submitter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Support Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G_HelpDeskIDPrefix",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assignment Log Created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Mobile Worklog Upd2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char12",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char13",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char10",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char11",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char16",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char14",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Group Shift Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.AttachmentSourceFormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.URL02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.SR_Instanceid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.URL03",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Previous Operation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.URL01",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Total Time Spent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Last Date Duration Calc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Work Log ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Enable German",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned To",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char03",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char05",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char04",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char07",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char06",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char09",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char08",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Close Dialog",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Char01",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assignee Login ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Communication Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D QuickViewWlg Flag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Last Modified By",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Status-INC",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.ClientLocale",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Enable Spanish",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_FileNameAttach3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_FileNameAttach2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Number of URLs",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.View Access",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_PrefixResult",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Group Shift ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Enable User Defined 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Enable User Defined 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G Enable French",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assign WorkLog Flag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer03",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Submitter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Last Modified Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G InitComplete",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Lastcount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Vendor Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.WorkLog Action Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Support Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Page Indicator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Vendor Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer04",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer02",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Incident Number",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer01",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.HPD Attachment ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_AttachedFileName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_ConfirmGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.InstanceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Number of Attachments",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_WorkInfo_NotesLabel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.DataTags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.zTmpEventGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Action02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Shifts Flag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Short Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D Work Log ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1D_WorkInfo_FileDefaultMsg",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Incident Entry ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Communication Source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.Secure Work Log",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z1G_Use_Custom_Prefix",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log01.sizeBytes",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log01.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log01.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log02.sizeBytes",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log02.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log02.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log03.sizeBytes",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log03.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log03.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details.entries.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.work_details._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Detailed Decription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.LastWIPDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.root_incident_id_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Phone Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.policy_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRAttachment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRAttachment.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRAttachment.sizeBytes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRAttachment.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Region",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRMSAOIGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.FirstWIPDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Total Transfers",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Department",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_View_Access",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Local Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Chat Session ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.use_case",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Auto Open Session",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.PortNumber",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.MaxRetries",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D Permission Group List",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Responded Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Submit Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.ServiceCI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Internet E-mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Incident Number",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Site ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.policy_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Mail Station",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D Permission Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Region",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AttachmentSourceGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Site Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Activity_Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.KMSGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact First Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Modified Chat Session ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.root_component_id_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.cell_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Char02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Service Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.VIP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Time Zone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Desk Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRInstanceID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Impact",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Support Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AppPassword",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Group Shift Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.HPD_CI_FormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AttachmentSourceFormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Resolution Method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AppLogin",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Site Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Last Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Created_By",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.State Province",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Zip/Postal Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_InterfaceAction",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Product Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_CreatedFromBackEndSynchWI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last _Assigned_Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D Char01",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D Char02",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Request ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z2AF_Act_Attachment_1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assignee Login ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Customer Login ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Secure_Log",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Command",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Site ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Urgency",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Modified By",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Location Details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_AssociationDescription",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.HPD_CI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closed Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Group ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AppInterfaceForm",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.ClientLocale",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Middle Initial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Group Shift ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact State/Province",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_Summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Contact Client Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Estimated Resolution Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Resolution Category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.status_reason2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Area Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Internet E-mail",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.ServiceCI_ReconID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Mail Station",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status_Reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Impact_OR_Root",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.status_incident",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.TemplateID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRMS Registry Instance ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Contact Sensitivity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Manufacturer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_WorkInfoSubmitter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Contact Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_CI_FormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AccessMode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Resolution Category Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Resolution Category Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Ticket Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Submitter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Modified Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Resolution",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Product Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_WorklogDetails",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Product Category Tier1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_FormName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Person ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Reported Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Entry ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Support Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Categorization Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Categorization Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.bOrphanedRoot",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Categorization Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.AppInstanceServer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Phone Number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Desk Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Vendor Assignee Groups_parent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Person ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Middle Initial",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.First Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Product Category Tier2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Product Category Tier3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Product Categorization Tier 3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Product Categorization Tier 2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Product Categorization Tier 1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.SRID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_ConfirmGroup",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Site",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Product Model/Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.TimeOfEvent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.InstanceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Number of Attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Acknowledged Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Priority Weight",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_ActivityDate_tab",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assignee Groups",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.zTmpEventGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.mc_ueid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_CommunicationSource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Component_ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Required Resolution DateTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.InfrastructureEventType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.HPD_CI_ReconID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Corporate ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Login ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Resolved Date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Zip/Postal Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Site",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Closure Manufacturer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Street",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Product Model/Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Reported Source",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.z1D_SR_Instanceid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Direct Contact Country Code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.New.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.New.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Assigned.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Assigned.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.In Progress.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.In Progress.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Pending.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Pending.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Resolved.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Resolved.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Closed.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Closed.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Cancelled.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status History.Cancelled.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ticket_availability",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list tickets",
+            "description": "Get list of incidents",
+            "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+in+the+advanced+search+bar\">Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+and+wildcard+symbols+in+a+search#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\">Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+the+advanced+search+bar\">Query Syntax link</a>.</p>",
+            "type": "generic",
+            "identifier": "list_tickets",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Additional parameters to query",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "limit": {
+                    "description": "Maximum number of incidents to return",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "title": "List Tickets",
+                "view": "bmcremedy_view.display_tickets"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Incident Number",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Last Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy last name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.First Name",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.values.Assigned Group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.self.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._links.next.*.href",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_tickets",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set status",
+            "description": "Set incident status",
+            "verbose": "Typical (default installation) values for <b>status</b> are:<ul><li>New</li><li>Assigned</li><li>In Progress</li><li>Pending</li><li>Resolved</li><li>Closed</li><li>Cancelled</li></ul>Typical (default installation) values of <b>status_reason</b> for a given <b>status</b> are:<ul><li>Pending<ul><li>Automated Resolution Reported</li><li>Client Action Required</li><li>Client Hold</li><li>Future Enhancement</li><li>Infrastructure Change</li><li>Local Site Action Required</li><li>Monitoring Incident</li><li>Purchase Order Approval</li><li>Registration Approval</li><li>Request</li><li>Supplier Delivery</li><li>Support Contact Hold</li><li>Third Party Vendor Action Reqd</li></ul></li><li>Resolved<ul><li>Automated Resolution Reported</li><li>Customer Follow-Up Required</li><li>Future Enhancement</li><li>Monitoring Incident</li><li>No Further Action Required</li><li>Temporary Corrective Action</li></ul></li><li>Closed<ul><li>Automated Resolution Reported</li><li>Infrastructure Change Created</li></ul></li><li>Cancelled<ul><li>No longer a Causal CI</li></ul></li></ul>",
+            "type": "generic",
+            "identifier": "set_status",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                "status": {
+                    "required": true,
+                    "description": "Status",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "assignee_login_id": {
+                    "description": "Login ID of assignee",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "assignee": {
+                    "description": "Assignee",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "assigned_support_company": {
+                    "description": "Assigned Support Company",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "assigned_support_organization": {
+                    "description": "Assigned Support Organization",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "assigned_group": {
+                    "description": "Assigned Group",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "status_reason": {
+                    "description": "Status Reason",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "resolution": {
+                    "description": "Resolution",
+                    "data_type": "string",
+                    "order": 8
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Ticket Details"
+            },
+            "output": [
+                {
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Incident ID",
+                    "column_order": 0,
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignee_login_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assignee",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_support_company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_support_organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_group",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status_reason",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.resolution",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add comment",
+            "description": "Add work log information to the incident",
+            "verbose": "Typical (default installation) values for <b>work_info_type</b> are:<ul><li>Customer Inbound:<ul><li>Customer Communication</li><li>Customer Follow-up</li><li>Customer Status Update</li></ul></li><li>Customer Outbound<ul><li>Closure Follow Up</li><li>Detail Clarification</li><li>General Information</li><li>Resolution Communications</li><li>Satisfaction Survey</li><li>Status Update</li></ul></li><li>General<ul><li>Incident Task / Action</li><li>Problem Script</li><li>Working Log</li><li>Email System</li><li>Paging System</li><li>BMC Impact Manager Update</li><li>Chat</li></ul></li><li>Vendor<ul><li>Vendor Communication</li></ul></li></ul>Typical (default installation) values for <b>secure_work_log</b> are:<ul><li>Yes</li><li>No</li></ul>Typical (default installation) values for <b>view_access</b> are:<ul><li>Internal</li><li>Public</li></ul>",
+            "type": "generic",
+            "identifier": "add_comment",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "primary": true,
+                    "description": "Incident ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                "work_info_type": {
+                    "required": true,
+                    "description": "Work Info Type",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Notes",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "secure_work_log": {
+                    "description": "Locked",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "view_access": {
+                    "description": "View Access",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Work Detail"
+            },
+            "output": [
+                {
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "column_name": "Incident ID",
+                    "column_order": 0,
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "bmcremedy incident id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.work_info_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.secure_work_log",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.view_access",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}

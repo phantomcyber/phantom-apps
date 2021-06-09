@@ -1,0 +1,179 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: bmcremedy_display_ticket_details.html
+  Copyright (c) 2017-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+
+    a:hover {
+        text-decoration:underline;
+    }
+
+
+    .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+    }
+
+    .wf-table-vertical td{
+    padding: 8px 10px;
+    border: 1px solid;
+    }
+
+    .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+    }
+
+    .wf-table-horizontal {
+        width: initial;
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .wf-h3-style {
+        font-size : 20px
+    }
+
+    .wf-h4-style {
+        font-size : 16px
+    }
+
+    .wf-h5-style {
+        font-size : 12px
+    }
+
+</style>
+<div style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+    {% for result in results %} <!-- loop for each result -->
+        <br>
+
+        <!------------------- For each Result ---------------------->
+        {% if not result.data.incident_details %}
+            <h4 class="wf-h4-style">No ticket found</h4>
+
+        {% else %}
+            <h4 class="wf-h4-style">Incident ID: <a href="javascript:;" onclick="context_menu(this, [{'contains': ['bmcremedy incident id'], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
+                                    {{ result.param.id }}
+                                    &nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a></h4>
+            <br>
+            <h5 class="wf-h5-style">Incident Details</h5>
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Summary</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Assignee Group</th>
+                        <th>Assignee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for current_entry in result.data.incident_details %}
+                        <tr>
+                            <td>
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['bmcremedy first name'], 'value': '{{current_entry.values|by_key:'First Name'}}' }], 0, {{ container.id }}, null, false);">
+                                    {{current_entry.values|by_key:'First Name'}}
+                                    &nbsp;&nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td>
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['bmcremedy last name'], 'value': '{{current_entry.values|by_key:'Last Name'}}' }], 0, {{ container.id }}, null, false);">
+                                    {{current_entry.values|by_key:'Last Name'}}
+                                    &nbsp;&nbsp;
+                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                            </td>
+                            <td>{{current_entry.values.Description}}</td>
+                            <td>{{current_entry.values.Status}}</td>
+                            <td>{{current_entry.values.Priority}}</td>
+                            <td>{{current_entry.values|by_key:"Assigned Group"}}</td>
+                            <td>{{current_entry.values.Assignee}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <h5 class="wf-h5-style">Work Detail</h5>
+            {% if not result.data.work_details %}
+                <h5 class="wf-h5-style">No comments added</h5>
+            {% else %}
+                <table class="wf-table-horizontal datatable">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Notes</th>
+                            <th>Files</th>
+                            <th>Submit Date</th>
+                            <th>Submitter</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for current_entry in result.data.work_details %}
+                            <tr>
+                                <td>{{current_entry.values|by_key:'Work Log Type'}}</td>
+                                <td>{{current_entry.values|by_key:'Detailed Description'}}</td>
+                                <td>{{current_entry.values|by_key:'Number of Attachments'}}</td>
+                                <td>{{current_entry.values|by_key:'Submit Date'}}</td>
+                                <td>{{current_entry.values.Submitter}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+            <br>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "searching": false,
+        "bLengthChange": false,
+        "language": {
+            "paginate": {
+                "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+                "next": "<i class='fa fa-angle-right fa-lg'></i>"
+            }
+        },
+        "dom": '<"top">rt<"bottom"p><"clear">',
+        drawCallback: function(settings) {
+            var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+            pagination.toggle(this.api().page.info().pages > 1);
+        }
+    });
+    $.fn.DataTable.ext.pager.numbers_length = 5;
+    $('.datatable').DataTable();
+</script>
+{% endblock %} <!-- Main Start Block -->
