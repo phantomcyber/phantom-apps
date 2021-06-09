@@ -9119,21 +9119,21 @@
                     "data_path": "action_result.summary.total_reports",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        1
                     ]
                 },
                 {
                     "data_path": "action_result.summary.verdict",
                     "data_type": "string",
                     "example_values": [
-                        "malicious"
+                        "suspicious"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Verdict: no verdict, Total reports: 1",
+                        "Verdict: suspicious, Total reports: 1",
                         "Total reports: 6"
                     ]
                 },
@@ -10204,7 +10204,10 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Verdict: no specific threat, Total reports: 1"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
