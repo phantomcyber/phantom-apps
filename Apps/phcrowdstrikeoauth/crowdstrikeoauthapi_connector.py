@@ -374,6 +374,31 @@ class CrowdstrikeConnector(BaseConnector):
 
         return list_ids
 
+    def _hunt_paginator(self, action_result, endpoint, params):
+        list_ids = list()
+
+        offset = ''
+        while True:
+            params.update({"offset": offset})
+
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+            if phantom.is_fail(ret_val):
+                return None
+
+            offset = response.get('meta', {}).get('pagination', {}).get('offset')
+
+            if len(response.get('errors', [])):
+                error = response.get('errors')[0]
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                return None
+
+            if response.get("resources"):
+                list_ids.extend(response.get("resources"))
+
+            if (not offset) and (not response.get('meta', {}).get("pagination", {}).get("next_page")):
+                return list_ids
+
     def _test_connectivity_oauth2(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -431,29 +456,6 @@ class CrowdstrikeConnector(BaseConnector):
 
         return list_ids_details
 
-    def _get_device_count(self, params, action_result):
-
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH, params=params)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        try:
-            resources = response['resources']
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to parse response {}".format(self._get_error_message_from_exception(e)))
-
-        if not resources:
-            action_result.update_summary({'device_count': 0})
-            return action_result.set_status(phantom.APP_SUCCESS)
-
-        result = resources[0]
-
-        # successful request
-        action_result.update_summary({'device_count': result.get('device_count', 0)})
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def _get_devices_ran_on(self, ioc, ioc_type, param, action_result):
 
         api_data = {
@@ -463,18 +465,19 @@ class CrowdstrikeConnector(BaseConnector):
 
         count_only = param.get(CROWDSTRIKE_JSON_COUNT_ONLY, False)
 
-        if count_only:
-            return self._get_device_count(api_data, action_result)
+        response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
-
-        if phantom.is_fail(ret_val):
+        if response is None:
             return action_result.get_status()
 
+        if count_only:
+            action_result.update_summary({'device_count': len(response)})
+            return action_result.set_status(phantom.APP_SUCCESS)
+
         # successful request / "none found"
-        for d in response["resources"]:
+        for d in response:
             action_result.add_data({"device_id": d})
-        action_result.set_summary({"device_count": len(response["resources"])})
+        action_result.set_summary({"device_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1939,19 +1942,18 @@ class CrowdstrikeConnector(BaseConnector):
             "device_id": fdid
         }
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
+        response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
 
-        if phantom.is_fail(ret_val):
+        if response is None:
             return action_result.get_status()
 
-        resources = response.get("resources", [])
-        if not resources:
+        if not response:
             return action_result.set_status(phantom.APP_SUCCESS, "No resources found from the response for the list processes action")
 
-        for p in resources:
+        for p in response:
             action_result.add_data({"falcon_process_id": p})
 
-        action_result.set_summary({"process_count": len(resources)})
+        action_result.set_summary({"process_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
