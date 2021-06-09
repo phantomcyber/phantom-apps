@@ -323,7 +323,6 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            
             # Always set the very first artifact to run_automation = True to never have duplicate conflicts
             if len_artifacts >= 1:
                 artifacts[0]['run_automation'] = True
