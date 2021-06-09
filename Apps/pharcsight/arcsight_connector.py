@@ -340,7 +340,10 @@ class ArcsightConnector(BaseConnector):
         # parse the response and get the ids of all the cases
         self.debug_print(resp)
 
-        events_details = resp.get('sev.getSecurityEventsResponse', {}).get('sev.return', {})
+        try:
+            events_details = resp.get('sev.getSecurityEventsResponse', {}).get('sev.return', {})
+        except:
+            events_details = {}
 
         return phantom.APP_SUCCESS, events_details
 
@@ -357,7 +360,10 @@ class ArcsightConnector(BaseConnector):
 
         # parse the response and get the ids of all the cases
         self.debug_print(resp)
-        case_details = resp.get('cas.getResourceByIdResponse', {}).get('cas.return', {})
+        try:
+            case_details = resp.get('cas.getResourceByIdResponse', {}).get('cas.return', {})
+        except:
+            case_details = {}
 
         return phantom.APP_SUCCESS, case_details
 
@@ -375,7 +381,10 @@ class ArcsightConnector(BaseConnector):
         # parse the response and get the ids of all the cases
         self.debug_print(resp)
 
-        case_ids = resp.get('cas.findAllIdsResponse', {}).get('cas.return', [])
+        try:
+            case_ids = resp.get('cas.findAllIdsResponse', {}).get('cas.return', [])
+        except:
+            case_ids = []
 
         if not isinstance(case_ids, (list, tuple)):
             case_ids = [case_ids]
@@ -445,7 +454,7 @@ class ArcsightConnector(BaseConnector):
                 cef['destinationPort'] = _to_port(destination.get('port'))
                 cef['destinationHostName'] = destination.get('hostName')
 
-            cef = {k: v for k, v in cef.iteritems() if v}
+            cef = {k: v for k, v in list(cef.items()) if v}
 
             if not cef:
                 continue
@@ -595,7 +604,10 @@ class ArcsightConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return phantom.APP_ERROR, {}
 
-        group_details = resp.get('gro.getGroupByURIResponse', {}).get('gro.return', {})
+        try:
+            group_details = resp.get('gro.getGroupByURIResponse', {}).get('gro.return', {})
+        except:
+            group_details = {}
 
         return phantom.APP_SUCCESS, group_details
 
@@ -698,7 +710,10 @@ class ArcsightConnector(BaseConnector):
 
         summary['case_created'] = True
 
-        case_details = resp.get('cas.insertResourceResponse', {}).get('cas.return', {})
+        try:
+            case_details = resp.get('cas.insertResourceResponse', {}).get('cas.return', {})
+        except:
+            case_details = {}
 
         case_id = case_details.get('resourceid')
 
@@ -753,7 +768,10 @@ class ArcsightConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return phantom.APP_ERROR, {}
 
-        case_details = resp.get('cas.updateResponse', {}).get('cas.return', {})
+        try:
+            case_details = resp.get('cas.updateResponse', {}).get('cas.return', {})
+        except:
+            case_details = {}
 
         action_result.add_data(case_details)
 
@@ -825,11 +843,14 @@ class ArcsightConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return phantom.APP_ERROR, {}
 
-        search_result = resp.get('mss.searchResponse', {}).get('mss.return', {})
+        try:
+            search_result = resp.get('mss.searchResponse', {}).get('mss.return', {})
+        except:
+            search_result = {}
 
         search_hits = search_result.get('searchHits', [])
 
-        if type(search_hits) != list:
+        if not isinstance(search_hits, list):
             search_result['searchHits'] = [search_hits]
             # this variable is used downstream, so set it up again
             search_hits = search_result.get('searchHits', [])
