@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: code42_run_query.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -174,7 +174,7 @@
                         <tr>
                             <td>Private IP</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'],
                                     'value':'{{ result.param.private_ip }}' }], 0,
                                     {{ container.id }}, null, false);">
                                         {{ result.param.private_ip }}
@@ -188,7 +188,7 @@
                         <tr>
                             <td>Public IP</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'],
                                     'value':'{{ result.param.public_ip }}' }], 0,
                                     {{ container.id }}, null, false);">
                                         {{ result.param.public_ip }}
@@ -309,7 +309,7 @@
                                     </a>
                                 </td>
                                 <td class="widget-td">
-                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip', 'ipv6'],
                                     'value':'{{ event.publicIpAddress }}' }], 0,
                                     {{ container.id }}, null, false);">
                                         {{ event.publicIpAddress }}
@@ -321,7 +321,7 @@
                                     {% for item in event.privateIpAddresses %}
                                         <span class="glyphicon glyphicon-dot"></span>&nbsp;
                                         <a href="javascript:;"
-                                           onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ item }}' }], 0, {{ container.id }}, null, false);">
+                                           onclick="context_menu(this, [{'contains': ['ip', 'ipv6'], 'value': '{{ item }}' }], 0, {{ container.id }}, null, false);">
                                             {{ item }}
                                             &nbsp;
                                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
