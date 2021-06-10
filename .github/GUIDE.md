@@ -52,7 +52,8 @@
  
  1. The final step is to create a pull request from `your-username/phantom-apps:your-branch` into `phantomcyber/phantom-apps:next` for the Splunk>Phantom Engineering team to review your code changes and provide feedback
  1. In order for the Splunk>Phantom team to properly aid you in the PR process, please make sure to check the 'Allow edits and access to secrets by maintainers' box which is shown in the image below.
+ 1. Please ensure your pull request adheres to the guidelines mentioned in [PULL REQUEST TEMPLATE](https://github.com/phantomcyber/phantom-apps/blob/next/.github/pull_request_template.md).
  
 ![Edit Access](Images/maintainerEditCheckbox.png)
  ---
- 
+![PR Template](Images/pr_template.png)
