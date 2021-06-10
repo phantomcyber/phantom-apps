@@ -128,6 +128,12 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
                 </a>
             </td>
         </tr>
+        {% if result.param.limit %}
+        <tr>
+            <td><b>Limit</b></td>
+            <td>{{ result.param.limit }}</td>
+        </tr>
+        {% endif %}
         <tr>
             <td><b>Total Processes Found</b></td>
             <td>{{ result.summary.process_count }}</td>

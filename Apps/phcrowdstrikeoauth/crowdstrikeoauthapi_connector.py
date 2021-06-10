@@ -378,8 +378,13 @@ class CrowdstrikeConnector(BaseConnector):
         list_ids = list()
 
         offset = ''
+        limit = None
+        if params.get('limit'):
+            limit = params.pop('limit')
+
         while True:
             params.update({"offset": offset})
+            params.update({"limit": 100})
 
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
@@ -395,6 +400,9 @@ class CrowdstrikeConnector(BaseConnector):
 
             if response.get("resources"):
                 list_ids.extend(response.get("resources"))
+
+            if limit and len(list_ids) >= limit:
+                return list_ids[:limit]
 
             if (not offset) and (not response.get('meta', {}).get("pagination", {}).get("next_page")):
                 return list_ids
@@ -462,7 +470,10 @@ class CrowdstrikeConnector(BaseConnector):
             "type": ioc_type,
             "value": ioc
         }
-
+        limit = self._validate_integers(action_result, param.get('limit', 100), 'limit')
+        if limit is None:
+            return action_result.get_status()
+        api_data['limit'] = limit
         count_only = param.get(CROWDSTRIKE_JSON_COUNT_ONLY, False)
 
         response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
@@ -475,8 +486,8 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_SUCCESS)
 
         # successful request / "none found"
-        for d in response:
-            action_result.add_data({"device_id": d})
+        for device_id in response:
+            action_result.add_data({"device_id": device_id})
         action_result.set_summary({"device_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1936,10 +1947,15 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        limit = self._validate_integers(action_result, param.get('limit', 100), 'limit')
+        if limit is None:
+            return action_result.get_status()
+
         api_data = {
             "type": ioc_type,
             "value": ioc,
-            "device_id": fdid
+            "device_id": fdid,
+            "limit": limit
         }
 
         response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
@@ -1950,8 +1966,8 @@ class CrowdstrikeConnector(BaseConnector):
         if not response:
             return action_result.set_status(phantom.APP_SUCCESS, "No resources found from the response for the list processes action")
 
-        for p in response:
-            action_result.add_data({"falcon_process_id": p})
+        for process_id in response:
+            action_result.add_data({"falcon_process_id": process_id})
 
         action_result.set_summary({"process_count": len(response)})
 

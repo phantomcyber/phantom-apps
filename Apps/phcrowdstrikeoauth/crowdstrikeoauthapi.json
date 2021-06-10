@@ -6542,6 +6542,7 @@
         {
             "action": "hunt file",
             "description": "Hunt for a file on the network by querying for the hash",
+            "verbose": "In case of count_only set to true, keep the limit value larger to fetch count of all the devices.",
             "type": "investigate",
             "identifier": "hunt_file",
             "read_only": true,
@@ -6565,6 +6566,12 @@
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
+                },
+                "limit": {
+                    "description": "Maximum device IDs to be fetched (defaults to 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
                 }
             },
             "render": {
@@ -6600,6 +6607,13 @@
                     ],
                     "example_values": [
                         "eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf44t"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -6647,6 +6661,7 @@
         {
             "action": "hunt domain",
             "description": "Get a list of device IDs on which the domain was matched",
+            "verbose": "In case of count_only set to true, keep the limit value larger to fetch count of all the devices.",
             "type": "investigate",
             "identifier": "hunt_domain",
             "read_only": true,
@@ -6667,6 +6682,12 @@
                     "data_type": "boolean",
                     "default": false,
                     "order": 1
+                },
+                "limit": {
+                    "description": "Maximum device IDs to be fetched (defaults to 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
                 }
             },
             "render": {
@@ -6699,6 +6720,13 @@
                     ],
                     "example_values": [
                         "www.example.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -7570,7 +7598,7 @@
         {
             "action": "list processes",
             "description": "List processes that have recently used the IOC on a particular device",
-            "verbose": "Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>query device</b> actions to get the device id to run the action on.",
+            "verbose": "Given a file hash or domain, the action will list all the processes that have either recently connected to the domain or interacted with the file that matches the supplied hash. Use the <b>query device</b> actions to get the device id to run the action on.In case of count_only set to true, keep the limit value larger to fetch count of all the devices.",
             "type": "investigate",
             "identifier": "list_processes",
             "read_only": true,
@@ -7599,6 +7627,12 @@
                     "primary": true,
                     "required": true,
                     "order": 1
+                },
+                "limit": {
+                    "description": "Maximum processes to be fetched (defaults to 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
                 }
             },
             "render": {
@@ -7643,6 +7677,13 @@
                     ],
                     "example_values": [
                         "eeb27d04c5fb25f7459407c0e5394621f12100e301b22d04a6b8f78e2adbf33d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
