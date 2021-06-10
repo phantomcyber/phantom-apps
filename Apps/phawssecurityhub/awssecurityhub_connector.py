@@ -43,6 +43,12 @@ class AwsSecurityHubConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
     def initialize(self):
 
         self._state = self.load_state()
