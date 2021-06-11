@@ -6,7 +6,7 @@
 # Standard library imports
 import json
 import re
-import mimetools
+import email.generator
 import mimetypes
 import requests
 
@@ -49,11 +49,11 @@ def encode_multipart_form_data(fields):
     :return: encoded request body and content type
     """
 
-    boundary = '--{}'.format(mimetools.choose_boundary())
+    boundary = '--{}'.format(email.generator._make_boundary())
 
     body = ''
 
-    for key, value in fields.iteritems():
+    for key, value in fields.items():
         if isinstance(value, tuple):
             filename = value[0]
             content = value[1]
@@ -169,7 +169,7 @@ class BmcremedyConnector(BaseConnector):
             return action_result.get_status()
 
         # Saving the token to be used in subsequent actions
-        self._state['token'] = self._token = response_dict["content"]
+        self._state['token'] = self._token = response_dict["content"].decode("utf-8")
 
         return phantom.APP_SUCCESS
 
@@ -307,12 +307,13 @@ class BmcremedyConnector(BaseConnector):
                 return action_result.get_status(), response_data
 
         # Prepare request headers
-        headers = {'Content-Type': 'application/json', "Authorization": "AR-JWT {}".format(self._token)}
+        headers = {'Content-Type': 'application/json', "Authorization": f"AR-JWT {self._token}"}
 
         # Updating headers if Content-Type is 'multipart/formdata'
         if accept_headers:
             headers.update(accept_headers)
-
+        
+        self.debug_print(headers)
         # Make call
         rest_ret_code, response_data, response = self._make_rest_call(endpoint, intermediate_action_result, headers=headers,
                                                        params=params, data=data, method=method)
@@ -801,7 +802,7 @@ class BmcremedyConnector(BaseConnector):
         })
 
         # Adding optional parameters in 'fields'
-        for key_param, api_key in optional_parameters.iteritems():
+        for key_param, api_key in optional_parameters.items():
             if param.get(key_param) and api_key not in add_attachment_details_param:
                 add_attachment_details_param[str(api_key)] = str(param.get(key_param))
 
@@ -864,14 +865,14 @@ if __name__ == '__main__':
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = BmcremedyConnector()
         connector.print_progress_message = True
         return_value = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(return_value), indent=4)
+        print(json.dumps(json.loads(return_value), indent=4))
     exit(0)
