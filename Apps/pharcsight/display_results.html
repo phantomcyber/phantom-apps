@@ -85,17 +85,25 @@ File: display_results.html
     <tr>
       <td><b>Query</b></td>
       <td>
-        <a href="javascript:;"
-          onclick="context_menu(this, [{'contains': ['arcsight search string'], 'value': '{{ result.param.query }}' }], 0, {{ container.id }}, null, false);">
-          {{ result.param.query }}
-          &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-        </a>
+        {% if result.param.query %}
+          <a href="javascript:;"
+            onclick="context_menu(this, [{'contains': ['arcsight search string'], 'value': '{{ result.param.query }}' }], 0, {{ container.id }}, null, false);">
+            {{ result.param.query }}
+            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+        {% else %}
+          None
+        {% endif %}
       </td>
     </tr>
     <tr>
       <td><b>Type</b></td>
       <td>
-        {{ result.param.type }}
+        {% if result.param.type %}
+          {{ result.param.type }}
+        {% else %}
+          All
+        {% endif %}
       </td>
     </tr>
     {% if result.summary %}
