@@ -51,7 +51,8 @@
     "actions": [
         {
             "action": "test connectivity",
-            "description": "Validate the asset configuration for connectivity. This action runs a quick query on the server to check the connection and credentials",
+            "description": "Validate the asset configuration for connectivity",
+            "verbose": "This action runs a quick query on the server to check the connection and credentials.",
             "type": "test",
             "identifier": "test_asset_connectivity",
             "read_only": true,
@@ -72,7 +73,7 @@
                     "order": 0,
                     "description": "Group",
                     "primary": true,
-                    "default": "All Cases/All Cases",
+                    "default": "/All Cases/All Cases",
                     "contains": [
                         "arcsight group"
                     ]
@@ -93,13 +94,19 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test case name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.parent_group",
                     "data_type": "string",
                     "contains": [
                         "arcsight group"
+                    ],
+                    "example_values": [
+                        "/All Cases/All Cases"
                     ]
                 },
                 {
@@ -411,11 +418,17 @@
                         "arcsight case id"
                     ],
                     "column_order": 1,
-                    "column_name": "ID"
+                    "column_name": "ID",
+                    "example_values": [
+                        "7Vvj0W1UBABCbNut33qjiZw=="
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.update_fields",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"externalID\": \"INC1231413\"}"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.URI",
@@ -794,7 +807,10 @@
                         "arcsight case id"
                     ],
                     "column_order": 1,
-                    "column_name": "ID"
+                    "column_name": "ID",
+                    "example_values": [
+                        "7Vvj0W1UBABCbNut33qjiZw=="
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.URI",
@@ -1211,15 +1227,24 @@
                     "data_type": "string",
                     "contains": [
                         "arcsight search string"
+                    ],
+                    "example_values": [
+                        "foo bar"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.range",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "0-10"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.type",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "ActiveChannel"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.elapsed",

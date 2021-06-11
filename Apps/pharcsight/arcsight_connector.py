@@ -101,12 +101,23 @@ def _get_str_from_epoch(epoch_milli):
 def _parse_error(response):
 
     pres = None
+    description = None
     try:
         soup = BeautifulSoup(response.text, "html.parser")
         pres = soup.findAll('pre')
         error_text = '\r\n'.join([str(x) for x in pres])
     except:
         error_text = "Cannot parse error details"
+
+    # Try to parse description
+    try:
+        for paragraph in soup.find_all('p'):
+            description_tag = paragraph.find_all('b')
+            if description_tag and description_tag[0].text == 'description':
+                description = paragraph.find_all('u')[0].text
+                break
+    except:
+        pass
 
     # Try to parse some more
     try:
@@ -115,8 +126,12 @@ def _parse_error(response):
     except:
         pass
 
-    if error_text:
-        message = f'API failed. Status Code: {response.status_code}. Message: {error_text}'
+    if error_text and description:
+        message = f'API failed. Status Code: {response.status_code}. Error Description: {description} Error Details: {error_text}'
+    elif error_text:
+        message = f'API failed. Status Code: {response.status_code}. Error Details: {error_text}'
+    elif description:
+        message = f'API failed. Status Code: {response.status_code}. Error Description: {description}'
     else:
         message = f'API failed. Status Code: {response.status_code}'
 
@@ -300,7 +315,7 @@ class ArcsightConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print(f"Unable to parse response dict. {error_msg}")
             self.save_progress(ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY)
-            return action_result.set_status(phantom.APP_ERROR, f"{ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY}. {error_msg}"), None
+            return action_result.set_status(phantom.APP_ERROR, ARCSIGHT_ERR_UNABLE_TO_PARSE_REPLY), None
 
         return phantom.APP_SUCCESS, response_dict
 
