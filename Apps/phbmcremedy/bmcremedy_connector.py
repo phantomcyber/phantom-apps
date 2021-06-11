@@ -312,7 +312,7 @@ class BmcremedyConnector(BaseConnector):
         # Updating headers if Content-Type is 'multipart/formdata'
         if accept_headers:
             headers.update(accept_headers)
-        
+
         self.debug_print(headers)
         # Make call
         rest_ret_code, response_data, response = self._make_rest_call(endpoint, intermediate_action_result, headers=headers,
@@ -734,10 +734,10 @@ class BmcremedyConnector(BaseConnector):
 
         # Getting optional parameter
         if param.get("assignee_login_id"):
-            fields_param["Assignee Login ID"] = param["assignee_login_id"]
+            fields_param["Assignee Login ID"] = param.get("assignee_login_id")
 
         if param.get("status_reason"):
-            fields_param["Status_Reason"] = param["status_reason"]
+            fields_param["Status_Reason"] = param.get("status_reason")
 
         optional_parameter_list = ["assigned_support_company", "assigned_support_organization", "assigned_group",
                                    "assignee", "resolution"]
