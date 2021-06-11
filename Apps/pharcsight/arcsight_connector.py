@@ -133,7 +133,21 @@ def _parse_error(response):
     elif description:
         message = f'API failed. Status Code: {response.status_code}. Error Description: {description}'
     else:
-        message = f'API failed. Status Code: {response.status_code}'
+        try:
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
+            split_lines = error_text.split('\n')
+            split_lines = [x.strip() for x in split_lines if x.strip()]
+            error_text = '\n'.join(split_lines)
+        except:
+            error_text = "Cannot parse error details"
+
+        if not error_text:
+            error_text = "Empty response and no information received"
+        message = f"API failed. Status Code: {response.status_code}. Error Details: {error_text}"
+        message = message.replace('{', '{{').replace('}', '}}')
 
     return message
 
@@ -293,14 +307,14 @@ class ArcsightConnector(BaseConnector):
 
         except requests.exceptions.ConnectionError as e:
             self.debug_print(self._get_error_message_from_exception(e))
-            error_message = "Error connecting to server. Connection refused from server"
+            error_message = f"Error connecting to server. Connection refused from server for {url}"
             return action_result.set_status(phantom.APP_ERROR, error_message), None
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print(f"REST call Failed: {error_msg}")
             return action_result.set_status(phantom.APP_ERROR, f"{ARCSIGHT_ERR_SERVER_CONNECTION}. {error_msg}"), None
 
-        if response.status_code != requests.codes.ok:  # pylint: disable=E1101
+        if (response.status_code != requests.codes.ok) or ('html' in response.headers.get('Content-Type', '')):  # pylint: disable=E1101
             message = _parse_error(response)
             self.debug_print(message)
             return action_result.set_status(phantom.APP_ERROR, message), None

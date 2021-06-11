@@ -112,12 +112,14 @@ File: display_results.html
       </td>
     </tr>
     {% endif %}
+    {% if result.data %}
     <tr>
       <td><b>Internal Query String</b></td>
       <td>
         {{ result.data.rewrittenQueryString }}
       </td>
     </tr>
+    {% endif %}
   </table>
   <br>
 
