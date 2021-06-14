@@ -96,16 +96,14 @@ File: display_results.html
         {% endif %}
       </td>
     </tr>
+    {% if result.param.type %}
     <tr>
       <td><b>Type</b></td>
       <td>
-        {% if result.param.type %}
           {{ result.param.type }}
-        {% else %}
-          All
-        {% endif %}
       </td>
     </tr>
+    {% endif %}
     {% if result.summary %}
     <tr>
       <td><b>Total Items</b></td>
