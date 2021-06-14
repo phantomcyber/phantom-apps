@@ -107,7 +107,7 @@ class AwsWafConnector(BaseConnector):
 
         # Try getting and using temporary assume role credentials from parameters
         temp_credentials = dict()
-        if param and credentials in param:
+        if param and 'credentials' in param:
             try:
                 temp_credentials = ast.literal_eval(param['credentials'])
                 self._access_key = temp_credentials.get('AccessKeyId', '')
