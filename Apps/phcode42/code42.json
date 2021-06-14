@@ -12,7 +12,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
     "app_version": "2.0.0",
-    "utctime_updated": "2018-09-14T17:35:56.000000Z",
+    "utctime_updated": "2021-06-14T09:55:35.000000Z",
     "package_name": "phantom_code42",
     "main_module": "code42_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -2907,7 +2907,7 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "example_values":[
+                    "example_values": [
                         "Device with ID 369425 unlocked successfully"
                     ]
                 },
