@@ -1,21 +1,25 @@
-    {
+{
     "appid": "59bb6cc4-6ae0-4bee-827c-5397a0f99cec",
     "name": "Code42",
-    "description": "This app integrates with Code42 to execute various investigate, correct, and containment actions",
+    "description": "This app integrates with Code42 to execute various investigate, correct, generic, and containment actions",
     "type": "endpoint",
     "product_vendor": "Code42",
     "logo": "logo_code42.svg",
     "logo_dark": "logo_code42_dark.svg",
     "product_name": "Code42",
+    "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2020 Splunk Inc.",
-    "app_version": "1.0.24",
-    "utctime_updated": "2018-09-14T17:35:56.000000Z",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-06-14T09:55:35.000000Z",
     "package_name": "phantom_code42",
-    "main_module": "code42_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "main_module": "code42_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
+    "latest_tested_versions": [
+        "Cloud endpoint, v8.6.0.1059"
+    ],
     "configuration": {
         "server_url": {
             "description": "Server URL (e.g. https://example.code42.com)",
@@ -44,9 +48,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -54,20 +58,12 @@
         },
         {
             "action": "list users",
-            "identifier": "list_users",
             "description": "List all users",
             "type": "investigate",
+            "identifier": "list_users",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.active",
                     "data_type": "boolean",
@@ -161,13 +157,16 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "This is notes"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2324
                     ],
                     "contains": [
                         "code42 org id"
@@ -231,7 +230,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -250,7 +249,7 @@
                     "data_path": "action_result.data.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "ph_test"
+                        "phtest@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -267,10 +266,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_users",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        4
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -278,6 +278,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total users: 4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
                     ]
                 },
                 {
@@ -302,9 +309,9 @@
         },
         {
             "action": "unblock device",
-            "identifier": "unblock_device",
             "description": "Unblock a device",
             "type": "correct",
+            "identifier": "unblock_device",
             "undo": "block device",
             "read_only": false,
             "parameters": {
@@ -321,6 +328,22 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        369425
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -331,33 +354,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "code42 device id"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 0,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        5
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                        "Device with ID 369425 unblocked successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Device with ID 5 unblocked successfully"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -381,11 +388,11 @@
         },
         {
             "action": "block device",
-            "identifier": "block_device",
             "description": "Block a device",
             "type": "contain",
-            "read_only": false,
+            "identifier": "block_device",
             "undo": "unblock device",
+            "read_only": false,
             "parameters": {
                 "device_id": {
                     "description": "ID of the device to block",
@@ -400,6 +407,22 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "example_values": [
+                        369425
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -410,33 +433,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "code42 device id"
-                    ],
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        13
+                        "Device with ID 369425 blocked successfully"
                     ],
-                    "column_name": "Device ID",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "column_order": 2,
+                    "column_name": "Message"
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Device with ID 13 blocked successfully"
-                    ],
-                    "column_order": 2,
-                    "column_name": "Message"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -460,9 +467,9 @@
         },
         {
             "action": "deactivate device",
-            "identifier": "deactivate_device",
             "description": "Deactivate a device",
             "type": "contain",
+            "identifier": "deactivate_device",
             "undo": "activate device",
             "read_only": false,
             "parameters": {
@@ -479,6 +486,22 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        369425
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -489,33 +512,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "code42 device id"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 0,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        5
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                        "Device with ID 369425 deactivated successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Device with ID 5 deactivated successfully"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -539,9 +546,9 @@
         },
         {
             "action": "activate device",
-            "identifier": "activate_device",
             "description": "Activate a device",
             "type": "correct",
+            "identifier": "activate_device",
             "undo": "deactivate device",
             "read_only": false,
             "parameters": {
@@ -558,6 +565,22 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        369425
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -568,33 +591,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "code42 device id"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 0,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        5
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                        "Device with ID 369425 activated successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Device with ID 5 activated successfully"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -618,9 +625,10 @@
         },
         {
             "action": "deauthorize device",
-            "identifier": "deauthorize_device",
             "description": "Deauthorize a device",
+            "verbose": "The current user is signed out of the Code42 app. The Code42 service stops backing up, and users cannot access the Code42 app to restore data or change settings without signing in again.",
             "type": "contain",
+            "identifier": "deauthorize_device",
             "read_only": false,
             "parameters": {
                 "device_id": {
@@ -636,6 +644,22 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "code42 device id"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0,
+                    "example_values": [
+                        369425
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -646,33 +670,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "code42 device id"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 0,
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        5
-                    ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                        "Device with ID 369425 deauthorized successfully"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Device with ID 5 deauthorized successfully"
-                    ],
-                    "column_name": "Message",
-                    "column_order": 2
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -696,11 +704,12 @@
         },
         {
             "action": "activate user",
-            "identifier": "activate_user",
             "description": "Activate a user",
+            "verbose": "For the 'unblock_user' true value the user status will be changed to 'Activated' and 'Unblocked' and for the false value, the user status will only be changed to 'Activated'. <b>Note:</b> If the user is already active then it will ignore the 'unblock_user' parameter.",
             "type": "correct",
-            "read_only": false,
+            "identifier": "activate_user",
             "undo": "deactivate user",
+            "read_only": false,
             "parameters": {
                 "user": {
                     "description": "ID or Username of the user to activate",
@@ -722,16 +731,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.parameter.unblock_user",
                     "data_type": "boolean",
                     "column_name": "Unblock User",
@@ -751,7 +750,8 @@
                     "column_name": "User",
                     "column_order": 0,
                     "example_values": [
-                        "13"
+                        "test@gmail.com",
+                        "234323"
                     ]
                 },
                 {
@@ -759,15 +759,25 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 activated successfully"
+                        "User with ID 234323 activated successfully"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -791,11 +801,12 @@
         },
         {
             "action": "deactivate user",
-            "identifier": "deactivate_user",
             "description": "Deactivate a user",
+            "verbose": "For the 'block_user' true value the user status will be changed to 'Deactivated' and 'Blocked' and for the false value, the user status will only be changed to 'Deactivated'. <b>Note:</b> If the user is already deactive then it will ignore the 'block_user' parameter.",
             "type": "contain",
-            "read_only": false,
+            "identifier": "deactivate_user",
             "undo": "activate user",
+            "read_only": false,
             "parameters": {
                 "user": {
                     "description": "ID or Username of the user to deactivate",
@@ -817,16 +828,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.parameter.block_user",
                     "data_type": "boolean",
                     "column_name": "Block User",
@@ -844,7 +845,8 @@
                         "user name"
                     ],
                     "example_values": [
-                        "3"
+                        "test@gmail.com",
+                        "234321"
                     ],
                     "column_name": "User",
                     "column_order": 0
@@ -854,15 +856,25 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 deactivated successfully"
+                        "User with ID 234321 deactivated successfully"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -886,18 +898,20 @@
         },
         {
             "action": "list devices",
-            "identifier": "list_devices",
             "description": "List all devices",
             "type": "investigate",
+            "identifier": "list_devices",
             "read_only": true,
             "parameters": {},
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.osHostname",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "WIN-K9L52G75BKV"
+                    ],
+                    "contains": [
+                        "host name"
                     ]
                 },
                 {
@@ -1029,7 +1043,7 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1074,7 +1088,7 @@
                     "data_path": "action_result.data.*.parentComputerId",
                     "data_type": "numeric",
                     "example_values": [
-                        12
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -1131,7 +1145,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -1152,10 +1166,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_devices",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1163,6 +1178,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total devices: 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -1187,9 +1209,10 @@
         },
         {
             "action": "change organization",
-            "identifier": "change_organization",
             "description": "Move a user to a specific organization",
+            "verbose": "<b>Note:</b> For the similar value of organization ID and name, organization ID will be considered upon name value. For instance, if the ID is 8062 and the organization name is also 8062 then action will be executed upon ID value.",
             "type": "generic",
+            "identifier": "change_organization",
             "read_only": false,
             "parameters": {
                 "organization": {
@@ -1217,16 +1240,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.parameter.organization",
                     "data_type": "string",
                     "column_name": "Organization",
@@ -1247,7 +1260,8 @@
                         "user name"
                     ],
                     "example_values": [
-                        "3"
+                        "test@gmail.com",
+                        "234323"
                     ],
                     "column_name": "User",
                     "column_order": 0
@@ -1257,15 +1271,25 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "User with ID 5 moved to organization with ID 3 successfully"
+                        "User with ID 5 moved to organization with ID 234323 successfully"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1289,20 +1313,12 @@
         },
         {
             "action": "list organizations",
-            "identifier": "list_organizations",
             "description": "List all organizations",
             "type": "investigate",
+            "identifier": "list_organizations",
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.active",
                     "data_type": "boolean",
@@ -1453,6 +1469,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.orgGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "9066bb83-2794-410d-b6e4-237e0b0e65cd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parentOrgGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "8scrk4m28ptrr8ch"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.configInheritanceCounts.allDeviceCount",
                     "data_type": "numeric",
                     "example_values": [
@@ -1580,7 +1610,7 @@
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1660,7 +1690,7 @@
                     "data_path": "action_result.data.*.parentOrgId",
                     "data_type": "numeric",
                     "example_values": [
-                        1
+                        2342
                     ],
                     "contains": [
                         "code42 org id"
@@ -1709,7 +1739,7 @@
                     "data_path": "action_result.data.*.reporting.orgManagers.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "test.user"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -2564,10 +2594,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_organizations",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        4
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2575,6 +2606,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total organizations: 4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_organizations",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
                     ]
                 },
                 {
@@ -2599,14 +2637,14 @@
         },
         {
             "action": "lock device",
-            "identifier": "lock_device",
             "description": "Invoke an access lock on a specified device",
             "type": "contain",
-            "read_only": false,
+            "identifier": "lock_device",
             "undo": "unlock device",
+            "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "ID of the device",
+                    "description": "ID of the device to lock",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -2618,22 +2656,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 5
-                },
-                {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        5
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -2682,15 +2710,25 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Device with ID 13 locked successfully"
+                        "Device with ID 369425 locked successfully"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2714,14 +2752,14 @@
         },
         {
             "action": "unlock device",
-            "identifier": "unlock_device",
             "description": "Deactivate an access lock on a specified device",
             "type": "correct",
-            "read_only": false,
+            "identifier": "unlock_device",
             "undo": "lock device",
+            "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "ID of the device",
+                    "description": "ID of the device to unlock",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -2733,22 +2771,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 5
-                },
-                {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "column_name": "Device ID",
                     "column_order": 0,
                     "example_values": [
-                        13
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -2867,11 +2895,24 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.passphrase",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device with ID 369425 unlocked successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.passphrase",
                     "data_type": "string"
                 },
                 {
@@ -2896,16 +2937,15 @@
         },
         {
             "action": "get device",
-            "identifier": "get_device",
             "description": "Get information for a specific device",
-            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details.",
+            "verbose": "The <b>query</b> parameter allows flexible searching on computer name, osHostname, or guid. One parameter or the other must be used. If both the parameters are provided, <b>device_id</b> will be used to fetch the device details. Please provide at least one of the <b>device_id</b> or <b>query</b> parameter.",
             "type": "investigate",
+            "identifier": "get_device",
             "read_only": true,
             "parameters": {
                 "device_id": {
                     "description": "ID of the device",
                     "data_type": "numeric",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "code42 device id"
@@ -2920,35 +2960,29 @@
                         "code42 device guid",
                         "host name"
                     ],
-                    "required": false,
                     "order": 1
                 },
                 "most_recent_only": {
                     "description": "Forces action to return one result, being the most recently connected device",
                     "data_type": "boolean",
-                    "required": false,
+                    "default": false,
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [
                         "code42 device id"
+                    ],
+                    "example_values": [
+                        123456
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.most_recent_only",
-                    "data_type": "string",
+                    "data_type": "boolean",
                     "example_values": [
                         true,
                         false
@@ -3239,6 +3273,51 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.backingUp",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.connected",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.restoring",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.remainingBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.remainingFiles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.backupUsage.*.activity.timeRemainingInMs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        10
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.blocked",
                     "data_type": "boolean",
                     "example_values": [
@@ -3266,7 +3345,7 @@
                     "column_name": "Computer ID",
                     "column_order": 0,
                     "example_values": [
-                        3344
+                        369425
                     ]
                 },
                 {
@@ -3391,7 +3470,7 @@
                     "data_path": "action_result.data.*.parentComputerId",
                     "data_type": "numeric",
                     "example_values": [
-                        12
+                        369425
                     ],
                     "contains": [
                         "code42 device id"
@@ -3448,7 +3527,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3628
+                        362824
                     ]
                 },
                 {
@@ -3466,11 +3545,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_devices",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1,
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3483,10 +3562,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
                         1
                     ]
                 },
@@ -3494,7 +3579,6 @@
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
                         1
                     ]
                 }
@@ -3506,10 +3590,10 @@
         },
         {
             "action": "push restore",
-            "identifier": "push_restore",
             "description": "Push a restore on a device",
-            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). If neither <b>files</b> nor <b>directories</b> params are supplied, the action will fail.",
+            "verbose": "A user with the Push Restore role is required (or the SYSADMIN). Please provide at least one of the <b>files</b> or <b>directories</b> parameter.",
             "type": "correct",
+            "identifier": "push_restore",
             "read_only": false,
             "parameters": {
                 "src_device_guid": {
@@ -3555,7 +3639,6 @@
                 "files": {
                     "description": "Comma-separated list of file paths to restore",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "file path"
@@ -3565,7 +3648,6 @@
                 "directories": {
                     "description": "Comma-separated list of directory paths to restore",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "file path"
@@ -3575,6 +3657,188 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.accepting_device_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.directories",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ],
+                    "example_values": [
+                        "C:/joe/Desktop/PushRestoreTestAPI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.files",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ],
+                    "example_values": [
+                        "joe/Desktop/PushRestoreTestAPI/file.txt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.restore_path",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ],
+                    "example_values": [
+                        "C:/joe/Desktop/Restore"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.src_device_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.target_node_guid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.acceptingGuid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.canceled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.done",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.providerDestination",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.restoreId",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 restore id"
+                    ],
+                    "example_values": [
+                        "1006477040764847854"
+                    ],
+                    "column_name": "Restore ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.web_restore_session_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 web restore session id"
+                    ],
+                    "example_values": [
+                        "0wyz741em1klr0epjn2czn4v9o"
+                    ],
+                    "column_name": "Web Restore Session ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.sourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1005741054493870472"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.targetEndpointPlatform",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.targetEndpointVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123452
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointOsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.acceptingEndpointOsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.originalEndpointOsVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.acceptingEndpointOsVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.14393"
+                    ]
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -3583,105 +3847,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.accepting_device_guid",
+                    "data_path": "action_result.message",
                     "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
+                    "example_values": [
+                        "Restore ID : 1006477040764847854"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.directories",
-                    "data_type": "string",
-                    "contains": [
-                        "file path"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.files",
-                    "data_type": "string",
-                    "contains": [
-                        "file path"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.restore_path",
-                    "data_type": "string",
-                    "contains": [
-                        "file path"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.src_device_guid",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.target_node_guid",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.acceptingGuid",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.canceled",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.done",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.originalEndpointPlatform",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.originalEndpointVersion",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.providerDestination",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.restoreId",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 restore id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.web_restore_session_id",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 web restore session id"
-                    ],
-                    "column_name": "WebRestoreSessionID",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.sourceId",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.targetEndpointPlatform",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.targetEndpointVersion",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.userId",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary.total_events",
@@ -3691,30 +3861,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "summary.restore_id",
+                    "data_path": "action_result.summary.restore_id",
                     "data_type": "string",
                     "contains": [
                         "code42 restore id"
                     ],
-                    "column_name": "Restore ID",
-                    "column_order": 0
+                    "example_values": [
+                        "1006477040764847854"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        1
                     ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        1
                     ]
                 }
             ],
@@ -3725,13 +3892,13 @@
         },
         {
             "action": "check restore status",
-            "identifier": "check_restore_status",
             "description": "Check the status of a restore on a device",
             "type": "investigate",
+            "identifier": "check_restore_status",
             "read_only": true,
             "parameters": {
                 "restore_id": {
-                    "description": "Unique ID for the restore record",
+                    "description": "Unique ID of the restore record",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -3743,38 +3910,38 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.restore_id",
                     "data_type": "string",
+                    "column_name": "Restore ID",
+                    "column_order": 0,
                     "contains": [
                         "code42 restore id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.acceptingComputerGuid",
-                    "data_type": "string",
-                    "contains": [
-                        "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1007737744528508654"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.archiveGuid",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "850661634311551096"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.byteCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.canceled",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.completedDate",
@@ -3783,21 +3950,30 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.destinationGuid",
+                    "data_path": "action_result.data.*.acceptingComputerGuid",
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
                     ],
-                    "column_name": "Destination Guid",
+                    "example_values": [
+                        "1005741054493870472"
+                    ],
+                    "column_name": "Accepting Guid",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.failedChecksumCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.fileCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.planUid",
@@ -3805,11 +3981,17 @@
                 },
                 {
                     "data_path": "action_result.data.*.problemCount",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.requestingUserId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        201234
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.restoreId",
@@ -3817,8 +3999,9 @@
                     "contains": [
                         "code42 restore id"
                     ],
-                    "column_name": "Restore ID",
-                    "column_order": 0
+                    "example_values": [
+                        "1007737744528508654"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sourceComputerGuid",
@@ -3826,28 +4009,43 @@
                     "contains": [
                         "code42 device guid"
                     ],
-                    "column_name": "Src Guid",
+                    "example_values": [
+                        "1005741054493870472"
+                    ],
+                    "column_name": "Source Guid",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.sourceOrgId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        2034
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.sourceUserId",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123454
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "string",
                     "column_name": "Start Date",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "2021-05-10T13:51:05.038Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.targetComputerGuid",
                     "data_type": "string",
                     "contains": [
                         "code42 device guid"
+                    ],
+                    "example_values": [
+                        "1005741054493870472"
                     ]
                 },
                 {
@@ -3862,10 +4060,11 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_events",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3873,6 +4072,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total events: 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -3897,9 +4103,9 @@
         },
         {
             "action": "get user",
-            "identifier": "get_user",
             "description": "Retrieves information for a specific user",
             "type": "investigate",
+            "identifier": "get_user",
             "read_only": true,
             "parameters": {
                 "user": {
@@ -3916,18 +4122,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com",
+                        "234323"
                     ],
                     "contains": [
                         "code42 user id",
@@ -4031,13 +4230,15 @@
                 },
                 {
                     "data_path": "action_result.data.*.notes",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Notes"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.orgId",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
                         1393
                     ],
                     "contains": [
@@ -4104,8 +4305,7 @@
                     "data_path": "action_result.data.*.userId",
                     "data_type": "numeric",
                     "example_values": [
-                        3,
-                        3628
+                        342354
                     ],
                     "contains": [
                         "code42 user id"
@@ -4125,7 +4325,6 @@
                     "data_path": "action_result.data.*.username",
                     "data_type": "string",
                     "example_values": [
-                        "ph_test",
                         "user@example.com"
                     ],
                     "contains": [
@@ -4144,10 +4343,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_users",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4155,6 +4355,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total users: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
@@ -4179,9 +4386,10 @@
         },
         {
             "action": "hunt file",
-            "identifier": "hunt_file",
             "description": "Hunt file on a forensic search",
+            "verbose": "The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100.",
             "type": "investigate",
+            "identifier": "hunt_file",
             "read_only": true,
             "parameters": {
                 "file_hash": {
@@ -4193,17 +4401,15 @@
                         "md5"
                     ],
                     "order": 0
+                },
+                "max_results": {
+                    "description": "Max results to return (Default: 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 1
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.file_hash",
                     "data_type": "string",
@@ -4212,6 +4418,13 @@
                     ],
                     "contains": [
                         "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
                     ]
                 },
                 {
@@ -4251,7 +4464,7 @@
                     "data_path": "action_result.data.*.deviceUserName",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -4302,7 +4515,7 @@
                     "data_path": "action_result.data.*.fileOwner",
                     "data_type": "string",
                     "example_values": [
-                        "Administrators"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -4383,7 +4596,8 @@
                         "52.24.242.108"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
@@ -4391,6 +4605,9 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "e5833c443c3a78a2af058e4eb77d1ffada52e4d19e13e6b4a1f9e2987004faec"
                     ]
                 },
                 {
@@ -4406,6 +4623,9 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://test.com"
                     ]
                 },
                 {
@@ -4416,10 +4636,202 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_events",
+                    "data_path": "action_result.data.*.fileId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabUrl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailFrom",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailSender",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.printerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.processName",
+                    "data_type": "string",
+                    "example_values": [
+                        "/Device/HarddiskVolume3/Program Files/Google/Chrome/Application/chrome.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailSubject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategory",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.printJobName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.processOwner",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.riskSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "MODERATE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remoteActivity",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNKNOWN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Uncategorized"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailRecipients",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeByBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.syncDestination",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeMismatch",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.insertionTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-11T12:09:20.700054Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.outsideActiveHours",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destinationCategory",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailDlpPolicyNames",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategoryByBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeByExtension",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/octet-stream"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.operatingSystemUser",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.detectionSourceAlias",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaVendor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaBusType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.printedFilesBackupPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaCapacity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategoryByExtension",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaMediaName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4430,17 +4842,24 @@
                     ]
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_events",
                     "data_type": "numeric",
                     "example_values": [
                         2
                     ]
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        1
                     ]
                 }
             ],
@@ -4452,19 +4871,19 @@
         },
         {
             "action": "run query",
-            "identifier": "run_query",
             "description": "Run query on a forensic search",
-            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are in logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If parameter <b>query</b> is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search API documentation for more details on query format.",
+            "verbose": "You can use wildcards (*,?) with parameters <b>file_name</b> and <b>file_path</b>. All query parameters are logical AND with each other. Parameters <b>start_time</b> and <b>end_time</b> are required when parameter <b>query</b> is not provided.<br>If <b>query</b> parameter is provided, other parameters will be ignored. Below is an example query for the <b>query</b> parameter:<br><pre>{\"groups\": [{\"filters\": [{\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"db349b97c37d22f5ea1d1841e3c89eb4\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"84c82835a5d21bbcf75a61706d8ab549\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"f351e1fcca0c4ea05fc44d15a17f8b36\"}, {\"operator\": \"IS\", \"term\": \"md5Checksum\", \"value\": \"7bf2b57f2a205768755c07f238fb32cc\"}], \"filterClause\": \"OR\"}, {\"filters\": [{\"operator\": \"ON_OR_AFTER\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-01T00:00:00.00Z\"}, {\"operator\": \"ON_OR_BEFORE\", \"term\": \"eventTimestamp\", \"value\": \"2018-02-07T00:00:00.00Z\"}], \"filterClause\": \"AND\"}], \"groupClause\": \"AND\"}</pre><br>Please refer to the Forensic file search <a href='https://support.code42.com/Administrator/Cloud/Monitoring_and_managing/Code42_API_resources/Forensic_Search_API'>API documentation</a> for more details on query format. The 'max_results' parameter is added to retrieve the provided number of max data. The default value is 100. </br><b>Note:</b> The value of 'pgNum' or 'pgSize' parameter provided in the JSON query parameter will be ignored by default.",
             "type": "investigate",
+            "identifier": "run_query",
             "read_only": true,
             "parameters": {
                 "start_time": {
-                    "description": "Start time in epoch",
+                    "description": "Start time in epoch(in seconds)",
                     "data_type": "numeric",
                     "order": 0
                 },
                 "end_time": {
-                    "description": "End time in epoch",
+                    "description": "End time in epoch(in seconds)",
                     "data_type": "numeric",
                     "order": 1
                 },
@@ -4473,7 +4892,6 @@
                     "data_type": "string",
                     "order": 2,
                     "value_list": [
-                        "",
                         "New file",
                         "Modified",
                         "No longer observed"
@@ -4544,21 +4962,19 @@
                         "ipv6"
                     ]
                 },
+                "max_results": {
+                    "description": "Max results to return (Default: 100)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 10
+                },
                 "query": {
                     "description": "Query in JSON format",
                     "data_type": "string",
-                    "order": 10
+                    "order": 11
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.end_time",
                     "data_type": "numeric",
@@ -4638,6 +5054,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
                     "example_values": [
@@ -4655,7 +5078,7 @@
                     "data_path": "action_result.parameter.username",
                     "data_type": "string",
                     "example_values": [
-                        "test_user"
+                        "test@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -4698,7 +5121,7 @@
                     "data_path": "action_result.data.*.deviceUserName",
                     "data_type": "string",
                     "example_values": [
-                        "testuser"
+                        "testuser@gmail.com"
                     ],
                     "contains": [
                         "user name"
@@ -4749,7 +5172,7 @@
                     "data_path": "action_result.data.*.fileOwner",
                     "data_type": "string",
                     "example_values": [
-                        "Administrators"
+                        "test@gmail.coms"
                     ],
                     "contains": [
                         "user name"
@@ -4820,7 +5243,8 @@
                         "127.0.0.1"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
@@ -4830,7 +5254,8 @@
                         "52.24.242.108"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
@@ -4838,6 +5263,9 @@
                     "data_type": "string",
                     "contains": [
                         "sha256"
+                    ],
+                    "example_values": [
+                        "e5833c443c3a78a2af058e4eb77d1ffada52e4d19e13e6b4a1f9e2987004faec"
                     ]
                 },
                 {
@@ -4866,10 +5294,238 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_events",
+                    "data_path": "action_result.data.*.fileId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabUrl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.trusted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailFrom",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailSender",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.printerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.processName",
+                    "data_type": "string",
+                    "example_values": [
+                        "/Device/HarddiskVolume3/Program Files/Google/Chrome/Application/chrome.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailSubject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategory",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.printJobName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.processOwner",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.riskSeverity",
+                    "data_type": "string",
+                    "example_values": [
+                        "MODERATE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remoteActivity",
+                    "data_type": "string",
+                    "example_values": [
+                        "UNKNOWN"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.destinationName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Uncategorized"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailRecipients",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeByBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/xml"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.syncDestination",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeMismatch",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.insertionTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-11T12:09:20.700054Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.outsideActiveHours",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.destinationCategory",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailDlpPolicyNames",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategoryByBytes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mimeTypeByExtension",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/octet-stream"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.operatingSystemUser",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.user"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detectionSourceAlias",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaVendor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaBusType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.printedFilesBackupPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaCapacity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.fileCategoryByExtension",
+                    "data_type": "string",
+                    "example_values": [
+                        "Archive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaMediaName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.removableMediaSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Title Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.urlError",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tabs.*.titleError",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskIndicators.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Zip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.riskIndicators.*.weight",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -4880,10 +5536,17 @@
                     ]
                 },
                 {
-                    "data_path": "summary.total_objects",
+                    "data_path": "action_result.summary.total_events",
                     "data_type": "numeric",
                     "example_values": [
                         2
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
@@ -4897,6 +5560,463 @@
             "render": {
                 "type": "custom",
                 "view": "code42_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get organization info",
+            "description": "Retrieve Code42 organization info using the v3_user_token for the given username & password",
+            "type": "investigate",
+            "identifier": "get_organization_info",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.deploymentModel",
+                    "data_type": "string",
+                    "example_values": [
+                        "PUBLIC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.maintenanceMode",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement.acceptanceRequired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.masterServicesAgreement.accepted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Parent org name"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.registrationKey",
+                    "data_type": "string",
+                    "example_values": [
+                        "s49tk29t9mr7m665"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tenantUid",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
+                    "example_values": [
+                        "s6512138-e9b5-0098-9fdd-99886f369765"
+                    ],
+                    "column_name": "Tenant ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved organization info successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add departing employee",
+            "description": "Add Departing Employee to Code42 Organization",
+            "verbose": "Action is divided into mainly two parts. First, the user profile will be created for the specified user and second is used to add the user profile to the departing employee list. Also, it will update/add the departure_notes and cloud_username details for the already added user profile.",
+            "type": "correct",
+            "undo": "remove departing employee",
+            "identifier": "add_departing_employee",
+            "read_only": false,
+            "parameters": {
+                "departing_employee_url": {
+                    "description": "Base URL for Departing Employee API",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "tenant_id": {
+                    "description": "Tenant ID for Code42 organization",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "code42 tenant id"
+                    ],
+                    "order": 1
+                },
+                "departing_user": {
+                    "description": "Code42 username of the departing employee",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 2
+                },
+                "departure_notes": {
+                    "description": "Optional notes for departing employee",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "departure_date": {
+                    "description": "Departure date of departing employee (Format: 'YYYY-MM-DD')",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "cloud_usernames": {
+                    "description": "Comma-separated list of cloud aliases",
+                    "data_type": "string",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.departing_employee_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tenant_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
+                    "example_values": [
+                        "f6b12138-e9b5-4739-9fdd-99886f369654"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.departing_user",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "username@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.departure_notes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Notes updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.departure_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-06-28"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cloud_usernames",
+                    "data_type": "string",
+                    "example_values": [
+                        "test1@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "username@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Departing Employee Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "User Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type$",
+                    "data_type": "string",
+                    "example_values": [
+                        "DEPARTING_EMPLOYEE_V2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Notes Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tenantId",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
+                    "example_values": [
+                        "f6b12138-e9b5-4739-9fdd-99886f369654"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cloudUsernames",
+                    "data_type": "string",
+                    "example_values": [
+                        "test1@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        345623
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.departureDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-08-28"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-05-20T10:43:53.1390198Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Departing Employee Addition was Successful - Created Time: 2021-05-14T10:07:23.6156069Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_value": [
+                        "Departing Employee Addition was Successful - Created Time: 2021-05-20T10:29:03.7668618Z"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove departing employee",
+            "description": "Remove departing employee from the departing employee list",
+            "type": "contain",
+            "undo": "add departing employee",
+            "identifier": "remove_departing_employee",
+            "read_only": false,
+            "parameters": {
+                "departing_employee_url": {
+                    "description": "Base URL for Departing Employee API",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ]
+                },
+                "tenant_id": {
+                    "description": "Tenant ID for Code42 organization",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1,
+                    "contains": [
+                        "code42 tenant id"
+                    ]
+                },
+                "departing_user": {
+                    "description": "Code42 username of the departing employee",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2,
+                    "contains": [
+                        "user name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.departing_employee_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tenant_id",
+                    "data_type": "string",
+                    "contains": [
+                        "code42 tenant id"
+                    ],
+                    "example_values": [
+                        "f6b12138-e9b5-4739-9fdd-99886f369654"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.departing_user",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 1,
+                    "contains": [
+                        "user name"
+                    ],
+                    "example_values": [
+                        "username@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully removed a user from departing list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
             },
             "versions": "EQ(*)"
         }
