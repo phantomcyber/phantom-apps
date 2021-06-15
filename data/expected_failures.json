@@ -12,5 +12,12 @@
         "JSON config param `key` should probably be of data_type `password` or `file`"
       ]
     }
+  },
+  "phantom_awslambda": {
+    "Action Names": {
+      "verbose": [
+        "`invoke lambda` contains product or vendor name"
+      ]
+    }
   }
 }
