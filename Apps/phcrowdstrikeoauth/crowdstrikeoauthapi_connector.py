@@ -295,13 +295,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            for j, artifact in enumerate(artifacts):
+            # Always set the very first artifact to run_automation = True to never have duplicate conflicts
+            if len_artifacts >= 1:
+                artifacts[0]['run_automation'] = True
 
-                # if it is the last artifact of the last container
-                if (j + 1) == len_artifacts:
-                    # mark it such that active playbooks get executed
-                    artifact['run_automation'] = True
-
+            # Useful for spawn.log file analysis
+            for artifact in artifacts:
                 artifact['container_id'] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
@@ -389,6 +388,8 @@ class CrowdstrikeConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
             if phantom.is_fail(ret_val):
+                if 'Error code: 404' in action_result.get_message():
+                    return []
                 return None
 
             offset = response.get('meta', {}).get('pagination', {}).get('offset')
@@ -549,6 +550,9 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val) and 'Error code: 404' in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1627,6 +1631,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
+        if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -2656,8 +2663,8 @@ class CrowdstrikeConnector(BaseConnector):
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
                     if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
-                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
-                            {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}".format(
+                            resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 
