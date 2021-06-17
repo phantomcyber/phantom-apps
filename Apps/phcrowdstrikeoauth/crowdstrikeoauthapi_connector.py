@@ -880,8 +880,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             # Make REST call
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
             if phantom.is_fail(ret_val):
-                return action_result.get_status()
+                if 'Status Code: 404' in action_result.get_message():
+                    return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+                else:
+                    return action_result.get_status()
 
             if response.get("resources"):
                 details_list.extend(response.get("resources"))
