@@ -9,7 +9,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: whois_domain.html
-  Copyright (c) 2016-2020 Splunk Inc.
+  Copyright (c) 2016-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -112,29 +112,37 @@
                                 </a>
                             </td>
                             <td>{{ result.message }}</td>
-                            <td>{{ result.data.contacts.admin.city }}</td>
-                            <td>{{ result.data.contacts.admin.country }}</td>
+                            <td>{{ result.data.contacts.admin.city|default:"None" }}</td>
+                            <td>{{ result.data.contacts.admin.country|default:"None" }}</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.admin.email }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ result.data.contacts.admin.email }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
+                                {% if result.data.contacts.admin.email %}
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.admin.email }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ result.data.contacts.admin.email }}
+                                        &nbsp;
+                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                    </a>
+                                {% else %}
+                                    None
+                                {% endif %}
                             </td>
-                            <td>{{ result.data.contacts.admin.name }}</td>
-                            <td>{{ result.data.contacts.admin.organization }}</td>
-                            <td>{{ result.data.contacts.registrant.city }}</td>
-                            <td>{{ result.data.contacts.registrant.country }}</td>
+                            <td>{{ result.data.contacts.admin.name|default:"None" }}</td>
+                            <td>{{ result.data.contacts.admin.organization|default:"None" }}</td>
+                            <td>{{ result.data.contacts.registrant.city|default:"None" }}</td>
+                            <td>{{ result.data.contacts.registrant.country|default:"None" }}</td>
                             <td>
-                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.registrant.email }}' }], 0, {{ container.id }}, null, false);">
-                                    {{ result.data.contacts.registrant.email }}
-                                    &nbsp;
-                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                </a>
+                                {% if result.data.contacts.registrant.email %}
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.registrant.email }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ result.data.contacts.registrant.email }}
+                                        &nbsp;
+                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                    </a>
+                                {% else %}
+                                    None
+                                {% endif %}
                             </td>
-                            <td>{{ result.data.contacts.registrant.name }}</td>
-                            <td>{{ result.data.contacts.registrant.organization }}</td>
-                            <td>{{ result.data.contacts.registrant.phone }}</td>
+                            <td>{{ result.data.contacts.registrant.name|default:"None" }}</td>
+                            <td>{{ result.data.contacts.registrant.organization|default:"None" }}</td>
+                            <td>{{ result.data.contacts.registrant.phone|default:"None" }}</td>
                         </tr>
                     </table>
                 </div>

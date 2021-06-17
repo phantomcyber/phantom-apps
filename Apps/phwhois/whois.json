@@ -11,9 +11,9 @@
     "product_vendor": "Generic",
     "product_name": "Whois",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.9.39220",
     "python_version": "3",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "app_config_render": "default",
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
@@ -48,9 +48,9 @@
     },
     "configuration": {
         "update_days": {
+            "description": "Update the tld list once every N days",
             "data_type": "numeric",
             "order": 0,
-            "description": "Update the tld list once every N days",
             "value": "14",
             "required": true
         }
@@ -58,9 +58,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Validate the configuration for connectivity",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -85,10 +85,6 @@
                     "primary": true,
                     "required": true
                 }
-            },
-            "render": {
-                "type": "custom",
-                "view": "whois_view.display_view"
             },
             "output": [
                 {
@@ -357,6 +353,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
@@ -380,6 +380,10 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "custom",
+                "view": "whois_view.display_view"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -400,12 +404,6 @@
                     "primary": true,
                     "required": true
                 }
-            },
-            "render": {
-                "type": "table",
-                "width": 12,
-                "height": 5,
-                "title": "Whois details"
             },
             "output": [
                 {
@@ -464,6 +462,10 @@
                     "example_values": [
                         "2000-04-27"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.asn_description",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.asn_registry",
@@ -699,6 +701,12 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Whois details"
+            },
             "versions": "EQ(*)"
         }
     ]
