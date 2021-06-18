@@ -1,7 +1,7 @@
 {
     "appid": "7129d563-a28d-4afc-8081-f909dce54293",
     "name": "Cofense Triage v2",
-    "description": "This app supports investigative actions that enable the security teams to analyze and respond to phishing faster",
+    "description": "This app supports actions that enable the security teams to analyze and respond to phishing faster",
     "type": "information",
     "product_vendor": "Cofense",
     "logo": "logo_cofensetriagev2.svg",
@@ -269,7 +269,7 @@
                     "primary": true
                 },
                 "sort": {
-                    "description": "Allows sorting the reports based on the updated_at date of the report",
+                    "description": "Allows sorting the reports based on the 'updated_at' date of the report",
                     "data_type": "string",
                     "default": "oldest_first",
                     "order": 10,
@@ -2373,7 +2373,7 @@
                     "order": 4
                 },
                 "to_other": {
-                    "description": "To add the addresses specified in to_other_address to the response recipient list or not",
+                    "description": "To add the addresses specified in 'to_other_address' to the response recipient list or not",
                     "data_type": "boolean",
                     "default": false,
                     "order": 5
@@ -2735,7 +2735,7 @@
                     "order": 3
                 },
                 "categorization_tags": {
-                    "description": "Allows the user to provide multiple tags to be given to the report while categorizing it",
+                    "description": "Allows the user to provide multiple tags to the report while categorizing it",
                     "data_type": "string",
                     "order": 4,
                     "contains": [
@@ -4204,7 +4204,7 @@
                     "primary": true
                 },
                 "sort": {
-                    "description": "Allows sorting the URLs based on the updated_at date",
+                    "description": "Allows sorting the URLs based on the 'updated_at' date",
                     "data_type": "string",
                     "default": "oldest_first",
                     "order": 5,
@@ -4738,7 +4738,7 @@
                     "primary": true
                 },
                 "sort": {
-                    "description": "Allows sorting the comments based on the updated_at date of the comment",
+                    "description": "Allows sorting the comments based on the 'updated_at' date of the comment",
                     "data_type": "string",
                     "default": "oldest_first",
                     "order": 4,
@@ -5889,7 +5889,7 @@
                     "primary": true
                 },
                 "sort": {
-                    "description": "Allows sorting the rules based on the updated_at date of the rule",
+                    "description": "Allows sorting the rules based on the 'updated_at' date of the rule",
                     "data_type": "string",
                     "default": "oldest_first",
                     "order": 12,
