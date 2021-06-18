@@ -19,5 +19,13 @@
         "`invoke lambda` contains product or vendor name"
       ]
     }
+  },
+  "phantom_whois": {
+    "Action Names": {
+      "verbose": [
+        "`whois domain` contains product or vendor name",
+        "`whois ip` contains product or vendor name"
+      ]
+    }
   }
 }
