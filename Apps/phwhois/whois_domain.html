@@ -81,10 +81,11 @@
         {% if not result.data %}
             <h4 class="wf-h4-style">No data found</h4>
         {% else %}
-            {% if not result.data.contacts.admin and not result.data.raw %}
+        {% with admin=result.data.contacts.admin registrant=result.data.contacts.registrant raw=result.data.raw %}
+            {% if not admin and not registrant and not raw %}
                 <h4 class="wf-h4-style">No data found</h4>
             {% endif %}
-            {% if result.data.contacts.admin %}
+            {% if admin or registrant %}
                 <h4 class="wf-h4-style">Info</h4>
                 <div class="domain_info overflow-column">
                     <table class="phantom-table dataTable">
@@ -112,12 +113,12 @@
                                 </a>
                             </td>
                             <td>{{ result.message }}</td>
-                            <td>{{ result.data.contacts.admin.city|default:"None" }}</td>
-                            <td>{{ result.data.contacts.admin.country|default:"None" }}</td>
+                            <td>{{ admin.city|default:"None" }}</td>
+                            <td>{{ admin.country|default:"None" }}</td>
                             <td>
-                                {% if result.data.contacts.admin.email %}
-                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.admin.email }}' }], 0, {{ container.id }}, null, false);">
-                                        {{ result.data.contacts.admin.email }}
+                                {% if admin.email %}
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ admin.email }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ admin.email }}
                                         &nbsp;
                                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                     </a>
@@ -125,14 +126,14 @@
                                     None
                                 {% endif %}
                             </td>
-                            <td>{{ result.data.contacts.admin.name|default:"None" }}</td>
-                            <td>{{ result.data.contacts.admin.organization|default:"None" }}</td>
-                            <td>{{ result.data.contacts.registrant.city|default:"None" }}</td>
-                            <td>{{ result.data.contacts.registrant.country|default:"None" }}</td>
+                            <td>{{ admin.name|default:"None" }}</td>
+                            <td>{{ admin.organization|default:"None" }}</td>
+                            <td>{{ registrant.city|default:"None" }}</td>
+                            <td>{{ registrant.country|default:"None" }}</td>
                             <td>
-                                {% if result.data.contacts.registrant.email %}
-                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ result.data.contacts.registrant.email }}' }], 0, {{ container.id }}, null, false);">
-                                        {{ result.data.contacts.registrant.email }}
+                                {% if registrant.email %}
+                                    <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ registrant.email }}' }], 0, {{ container.id }}, null, false);">
+                                        {{ registrant.email }}
                                         &nbsp;
                                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                     </a>
@@ -140,24 +141,25 @@
                                     None
                                 {% endif %}
                             </td>
-                            <td>{{ result.data.contacts.registrant.name|default:"None" }}</td>
-                            <td>{{ result.data.contacts.registrant.organization|default:"None" }}</td>
-                            <td>{{ result.data.contacts.registrant.phone|default:"None" }}</td>
+                            <td>{{ registrant.name|default:"None" }}</td>
+                            <td>{{ registrant.organization|default:"None" }}</td>
+                            <td>{{ registrant.phone|default:"None" }}</td>
                         </tr>
                     </table>
                 </div>
             {% endif %}
-            {% if result.data.raw %}
+            {% if raw %}
                 <div class="info">
                     <h4 class="wf-h4-style">Raw</h4>
                     <table class="wf-table-vertical">
                         <tr>
                             <td>Raw object</td>
-                            <td>{{ result.data.raw }}</td>
+                            <td>{{ raw }}</td>
                         </tr>
                     </table>
                 </div>
             {% endif %}
+        {% endwith %}
         {% endif %}
     {% endfor %}
 </div>
