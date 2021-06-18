@@ -1,9 +1,10 @@
 # --
 # File: rsasa_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2017-2018
+# Copyright (c) 2017-2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 #
 # --
 
@@ -68,7 +69,7 @@ class RSASAConnector(phantom.BaseConnector):
         self._state = self.load_state()
 
         if not self._state:
-             return phantom.APP_ERROR
+            return phantom.APP_ERROR
 
         ret_val = self._login()
 
@@ -129,7 +130,7 @@ class RSASAConnector(phantom.BaseConnector):
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR,
-                    "Could not find INCIDENT_MANAGEMENT type devices configured, can't continue")
+                                   "Could not find INCIDENT_MANAGEMENT type devices configured, can't continue")
 
         matched_index = None
 
@@ -141,8 +142,8 @@ class RSASAConnector(phantom.BaseConnector):
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR,
-                    "Could not find INCIDENT_MANAGEMENT type device named '{0}'. Can't continue".format(
-                        config[consts.RSASA_JSON_INCIDENT_MANAGER]))
+                                   "Could not find INCIDENT_MANAGEMENT type device named '{0}'. Can't continue".format(
+                                       config[consts.RSASA_JSON_INCIDENT_MANAGER]))
 
         self._inc_mgnt_id = data[matched_index].get('id')
 
@@ -150,8 +151,8 @@ class RSASAConnector(phantom.BaseConnector):
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR,
-                    "Could not get ID of device named '{0}'. Can't continue".format(
-                        config[consts.RSASA_JSON_INCIDENT_MANAGER]))
+                                   "Could not get ID of device named '{0}'. Can't continue".format(
+                                       config[consts.RSASA_JSON_INCIDENT_MANAGER]))
 
         return phantom.APP_SUCCESS
 
@@ -195,14 +196,13 @@ class RSASAConnector(phantom.BaseConnector):
     def _make_rest_call(self, endpoint, result, params={}, headers={}):
         """ Will query the endpoint, parses the response and returns status and data,
         BEWARE data can be None"""
-
+        
         # Get the config
         config = self.get_config()
 
         resp_json = None
 
         url = "{0}{1}".format(self._base_url, endpoint)
-
         if (params):
             params.update({'_dc': int(time.time()) * 1000})
 
@@ -219,7 +219,7 @@ class RSASAConnector(phantom.BaseConnector):
             # error
             detail = self._get_http_error_details(r)
             return RetVal(result.set_status(phantom.APP_ERROR,
-                "Call failed with HTTP Code: {0}. Reason: {1}. Details: {2}".format(r.status_code, r.reason, detail)), None)
+                                            "Call failed with HTTP Code: {0}. Reason: {1}. Details: {2}".format(r.status_code, r.reason, detail)), None)
 
         # Try a json load
         try:
@@ -228,7 +228,7 @@ class RSASAConnector(phantom.BaseConnector):
             # r.text is guaranteed to be NON None, it will be empty, but not None
             # TODO the error returned is in HTML need to parse it
             return RetVal(result.set_status(phantom.APP_ERROR, "Server returned a response that was not a JSON. Please check your credentials"),
-                    resp_json)
+                          resp_json)
 
         success = resp_json.get('success')
 
@@ -355,7 +355,7 @@ class RSASAConnector(phantom.BaseConnector):
         endpoint = "/ajax/incidents/{0}".format(self._inc_mgnt_id)
 
         ret_val, data = self._make_rest_call(endpoint, action_result, params=query_params)
-
+    
         if (not ret_val):
             return RetVal(action_result.get_status(), [])
 
@@ -447,7 +447,6 @@ class RSASAConnector(phantom.BaseConnector):
         search_token = "deviceName: '"
 
         if search_token not in r.text:
-            print 'you done'
             return RetVal(phantom.APP_ERROR, "Could not find device ID in response text.")
 
         device_name_index = re.search(search_token, r.text).end()
@@ -502,7 +501,7 @@ class RSASAConnector(phantom.BaseConnector):
             self.debug_print('Handled exception in _create_dict_hash', e)
             return None
 
-        return hashlib.md5(input_dict_str).hexdigest()
+        return hashlib.md5(input_dict_str.encode()).hexdigest()
 
     def _parse_results(self, action_result, param, results):
 
@@ -616,7 +615,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         # get the incidents
         ret_val, incidents = self._get_incidents(action_result, max_containers, start_time, end_time)
-
+        
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
@@ -734,6 +733,6 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
 
         # Dump the return value
-        print ret_val
+        print(ret_val)
 
     exit(0)
