@@ -868,26 +868,25 @@ class CrowdstrikeConnector(BaseConnector):
         list_ids = [x.strip() for x in list_ids.split(',')]
         list_ids = list(filter(None, list_ids))
 
-        endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
-
         details_list = list()
         while list_ids:
             # Endpoint creation
             ids = list_ids[:min(100, len(list_ids))]
+            endpoint_param = ''
+            for resource in ids:
+                endpoint_param += "ids={}&".format(resource)
 
-            # Create the param variable to send
-            params = {'ids': ids}
+            endpoint_param = endpoint_param.strip("&")
+            endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
 
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
             # Make REST call
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
 
-            if phantom.is_fail(ret_val):
-                if 'Status Code: 404' in action_result.get_message():
-                    return action_result.set_status(phantom.APP_SUCCESS, "No data found")
-                else:
-                    return action_result.get_status()
+            if phantom.is_fail(ret_val) and 'Status Code: 404' not in action_result.get_message():
+                return action_result.get_status()
 
-            if response.get("resources"):
+            if ret_val and response.get("resources"):
                 details_list.extend(response.get("resources"))
 
             del list_ids[:min(100, len(list_ids))]
