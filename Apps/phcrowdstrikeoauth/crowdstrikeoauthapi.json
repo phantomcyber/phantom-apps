@@ -12,7 +12,7 @@
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "3.1.0",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, May 31 2021, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, June 21 2021, API version: v1, v2"
     ],
     "utctime_updated": "2021-06-14T13:27:37.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
@@ -10405,7 +10405,8 @@
                     ],
                     "contains": [
                         "crowdstrike environment"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "comment": {
                     "data_type": "string",
@@ -11682,7 +11683,8 @@
                     ],
                     "contains": [
                         "crowdstrike environment"
-                    ]
+                    ],
+                    "primary": true
                 },
                 "limit": {
                     "data_type": "numeric",
