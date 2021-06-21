@@ -2748,7 +2748,7 @@ class CrowdstrikeConnector(BaseConnector):
                     action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
             try:
-                vault_results = Vault.add_attachment(compressed_file_path, self.get_container_id(), filename)
+                vault_results = phantom_rules.vault_add(container=self.get_container_id(), file_location=compressed_file_path, file_name=filename)
                 return RetVal(phantom.APP_SUCCESS, vault_results)
             except Exception as e:
                 return RetVal(
