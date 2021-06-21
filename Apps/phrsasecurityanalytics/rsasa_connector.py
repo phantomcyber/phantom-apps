@@ -3,8 +3,7 @@
 #
 # Copyright (c) 2017-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 # --
 
@@ -196,7 +195,7 @@ class RSASAConnector(phantom.BaseConnector):
     def _make_rest_call(self, endpoint, result, params={}, headers={}):
         """ Will query the endpoint, parses the response and returns status and data,
         BEWARE data can be None"""
-        
+
         # Get the config
         config = self.get_config()
 
@@ -355,7 +354,7 @@ class RSASAConnector(phantom.BaseConnector):
         endpoint = "/ajax/incidents/{0}".format(self._inc_mgnt_id)
 
         ret_val, data = self._make_rest_call(endpoint, action_result, params=query_params)
-    
+
         if (not ret_val):
             return RetVal(action_result.get_status(), [])
 
@@ -615,7 +614,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         # get the incidents
         ret_val, incidents = self._get_incidents(action_result, max_containers, start_time, end_time)
-        
+
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
