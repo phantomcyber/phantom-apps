@@ -388,7 +388,7 @@ class CrowdstrikeConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
             if phantom.is_fail(ret_val):
-                if 'Error code: 404' in action_result.get_message():
+                if CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
                     return []
                 return None
 
@@ -551,8 +551,8 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
 
-        if phantom.is_fail(ret_val) and 'Error code: 404' in action_result.get_message():
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -871,10 +871,10 @@ class CrowdstrikeConnector(BaseConnector):
         details_list = list()
         while list_ids:
             # Endpoint creation
-            ids = list_ids[:min(100, len(list_ids))]
+            role_ids = list_ids[:min(100, len(list_ids))]
             endpoint_param = ''
-            for resource in ids:
-                endpoint_param += "ids={}&".format(resource)
+            for role in role_ids:
+                endpoint_param += "ids={}&".format(role)
 
             endpoint_param = endpoint_param.strip("&")
             endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
@@ -883,7 +883,7 @@ class CrowdstrikeConnector(BaseConnector):
             # Make REST call
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
 
-            if phantom.is_fail(ret_val) and 'Status Code: 404' not in action_result.get_message():
+            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE not in action_result.get_message():
                 return action_result.get_status()
 
             if ret_val and response.get("resources"):
@@ -892,7 +892,7 @@ class CrowdstrikeConnector(BaseConnector):
             del list_ids[:min(100, len(list_ids))]
 
         if not details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
 
@@ -1010,7 +1010,7 @@ class CrowdstrikeConnector(BaseConnector):
             del id_list[:min(100, len(id_list))]
 
         if not host_group_details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         for host_group in host_group_details_list:
             action_result.add_data(host_group)
@@ -1634,8 +1634,8 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
-        if phantom.is_fail(ret_val) and 'Status Code: 404' in action_result.get_message():
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -2666,6 +2666,7 @@ class CrowdstrikeConnector(BaseConnector):
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
                     if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
+                        self.debug_print("Error from server. Error code: {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"]))
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}".format(
                             resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
         except:
