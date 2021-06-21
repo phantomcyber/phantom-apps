@@ -402,6 +402,11 @@ class WhoisConnector(BaseConnector):
 
         self.save_progress("Querying...")
 
+        pythonwhois.parse.registrant_regexes.extend(REGISTRANT_REGEXES)
+        pythonwhois.parse.admin_contact_regexes.extend(ADMIN_CONTACT_REGEXES)
+        pythonwhois.parse.tech_contact_regexes.extend(TECH_CONTACT_REGEXES)
+        pythonwhois.parse.billing_contact_regexes.extend(BILLING_CONTACT_REGEXES)
+
         # 1. Attempting to fetch the whois information with the server
         # if provided or without it if not provided
         whois_response = self._fetch_whois_info(action_result, domain, server)
@@ -414,10 +419,6 @@ class WhoisConnector(BaseConnector):
         if whois_response.get('contacts') and not whois_response.get('contacts').get('registrant'):
             if whois_response.get('whois_server'):
                 resp_server = UnicodeDammit(whois_response.get('whois_server')[0]).unicode_markup.encode('utf-8')
-
-                pythonwhois.parse.registrant_regexes.append(REGISTRANT_REGEX)
-                pythonwhois.parse.admin_contact_regexes.append(ADMIN_CONTACT_REGEX)
-                pythonwhois.parse.tech_contact_regexes.append(TECH_CONTACT_REGEX)
 
                 whois_response = self._fetch_whois_info(action_result, domain, resp_server)
 
