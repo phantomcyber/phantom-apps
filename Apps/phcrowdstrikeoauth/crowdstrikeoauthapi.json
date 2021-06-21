@@ -5448,10 +5448,81 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.container",
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.7z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "16723c3d039bc94e1636c0bf0c23ec26"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "d43b1c57023fab4e3040dd6f2970053d690b0fab"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "8a050bf93fe354d6ad03c6ba2b286f2649fb1420ae80eefac773208e5a0b7c0d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mime_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-7z-compressed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.create_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "0 minutes ago"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
                     "data_type": "numeric",
                     "example_values": [
-                        67115
+                        2840
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_document",
+                    "data_type": "numeric",
+                    "example_values": [
+                        556
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_crowdstrike"
                     ]
                 },
                 {
@@ -5481,25 +5552,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "example_values": [
                         5122
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.succeeded",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
                     ]
                 },
                 {

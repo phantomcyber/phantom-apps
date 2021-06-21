@@ -2750,7 +2750,16 @@ class CrowdstrikeConnector(BaseConnector):
 
             try:
                 vault_results = phantom_rules.vault_add(container=self.get_container_id(), file_location=compressed_file_path, file_name=filename)
-                return RetVal(phantom.APP_SUCCESS, vault_results)
+                if vault_results[0]:
+                    try:
+                        _, _, vault_info = phantom_rules.vault_info(vault_id=vault_results[2], file_name=filename, container_id=self.get_container_id())
+                        vault_info = list(vault_info)[0]
+                    except IndexError:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None)
+                    except Exception as e:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                                        "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))), None)
+                    return RetVal(phantom.APP_SUCCESS, vault_info)
             except Exception as e:
                 return RetVal(
                     action_result.set_status(phantom.APP_ERROR, "Unable to store file in Phantom Vault. Error: {0}".format(self._get_error_message_from_exception(e))), None)
