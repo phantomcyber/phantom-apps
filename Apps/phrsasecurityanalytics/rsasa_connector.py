@@ -214,7 +214,7 @@ class RSASAConnector(phantom.BaseConnector):
         if hasattr(result, 'add_debug_data'):
             result.add_debug_data({'r_text': r.text if r else 'r is None'})
 
-        if not 200 <= r.status_code <= 399:
+        if not (200 <= r.status_code <= 399):
             # error
             detail = self._get_http_error_details(r)
             return RetVal(result.set_status(phantom.APP_ERROR,
