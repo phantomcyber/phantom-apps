@@ -102,7 +102,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         session_id = self._session.cookies.get('JSESSIONID')
 
-        if (session_id is None):
+        if session_id is None:
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR, "Required Cookie value missing in response")
@@ -118,14 +118,14 @@ class RSASAConnector(phantom.BaseConnector):
 
         ret_val, data = self._make_rest_call(endpoint, self, params=query_params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.get_status()
 
         data = data.get('data')
 
-        if (not data):
+        if not data:
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR,
@@ -146,7 +146,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         self._inc_mgnt_id = data[matched_index].get('id')
 
-        if (self._inc_mgnt_id is None):
+        if self._inc_mgnt_id is None:
             if self.get_action_identifier() == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self.save_progress(consts.RSASA_ERR_TEST_CONNECTIVITY)
             return self.set_status(phantom.APP_ERROR,
@@ -157,7 +157,7 @@ class RSASAConnector(phantom.BaseConnector):
 
     def _logout(self):
 
-        if (self._cookies is None):
+        if self._cookies is None:
             return phantom.APP_SUCCESS
 
         config = self.get_config()
@@ -181,7 +181,7 @@ class RSASAConnector(phantom.BaseConnector):
 
     def _get_http_error_details(self, r):
 
-        if('text/html' in r.headers.get('Content-Type', '')):
+        if 'text/html' in r.headers.get('Content-Type', ''):
 
             # Try BeautifulSoup
             try:
@@ -202,7 +202,7 @@ class RSASAConnector(phantom.BaseConnector):
         resp_json = None
 
         url = "{0}{1}".format(self._base_url, endpoint)
-        if (params):
+        if params:
             params.update({'_dc': int(time.time()) * 1000})
 
         # Make the call
@@ -211,10 +211,10 @@ class RSASAConnector(phantom.BaseConnector):
         except Exception as e:
             return RetVal(result.set_status(phantom.APP_ERROR, consts.RSASA_ERR_SERVER_CONNECTION, e), resp_json)
 
-        if (hasattr(result, 'add_debug_data')):
+        if hasattr(result, 'add_debug_data'):
             result.add_debug_data({'r_text': r.text if r else 'r is None'})
 
-        if (not (200 <= r.status_code <= 399)):
+        if not 200 <= r.status_code <= 399:
             # error
             detail = self._get_http_error_details(r)
             return RetVal(result.set_status(phantom.APP_ERROR,
@@ -231,10 +231,10 @@ class RSASAConnector(phantom.BaseConnector):
 
         success = resp_json.get('success')
 
-        if (success is None):
+        if success is None:
             return RetVal(result.set_status(phantom.APP_ERROR, "Status info not found in response"), resp_json)
 
-        if (success is not True):
+        if success is not True:
             message = resp_json.get('message', "Not specified")
             self.save_progress(message)
             return RetVal(result.set_status(phantom.APP_ERROR, "Call failed, details: {0}".format(message)), resp_json)
@@ -355,7 +355,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         ret_val, data = self._make_rest_call(endpoint, action_result, params=query_params)
 
-        if (not ret_val):
+        if not ret_val:
             return RetVal(action_result.get_status(), [])
 
         return RetVal(phantom.APP_SUCCESS, data.get('data'))
@@ -411,7 +411,7 @@ class RSASAConnector(phantom.BaseConnector):
 
             ret_val, data = self._make_rest_call(endpoint, action_result, params=query_params)
 
-            if (not ret_val):
+            if not ret_val:
                 return RetVal(action_result.get_status(), [])
 
             if not total:
@@ -480,7 +480,7 @@ class RSASAConnector(phantom.BaseConnector):
 
     def _set_sdi(self, default_id, input_dict):
 
-        if ('source_data_identifier' in input_dict):
+        if 'source_data_identifier' in input_dict:
             del input_dict['source_data_identifier']
 
         input_dict['source_data_identifier'] = self._create_dict_hash(input_dict)
@@ -491,7 +491,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         input_dict_str = None
 
-        if (not input_dict):
+        if not input_dict:
             return None
 
         try:
@@ -506,7 +506,7 @@ class RSASAConnector(phantom.BaseConnector):
 
         container_count = consts.RSASA_DEFAULT_CONTAINER_COUNT
 
-        if (param):
+        if param:
             container_count = param.get(phantom.APP_JSON_CONTAINER_COUNT, consts.RSASA_DEFAULT_CONTAINER_COUNT)
 
         results = results[:container_count]
@@ -515,7 +515,7 @@ class RSASAConnector(phantom.BaseConnector):
 
             container = result.get('container')
 
-            if (not container):
+            if not container:
                 continue
 
             self.send_progress("Saving Container # {0}".format(i + 1))
@@ -528,26 +528,26 @@ class RSASAConnector(phantom.BaseConnector):
 
             self.debug_print("save_container returns, value: {0}, reason: {1}, id: {2}".format(ret_val, message, container_id))
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress(message)
                 message = "Failed to add Container for id: {0}, error msg: {1}".format(container.get('source_data_identifier', 'N/A'), message)
                 self.debug_print(message)
                 continue
 
-            if (not container_id):
+            if not container_id:
                 message = "save_container did not return a container_id"
                 self.debug_print(message)
                 continue
 
             artifacts = result.get('artifacts')
-            if (not artifacts):
+            if not artifacts:
                 continue
 
             len_artifacts = len(artifacts)
 
             for j, artifact in enumerate(artifacts):
 
-                if (not artifact):
+                if not artifact:
                     continue
 
                 # add the container id to the artifact
@@ -555,7 +555,7 @@ class RSASAConnector(phantom.BaseConnector):
                 self._set_sdi(j, artifact)
 
                 # if it is the last artifact of the last container
-                if ((j + 1) == len_artifacts):
+                if (j + 1) == len_artifacts:
                     # mark it such that active playbooks get executed
                     artifact['run_automation'] = True
 
@@ -570,18 +570,18 @@ class RSASAConnector(phantom.BaseConnector):
         config = self.get_config()
         last_time = self._state.get(consts.RSASA_JSON_LAST_DATE_TIME)
         utc_now = datetime.utcnow()
-        end_time = (calendar.timegm(utc_now.timetuple())) * 1000
+        end_time = calendar.timegm(utc_now.timetuple()) * 1000
 
         if self.is_poll_now():
             dt_diff = utc_now - timedelta(days=int(config[consts.RSASA_JSON_POLL_NOW_DAYS]))
             start_time = calendar.timegm(dt_diff.timetuple())
             return (start_time * 1000, end_time)
-        elif (self._state.get('first_run', True)):
+        elif self._state.get('first_run', True):
             self._state['first_run'] = False
             dt_diff = utc_now - timedelta(days=int(config[consts.RSASA_JSON_SCHEDULED_POLL_DAYS]))
             start_time = calendar.timegm(dt_diff.timetuple())
             return (start_time * 1000, end_time)
-        elif (last_time):
+        elif last_time:
             start_time = last_time
             return (start_time, end_time)
 
@@ -615,10 +615,10 @@ class RSASAConnector(phantom.BaseConnector):
         # get the incidents
         ret_val, incidents = self._get_incidents(action_result, max_containers, start_time, end_time)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if (not incidents):
+        if not incidents:
             return action_result.set_status(phantom.APP_SUCCESS, consts.RSASA_NO_INCIDENTS)
 
         for incident in incidents:
@@ -627,7 +627,7 @@ class RSASAConnector(phantom.BaseConnector):
 
             incident['alerts'] = alerts
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.debug_print("get alert failed with: {0}".format(action_result.get_message()))
 
             for alert in alerts:
@@ -636,7 +636,7 @@ class RSASAConnector(phantom.BaseConnector):
 
                 alert['events'] = events
 
-                if (phantom.is_fail(ret_val)):
+                if phantom.is_fail(ret_val):
                     self.debug_print("get event failed with: {0}".format(action_result.get_message()))
 
                 for event in events:
@@ -689,19 +689,19 @@ class RSASAConnector(phantom.BaseConnector):
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
 
-        if (action == self.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+        if action == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
             ret_val = self._test_connectivity(param)
-        elif (action == self.ACTION_ID_RESTART_SERVICE):
+        elif action == self.ACTION_ID_RESTART_SERVICE:
             ret_val = self._restart_service(param)
-        elif (action == self.ACTION_ID_LIST_INCIDENTS):
+        elif action == self.ACTION_ID_LIST_INCIDENTS:
             ret_val = self._list_incidents(param)
-        elif (action == self.ACTION_ID_LIST_DEVICES):
+        elif action == self.ACTION_ID_LIST_DEVICES:
             ret_val = self._list_devices(param)
-        elif (action == self.ACTION_ID_LIST_ALERTS):
+        elif action == self.ACTION_ID_LIST_ALERTS:
             ret_val = self._list_alerts(param)
-        elif (action == self.ACTION_ID_LIST_EVENTS):
+        elif action == self.ACTION_ID_LIST_EVENTS:
             ret_val = self._list_events(param)
-        elif (action == self.ACTION_ID_ON_POLL):
+        elif action == self.ACTION_ID_ON_POLL:
             ret_val = self._on_poll(param)
 
         return ret_val
