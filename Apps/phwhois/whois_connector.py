@@ -213,6 +213,11 @@ class WhoisConnector(BaseConnector):
 
         action_result.set_param({phantom.APP_JSON_IP: ip})
 
+        # This sleep is required between two calls, else the server might
+        # throttle the queries when done in quick succession, which leads
+        # to a 'Connection reset by peer' error.
+        time.sleep(1)
+
         self.debug_print("Validating/Querying IP '{0}'".format(ip))
 
         self.save_progress("Querying...")
@@ -263,12 +268,7 @@ class WhoisConnector(BaseConnector):
                 message += '\nRange: {0}'.format(summary_net['range'])
                 message += '\nAddress: {0}'.format(self._handle_py_ver_compat_for_input_str(summary_net['address']))
 
-        action_result.set_status(phantom.APP_SUCCESS, message)
-
-        # This sleep is required between two calls, else the server might
-        # throttle the queries when done in quick succession, which leads
-        # to a 'Connection reset by peer' error.
-        time.sleep(1)
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _is_ip(self, input_ip_address):
         """ Function that checks given address and returns True if address is valid IPv4 or IPV6 address.
