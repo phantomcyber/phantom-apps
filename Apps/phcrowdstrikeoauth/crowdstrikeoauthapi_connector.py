@@ -2761,7 +2761,7 @@ class CrowdstrikeConnector(BaseConnector):
                             if vault_info:
                                 for vault_meta_info in vault_info:
                                     if vault_meta_info['name'] == filename:
-                                        vault_result_information = vault_meta_info
+                                        vault_result_information = [vault_meta_info]
                                         break
                         vault_info = list(vault_result_information)[0]
                     except IndexError:
