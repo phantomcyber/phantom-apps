@@ -2729,6 +2729,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Try to stream the response to a file
         if response.status_code == 200:
             try:
+                compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup.encode('utf-8')
                 with open(compressed_file_path, 'wb') as f:
                     f.write(response.content)
             except IOError as e:
@@ -2752,8 +2753,17 @@ class CrowdstrikeConnector(BaseConnector):
                 vault_results = phantom_rules.vault_add(container=self.get_container_id(), file_location=compressed_file_path, file_name=filename)
                 if vault_results[0]:
                     try:
-                        _, _, vault_info = phantom_rules.vault_info(vault_id=vault_results[2], file_name=filename, container_id=self.get_container_id())
-                        vault_info = list(vault_info)[0]
+                        _, _, vault_result_information = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id(), file_name=filename)
+                        if not vault_result_information:
+                            vault_result_information = None
+                            # If filename contains special characters, vault_info will return None when passing filename as argument, hence this call is executed
+                            _, _, vault_info = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id())
+                            if vault_info:
+                                for vault_meta_info in vault_info:
+                                    if vault_meta_info['name'] == filename:
+                                        vault_result_information = vault_meta_info
+                                        break
+                        vault_info = list(vault_result_information)[0]
                     except IndexError:
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None)
                     except Exception as e:
