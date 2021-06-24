@@ -1,9 +1,10 @@
 # --
 # File: rsasa_consts.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2017-2018
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 # --
 
 RSASA_JSON_URL = "url"
