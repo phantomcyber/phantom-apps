@@ -295,13 +295,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            for j, artifact in enumerate(artifacts):
+            # Always set the very first artifact to run_automation = True to never have duplicate conflicts
+            if len_artifacts >= 1:
+                artifacts[0]['run_automation'] = True
 
-                # if it is the last artifact of the last container
-                if (j + 1) == len_artifacts:
-                    # mark it such that active playbooks get executed
-                    artifact['run_automation'] = True
-
+            # Useful for spawn.log file analysis
+            for artifact in artifacts:
                 artifact['container_id'] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
@@ -389,6 +388,8 @@ class CrowdstrikeConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
 
             if phantom.is_fail(ret_val):
+                if CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+                    return []
                 return None
 
             offset = response.get('meta', {}).get('pagination', {}).get('offset')
@@ -549,6 +550,9 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -864,28 +868,31 @@ class CrowdstrikeConnector(BaseConnector):
         list_ids = [x.strip() for x in list_ids.split(',')]
         list_ids = list(filter(None, list_ids))
 
-        endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
-
         details_list = list()
         while list_ids:
             # Endpoint creation
-            ids = list_ids[:min(100, len(list_ids))]
+            role_ids = list_ids[:min(100, len(list_ids))]
+            endpoint_param = ''
+            for role in role_ids:
+                endpoint_param += "ids={}&".format(role)
 
-            # Create the param variable to send
-            params = {'ids': ids}
+            endpoint_param = endpoint_param.strip("&")
+            endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
 
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
             # Make REST call
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
-            if phantom.is_fail(ret_val):
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE not in action_result.get_message():
                 return action_result.get_status()
 
-            if response.get("resources"):
+            if ret_val and response.get("resources"):
                 details_list.extend(response.get("resources"))
 
             del list_ids[:min(100, len(list_ids))]
 
         if not details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
 
@@ -1003,7 +1010,7 @@ class CrowdstrikeConnector(BaseConnector):
             del id_list[:min(100, len(id_list))]
 
         if not host_group_details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         for host_group in host_group_details_list:
             action_result.add_data(host_group)
@@ -1626,6 +1633,9 @@ class CrowdstrikeConnector(BaseConnector):
         }
 
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
+
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -2656,8 +2666,9 @@ class CrowdstrikeConnector(BaseConnector):
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
                     if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
-                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
-                            {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
+                        self.debug_print("Error from server. Error code: {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"]))
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}".format(
+                            resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 
@@ -2718,6 +2729,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Try to stream the response to a file
         if response.status_code == 200:
             try:
+                compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup.encode('utf-8')
                 with open(compressed_file_path, 'wb') as f:
                     f.write(response.content)
             except IOError as e:
@@ -2738,8 +2750,26 @@ class CrowdstrikeConnector(BaseConnector):
                     action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
             try:
-                vault_results = Vault.add_attachment(compressed_file_path, self.get_container_id(), filename)
-                return RetVal(phantom.APP_SUCCESS, vault_results)
+                vault_results = phantom_rules.vault_add(container=self.get_container_id(), file_location=compressed_file_path, file_name=filename)
+                if vault_results[0]:
+                    try:
+                        _, _, vault_result_information = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id(), file_name=filename)
+                        if not vault_result_information:
+                            vault_result_information = None
+                            # If filename contains special characters, vault_info will return None when passing filename as argument, hence this call is executed
+                            _, _, vault_info = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id())
+                            if vault_info:
+                                for vault_meta_info in vault_info:
+                                    if vault_meta_info['name'] == filename:
+                                        vault_result_information = [vault_meta_info]
+                                        break
+                        vault_info = list(vault_result_information)[0]
+                    except IndexError:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None)
+                    except Exception as e:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                                        "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))), None)
+                    return RetVal(phantom.APP_SUCCESS, vault_info)
             except Exception as e:
                 return RetVal(
                     action_result.set_status(phantom.APP_ERROR, "Unable to store file in Phantom Vault. Error: {0}".format(self._get_error_message_from_exception(e))), None)

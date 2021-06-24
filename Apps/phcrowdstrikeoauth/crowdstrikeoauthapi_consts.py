@@ -75,6 +75,9 @@ CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in 
 CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
 CROWDSTRIKE_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
+CROWDSTRIKE_CODE_MESSAGE = "Error code: 404"
+CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
+CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
