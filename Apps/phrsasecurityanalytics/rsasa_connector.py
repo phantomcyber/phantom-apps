@@ -364,7 +364,7 @@ class RSASAConnector(phantom.BaseConnector):
         """get all alerts for an incident"""
 
         endpoint = "/ajax/alerts/{0}".format(self._inc_mgnt_id)
-        query_params = {'start': 0, 'limit': limit if limit else consts.RSASA_DEFAULT_PAGE_SIZE, 'sort': '[{"property": "alert.timestamp", "direction": "DESC"}]'}
+        query_params = {'start': 0, 'limit': limit if limit is not None else consts.RSASA_DEFAULT_PAGE_SIZE, 'sort': '[{"property": "alert.timestamp", "direction": "DESC"}]'}
 
         if incident:
             query_params['filter'] = '[{{"property": "incidentId", "value": "{0}"}}]'.format(incident)
@@ -400,7 +400,7 @@ class RSASAConnector(phantom.BaseConnector):
         """get all events for an alert"""
 
         endpoint = "/ajax/alerts/events/{0}/{1}".format(self._inc_mgnt_id, alert)
-        query_params = {'start': 0, 'limit': limit if limit else consts.RSASA_DEFAULT_PAGE_SIZE, 'sort': '[{"property": "timestamp", "direction": "DESC"}]'}
+        query_params = {'start': 0, 'limit': limit if limit is not None else consts.RSASA_DEFAULT_PAGE_SIZE, 'sort': '[{"property": "timestamp", "direction": "DESC"}]'}
 
         events = []
         page = 1
