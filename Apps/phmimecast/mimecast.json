@@ -83,10 +83,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "block url",
+            "action": "blocklist url",
             "description": "Adds URL to a managed URL blocklist",
             "type": "contain",
-            "identifier": "block_url",
+            "identifier": "blocklist_url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -360,6 +360,7 @@
             "description": "Add a sender or domain to a Mimecast group",
             "type": "contain",
             "identifier": "add_member",
+            "undo": "remove member",
             "read_only": false,
             "parameters": {
                 "member": {
@@ -505,6 +506,7 @@
             "description": "Remove a sender or domain from a Mimecast group",
             "type": "correct",
             "identifier": "remove_member",
+            "undo": "add member",
             "read_only": false,
             "parameters": {
                 "member": {
@@ -646,10 +648,11 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "block sender",
+            "action": "blocklist sender",
             "description": "Blocks a specific sender and recipient in Mimecast",
             "type": "contain",
-            "identifier": "block_sender",
+            "identifier": "blocklist_sender",
+            "undo": "allowlist sender",
             "read_only": false,
             "parameters": {
                 "sender": {
@@ -832,10 +835,11 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "allow sender",
+            "action": "allowlist sender",
             "description": "Allows a specific sender and recipient in Mimecast",
             "type": "contain",
-            "identifier": "allow_sender",
+            "identifier": "allowlist_sender",
+            "undo": "blocklist sender",
             "read_only": false,
             "parameters": {
                 "sender": {
@@ -961,10 +965,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "allow url",
+            "action": "allowlist url",
             "description": "Adds URL to a managed URL allowlist",
             "type": "contain",
-            "identifier": "allow_url",
+            "identifier": "allowlist_url",
             "read_only": false,
             "parameters": {
                 "url": {
@@ -1203,10 +1207,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "unblock url",
+            "action": "unblocklist url",
             "description": "Removes URL from a managed URL blocklist",
             "type": "correct",
-            "identifier": "unblock_url",
+            "identifier": "unblocklist_url",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -1337,10 +1341,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "unallow url",
+            "action": "unallowlist url",
             "description": "Removes URL from a managed URL allowlist",
             "type": "correct",
-            "identifier": "unallow_url",
+            "identifier": "unallowlist_url",
             "read_only": false,
             "parameters": {
                 "id": {
@@ -2095,8 +2099,37 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_manually"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internal",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emailAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantomtest@gmail.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.data.*.duration",

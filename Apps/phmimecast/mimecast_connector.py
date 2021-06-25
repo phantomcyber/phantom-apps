@@ -348,6 +348,15 @@ class MimecastConnector(BaseConnector):
                             json=data,
                             verify=config.get('verify_server_cert', False),
                             params=params)
+        except requests.exceptions.InvalidSchema:
+            err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+        except requests.exceptions.InvalidURL:
+            err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error Details: Connection Refused from the Server'
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_CONNECTING_SERVER
                         .format(error=self._get_error_message_from_exception(e))), resp_json)
@@ -375,7 +384,7 @@ class MimecastConnector(BaseConnector):
         self.save_progress(MIMECAST_SUCC_TEST_CONN_PASSED)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_block_url(self, param):
+    def _handle_blocklist_url(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -443,7 +452,7 @@ class MimecastConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_allow_url(self, param):
+    def _handle_allowlist_url(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -580,7 +589,7 @@ class MimecastConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_block_sender(self, param):
+    def _handle_blocklist_sender(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -591,7 +600,7 @@ class MimecastConnector(BaseConnector):
         action_id = self.get_action_identifier()
         action = None
 
-        if action_id == 'block_sender':
+        if action_id == 'blocklist_sender':
             action = 'block'
         else:
             action = 'permit'
@@ -794,7 +803,12 @@ class MimecastConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
             # Successful if member found, fails if nextToken does not exist, repeats loop if nextToken exists
-            if any(i[search_type] == member for i in groupMembers):
+            member_object = None
+            for each_member in groupMembers:
+                if each_member[search_type] == member:
+                    member_object = each_member
+            if member_object:
+                action_result.add_data(member_object)
                 summary = action_result.update_summary({})
                 summary['status'] = "Found Member!"
                 return action_result.set_status(phantom.APP_SUCCESS)
@@ -813,20 +827,35 @@ class MimecastConnector(BaseConnector):
         uri = '/api/message-finder/search'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
 
-        data = {
-            "data": [
-                {
-                    "searchReason": param.get("search_reason"),
-                    "messageId": param.get("message_id"),
-                    "advancedTrackAndTraceOptions": {
-                        "from": param.get("from"),
-                        "to": param.get("to"),
-                        "subject": param.get("subject"),
-                        "senderIP": param.get("sender_ip")
-                    }
-                }
-            ]
-        }
+        data = {"data": [{}]}
+        message_id = param.get("message_id")
+        search_reason = param.get("search_reason")
+        from_address = param.get("from")
+        to_address = param.get("to")
+        subject = param.get("subject")
+        sender_ip = param.get("sender_ip")
+
+        if message_id:
+            data['data'][0]['messageId'] = message_id
+
+        if search_reason:
+            data['data'][0]['searchReason'] = search_reason
+
+        if from_address or to_address or subject or sender_ip:
+            data_object = {'advancedTrackAndTraceOptions': {}}
+            if from_address:
+                data_object['advancedTrackAndTraceOptions']['from'] = from_address
+
+            if to_address:
+                data_object['advancedTrackAndTraceOptions']['to'] = to_address
+
+            if subject:
+                data_object['advancedTrackAndTraceOptions']['subject'] = subject
+
+            if sender_ip:
+                data_object['advancedTrackAndTraceOptions']['senderIp'] = sender_ip
+
+            data['data'][0].update(data_object)
 
         # Check to see if both timestamps are in valid format
         if param.get('start') is not None:
@@ -948,16 +977,16 @@ class MimecastConnector(BaseConnector):
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
 
-        elif action_id == 'block_url':
-            ret_val = self._handle_block_url(param)
+        elif action_id == 'blocklist_url':
+            ret_val = self._handle_blocklist_url(param)
 
-        elif action_id == 'unblock_url':
+        elif action_id == 'unblocklist_url':
             ret_val = self._handle_remove_url(param)
 
-        elif action_id == 'allow_url':
-            ret_val = self._handle_allow_url(param)
+        elif action_id == 'allowlist_url':
+            ret_val = self._handle_allowlist_url(param)
 
-        elif action_id == 'unallow_url':
+        elif action_id == 'unallowlist_url':
             ret_val = self._handle_remove_url(param)
 
         elif action_id == 'add_member':
@@ -966,11 +995,11 @@ class MimecastConnector(BaseConnector):
         elif action_id == 'remove_member':
             ret_val = self._handle_remove_member(param)
 
-        elif action_id == 'block_sender':
-            ret_val = self._handle_block_sender(param)
+        elif action_id == 'blocklist_sender':
+            ret_val = self._handle_blocklist_sender(param)
 
-        elif action_id == 'allow_sender':
-            ret_val = self._handle_block_sender(param)
+        elif action_id == 'allowlist_sender':
+            ret_val = self._handle_blocklist_sender(param)
 
         elif action_id == 'list_urls':
             ret_val = self._handle_list_urls(param)
@@ -999,6 +1028,8 @@ class MimecastConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        if self._state is None:
+            self._state = dict()
 
         config = self.get_config()
         self._base_url = config['base_url'].rstrip('/')
@@ -1011,6 +1042,7 @@ class MimecastConnector(BaseConnector):
         if self._auth_type == "Bypass (Access Key)":
             self._access_key = config.get('access_key')
             self._secret_key = config.get('secret_key')
+            self.save_progress(self._secret_key)
             if self._access_key is None or self._secret_key is None:
                 return self.set_status(phantom.APP_ERROR, MIMECAST_ERR_BYPASS_AUTH)
         else:
