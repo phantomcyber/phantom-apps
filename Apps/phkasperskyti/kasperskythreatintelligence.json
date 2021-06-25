@@ -1,0 +1,682 @@
+{
+    "appid": "2492d30e-9c79-4905-abab-9359d78e85bc",
+    "name": "Kaspersky Threat Intelligence",
+    "description": "Kaspersky Threat Intelligence Portal provides reliable, immediate intelligence about cyber-threats, legitimate objects, their interconnections and indicators, enriched with actionable context to inform your business or clients about the associated risks and implications",
+    "type": "reputation",
+    "product_vendor": "Kaspersky Lab",
+    "logo": "logo_kasperskythreatintelligence.svg",
+    "logo_dark": "logo_kasperskythreatintelligence_dark.svg",
+    "product_name": "Kaspersky Threat Intelligence Portal",
+    "product_version_regex": ".*",
+    "publisher": "Kaspersky Lab",
+    "license": "(c) 2019-2021 AO Kaspersky Lab. All Rights Reserved.",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-05-24T13:55:24.000000Z",
+    "package_name": "phantom_kasperskythreatintelligence",
+    "main_module": "kasperskythreatintelligence_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "app_wizard_version": "1.2.2",
+    "configuration": {
+        "username": {
+            "description": "Portal user name",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "password": {
+            "description": "Portal password",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "pem_key": {
+            "description": "PEM certificate for Kaspersky Threat Intelligence Portal",
+            "data_type": "file",
+            "required": true,
+            "order": 2
+        },
+        "records_count": {
+            "description": "Maximum number of records to display",
+            "data_type": "numeric",
+            "required": true,
+            "default": 10,
+            "order": 3
+        },
+        "accept_the_terms_and_conditions": {
+            "description": "I understand and accept the Terms and Conditions",
+            "data_type": "boolean",
+            "default": false,
+            "order": 4
+        },
+        "accept_privacy_policy": {
+            "description": "I understand and accept Privacy Policy",
+            "data_type": "boolean",
+            "default": false,
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Looks up information about domains in Kaspersky Threat Intelligence Portal",
+            "type": "investigate",
+            "identifier": "domain_reputation",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
+                    "column_name": "Domain",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.DomainGeneralInfo.Categories",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.DomainGeneralInfo.HasApt",
+                    "data_type": "boolean",
+                    "column_name": "Related To APT",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_id",
+                    "data_type": "string",
+                    "column_name": "APT Report ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip reputation",
+            "description": "Looks up information about IP addresses in Kaspersky Threat Intelligence Portal",
+            "type": "investigate",
+            "identifier": "ip_reputation",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.threat_score",
+                    "data_type": "numeric",
+                    "column_name": "Threat Score",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.categories",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.apt_related",
+                    "data_type": "boolean",
+                    "column_name": "Related To APT",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_id",
+                    "data_type": "string",
+                    "column_name": "APT Report ID",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file reputation",
+            "description": "Looks up information about hashes in Kaspersky Threat Intelligence Portal",
+            "type": "investigate",
+            "identifier": "file_reputation",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "description": "File hash to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ],
+                    "column_name": "MD5",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ],
+                    "column_name": "SHA1",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.sha2",
+                    "data_type": "string",
+                    "contains": [
+                        "hash"
+                    ],
+                    "column_name": "SHA256",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.categories",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.apt_related",
+                    "data_type": "boolean",
+                    "column_name": "Related To APT",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_id",
+                    "data_type": "string",
+                    "column_name": "APT Report ID",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "url reputation",
+            "description": "Looks up information about URLs in Kaspersky Threat Intelligence Portal",
+            "type": "investigate",
+            "identifier": "url_reputation",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "description": "URL to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.zone",
+                    "data_type": "string",
+                    "column_name": "Zone",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.categories",
+                    "data_type": "string",
+                    "column_name": "Categories",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.apt_related",
+                    "data_type": "boolean",
+                    "column_name": "Related To APT",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_id",
+                    "data_type": "string",
+                    "column_name": "APT Report ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get detailed info",
+            "description": "Queries detailed information about indicator",
+            "type": "investigate",
+            "identifier": "get_more_info",
+            "read_only": true,
+            "parameters": {
+                "indicator": {
+                    "description": "Indicator to query",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url",
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5",
+                        "domain",
+                        "ip"
+                    ],
+                    "order": 0
+                },
+                "sections": {
+                    "description": "Sections to query",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator",
+                    "data_type": "string",
+                    "contains": [
+                        "url",
+                        "hash",
+                        "sha256",
+                        "sha1",
+                        "md5",
+                        "domain",
+                        "ip"
+                    ],
+                    "column_name": "Indicator",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.sections",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.tip_url",
+                    "data_type": "string",
+                    "column_name": "KL TIP URL",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.hits_count",
+                    "data_type": "numeric",
+                    "column_name": "Hits Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get reports",
+            "description": "Requests APT reports by using the Kaspersky Threat Intelligence Portal API",
+            "type": "investigate",
+            "identifier": "get_reports",
+            "read_only": true,
+            "parameters": {
+                "apt_id": {
+                    "description": "APT ID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.apt_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.apt_report",
+                    "data_type": "string",
+                    "column_name": "APT Report Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.apt_url",
+                    "data_type": "string",
+                    "column_name": "APT Report Link",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_desc",
+                    "data_type": "string",
+                    "column_name": "APT Report Description",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_geo",
+                    "data_type": "string",
+                    "column_name": "APT Report Geo Tags",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_industry",
+                    "data_type": "boolean",
+                    "column_name": "APT Report Industry Tags",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.apt_report_actors",
+                    "data_type": "string",
+                    "column_name": "APT Report Actors Tags",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

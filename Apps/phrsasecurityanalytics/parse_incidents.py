@@ -1,7 +1,7 @@
 # --
 # File: parse_incidents.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2017-2018
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -45,7 +45,7 @@ def parse_incidents(incidents, base_connector):
             results.append({'container': container, 'artifacts': artifacts})
 
             container['data'] = incident
-            container['name'] = '{0} - {1}'.format(incident['id'], incident['name'].encode('utf-8'))
+            container['name'] = '{0} - {1}'.format(incident['id'], incident['name'])
             container['description'] = incident['summary']
             container['source_data_identifier'] = incident['id']
 
@@ -61,7 +61,7 @@ def parse_incidents(incidents, base_connector):
                 artifact['label'] = 'alert'
                 cef['events'] = event_id_list
                 artifact['source_data_identifier'] = alert['id']
-                artifact['name'] = 'alert - {0}'.format(alert['name'].encode('utf-8'))
+                artifact['name'] = 'alert - {0}'.format(alert['name'])
                 artifact['cef_types'] = {'incidentId': ['rsa incident id'], 'alertId': ['rsa alert id']}
 
                 for key in alert:

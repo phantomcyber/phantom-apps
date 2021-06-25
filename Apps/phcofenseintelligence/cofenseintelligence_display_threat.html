@@ -1,0 +1,241 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: cofenseintelligence_display_threat.html
+Copyright (c) 2020-2021 Splunk Inc.
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+
+    .phishme-threat a:hover {
+    text-decoration:underline;
+    }
+
+
+    .phishme-threat .wf-table-horizontal {
+    width: initial;
+    border: 1px solid;
+    font-size: 12px;
+    }
+
+    .phishme-threat .wf-table-horizontal th {
+    text-align: center;
+    border: 1px solid;
+    text-transform: uppercase;
+    font-weight: normal;
+    padding: 5px;
+    }
+
+    .phishme-threat .wf-table-horizontal td {
+    border: 1px solid;
+    padding: 5px;
+    padding-left: 4px;
+    }
+
+    .phishme-threat .table-header {
+    font-size: 18px
+    }
+
+    .phishme-threat .wf-h4-style {
+    font-size: 18px;
+    }
+
+    .phishme-threat .td-scroll-height {
+    max-height: 120px;
+    overflow-y: auto;
+    }
+
+</style>
+
+<div class="phishme-threat" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+
+    <!------------ loop for each result ------------>
+    {% for result in results %}
+    </br>
+
+    <h3> Threat Details </h3>
+    {% if not result.details %}
+    <h4 class="wf-h4-style">Data not available</h4>
+    {% elif result.details %}
+    <table id="watch-list-table" class="wf-table-horizontal datatable">
+        <thead>
+        <tr>
+            <th>Threat ID</th>
+            <th>Label</th>
+            <th>Type</th>
+            <th>First Published</th>
+            <th>Last Published</th>
+            {% if result.param_name == 'file' %}
+                <th>md5 Hash</th>
+                <th>sha256 Hash</th>
+                <th>sha1 Hash</th>
+                <th>sha384 Hash</th>
+                <th>sha224 Hash</th>
+                <th>sha512 Hash</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for info in result.details %}
+            <tr>
+            <td>
+                <a href="javascript:;"
+                   onclick="context_menu(this, [{'contains': ['phishme threat id'], 'value': '{{ info.id }}' }], 0, {{ container.id }}, null, false);">
+                    {{ info.id }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+            </td>
+            <td>{{ info.label }}</td>
+            <td>{{ info.threatType }}</td>
+            <td>{{ info.firstPublished }}</td>
+            <td>{{ info.lastPublished }}</td>
+
+            {% if result.param_name == 'file' %}
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.md5Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ curr_file.md5Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.md5Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.sha256Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ curr_file.sha256Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha256Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.sha1Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ curr_file.sha1Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha1Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.sha384Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['sha384'], 'value': '{{ curr_file.sha384Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha384Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.sha224Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['sha224'], 'value': '{{ curr_file.sha224Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha224Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td>
+                <div class="td-scroll-height">
+                    {% for curr_file in info.executableSet %}
+                        {% if curr_file.sha512Hex %}
+                            <a href="javascript:;"
+                               onclick="context_menu(this, [{'contains': ['sha512'], 'value': '{{ curr_file.sha512Hex }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha512Hex }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                                <br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% endif %}
+
+    {% endfor %}
+    <!------------ loop for each result end ------------>
+</div> <!-- Main Div -->
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": false,
+    "bLengthChange": false,
+    "info": false,
+    "language": {
+       "paginate": {
+         "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+         "next": "<i class='fa fa-angle-right fa-lg'></i>"
+       }
+    },
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+});
+$('.datatable').DataTable();
+
+</script>
+
+{% endblock %} <!-- Main Start Block -->
+

@@ -126,19 +126,13 @@ def handle_request(request, path):
         except Exception as e:
             return HttpResponse(SLACK_ERR_PARSE_JSON_FROM_CALLBACK_ID.format(error=e), content_type="text/plain", status=400)
 
-        directory = dict(callback_json).get('directory')
-        if not directory:
-            return HttpResponse(SLACK_ERR_STATE_DIR_NOT_FOUND, content_type="text/plain", status=400)
+        apps_directory = os.path.dirname(os.path.abspath(__file__))
 
-        if len(directory.split(",")) != 2:
-            return HttpResponse(SLACK_ERR_UNEXPECTED_STATE_DIR, content_type="text/plain", status=400)
-
-        apps_directory, local_data_directory = [x.strip() for x in directory.split(',')]
-
-        state_filename = dict(callback_json).get('state')
-        if not state_filename:
+        asset_id = dict(callback_json).get('asset_id')
+        if not asset_id:
             return HttpResponse(SLACK_ERR_STATE_FILE_NOT_FOUND, content_type="text/plain", status=400)
 
+        state_filename = "{0}_state.json".format(asset_id)
         state_path = "{0}/{1}".format(apps_directory, state_filename)
         try:
             with open(state_path, 'r') as state_file_obj:
@@ -147,16 +141,21 @@ def handle_request(request, path):
         except Exception as e:
             return HttpResponse(SLACK_ERR_UNABLE_TO_READ_STATE_FILE.format(error=e), content_type="text/plain", status=400)
 
+        local_data_directory = dict(state).get('local_data_path')
+        if not local_data_directory:
+            return HttpResponse(SLACK_ERR_STATE_DIR_NOT_FOUND, content_type="text/plain", status=400)
+
         my_token = dict(state).get('token', 'my token does not exist')
         their_token = dict(payload).get('token', 'their token is missing')
 
         if my_token != their_token:
             return HttpResponse(SLACK_ERR_AUTH_FAILED, content_type="text/plain", status=400)
 
-        answer_filename = dict(callback_json).get('answer')
-        if not answer_filename:
+        qid = dict(callback_json).get('qid')
+        if not qid:
             return HttpResponse(SLACK_ERR_ANSWER_FILE_NOT_FOUND, content_type="text/plain", status=400)
 
+        answer_filename = '{0}.json'.format(qid)
         answer_path = "{0}/{1}".format(local_data_directory, answer_filename)
         try:
             answer_file = open(answer_path, 'w')
@@ -1020,6 +1019,8 @@ class SlackConnector(phantom.BaseConnector):
         action_result = self.add_action_result(phantom.ActionResult(dict(param)))
         config = self.get_config()
 
+        local_data_state_dir = self.get_state_dir().rstrip('/')
+        self._state['local_data_path'] = local_data_state_dir
         # Need to make sure the configured verification token is in the app state so the request_handler can use it to verify POST requests
         if 'token' not in self._state:
             self._state['token'] = config[SLACK_JSON_VERIFICATION_TOKEN]
@@ -1043,17 +1044,19 @@ class SlackConnector(phantom.BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_UNABLE_TO_SEND_QUESTION_TO_CHANNEL)
 
         qid = uuid.uuid4().hex
-        apps_state_dir = os.path.dirname(os.path.abspath(__file__))
-        local_data_state_dir = self.get_state_dir()
-        state_dir = "{0},{1}".format(apps_state_dir, local_data_state_dir)
 
         answer_filename = '{0}.json'.format(qid)
-        state_filename = "{0}_state.json".format(self.get_asset_id())
+        answer_path = "{0}/{1}".format(local_data_state_dir, answer_filename)
 
-        path_json = {'answer': answer_filename,
-                     'state': state_filename,
-                     'directory': state_dir,
+        path_json = {'qid': qid,
+                     'asset_id': str(self.get_asset_id()),
                      'confirmation': param.get('confirmation', ' ')}
+
+        callback_id = json.dumps(path_json)
+        if len(callback_id) > 255:
+            path_json['confirmation'] = ''
+            valid_length = 255 - len(json.dumps(path_json))
+            return action_result.set_status(phantom.APP_ERROR, SLACK_ERR_LENGTH_LIMIT_EXCEEDED.format(asset_length=len(self.get_asset_id()), valid_length=valid_length))
 
         self.save_progress('Asking question with ID: {0}'.format(qid))
 
@@ -1068,7 +1071,7 @@ class SlackConnector(phantom.BaseConnector):
                         {
                           'text': question,
                           'fallback': 'Phantom cannot post questions on this channel.',
-                          'callback_id': json.dumps(path_json),
+                          'callback_id': callback_id,
                           'color': '#422E61',
                           'attachment_type': 'default',
                           'actions': answers
@@ -1086,7 +1089,6 @@ class SlackConnector(phantom.BaseConnector):
                 error_message = SLACK_ERR_ASKING_QUESTION
             return action_result.set_status(phantom.APP_ERROR, error_message)
 
-        answer_path = "{0}/{1}".format(local_data_state_dir, answer_filename)
         loop_count = (self._timeout * 60) / self._interval
         count = 0
 

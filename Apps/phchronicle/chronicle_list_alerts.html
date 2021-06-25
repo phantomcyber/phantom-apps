@@ -11,7 +11,7 @@
 
 <!-- File: chronicle_list_alerts.html
 
-    Copyright (c) 2020 Google LLC.
+    Copyright (c) 2020-2021 Google LLC.
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -36,17 +36,17 @@
 
 
     .gc .wf-table-vertical {
-    width: initial;
-    font-size: 12px;
+        width: initial;
+        font-size: 12px;
     }
 
     .gc .wf-table-vertical td{
-    padding: 8px 10px;
-    border: 1px solid;
+        padding: 8px 10px;
+        border: 1px solid;
     }
 
     .gc .wf-table-vertical tr td:first-child {
-    font-weight: bold;
+        font-weight: bold;
     }
 
     .gc .wf-table-horizontal {
@@ -150,6 +150,12 @@
                     <td>{{ result.param.limit }}</td>
                 </tr>
             {% endif %}
+            {% if result.param.alert_type %}
+                <tr>
+                    <td>Alert Type</td>
+                    <td>{{ result.param.alert_type }}</td>
+                </tr>
+            {% endif %}
         </table>
 
         <!-- Output view -->
@@ -240,6 +246,107 @@
                                     </thead>
                                     <tbody>
                                         {% for summary in alert.alertSummary %}
+                                        <tr>
+                                            <td>{{ summary.name }}</td>
+                                            <td>{{ summary.count }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            No data found
+            {% endif %}
+
+            <h3 class="wf-h3-style">Alerts Users Association</h3>
+            {% if response.alerts_users_association %}
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>Alert Name</th>
+                        <th>Affected Users</th>
+                        <th>Affected Users Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alert in response.alerts_users_association %}
+                    <tr>
+                        <td>{{ alert.alert_name }}</td>
+                        <td>
+                            <table class="wf-table-vertical">
+                            {% for key, value in alert.affected_users.items %}
+                                {% if value %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>
+                                            {% for a in value %}
+                                                <li style="list-style-type:none;">
+                                                    <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['email', 'gc username', 'user name', 'gc email'], 'value':'{{ a }}' }], 0, {{ container.id }}, null, false);">
+                                                        {{ a }}
+                                                        &nbsp;
+                                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                            </table>
+                        </td>
+                        <td>{{ alert.user_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            No data found
+            {% endif %}
+
+            <h3 class="wf-h3-style">Users with Alerts Summary</h3>
+            {% if response.userAlerts %}
+            <table class="wf-table-horizontal datatable">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Alert Summary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for userAlert in response.userAlerts %}
+                    <tr>
+                        <td>
+                            <table class="wf-table-vertical">
+                                {% for key, value in userAlert.user.items %}
+                                <tr>
+                                    <td>{{ key }}</td>
+                                    <td>
+                                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['email', 'gc username', 'user name', 'gc email'], 'value':'{{ value }}' }], 0, {{ container.id }}, null, false);">
+                                            {{ value }}
+                                            &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                        <td>
+                            {% if userAlert.userAlertSummary %}
+                                <table class="wf-table-horizontal datatable">
+                                    <thead>
+                                        <tr>
+                                            <td>Alert Name</td>
+                                            <td>Number of Occurences</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for summary in userAlert.userAlertSummary %}
                                         <tr>
                                             <td>{{ summary.name }}</td>
                                             <td>{{ summary.count }}</td>

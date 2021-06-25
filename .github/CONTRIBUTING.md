@@ -34,13 +34,12 @@ If you are not familiar with a fork-and-branch Git workflow, or just feel a bit 
 ## Contributing Bug-fixes
 If you've found a bug and wish to fix it, the first thing to do is
 
-1. If one does not already exist, create an Issue (otherwise we'll use the existing one)
 1. [Fork](https://guides.github.com/activities/forking/) the project
-1. Create a branch for the issue
+1. Create a branch
 1. Make your changes on your branch
 1. Thoroughly test your changes. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
 1. Add your name to the contributors list in the app JSON! [Example](https://github.com/phantomcyber/phantom-apps/pull/488/commits/a02e345ce48e56bcb8711d1c5c4e40dd6e62fd11?diff=split&w=1)
-1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch that gives edit access to the maintainers of the phantom-apps repo.
+1. Open a [pull request](https://help.github.com/articles/using-pull-requests/) to the [next](https://github.com/phantomcyber/phantom-apps/tree/next) branch that gives edit access to the maintainers of the phantom-apps repo. Please ensure your pull request adheres to the guidelines mentioned in [PULL REQUEST TEMPLATE](https://github.com/phantomcyber/phantom-apps/blob/next/.github/pull_request_template.md).
 
 *****Important Notes:**
 
@@ -56,15 +55,14 @@ If you've found a bug and wish to fix it, the first thing to do is
 
 If you've created a brand new App and wish to contribute it, the steps to do so are as follows.
 
-1. If one does not already exist, create an Issue (otherwise we'll use the existing one)
 1. [Fork](https://guides.github.com/activities/forking/) the project
-1. Create a branch for the issue (following our [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)))
+1. Create a branch (following our [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)))
 1. Create a new directory/folder for your App (again following the [Conventions](https://github.com/phantomcyber/phantom-apps/blob/next/.github/CONVENTIONS.md)).
 1. Add your app code to the folder. Ensure no other folders are affected.
 1. **Thoroughly** test your code for the new App. See the [Automated Checks](#automated-checks) section for information about basic automated checks we provide for all apps.
     <!-- 1. Ensure your new app has a [TESTING](https://about:blank) document for the community and our developers. -->
 1. Add your name to the contributors list in the app JSON! [Example](https://github.com/phantomcyber/phantom-apps/pull/488/commits/a02e345ce48e56bcb8711d1c5c4e40dd6e62fd11?diff=split&w=1)
-1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch.
+1. Perform a [pull request](https://help.github.com/articles/using-pull-requests/) to the [Next](https://github.com/phantomcyber/phantom-apps/tree/next) branch. Please ensure your pull request adheres to the guidelines mentioned in [PULL REQUEST TEMPLATE](https://github.com/phantomcyber/phantom-apps/blob/next/.github/pull_request_template.md).
 
 **Note: Any pull-request to [Master](https://github.com/phantomcyber/phantom-apps/tree/master) will not be accepted**
 
