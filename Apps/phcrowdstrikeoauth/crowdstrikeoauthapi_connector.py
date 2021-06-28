@@ -26,8 +26,6 @@ from datetime import timedelta
 import time
 import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
-import sys
-import imp
 from _collections import defaultdict
 
 
@@ -51,6 +49,8 @@ class CrowdstrikeConnector(BaseConnector):
         self._client_id = None
         self._client_secret = None
         self._oauth_access_token = None
+        self._poll_interval = None
+        self._required_detonation = False
 
     def initialize(self):
         """ Automatically called by the BaseConnector before the calls to the handle_action function"""
@@ -60,22 +60,21 @@ class CrowdstrikeConnector(BaseConnector):
         # The headers, initialize them here once and use them for all other REST calls
         self._headers = {'Content-Type': 'application/json'}
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
-
         # Base URL
-        self._client_id = self._handle_py_ver_compat_for_input_str(config[CROWDSTRIKE_CLIENT_ID])
+        self._client_id = config[CROWDSTRIKE_CLIENT_ID]
         self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
-        self._base_url_oauth = self._handle_py_ver_compat_for_input_str(config[CROWDSTRIKE_JSON_URL_OAuth])
+        self._base_url_oauth = config[CROWDSTRIKE_JSON_URL_OAuth]
+        self._required_detonation = False
+        self._poll_interval = self._validate_integers(self, config.get(CROWDSTRIKE_POLL_INTERVAL, 15), CROWDSTRIKE_POLL_INTERVAL)
+        if self._poll_interval is None:
+            return self.get_status()
+
         self._base_url_oauth = self._base_url_oauth.replace('\\', '/')
 
         if self._base_url_oauth[-1] == '/':
             self._base_url_oauth = self._base_url_oauth[:-1]
 
-        app_id = self._handle_py_ver_compat_for_input_str(config.get('app_id', self.get_asset_id().replace('-', '')))
+        app_id = config.get('app_id', self.get_asset_id().replace('-', ''))
         self._parameters = {'appId': app_id.replace('-', '')}
 
         self._state = self.load_state()
@@ -100,14 +99,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         if script:
             try:  # Try to laod in script to preprocess artifacts
-                if self._python_version < 3:
-                    self._script_module = imp.new_module('preprocess_methods')
-                    exec(script, self._script_module.__dict__)
-                else:
-                    import importlib.util
-                    preprocess_methods = importlib.util.spec_from_loader('preprocess_methods', loader=None)
-                    self._script_module = importlib.util.module_from_spec(preprocess_methods)
-                    exec(script, self._script_module.__dict__)
+                import importlib.util
+                preprocess_methods = importlib.util.spec_from_loader('preprocess_methods', loader=None)
+                self._script_module = importlib.util.module_from_spec(preprocess_methods)
+                exec(script, self._script_module.__dict__)
             except Exception as e:
                 self.save_progress("Error loading custom script. Error: {}".format(str(e)))
                 return phantom.APP_ERROR
@@ -143,30 +138,7 @@ class CrowdstrikeConnector(BaseConnector):
             error_code = CROWDSTRIKE_ERROR_CODE_MESSAGE
             error_msg = CROWDSTRIKE_ERROR_MESSAGE
 
-        try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
-        except:
-            error_msg = CROWDSTRIKE_ERROR_MESSAGE
-
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _check_for_existing_container(self, container, time_interval, collate):
         # Even if the collate parameter is selected, the time mentioned in the merge_time_interval
@@ -323,13 +295,12 @@ class CrowdstrikeConnector(BaseConnector):
 
             # get the length of the artifact, we might have trimmed it or not
             len_artifacts = len(artifacts)
-            for j, artifact in enumerate(artifacts):
+            # Always set the very first artifact to run_automation = True to never have duplicate conflicts
+            if len_artifacts >= 1:
+                artifacts[0]['run_automation'] = True
 
-                # if it is the last artifact of the last container
-                if (j + 1) == len_artifacts:
-                    # mark it such that active playbooks get executed
-                    artifact['run_automation'] = True
-
+            # Useful for spawn.log file analysis
+            for artifact in artifacts:
                 artifact['container_id'] = container_id
 
             ret_val, status_string, artifact_ids = self.save_artifacts(artifacts)
@@ -394,10 +365,48 @@ class CrowdstrikeConnector(BaseConnector):
             if limit and len(list_ids) >= int(limit):
                 return list_ids[:int(limit)]
 
+            if self.get_action_identifier() in ['detonate_file', 'detonate_url']:
+                if total == 0:
+                    self._required_detonation = True
             if offset >= total:
                 return list_ids
 
         return list_ids
+
+    def _hunt_paginator(self, action_result, endpoint, params):
+        list_ids = list()
+
+        offset = ''
+        limit = None
+        if params.get('limit'):
+            limit = params.pop('limit')
+
+        while True:
+            params.update({"offset": offset})
+            params.update({"limit": 100})
+
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
+
+            if phantom.is_fail(ret_val):
+                if CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+                    return []
+                return None
+
+            offset = response.get('meta', {}).get('pagination', {}).get('offset')
+
+            if len(response.get('errors', [])):
+                error = response.get('errors')[0]
+                action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
+                return None
+
+            if response.get("resources"):
+                list_ids.extend(response.get("resources"))
+
+            if limit and len(list_ids) >= limit:
+                return list_ids[:limit]
+
+            if (not offset) and (not response.get('meta', {}).get("pagination", {}).get("next_page")):
+                return list_ids
 
     def _test_connectivity_oauth2(self, param):
 
@@ -438,7 +447,7 @@ class CrowdstrikeConnector(BaseConnector):
 
     def _get_details(self, action_result, endpoint, param, method='get'):
 
-        list_ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        list_ids = param.get("ids")
 
         list_ids_details = list()
 
@@ -456,50 +465,31 @@ class CrowdstrikeConnector(BaseConnector):
 
         return list_ids_details
 
-    def _get_device_count(self, params, action_result):
-
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH, params=params)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        try:
-            resources = response['resources']
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to parse response {}".format(self._get_error_message_from_exception(e)))
-
-        if not resources:
-            action_result.update_summary({'device_count': 0})
-            return action_result.set_status(phantom.APP_SUCCESS)
-
-        result = resources[0]
-
-        # successful request
-        action_result.update_summary({'device_count': result.get('device_count', 0)})
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
     def _get_devices_ran_on(self, ioc, ioc_type, param, action_result):
 
         api_data = {
             "type": ioc_type,
             "value": ioc
         }
-
+        limit = self._validate_integers(action_result, param.get('limit', 100), 'limit')
+        if limit is None:
+            return action_result.get_status()
+        api_data['limit'] = limit
         count_only = param.get(CROWDSTRIKE_JSON_COUNT_ONLY, False)
 
-        if count_only:
-            return self._get_device_count(api_data, action_result)
+        response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH, params=api_data)
-
-        if phantom.is_fail(ret_val):
+        if response is None:
             return action_result.get_status()
 
+        if count_only:
+            action_result.update_summary({'device_count': len(response)})
+            return action_result.set_status(phantom.APP_SUCCESS)
+
         # successful request / "none found"
-        for d in response["resources"]:
-            action_result.add_data({"device_id": d})
-        action_result.set_summary({"device_count": len(response["resources"])})
+        for device_id in response:
+            action_result.add_data({"device_id": device_id})
+        action_result.set_summary({"device_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -508,7 +498,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        detection_id = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_JSON_ID])
+        detection_id = param[CROWDSTRIKE_JSON_ID]
         to_state = param[CROWDSTRIKE_RESOLVE_DETECTION_TO_STATE]
 
         detection_id = [x.strip() for x in detection_id.split(',')]
@@ -553,13 +543,16 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        fdid = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID])
+        fdid = param[CROWDSTRIKE_GET_DEVICE_DETAIL_DEVICE_ID]
 
         api_data = {
             "ids": fdid
         }
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -585,7 +578,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        fpid = self._handle_py_ver_compat_for_input_str(param.get(CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID, ''))
+        fpid = param.get(CROWDSTRIKE_GET_PROCESS_DETAIL_FALCON_PROCESS_ID, '')
 
         api_data = {
             "ids": fpid
@@ -672,7 +665,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -700,7 +693,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -760,7 +753,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Hold the values for the status
         statuses = {"new": 20, "reopened": 25, "in progress": 30, "closed": 40}
 
-        ids = self._handle_py_ver_compat_for_input_str(param.get("ids"))
+        ids = param.get("ids")
         ids = [x.strip() for x in ids.split(',')]
         ids = list(filter(None, ids))
 
@@ -768,25 +761,25 @@ class CrowdstrikeConnector(BaseConnector):
         data = {"action_parameters": [], "ids": ids}
 
         if param.get("add_tag"):
-            add_tags = self._handle_py_ver_compat_for_input_str(param.get("add_tag"))
+            add_tags = param.get("add_tag")
             add_tags = [x.strip() for x in add_tags.split(',')]
             add_tags = list(filter(None, add_tags))
             for tag in add_tags:
                 data["action_parameters"].append({"name": "add_tag", "value": tag})
 
         if param.get("delete_tag"):
-            delete_tags = self._handle_py_ver_compat_for_input_str(param.get("delete_tag"))
+            delete_tags = param.get("delete_tag")
             delete_tags = [x.strip() for x in delete_tags.split(',')]
             delete_tags = list(filter(None, delete_tags))
             for tag in delete_tags:
                 data["action_parameters"].append({"name": "delete_tag", "value": tag})
 
         if param.get("update_name"):
-            name = self._handle_py_ver_compat_for_input_str(param.get("update_name"))
+            name = param.get("update_name")
             data["action_parameters"].append({"name": "update_name", "value": name})
 
         if param.get("update_description"):
-            description = self._handle_py_ver_compat_for_input_str(param.get("update_description"))
+            description = param.get("update_description")
             data["action_parameters"].append({"name": "update_description", "value": description})
 
         data_list = ["New", "Reopened", "In Progress", "Closed"]
@@ -797,7 +790,7 @@ class CrowdstrikeConnector(BaseConnector):
             data["action_parameters"].append({"name": "update_status", "value": str(statuses[status])})
 
         if param.get("add_comment"):
-            comment = self._handle_py_ver_compat_for_input_str(param.get("add_comment"))
+            comment = param.get("add_comment")
             data["action_parameters"].append({"name": "add_comment", "value": comment})
 
         endpoint = CROWDSTRIKE_UPDATE_INCIDENT_ENDPOINT
@@ -871,32 +864,35 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        list_ids = self._handle_py_ver_compat_for_input_str(param.get("role_id"))
+        list_ids = param.get("role_id")
         list_ids = [x.strip() for x in list_ids.split(',')]
         list_ids = list(filter(None, list_ids))
-
-        endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
 
         details_list = list()
         while list_ids:
             # Endpoint creation
-            ids = list_ids[:min(100, len(list_ids))]
+            role_ids = list_ids[:min(100, len(list_ids))]
+            endpoint_param = ''
+            for role in role_ids:
+                endpoint_param += "ids={}&".format(role)
 
-            # Create the param variable to send
-            params = {'ids': ids}
+            endpoint_param = endpoint_param.strip("&")
+            endpoint = CROWDSTRIKE_GET_ROLE_ENDPOINT
 
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
             # Make REST call
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint, params=params)
-            if phantom.is_fail(ret_val):
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE not in action_result.get_message():
                 return action_result.get_status()
 
-            if response.get("resources"):
+            if ret_val and response.get("resources"):
                 details_list.extend(response.get("resources"))
 
             del list_ids[:min(100, len(list_ids))]
 
         if not details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         details_data_list = [i for n, i in enumerate(details_list) if i not in details_list[n + 1:]]
 
@@ -1014,7 +1010,7 @@ class CrowdstrikeConnector(BaseConnector):
             del id_list[:min(100, len(id_list))]
 
         if not host_group_details_list:
-            return action_result.set_status(phantom.APP_SUCCESS, "No data found")
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
 
         for host_group in host_group_details_list:
             action_result.add_data(host_group)
@@ -1155,8 +1151,8 @@ class CrowdstrikeConnector(BaseConnector):
     def _check_params(self, action_result, param):
 
         ids = list()
-        device_id = self._handle_py_ver_compat_for_input_str(param.get('device_id', ''))
-        hostname = self._handle_py_ver_compat_for_input_str(param.get("hostname"))
+        device_id = param.get('device_id', '')
+        hostname = param.get("hostname")
         device_id_flag, hostname_flag = False, False
         intermediate_device_ids = list()
         if not device_id and not hostname:
@@ -1593,7 +1589,7 @@ class CrowdstrikeConnector(BaseConnector):
                         sequence_id += 1
             # if errors occurred while executing the command
             elif len(resp_json.get('errors', [])):
-                errors = [self._handle_py_ver_compat_for_input_str(err.get('message')) for err in resp_json.get('errors')]
+                errors = [err.get('message') for err in resp_json.get('errors')]
                 return action_result.set_status(phantom.APP_ERROR, "Errors occurred while executing command: {}".format("\r\n".join(errors)))
 
             # wait 5 seconds and try again
@@ -1638,6 +1634,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         ret_val, vault_results = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT, params=params)
 
+        if phantom.is_fail(ret_val) and CROWDSTRIKE_STATUS_CODE_MESSAGE in action_result.get_message():
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_NO_DATA_MESSAGE)
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -1654,7 +1653,7 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
-            file_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+            file_id = param['vault_id']
             success, message, file_info = phantom_rules.vault_info(vault_id=file_id)
             file_info = list(file_info)[0]
         except IndexError:
@@ -1779,6 +1778,36 @@ class CrowdstrikeConnector(BaseConnector):
 
         return parameter
 
+    def _validate_on_poll_config_params(self, action_result, config):
+        self.debug_print("Validating 'max_crlf' asset configuration parameter")
+        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT),
+                                           "max_crlf")
+
+        self.debug_print("Validating 'merge_time_interval' asset configuration parameter")
+        merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0),
+                                                      "merge_time_interval", allow_zero=True)
+
+        if self.is_poll_now():
+            # Manual Poll Now
+            try:
+                self.debug_print("Validating 'max_events_poll_now' asset configuration parameter")
+                max_events = self._validate_integers(action_result,
+                                                     config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT),
+                                                     "max_events_poll_now")
+            except:
+                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
+                max_events = DEFAULT_POLLNOW_EVENTS_COUNT
+        else:
+            # Scheduled and Interval Polling
+            try:
+                self.debug_print("Validating 'max_events' asset configuration parameter")
+                max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT),
+                                                     "max_events")
+            except:
+                max_events = DEFAULT_EVENTS_COUNT
+
+        return max_crlf, merge_time_interval, max_events
+
     def _on_poll(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1793,35 +1822,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         config = self.get_config()
 
-        self.debug_print("Validating 'max_crlf' asset configuration parameter")
-        max_crlf = self._validate_integers(action_result, config.get("max_crlf", DEFAULT_BLANK_LINES_ALLOWABLE_LIMIT), "max_crlf")
-        if max_crlf is None:
-            return action_result.get_status()
+        max_crlf, merge_time_interval, max_events = self._validate_on_poll_config_params(action_result, config)
 
-        self.debug_print("Validating 'merge_time_interval' asset configuration parameter")
-        merge_time_interval = self._validate_integers(action_result, config.get('merge_time_interval', 0), "merge_time_interval", allow_zero=True)
-        if merge_time_interval is None:
+        if max_crlf is None or merge_time_interval is None or max_events is None:
             return action_result.get_status()
-
-        if self.is_poll_now():
-            # Manual Poll Now
-            try:
-                self.debug_print("Validating 'max_events_poll_now' asset configuration parameter")
-                max_events = self._validate_integers(action_result, config.get('max_events_poll_now', DEFAULT_POLLNOW_EVENTS_COUNT), "max_events_poll_now")
-                if max_events is None:
-                    return action_result.get_status()
-            except:
-                self.debug_print("Error occurred while validating 'max_events_poll_now' asset configuration parameter")
-                max_events = DEFAULT_POLLNOW_EVENTS_COUNT
-        else:
-            # Scheduled and Interval Polling
-            try:
-                self.debug_print("Validating 'max_events' asset configuration parameter")
-                max_events = self._validate_integers(action_result, config.get('max_events', DEFAULT_EVENTS_COUNT), "max_events")
-                if max_events is None:
-                    return action_result.get_status()
-            except:
-                max_events = DEFAULT_EVENTS_COUNT
 
         lower_id = 0
         if not self.is_poll_now():
@@ -1865,8 +1869,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         try:
             for chunk in r.iter_content(chunk_size=None):
-                if self._python_version == 3:
-                    chunk = UnicodeDammit(chunk).unicode_markup
+                chunk = UnicodeDammit(chunk).unicode_markup
 
                 if not chunk:
                     # Done with all the event data for now
@@ -1946,33 +1949,37 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_JSON_IOC])
-        fdid = self._handle_py_ver_compat_for_input_str(param[CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID])
+        ioc = param[CROWDSTRIKE_JSON_IOC]
+        fdid = param[CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID]
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        limit = self._validate_integers(action_result, param.get('limit', 100), 'limit')
+        if limit is None:
+            return action_result.get_status()
+
         api_data = {
             "type": ioc_type,
             "value": ioc,
-            "device_id": fdid
+            "device_id": fdid,
+            "limit": limit
         }
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
+        response = self._hunt_paginator(action_result, CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH, params=api_data)
 
-        if phantom.is_fail(ret_val):
+        if response is None:
             return action_result.get_status()
 
-        resources = response.get("resources", [])
-        if not resources:
+        if not response:
             return action_result.set_status(phantom.APP_SUCCESS, "No resources found from the response for the list processes action")
 
-        for p in resources:
-            action_result.add_data({"falcon_process_id": p})
+        for process_id in response:
+            action_result.add_data({"falcon_process_id": process_id})
 
-        action_result.set_summary({"process_count": len(resources)})
+        action_result.set_summary({"process_count": len(response)})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -2069,6 +2076,528 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
 
+    def _paginate_endpoint(self, action_result, resource_id_list, endpoint, param):
+        id_list = list()
+        id_list.extend(resource_id_list)
+        resource_details_list = list()
+        summary_data = action_result.update_summary({})
+        while id_list:
+            # Endpoint creation
+            ids = id_list[:min(100, len(id_list))]
+            endpoint_param = ''
+            for resource in ids:
+                endpoint_param += "ids={}&".format(resource)
+
+            endpoint_param = endpoint_param.strip("&")
+
+            endpoint = "{}?{}".format(endpoint, endpoint_param)
+
+            # Make REST call
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, endpoint)
+
+            if phantom.is_fail(ret_val):
+                self.debug_print('Error response returned from the API : {}'.format(endpoint))
+                return action_result.get_status()
+
+            if response.get("resources"):
+                resource_details_list.extend(response.get("resources"))
+
+            del id_list[:min(100, len(id_list))]
+
+        if not resource_details_list:
+            return action_result.set_status(phantom.APP_SUCCESS, 'No data found')
+
+        try:
+            sort_criteria = param.get('sort')
+            if sort_criteria is not None:
+                sort_criteria = sort_criteria.lower()
+                if sort_criteria == 'verdict.asc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['verdict'])
+                if sort_criteria == 'verdict.desc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['verdict'], reverse=True)
+                if sort_criteria == 'created_timestamp.asc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['created_timestamp'])
+                if sort_criteria == 'created_timestamp.desc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['created_timestamp'], reverse=True)
+                if sort_criteria == 'environment_description.asc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'])
+                if sort_criteria == 'environment_description.desc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0]['environment_description'], reverse=True)
+                if sort_criteria == 'threat_score.asc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0].get('threat_score', 0))
+                if sort_criteria == 'threat_score.desc':
+                    resource_details_list = sorted(resource_details_list, key=lambda x: x['sandbox'][0].get('threat_score', 0), reverse=True)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while sorting the response : {}'.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while sorting the response : {}'.format(err_msg))
+
+        for report in resource_details_list:
+            action_result.add_data(report)
+
+        if len(resource_details_list) == 1 and 'verdict' in list(resource_details_list[0].keys()):
+            summary_data['verdict'] = resource_details_list[0]['verdict']
+            summary_data['total_reports'] = len(resource_details_list)
+        else:
+            summary_data['total_reports'] = len(resource_details_list)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_file_reputation(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        try:
+            file_id = param['vault_id']
+            _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+            file_hash = file_info['metadata']['sha256']
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
+
+        filter_query = "sandbox.sha256:'{}'".format(file_hash)
+
+        max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
+
+        sort_data = [ 'created_timestamp.asc', 'created_timestamp.desc', 'threat_score.asc', 'threat_score.desc']
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc', 'verdict.desc', 'verdict.asc']
+
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            self.debug_print('Error occurred while checking the data')
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
+
+        is_detail = param.get('detail_report', False)
+        if is_detail:
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
+
+    def _handle_url_reputation(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Find for the example rest call query just for checking
+        url = param['url']
+        if 'https://' in url:
+            url = url.replace('https://', 'hxxps://')
+        elif 'http://' in url:
+            url = url.replace('http://', 'hxxp://')
+        elif 'ftp://' in url:
+            url = url.replace('ftp://', 'fxp://')
+
+        filter_query = "sandbox.submit_url.raw:'{}'".format(url)
+
+        # Define constant in consts file
+        max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
+
+        sort_data = ['verdict.desc', 'verdict.asc', 'created_timestamp.asc', 'created_timestamp.desc']
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['environment_description.asc', 'environment_description.desc', 'threat_score.asc', 'threat_score.desc']
+
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            self.debug_print('Error occurred while checking the data')
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
+
+        is_detail = param.get('detail_report', False)
+        if is_detail:
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
+
+    def _handle_download_report(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query_param = {
+            'id': param['artifact_id']
+        }
+        header = {
+            'Accept-Encoding': 'application/gzip'
+        }
+        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Report downloaded successfully')
+
+    def _handle_check_detonate_status(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        query_param = {
+            'ids': param['resource_id']
+        }
+        header = {
+            'accept': 'application/json'
+        }
+
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=header, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT)
+
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error response returned from the API')
+            return action_result.get_status()
+
+        if not resp_json['resources']:
+            return action_result.set_status(phantom.APP_SUCCESS, 'No data found')
+
+        summary_data = action_result.update_summary({})
+        try:
+            if 'state' in list(resp_json['resources'][0].keys()):
+                summary_data['state'] = resp_json['resources'][0]['state']
+            else:
+                summary_data['state'] = 'No state found'
+
+            action_result.add_data(resp_json['resources'][0])
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while parsing the response : {}'.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_msg))
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_detonate_url(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url = param['url']
+        if 'https://' in url:
+            url = url.replace('https://', 'hxxps://')
+        elif 'http://' in url:
+            url = url.replace('http://', 'hxxp://')
+        elif 'ftp://' in url:
+            url = url.replace('ftp://', 'fxp://')
+
+        environment_param = param['environment'].lower()
+
+        if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
+
+        filter_query = "sandbox.submit_url.raw:'{}'+sandbox.environment_id:'{}'".format(url, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
+
+        max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
+
+        sort_data = ['verdict.desc', 'verdict.asc', 'created_timestamp.asc', 'created_timestamp.desc']
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['threat_score.asc', 'threat_score.desc']
+
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            self.debug_print('Error occurred while checking the data')
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_REPORT_ENDPOINT, param_dict)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
+
+        if (not resource_id_list) and self._required_detonation:
+            return self._submit_resource_for_detonation(action_result, param, url=param['url'])
+
+        is_detail = param.get('detail_report', False)
+        if is_detail:
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
+
+    def _handle_detonate_file(self, param):
+        self.save_progress("In action handler for: {}".format(self.get_action_identifier()))
+        # Add an action result to the App Run
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        try:
+            file_id = param['vault_id']
+            _, _, file_info = phantom_rules.vault_info(vault_id=file_id)
+            file_info = list(file_info)[0]
+            file_hash = file_info['metadata']['sha256']
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, 'Vault file could not be found with supplied Vault ID')
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, 'Vault ID not valid: {}'.format(self._get_error_message_from_exception(e)))
+
+        environment_param = param['environment'].lower()
+        if environment_param not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
+
+        filter_query = "sandbox.sha256:'{}'+sandbox.environment_id:'{}'".format(file_hash, CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_param])
+
+        max_limit = CROWDSTRIKE_FALCONX_API_LIMIT
+
+        sort_data = [ 'created_timestamp.asc', 'created_timestamp.desc']
+        if param.get('sort') == '--':
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'sort' parameter")
+
+        custom_list = ['threat_score.asc', 'threat_score.desc', 'verdict.desc', 'verdict.asc']
+
+        param_dict = {
+            'filter': filter_query
+        }
+        if 'offset' in param:
+            param_dict['offset'] = param.get('offset')
+        if 'limit' in param:
+            param_dict['limit'] = param.get('limit')
+        if 'sort' in param:
+            param_dict['sort'] = param.get('sort').lower()
+        if param_dict.get('sort') in custom_list:
+            del param_dict['sort']
+
+        resp = self._check_data(action_result, param_dict, max_limit, sort_data)
+
+        if phantom.is_fail(resp):
+            self.debug_print('Error occurred while checking the data')
+            return action_result.get_status()
+
+        resource_id_list = self._get_ids(action_result, CROWDSTRIKE_QUERY_FILE_ENDPOINT, param_dict)
+
+        if resource_id_list is None:
+            return action_result.get_status()
+
+        if not isinstance(resource_id_list, list):
+            return action_result.set_status(phantom.APP_ERROR, 'Unknown response retrieved')
+
+        if (not resource_id_list) and self._required_detonation:
+            return self._upload_file(action_result, param, file_info=file_info)
+
+        is_detail = param.get('detail_report', False)
+        if is_detail:
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+        else:
+            endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+
+        return self._paginate_endpoint(action_result, resource_id_list, endpoint, param)
+
+    def _upload_file(self, action_result, param, file_info=None):
+
+        file_path = file_info['path']
+        file_name = file_info['name']
+
+        query_param = {
+            'file_name': file_name,
+            'is_confidential': param.get('is_confidential', True),
+            'comment': param.get('comment')
+        }
+
+        with open(file_path, 'rb') as f:
+            data = f.read()
+
+        headers = {
+            'Content-Type': 'application/octet-stream'
+        }
+
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, headers=headers,
+            endpoint=CROWDSTRIKE_UPLOAD_FILE_ENDPOINT, data=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error response returned from the API : {}'.format(CROWDSTRIKE_UPLOAD_FILE_ENDPOINT))
+            return action_result.get_status()
+
+        try:
+            sha256 = json_resp['resources'][0]['sha256']
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Error while fetching sha256. Error: {}".format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occured while fetching sha256 for the file')
+
+        return self._submit_resource_for_detonation(action_result, param, sha256=sha256)
+
+    def _submit_resource_for_detonation(self, action_result, param, sha256=None, url=None):
+        environment_id = param['environment'].lower()
+        action_script = None
+        if 'action_script' in param:
+            action_script = param.get('action_script').lower()
+
+        # Checking environment id
+        if environment_id not in list(CROWDSTRIKE_ENVIRONMENT_ID_DICT.keys()):
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid environment')
+
+        # Checking action script
+        action_script_list = ['default', 'default_maxantievasion', 'default_randomfiles', 'default_randomtheme', 'default_openie']
+        if action_script is not None and action_script not in action_script_list:
+            return action_result.set_status(phantom.APP_ERROR, 'Please provide a valid action script')
+
+        user_tags = param.get('user_tags')
+        tag_list = None
+        if user_tags is not None:
+            tag_list = [x.strip() for x in user_tags.split(',')]
+            tag_list = list(filter(None, tag_list))
+
+        json_payload = {
+            'sandbox': [
+                {
+                    'environment_id': CROWDSTRIKE_ENVIRONMENT_ID_DICT[environment_id],
+                    'enable_tor': param.get('enable_tor', False)
+                }
+            ]
+        }
+
+        # optional parameters
+        if sha256 is not None:
+            json_payload['sandbox'][0]['sha256'] = sha256
+        if url is not None:
+            json_payload['sandbox'][0]['url'] = url
+        if 'action_script' in param:
+            json_payload['sandbox'][0]['action_script'] = param.get('action_script')
+        if 'command_line' in param:
+            json_payload['sandbox'][0]['command_line'] = param.get('command_line')
+        if 'document_password' in param:
+            json_payload['sandbox'][0]['document_password'] = param.get('document_password')
+        if 'submit_name' in param:
+            json_payload['sandbox'][0]['submit_name'] = param.get('submit_name')
+        if tag_list and 'user_tags' in param:
+            json_payload['user_tags'] = tag_list
+
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, json=json_payload, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT, method='post')
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error response returned from the API : {}'.format(CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT))
+            return action_result.get_status()
+
+        try:
+            resource_id = json_resp['resources'][0]['id']
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while fetching the resource id : {}'.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while fetching the resource id : {}'.format(err_msg))
+        return self._poll_for_detonate_results(action_result, param, resource_id)
+
+    def _poll_for_detonate_results(self, action_result, param, resource_id):
+        counter = 0
+        prev_resp = None
+        while counter < self._poll_interval:
+            query_param = {
+                'ids': resource_id
+            }
+            ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT)
+            if phantom.is_fail(ret_val):
+                self.debug_print('Error response returned from the API : {}'.format(CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT))
+                return action_result.get_status()
+
+            prev_resp = json_resp
+            if 'resources' in json_resp and json_resp['resources'] is not None and len(json_resp['resources']) > 0 and \
+                    'state' in json_resp['resources'][0] and json_resp['resources'][0]['state'] == 'success':
+                self.debug_print('Success status returned from the CrowdStrike Server')
+                return self._get_resource_report(action_result, param, resource_id)
+
+            if 'resources' in json_resp and json_resp['resources'] is not None and len(json_resp['resources']) > 0 and \
+                    'state' in json_resp['resources'][0] and json_resp['resources'][0]['state'] not in ['success', 'running']:
+                self.debug_print('Error state returned from the CrowdStrike Server')
+                return action_result.set_status(phantom.APP_ERROR, 'Analysis of the report failed for resource id : {}'.format(resource_id))
+
+            counter += 1
+            time.sleep(60)
+
+        try:
+            if prev_resp and prev_resp['resources']:
+                action_result.add_data(prev_resp['resources'][0])
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while adding the response to action result : {}'.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while adding the response to action result : {}'.format(err_msg))
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Timed out while waiting for the result. To know the status of submitted \
+            sample please run the check status action with {} resource id.'.format(resource_id))
+
+    def _get_resource_report(self, action_result, param, resource_id):
+        endpoint = CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT
+        is_detail = param.get('detail_report', False)
+        if is_detail:
+            endpoint = CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT
+
+        summary_data = action_result.update_summary({})
+        query_param = {
+            'ids': resource_id
+        }
+        ret_val, json_resp = self._make_rest_call_helper_oauth2(action_result, params=query_param, endpoint=endpoint)
+        if phantom.is_fail(ret_val):
+            self.debug_print('Error response returned from the API : {}'.format(endpoint))
+            return action_result.get_status()
+
+        try:
+            summary_data['verdict'] = json_resp['resources'][0]['verdict']
+            summary_data['total_reports'] = len(json_resp['resources'])
+            action_result.add_data(json_resp['resources'][0])
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            self.debug_print('Error occurred while parsing the response : {}'.format(err_msg))
+            return action_result.set_status(phantom.APP_ERROR, 'Error occurred while parsing the response : {}'.format(err_msg))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
@@ -2108,7 +2637,7 @@ class CrowdstrikeConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -2136,31 +2665,32 @@ class CrowdstrikeConnector(BaseConnector):
         try:
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
-                    if len(resp_json["resources"]) == 0 and len(resp_json["errors"]) != 0:
-                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code:\
-                            {0} Data from server: {1}".format(resp_json["errors"][0]["code"], self._handle_py_ver_compat_for_input_str(resp_json["errors"][0]["message"]))), None)
+                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
+                        self.debug_print("Error from server. Error code: {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"]))
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}".format(
+                            resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
         except:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server")), None
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         # Show only error message if available
         if isinstance(resp_json.get('errors', []), list):
             msg = ""
             for error in resp_json.get('errors', []):
-                msg = "{} {}".format(msg, self._handle_py_ver_compat_for_input_str(error.get('message')))
+                msg = "{} {}".format(msg, error.get('message'))
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, msg)
         else:
             message = "Error from server. Status Code: {0}".format(response.status_code)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_compressed_file_response(self, response, action_result):
+    def _process_compressed_file_response(self, response, action_result, type, file_extension=None):
 
         guid = uuid.uuid4()
 
@@ -2179,33 +2709,78 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Unable to create temporary vault folder.", self._get_error_message_from_exception(e))
 
         action_params = self.get_current_param()
-        filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
+
+        if type == 'compress':
+            filename = "{0}.7z".format(action_params.get('file_name', action_params['file_hash']))
+        elif type == 'csv':
+            filename = "{0}.csv".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'json':
+            filename = "{0}.json".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'plain':
+            if file_extension == 'pcap':
+                filename = "{0}.pcap".format(action_params.get('file_name', action_params['artifact_id']))
+            else:
+                filename = "{0}.zip".format(action_params.get('file_name', action_params['artifact_id']))
+        elif type == 'png':
+            filename = "{0}.png".format(action_params.get('file_name', action_params['artifact_id']))
 
         compressed_file_path = "{0}/{1}".format(local_dir, filename)
 
         # Try to stream the response to a file
         if response.status_code == 200:
             try:
+                compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup.encode('utf-8')
                 with open(compressed_file_path, 'wb') as f:
                     f.write(response.content)
+            except IOError as e:
+                error_message = self._get_error_message_from_exception(e)
+                if "File name too long" in error_message:
+                    new_file_name = "ph_long_file_name_temp"
+                    compressed_file_path = "{0}/{1}".format(local_dir, new_file_name)
+                    self.debug_print('Original filename : {}'.format(filename))
+                    self.debug_print('Modified filename : {}'.format(new_file_name))
+                    with open(compressed_file_path, 'wb') as f:
+                        f.write(response.content)
+                else:
+                    return RetVal(
+                        action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+
             except Exception as e:
                 return RetVal(
-                    action_result.set_status(phantom.APP_ERROR, "Unable to write 7z file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
+                    action_result.set_status(phantom.APP_ERROR, "Unable to write file to disk. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
             try:
-                vault_results = Vault.add_attachment(compressed_file_path, self.get_container_id(), filename)
-                return RetVal(phantom.APP_SUCCESS, vault_results)
+                vault_results = phantom_rules.vault_add(container=self.get_container_id(), file_location=compressed_file_path, file_name=filename)
+                if vault_results[0]:
+                    try:
+                        _, _, vault_result_information = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id(), file_name=filename)
+                        if not vault_result_information:
+                            vault_result_information = None
+                            # If filename contains special characters, vault_info will return None when passing filename as argument, hence this call is executed
+                            _, _, vault_info = phantom_rules.vault_info(vault_id=vault_results[2], container_id=self.get_container_id())
+                            if vault_info:
+                                for vault_meta_info in vault_info:
+                                    if vault_meta_info['name'] == filename:
+                                        vault_result_information = [vault_meta_info]
+                                        break
+                        vault_info = list(vault_result_information)[0]
+                    except IndexError:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Vault file could not be found with supplied Vault ID"), None)
+                    except Exception as e:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR,
+                                                        "Vault ID not valid: {}".format(self._get_error_message_from_exception(e))), None)
+                    return RetVal(phantom.APP_SUCCESS, vault_info)
             except Exception as e:
                 return RetVal(
                     action_result.set_status(phantom.APP_ERROR, "Unable to store file in Phantom Vault. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         # You should process the error returned in the json
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_response(self, response, action_result):
+    def _process_response(self, response, action_result, is_download=False):
         """ This function is used to process html response.
 
         :param response: response data
@@ -2223,12 +2798,26 @@ class CrowdstrikeConnector(BaseConnector):
         if not response.text and 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, {})
 
+        if is_download:
+            if 'csv' in response.headers.get('Content-Type', ''):
+                return self._process_compressed_file_response(response, action_result, 'csv')
+
+            if 'plain' in response.headers.get('Content-Type', ''):
+                if 'pcap' in response.headers.get('Content-Disposition', ''):
+                    return self._process_compressed_file_response(response, action_result, 'plain', file_extension='pcap')
+                return self._process_compressed_file_response(response, action_result, 'plain', file_extension='zip')
+
+            if 'png' in response.headers.get('Content-Type', ''):
+                return self._process_compressed_file_response(response, action_result, 'png')
+
         # Process each 'Content-Type' of response separately
         if 'x-7z-compressed' in response.headers.get('Content-Type', ''):
-            return self._process_compressed_file_response(response, action_result)
+            return self._process_compressed_file_response(response, action_result, 'compress')
 
         # Process a json response
         if 'json' in response.headers.get('Content-Type', ''):
+            if is_download:
+                return self._process_compressed_file_response(response, action_result, 'json')
             return self._process_json_response(response, action_result)
 
         if 'text/javascript' in response.headers.get('Content-Type', ''):
@@ -2246,7 +2835,7 @@ class CrowdstrikeConnector(BaseConnector):
             return self._process_empty_response(response, action_result)
 
         # everything else is actually an error at this point
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -2277,7 +2866,10 @@ class CrowdstrikeConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))), resp_json
 
-        return self._process_response(r, action_result)
+        is_download = False
+        if CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT in endpoint:
+            is_download = True
+        return self._process_response(r, action_result, is_download)
 
     def _make_rest_call_helper_oauth2(self, action_result, endpoint, headers=None, params=None, data=None, json=None, method="get"):
         """ Function that helps setting REST call to the app.
@@ -2316,6 +2908,11 @@ class CrowdstrikeConnector(BaseConnector):
         msg = action_result.get_message()
         if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'authorization failed' in msg or 'access denied' in msg:
             ret_val = self._get_token(action_result)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+            action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched access token")
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._oauth_access_token)})
 
@@ -2411,7 +3008,13 @@ class CrowdstrikeConnector(BaseConnector):
             'list_processes': self._handle_list_processes,
             'upload_iocs': self._handle_upload_iocs,
             'delete_iocs': self._handle_delete_iocs,
-            'update_iocs': self._handle_update_iocs
+            'update_iocs': self._handle_update_iocs,
+            'file_reputation': self._handle_file_reputation,
+            'url_reputation': self._handle_url_reputation,
+            'download_report': self._handle_download_report,
+            'detonate_file': self._handle_detonate_file,
+            'detonate_url': self._handle_detonate_url,
+            'check_detonate_status': self._handle_check_detonate_status
         }
 
         action = self.get_action_identifier()
