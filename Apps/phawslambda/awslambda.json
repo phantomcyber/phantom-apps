@@ -115,6 +115,7 @@
             "description": "Use attached role when running Phantom in EC2",
             "data_type": "boolean",
             "default": false,
+            "visibility": ["onprem"],
             "order": 3
         }
     },

@@ -47,10 +47,10 @@ def _get_value(in_dict, in_key, def_val=None, strip_it=True):
         return def_val
 
     try:
-        if (type(in_dict[in_key]) != str) and (type(in_dict[in_key]) != unicode):
+        if not isinstance(in_dict[in_key], str):
             return in_dict[in_key]
     except:
-        if type(in_dict[in_key]) != str:
+        if not isinstance(in_dict[in_key], str):
             return in_dict[in_key]
 
     value = in_dict[in_key].strip() if (strip_it) else in_dict[in_key]
@@ -171,10 +171,7 @@ def _convert_to_cef_dict(output_dict, input_dict):
 
     time_keys = list()
     # convert any remaining keys in the event_details to follow the cef naming conventions
-    try:
-        input_dict_items = input_dict.iteritems()
-    except:
-        input_dict_items = input_dict.items()
+    input_dict_items = input_dict.items()
     for k, v in input_dict_items:
         new_key_name = k[:1].lower() + k[1:]
         output_dict[new_key_name] = v
@@ -198,11 +195,7 @@ def _convert_to_cef_dict(output_dict, input_dict):
 def _set_cef_types(artifact, cef):
 
     cef_types = dict()
-
-    try:
-        cef_items = cef.iteritems()
-    except:
-        cef_items = cef.items()
+    cef_items = cef.items()
     for k, v in cef_items:
 
         if k.lower().endswith('filename'):
@@ -213,10 +206,7 @@ def _set_cef_types(artifact, cef):
             cef_types[k] = ['domain']
             continue
 
-        try:
-            util_items = ph_utils.CONTAINS_VALIDATORS.iteritems()
-        except:
-            util_items = ph_utils.CONTAINS_VALIDATORS.items()
+        util_items = ph_utils.CONTAINS_VALIDATORS.items()
         for contains, function in util_items:
             if contains in IGNORE_CONTAINS_VALIDATORS:
                 continue
@@ -292,7 +282,7 @@ def _parse_sub_events(artifacts_list, input_dict, key_name, parent_artifact):
     input_list = input_dict[key_name]
 
     # make it into a list
-    if type(input_list) != list:
+    if not isinstance(input_list, list):
         input_list = [input_list]
 
     artifact_name = _get_artifact_name(key_name)
