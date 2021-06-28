@@ -1,5 +1,5 @@
 # File: checkpoint_connector.py
-# Copyright (c) 2017-2020 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -363,7 +363,7 @@ class CheckpointConnector(BaseConnector):
         if (new_name is None):
             return action_result.get_status()
 
-        if (new_name is not ""):
+        if (new_name != ""):
             object_name = new_name
 
         else:
@@ -482,7 +482,7 @@ if __name__ == '__main__':
     # pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -493,6 +493,6 @@ if __name__ == '__main__':
         connector = CheckpointConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
