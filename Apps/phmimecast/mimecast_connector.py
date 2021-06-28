@@ -251,8 +251,8 @@ class MimecastConnector(BaseConnector):
 
         return error_text
 
-    def _paginator(self, endpoint, action_result, limit=None, headers=None, data=None, method="get", **kwargs):
-
+    def _paginator(self, endpoint, action_result, limit=None, headers=None, data=None, method="get", data_key=None, **kwargs):
+        action_id = self.get_action_identifier()
         page_size = DEFAULT_MAX_RESULTS
         # If page_size param is present, then validate if pageSize is a positive integer greater than zero
         data_object = {}
@@ -276,20 +276,23 @@ class MimecastConnector(BaseConnector):
             if response:
                 response['meta'].update(interim_response['meta'])
                 response['fail'].extend(interim_response['fail'])
-                for key, val in list(interim_response['data'][0].items()):
-                    if isinstance(val, list):
-                        response['data'][0][key].extend(val)
-                    else:
-                        response['data'][0][key] = val
+                if action_id == 'list_urls':
+                    response['data'].extend(interim_response['data'])
+                else:
+                    for key, val in list(interim_response['data'][0].items()):
+                        if isinstance(val, list):
+                            response['data'][0][key].extend(val)
+                        else:
+                            response['data'][0][key] = val
             else:
                 response = interim_response
             count += interim_response['meta']['pagination']['pageSize']
-            if limit:
-                if count == limit:
-                    break
-                if count + page_size > limit:
-                    data['meta']['pagination']['pageSize'] = limit - count
-
+            if limit and count >= limit:
+                if action_id == 'list_urls':
+                    response['data'] = response['data'][:limit]
+                else:
+                    response['data'][0][data_key] = response['data'][0].get(data_key, [])[:limit]
+                break
             nextToken = interim_response['meta']['pagination'].get('next')
 
             if nextToken:
@@ -304,7 +307,7 @@ class MimecastConnector(BaseConnector):
         ret_val, response = self._make_rest_call(endpoint, action_result, headers, params, data, method, **kwargs)
 
         if not phantom.is_fail(ret_val):
-            ret_val, response
+            return ret_val, response
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
@@ -355,7 +358,7 @@ class MimecastConnector(BaseConnector):
             err_msg = 'Error connecting to server. Invalid URL %s' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except requests.exceptions.ConnectionError:
-            err_msg = 'Error Details: Connection Refused from the Server'
+            err_msg = 'Error Details: Connection Refused from the Server' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_CONNECTING_SERVER
@@ -402,7 +405,7 @@ class MimecastConnector(BaseConnector):
             "data": [
                 {
                     "comment": param.get("comment"),
-                    "url": param.get("url"),
+                    "url": param["url"],
                     "disableLogClick": log_click,
                     "action": "block",
                     "matchType": param.get("match_type", "explicit")
@@ -435,7 +438,7 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": param["id"]
                 }
             ]
         }
@@ -481,7 +484,7 @@ class MimecastConnector(BaseConnector):
                 {
                     "comment": param.get("comment"),
                     "disableRewrite": rewrite,
-                    "url": param.get("url"),
+                    "url": param["url"],
                     "disableUserAwareness": user_awareness,
                     "disableLogClick": log_click,
                     "action": "permit",
@@ -516,13 +519,13 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": param["id"]
                 }
             ]
         }
 
         data_object = {}
-        member = param.get("member")
+        member = param["member"]
 
         if phantom.is_domain(member):
             data_object['domain'] = member
@@ -558,13 +561,13 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": param["id"]
                 }
             ]
         }
 
         data_object = {}
-        member = param.get("member")
+        member = param["member"]
 
         if phantom.is_domain(member):
             data_object['domain'] = member
@@ -608,8 +611,8 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "sender": param.get("sender"),
-                    "to": param.get("to"),
+                    "sender": param["sender"],
+                    "to": param["to"],
                     "action": action
                 }
             ]
@@ -641,14 +644,20 @@ class MimecastConnector(BaseConnector):
         data = {
             'meta': {
                 'pagination': {
-                    'pageSize': DEFAULT_MAX_RESULTS
+                    'pageToken': None
                 }
             },
             'data': [
             ]
         }
 
-        ret_val, response = self._paginator(uri, action_result, headers=headers, method="post", data=data)
+        limit = param.get('max_results')
+        if limit is not None:
+            limit = self._validate_integers(action_result, limit, "max_results")
+            if limit is None:
+                return action_result.get_status()
+
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -697,7 +706,7 @@ class MimecastConnector(BaseConnector):
             if limit is None:
                 return action_result.get_status()
 
-        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data, data_key="folders")
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -730,7 +739,7 @@ class MimecastConnector(BaseConnector):
             },
             'data': [
                 {
-                    'id': param.get('id')
+                    'id': param['id']
                 }
             ]
         }
@@ -741,7 +750,7 @@ class MimecastConnector(BaseConnector):
             if limit is None:
                 return action_result.get_status()
 
-        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data)
+        ret_val, response = self._paginator(uri, action_result, limit=limit, headers=headers, method="post", data=data, data_key="groupMembers")
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -765,10 +774,10 @@ class MimecastConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         uri = '/api/directory/get-group-members'
         headers = self._get_request_headers(uri=uri, action_result=action_result)
-        member = param.get('member')
+        member = param['member']
         type_list = ['email', 'domain']
         search_type = param['type']
-        if search_type and search_type not in type_list:
+        if search_type not in type_list:
             return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_TYPE_ACTION_PARAMETER)
         if search_type == 'email':
             search_type = 'emailAddress'
@@ -785,7 +794,7 @@ class MimecastConnector(BaseConnector):
                 },
                 'data': [
                     {
-                        'id': param.get('id')
+                        'id': param['id']
                     }
                 ]
             }
@@ -803,18 +812,15 @@ class MimecastConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_PROCESSING_RESPONSE)
 
             # Successful if member found, fails if nextToken does not exist, repeats loop if nextToken exists
-            member_object = None
             for each_member in groupMembers:
                 if each_member[search_type] == member:
-                    member_object = each_member
-            if member_object:
-                action_result.add_data(member_object)
+                    action_result.add_data(each_member)
+                    summary = action_result.update_summary({})
+                    summary['status'] = "Found Member!"
+                    return action_result.set_status(phantom.APP_SUCCESS)
+            if nextToken is None:
                 summary = action_result.update_summary({})
-                summary['status'] = "Found Member!"
-                return action_result.set_status(phantom.APP_SUCCESS)
-            elif nextToken is None:
-                summary = action_result.update_summary({})
-                summary['status'] = "Member does not exist."
+                summary['status'] = "Member does not exist"
                 return action_result.set_status(phantom.APP_ERROR)
             else:
                 param['page_token'] = nextToken
@@ -914,7 +920,7 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "id": param.get("id")
+                    "id": param["id"]
                 }
             ]
         }
@@ -945,7 +951,7 @@ class MimecastConnector(BaseConnector):
         data = {
             "data": [
                 {
-                    "url": param.get("url")
+                    "url": param["url"]
                 }
             ]
         }
@@ -1028,8 +1034,12 @@ class MimecastConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
-        if self._state is None:
-            self._state = dict()
+        if not isinstance(self._state, dict):
+            self.debug_print("Reseting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, MIMECAST_STATE_FILE_CORRUPT_ERR)
 
         config = self.get_config()
         self._base_url = config['base_url'].rstrip('/')
@@ -1042,7 +1052,6 @@ class MimecastConnector(BaseConnector):
         if self._auth_type == "Bypass (Access Key)":
             self._access_key = config.get('access_key')
             self._secret_key = config.get('secret_key')
-            self.save_progress(self._secret_key)
             if self._access_key is None or self._secret_key is None:
                 return self.set_status(phantom.APP_ERROR, MIMECAST_ERR_BYPASS_AUTH)
         else:

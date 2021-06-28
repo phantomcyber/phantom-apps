@@ -6,18 +6,28 @@
 
 <h2>Playbook Backward Compatibility</h2>
 <p>
-  The newer version of the app updates the action names for blacklist and whitelist actions. Hence, it is requested to
-  the end-user to please update their existing playbooks by modifying the corresponding action blocks to ensure the
-  correct functioning of the playbooks created on the earlier versions of the app. The following actions names have been
-  updated:
-<ul>
-  <li>[blacklist url] to [blocklist url]</li>
-  <li>[unblacklist url] to [unblocklist url]</li>
-  <li>[whitelist url] to [allowlist url]</li>
-  <li>[unwhitelist url] to [unallowlist url]</li>
-  <li>[blacklist sender] to [blocklist sender]</li>
-  <li>[whitelist sender] to [allowlist sender]</li>
-</ul>
+  <ul>
+    <li>
+      The newer version of the app updates the action names for blacklist and whitelist actions. Hence, it is requested to
+      the end-user to please update their existing playbooks by modifying the corresponding action blocks to ensure the
+      correct functioning of the playbooks created on the earlier versions of the app. The following actions names have been
+      updated:
+    </li>
+    <ul>
+      <li>[blacklist url] to [blocklist url]</li>
+      <li>[unblacklist url] to [unblocklist url]</li>
+      <li>[whitelist url] to [allowlist url]</li>
+      <li>[unwhitelist url] to [unallowlist url]</li>
+      <li>[blacklist sender] to [blocklist sender]</li>
+      <li>[whitelist sender] to [allowlist sender]</li>
+    </ul>
+    <li>
+      Added new paremeter in the action given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.
+      <ul>
+        <li>list urls - 'max_results' parameter has been added</li>
+      </ul>
+    </li>
+  </ul>
 </p>
 
 <h2>Authorization</h2>

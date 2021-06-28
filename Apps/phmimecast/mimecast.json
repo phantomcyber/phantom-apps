@@ -1423,8 +1423,21 @@
             "type": "investigate",
             "identifier": "list_urls",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "max_results": {
+                    "description": "Max results to return",
+                    "data_type": "numeric",
+                    "order": 0
+                }
+            },
             "output": [
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "string",
+                    "example_values": [
+                        100
+                    ]
+                },
                 {
                     "data_path": "action_result.data.*.data.*.duration",
                     "data_type": "numeric",
@@ -1638,6 +1651,7 @@
             "parameters": {
                 "page_size": {
                     "description": "Number of results to request",
+                    "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
                     "data_type": "numeric",
                     "order": 0
                 },
@@ -1826,6 +1840,7 @@
             "parameters": {
                 "page_size": {
                     "description": "Number of results to request",
+                    "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
                     "data_type": "numeric",
                     "order": 0
                 },
