@@ -53,7 +53,7 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity",
-            "verbose": "This action logs into the device using a REST API call to check the connection and credentials configured",
+            "verbose": "This action logs into the device using a REST API call to check the connection and credentials configured.",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
