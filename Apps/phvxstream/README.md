@@ -1,5 +1,8 @@
 # VxPhantom
+
 The Falcon Sandbox Phantom App
+
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 Copyright (C) 2018 Hybrid Analysis GmbH
 

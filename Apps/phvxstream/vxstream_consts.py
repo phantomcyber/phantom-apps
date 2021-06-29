@@ -1,12 +1,7 @@
 # File: vxstream_consts.py
-# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)# --
-# File: vxstream_consts.py
 #
-# Copyright (C) 2018 Hybrid Analysis GmbH
-#
-# --
 
 PAYLOAD_SECURITY_API_KEY = 'api_key'
 PAYLOAD_SECURITY_API_SECRET = 'api_secret'

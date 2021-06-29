@@ -1,3 +1,8 @@
+# File: api_report_summary.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)# init.py
+#
+
 from api_classes.api_caller import ApiCaller
 
 
