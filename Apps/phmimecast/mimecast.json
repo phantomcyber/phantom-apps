@@ -1645,13 +1645,13 @@
         {
             "action": "list groups",
             "description": "Lists all Mimecast groups matching the requested search criteria",
+            "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
             "type": "investigate",
             "identifier": "list_groups",
             "read_only": true,
             "parameters": {
                 "page_size": {
                     "description": "Number of results to request",
-                    "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
                     "data_type": "numeric",
                     "order": 0
                 },
@@ -1834,13 +1834,13 @@
         {
             "action": "list members",
             "description": "Lists the members of a specified Mimecast group",
+            "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
             "type": "investigate",
             "identifier": "list_members",
             "read_only": true,
             "parameters": {
                 "page_size": {
                     "description": "Number of results to request",
-                    "verbose": "Here, page_size parameter is working as max_results parameter meaning it will return the max number of result provided.",
                     "data_type": "numeric",
                     "order": 0
                 },
