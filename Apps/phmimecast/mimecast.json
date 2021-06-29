@@ -2336,7 +2336,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.message_id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "<Mimecast.3.aa5a361b92e49192.17a538d0a82@snd-sl-1.snd.mimecast.lan>"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.search_reason",

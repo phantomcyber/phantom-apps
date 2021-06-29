@@ -358,7 +358,7 @@ class MimecastConnector(BaseConnector):
             err_msg = 'Error connecting to server. Invalid URL %s' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except requests.exceptions.ConnectionError:
-            err_msg = 'Error Details: Connection Refused from the Server' % (url)
+            err_msg = 'Error Details: Connection Refused from the Server %s' % (url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_CONNECTING_SERVER
