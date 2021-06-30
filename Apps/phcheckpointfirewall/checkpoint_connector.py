@@ -180,7 +180,25 @@ class CheckpointConnector(BaseConnector):
         if (not ret_val):
             return action_result.get_status()
 
-        self._headers['X-chkp-sid'] = resp_json.get('sid')
+        self._sid = resp_json.get('sid')
+
+        self._headers['X-chkp-sid'] = self._sid
+
+        return phantom.APP_SUCCESS
+
+    def _logout(self, action_result):
+
+        if (self._sid is None):
+            # logout already called, sid is null
+            return phantom.APP_SUCCESS
+
+        ret_val, resp_json = self._make_rest_call('logout', {}, action_result)
+
+        if phantom.is_fail(ret_val):
+            self.save_progress("Failed to logout: {}".format(action_result.get_status_message()))
+            return action_result.get_status()
+
+        self._sid = None
 
         return phantom.APP_SUCCESS
 
@@ -278,7 +296,10 @@ class CheckpointConnector(BaseConnector):
 
         if (phantom.is_fail(status)):
             self.append_to_message(CHECKPOINT_ERR_CONNECTIVITY_TEST)
+            self._logout(self)
             return self.get_status()
+
+        self._logout(self)
 
         return self.set_status_save_progress(phantom.APP_SUCCESS, CHECKPOINT_SUCC_CONNECTIVITY_TEST)
 
@@ -311,6 +332,9 @@ class CheckpointConnector(BaseConnector):
         else:
             message = "Found no policies"
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _list_layers(self, param):
@@ -341,6 +365,9 @@ class CheckpointConnector(BaseConnector):
 
         else:
             message = "Found no layers"
+
+        # logout of session
+        self._logout(self)
 
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
@@ -410,6 +437,9 @@ class CheckpointConnector(BaseConnector):
         if ((not ret_val) and (not resp_json)):
             return action_result.get_status()
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully blocked {0}".format('subnet' if length != '32' else 'IP'))
 
     def _unblock_ip(self, param):
@@ -450,6 +480,9 @@ class CheckpointConnector(BaseConnector):
 
         if ((not ret_val) and (not resp_json)):
             return action_result.get_status()
+
+        # logout of session
+        self._logout(self)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully unblocked {0}".format('subnet' if length != '32' else 'IP'))
 
