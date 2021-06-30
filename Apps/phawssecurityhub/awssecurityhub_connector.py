@@ -43,6 +43,12 @@ class AwsSecurityHubConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
     def initialize(self):
 
         self._state = self.load_state()
@@ -298,9 +304,9 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, 'Artifacts created successfully'
 
-    def _poll_from_sqs(self, action_result, url, max_containers):
+    def _poll_from_sqs(self, action_result, url, max_containers, param):
 
-        if phantom.is_fail(self._create_client(action_result, service='sqs', param)):
+        if phantom.is_fail(self._create_client(action_result, 'sqs', param)):
             return None
 
         self.debug_print("Max containers to poll for: {0}".format(max_containers))
@@ -338,7 +344,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return findings[:max_containers]
 
-    def _poll_from_security_hub(self, action_result, max_containers):
+    def _poll_from_security_hub(self, action_result, max_containers, param):
 
         if phantom.is_fail(self._create_client(action_result, param)):
             return None
@@ -401,9 +407,9 @@ class AwsSecurityHubConnector(BaseConnector):
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
 
         if 'sqs_url' in config:
-            findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count)
+            findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count, param)
         else:
-            findings = self._poll_from_security_hub(action_result, container_count)
+            findings = self._poll_from_security_hub(action_result, container_count, param)
 
         if findings:
             self.save_progress('Ingesting data')
