@@ -17,7 +17,6 @@ from phantom import vault
 # from oletools_consts import *
 import requests
 import json
-from bs4 import BeautifulSoup
 import oletools.oleid
 from oletools.mraptor import MacroRaptor
 from oletools import olevba
@@ -71,7 +70,6 @@ class OletoolsConnector(BaseConnector):
 
         summary["ftype"] = result["oleid"]["ftype"]["value"]
 
-
         vba_parser = olevba.VBA_Parser(filename=vault_path)
         if vba_parser.detect_vba_macros():
             vba_code_all_modules = ''
@@ -81,7 +79,7 @@ class OletoolsConnector(BaseConnector):
             mraptor.scan()
             result["mraptor"] = mraptor.__dict__
             summary['suspicious'] = mraptor.suspicious
-            
+
         action_result.add_data(result)
 
         # Add a dictionary that is made up of the most important values from data into the summary

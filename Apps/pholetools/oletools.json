@@ -1,7 +1,7 @@
 {
     "appid": "6549eb4a-d15c-4e01-8e15-91b85dd77087",
     "name": "oletools",
-    "description": "This app provides actions to analyze Microsoft OLE2 files such as Microsoft Office Documents of Outlook messages. It is based on the oletools toolkit.",
+    "description": "This app provides actions to analyze Microsoft OLE2 files such as Microsoft Office Documents of Outlook messages. It is based on the oletools toolkit",
     "type": "information",
     "product_vendor": "decalage2",
     "logo": "oletools.svg",
@@ -10,12 +10,12 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
-    "license": "Copyright (c) Splunk Community, 2021",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2021-07-01T09:01:24.184114Z",
     "package_name": "phantom_oletools",
     "main_module": "oletools_connector.py",
-    "min_phantom_version": "4.10.4.56260",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
@@ -39,7 +39,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -50,7 +49,6 @@
             "action": "mraptor scan",
             "identifier": "mraptor_scan",
             "description": "Perform a MacroRaptor scan on a file",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
