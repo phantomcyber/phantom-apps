@@ -86,10 +86,16 @@
             <td>{{result.param.query}}</td>
         </tr>
         {% endif %}
-        {% if result.param.limit %}
+        {% if result.param.limit is not None%}
         <tr>
             <td>Limit</td>
             <td>{{result.param.limit}}</td>
+        </tr>
+        {% endif %}
+        {% if result.param.offset is not None %}
+        <tr>
+            <td>Offset</td>
+            <td>{{result.param.offset}}</td>
         </tr>
         {% endif %}
         <tr>

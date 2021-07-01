@@ -5,9 +5,9 @@
   "publisher": "Splunk",
   "package_name": "phantom_bmcremedy",
   "license": "Copyright (c) 2017-2021 Splunk Inc.",
-  "main_module": "bmcremedy_connector.pyc",
+  "main_module": "bmcremedy_connector.py",
   "type": "ticketing",
-  "app_version": "1.0.16",
+  "app_version": "2.0.0",
   "utctime_updated": "2018-12-07T02:10:53.000000Z",
   "product_vendor": "BMC Software",
   "product_name": "BMC Remedy",
@@ -125,12 +125,8 @@
           "order": 10
         },
         "vault_id": {
-          "contains": [
-            "vault id"
-          ],
           "description": "Comma (,) separated vault ID (maximum 3)",
           "data_type": "string",
-          "allow_list": true,
           "order": 11
         }
       },
@@ -1219,12 +1215,8 @@
           "order": 2
         },
         "vault_id": {
-          "contains": [
-            "vault id"
-          ],
           "description": "Comma (',') separated vault ID (maximum 3)",
           "data_type": "string",
-          "allow_list": true,
           "order": 3
         }
       },
@@ -1285,7 +1277,7 @@
     {
       "action": "get ticket",
       "description": "Get incident information",
-      "type": "generic",
+      "type": "investigate",
       "identifier": "get_ticket",
       "read_only": true,
       "parameters": {
@@ -2644,7 +2636,7 @@
       "action": "list tickets",
       "description": "Get list of incidents",
       "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+in+the+advanced+search+bar\">Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+and+wildcard+symbols+in+a+search#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\">Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+the+advanced+search+bar\">Query Syntax link</a>.</p>.",
-      "type": "generic",
+      "type": "investigate",
       "identifier": "list_tickets",
       "read_only": true,
       "parameters": {
@@ -2657,6 +2649,12 @@
           "description": "Maximum number of incidents to return",
           "data_type": "numeric",
           "order": 1
+        },
+        "offset": {
+            "description": "Set the starting point or offset for the response. The default value is 0",
+            "data_type": "numeric",
+            "default": 0,
+            "order": 2
         }
       },
       "render": {
