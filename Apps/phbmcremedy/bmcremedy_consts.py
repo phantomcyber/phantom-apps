@@ -49,7 +49,7 @@ BMCREMEDY_JSON_FIELDS = "fields"
 BMCREMEDY_JSON_VAULT_ID = "vault_id"
 BMCREMEDY_UNKNOWN_VAULT_ID = "Invalid or unknown vault ID"
 BMCREMEDY_ATTACHMENT_LIMIT_EXCEED = "Maximum 3 attachments can be provided"
-BMCREMEDY_DEFAULT_PAGE_LIMIT = 5
+BMCREMEDY_DEFAULT_PAGE_LIMIT = 100
 BMCREMEDY_DEFAULT_OFFSET = 0
 BMCREMEDY_ENCODE_TEMPLATE_FILE = """--{boundary}
 Content-Disposition: form-data; name="{name}"; filename="{filename}"
