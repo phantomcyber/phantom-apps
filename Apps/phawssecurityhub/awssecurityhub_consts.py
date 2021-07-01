@@ -53,6 +53,7 @@ AWSSECURITYHUB_ERR_ALL_NETWORK_IP_VALIDATION = "Network source IP validation fai
 AWSSECURITYHUB_ERR_FINDING_ID_IN_RECORD_STATE = "Provided findings ID is already in {record_state}"
 AWSSECURITYHUB_ERR_INVALID_FINDING_ID = "Please provide a valid findings ID"
 AWSSECURITYHUB_SUCC_ADD_NOTE = "Note added successfully to the provided findings ID"
+AWSSECURITYHUB_BAD_ASSET_CONFIG_ERR_MSG = "Please provide access keys or select assume role check box in asset configuration"
 
 # constants relating to 'get_error_message_from_exception'
 AWSSECURITYHUB_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."

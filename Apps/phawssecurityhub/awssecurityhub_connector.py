@@ -13,9 +13,10 @@ import requests
 import json
 import ipaddress
 from datetime import datetime, timedelta
-from boto3 import client
+from boto3 import client, Session
 from botocore.config import Config
 from awssecurityhub_consts import *
+import ast
 
 
 class RetVal(tuple):
@@ -34,12 +35,19 @@ class AwsSecurityHubConnector(BaseConnector):
         self._region = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._proxy = None
 
         # Variable to hold a base_url in case the app makes REST calls
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
+
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
 
     def initialize(self):
 
@@ -61,10 +69,22 @@ class AwsSecurityHubConnector(BaseConnector):
         if not self._region:
             return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_ERR_REGION_INVALID)
 
-        if 'access_key' in config:
-            self._access_key = config['access_key']
-        if 'secret_key' in config:
-            self._secret_key = config['secret_key']
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, "Failed to get EC2 role credentials")
+
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get('access_key')
+        self._secret_key = config.get('secret_key')
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSSECURITYHUB_BAD_ASSET_CONFIG_ERR_MSG)
 
         self._proxy = {}
         env_vars = config.get('_reserved_environment_variables', {})
@@ -138,11 +158,25 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, parameter
 
-    def _create_client(self, action_result, service='securityhub'):
+    def _create_client(self, action_result, service='securityhub', param=None):
 
         boto_config = None
         if self._proxy:
             boto_config = Config(proxies=self._proxy)
+
+        # Try to get and use temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Failed to get temporary credentials: {}".format(e))
 
         try:
             if self._access_key and self._secret_key:
@@ -152,6 +186,7 @@ class AwsSecurityHubConnector(BaseConnector):
                         region_name=self._region,
                         aws_access_key_id=self._access_key,
                         aws_secret_access_key=self._secret_key,
+                        aws_session_token=self._session_token,
                         config=boto_config)
             else:
                 self.debug_print("Creating boto3 client without API keys")
@@ -187,7 +222,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self.save_progress("Connecting to endpoint")
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
@@ -269,9 +304,9 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, 'Artifacts created successfully'
 
-    def _poll_from_sqs(self, action_result, url, max_containers):
+    def _poll_from_sqs(self, action_result, url, max_containers, param):
 
-        if phantom.is_fail(self._create_client(action_result, service='sqs')):
+        if phantom.is_fail(self._create_client(action_result, 'sqs', param)):
             return None
 
         self.debug_print("Max containers to poll for: {0}".format(max_containers))
@@ -309,9 +344,9 @@ class AwsSecurityHubConnector(BaseConnector):
 
         return findings[:max_containers]
 
-    def _poll_from_security_hub(self, action_result, max_containers):
+    def _poll_from_security_hub(self, action_result, max_containers, param):
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return None
 
         end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
@@ -372,9 +407,9 @@ class AwsSecurityHubConnector(BaseConnector):
         container_count = int(param.get(phantom.APP_JSON_CONTAINER_COUNT))
 
         if 'sqs_url' in config:
-            findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count)
+            findings = self._poll_from_sqs(action_result, config['sqs_url'], container_count, param)
         else:
-            findings = self._poll_from_security_hub(action_result, container_count)
+            findings = self._poll_from_security_hub(action_result, container_count, param)
 
         if findings:
             self.save_progress('Ingesting data')
@@ -405,7 +440,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         limit = param.get('limit')
@@ -550,7 +585,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         findings_id = param['findings_id']
@@ -621,7 +656,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         note = param.get('note')
@@ -673,7 +708,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         note = param.get('note')
@@ -725,7 +760,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         findings_id = param['findings_id']
