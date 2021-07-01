@@ -352,13 +352,13 @@ class MimecastConnector(BaseConnector):
                             verify=config.get('verify_server_cert', False),
                             params=params)
         except requests.exceptions.InvalidSchema:
-            err_msg = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            err_msg = 'Error connecting to server. No connection adapters were found for {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except requests.exceptions.InvalidURL:
-            err_msg = 'Error connecting to server. Invalid URL %s' % (url)
+            err_msg = 'Error connecting to server. Invalid URL {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except requests.exceptions.ConnectionError:
-            err_msg = 'Error Details: Connection Refused from the Server %s' % (url)
+            err_msg = 'Error Details: Connection Refused from the Server {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err_msg), resp_json)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, MIMECAST_ERR_CONNECTING_SERVER
