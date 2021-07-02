@@ -637,7 +637,6 @@ class BmcremedyConnector(BaseConnector):
 
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            self.debug_print(incident_response_data)
             self.debug_print("Error while summarizing data: {}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_SUMMARY_ERROR.format(
                 action_name="create_ticket"))
