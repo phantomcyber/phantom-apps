@@ -633,11 +633,11 @@ class BmcremedyConnector(BaseConnector):
         try:
             if not incident_response_data.get("values", {}).get("Incident Number"):
                 return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
-
-            summary_data["incident_id"] = incident_response_data("values", {}).get("Incident Number")
+            summary_data["incident_id"] = incident_response_data.get("values", {})["Incident Number"]
 
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(incident_response_data)
             self.debug_print("Error while summarizing data: {}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_SUMMARY_ERROR.format(
                 action_name="create_ticket"))
