@@ -9,12 +9,18 @@
     "product_name": "Endace",
     "product_version_regex": ".*",
     "publisher": "Phantom",
+    "contributors": [
+      {
+        "name": "Soumen Chakraborty"
+      }
+    ],
     "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "app_version": "1.1.6",
-    "utctime_updated": "2018-12-07T01:15:23.000000Z",
+    "app_version": "1.1.7",
+    "python_version": "3",
+    "utctime_updated": "2021-04-15T10:15:23.000000Z",
     "package_name": "phantom_endace",
     "main_module": "endace_connector.pyc",
-    "min_phantom_version": "3.0.284",
+    "min_phantom_version": "4.10.0",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "server": {

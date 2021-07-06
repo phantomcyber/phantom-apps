@@ -2,6 +2,7 @@
 # File: endace_connector.py
 #
 # Copyright (c) Phantom Cyber Corporation, 2018
+# Copyright (C) Endace Technology Limited, 2021 to 2021
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -9,10 +10,12 @@
 
 # Phantom App imports
 import phantom.app as phantom
-import phantom.utils as utils
+# import phantom.utils as utils
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+from phantom import vault as Vault
+
+# from phantom.vault import Vault
 
 # Usage of the consts file is recommended
 # from endace_consts import *
@@ -291,22 +294,33 @@ class EndaceConnector(BaseConnector):
 
         file_name = os.path.basename(local_file_path)
 
+        # self.debug_print(container_id)
+        # self.debug_print(file_size)
+        # self.debug_print(local_file_path)
+
         # Adding file to vault
         try:
-            vault_ret_dict = Vault.add_attachment(local_file_path, container_id, file_name, vault_details)
+            success, message, vault_id = Vault.vault_add(container_id, local_file_path, file_name)
+            # self.debug_print(success)
         except Exception as e:
+            # self.debug_print(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e))), None)
 
         # Updating report data with vault details
-        if vault_ret_dict['succeeded']:
-            vault_details[phantom.APP_JSON_VAULT_ID] = vault_ret_dict[phantom.APP_JSON_HASH]
+        if success:
+            success, message, info = Vault.vault_info(vault_id, file_name, container_id, trace=True)
+            # self.debug_print(success)
+            # self.debug_print(message)
+            # self.debug_print(info)
+            vault_details[phantom.APP_JSON_VAULT_ID] = vault_id
             vault_details['filename'] = file_name
-            self.send_progress('Success adding file to Vault.', vault_id=vault_ret_dict[phantom.APP_JSON_HASH])
+            if success:
+                self.send_progress('Success adding file to Vault.', vault_id=vault_id)
             return RetVal(phantom.APP_SUCCESS, vault_details)
 
-        # Error while adding file to vault
-        self.debug_print('ERROR: Adding file to vault:', vault_ret_dict)
-        action_result.append_to_message('. {}'.format(vault_ret_dict['message']))
+            # Error while adding file to vault
+            self.debug_print('ERROR: Adding file to vault:', info)
+            action_result.append_to_message('. {}'.format(message))
 
         # set the action_result status to error, the handler function
         # will most probably return as is
@@ -371,14 +385,16 @@ class EndaceConnector(BaseConnector):
 
         # Check if file with same file name and size is available in vault and save only if it is not available
         try:
-            vault_list = Vault.get_file_info(container_id=container_id)
+            vault_list = Vault.vault_info(container_id=container_id)
+            # self.debug_print(vault_list)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR,
                                             'Unable to get Vault item details from Phantom. Details: {0}'.format(str(e)))
 
         vault_details = {}
         # Iterate through each vault item in the container and compare name and size of file
-        for vault in vault_list:
+        for vault in vault_list[2]:
+            # self.debug_print(vault)
             if vault.get('name') == filename and vault.get('size') == os.path.getsize(file_path):
                 self.send_progress('PCAP already available in Vault.')
                 vault_details = {phantom.APP_JSON_SIZE: vault.get('size'),
@@ -539,8 +555,8 @@ class EndaceConnector(BaseConnector):
         summary = action_result.update_summary({'flow_byte_count': byte_count})
 
         # Check max pcap size before continuing.
-        if not self.max_pcap_size == 0:  # if set to 0, ignore max_byte_count
-            if byte_count > self.max_pcap_size:
+        if not int(self.max_pcap_size) == 0:  # if set to 0, ignore max_byte_count
+            if int(byte_count) > int(self.max_pcap_size):
                 message = 'Exceeded maximum pcap size. {0} > {1}'.format(byte_count, self.max_pcap_size)
                 return action_result.set_status(phantom.APP_ERROR, message)
             if byte_count == -1:
@@ -663,7 +679,7 @@ class EndaceConnector(BaseConnector):
 
         self.set_validator('rfc3339', self._validate_rfc3339)
         self.set_validator('pcap id', self._validate_uuid)
-        self.set_validator('ip network', utils.valid_net)
+        # self.set_validator('ip network', utils.valid_net)
 
         return phantom.APP_SUCCESS
 
@@ -702,7 +718,7 @@ if __name__ == '__main__':
 
     if username and password:
         try:
-            print ('Accessing the Login page')
+            print('Accessing the Login page')
             r = requests.get('https://127.0.0.1/login', verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -715,21 +731,21 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ('Logging into Platform to get the session id')
+            print('Logging into Platform to get the session id')
             r2 = requests.post('https://127.0.0.1/login', verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ('Unable to get session id from the platfrom. Error: ' + str(e))
+            print(('Unable to get session id from the platfrom. Error: ' + str(e)))
             exit(1)
 
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
 
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=4))
+        print((json.dumps(in_json, indent=4)))
 
         connector = EndaceConnector()
         connector.print_progress_message = True
@@ -738,6 +754,6 @@ if __name__ == '__main__':
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print(json.dumps(json.loads(ret_val), indent=4))
+        print((json.dumps(json.loads(ret_val), indent=4)))
 
     exit(0)
