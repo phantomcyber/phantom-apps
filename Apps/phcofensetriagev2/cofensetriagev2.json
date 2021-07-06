@@ -1,7 +1,7 @@
 {
     "appid": "7129d563-a28d-4afc-8081-f909dce54293",
-    "name": "Cofense Triage v2",
-    "description": "This app supports actions that enable the security teams to analyze and respond to phishing faster",
+    "name": "Cofense Triage v2 API",
+    "description": "This app supports actions for Cofense Triage’s version 2 API for faster bidirectional phishing analysis and response",
     "type": "information",
     "product_vendor": "Cofense",
     "logo": "logo_cofensetriagev2.svg",
@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "Cofense",
     "license": "Copyright (c) 2021 Cofense",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2021-03-16T05:44:39.732882Z",
     "package_name": "phantom_cofensetriagev2",
     "main_module": "cofensetriagev2_connector.py",
