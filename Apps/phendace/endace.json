@@ -538,7 +538,7 @@
             "action": "get status",
             "identifier": "get_status",
             "description": "Get the status of a previously executed query",
-            "verbose": "Request the status of a query and when complete it will include a link for downloading the PCAP",
+            "verbose": "Request the status of a query and when complete it will include a link for downloading the PCAP.",
             "type": "investigate",
             "read_only": true,
             "parameters": {

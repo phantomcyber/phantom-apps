@@ -524,21 +524,21 @@ class EndaceConnector(BaseConnector):
 
         # Validate time fields
         if 'time' in param:
-            parameters['time3339'] = param['time']
+            parameters['time3339'] = param.get('time')
             parameters['spanBefore'] = param.get('span_before', 30)
             parameters['spanAfter'] = param.get('span_after', 30)
         elif 'start_time' in param and 'end_time' in param:
-            parameters['startTime3339'] = param['start_time']
-            parameters['endTime3339'] = param['end_time']
+            parameters['startTime3339'] = param.get('start_time')
+            parameters['endTime3339'] = param.get('end_time')
         else:
             message = 'Missing parameters. Either ("time") or ("start_time" and "end_time") are required to run this action.'
             return action_result.set_status(phantom.APP_ERROR, message)
 
         if 'port1' in param:
-            parameters['port1'] = param['port1']
+            parameters['port1'] = param.get('port1')
 
         if 'port2' in param:
-            parameters['port2'] = param['port2']
+            parameters['port2'] = param.get('port2')
 
         # make rest call
         flow_ret_val, flow_resp = self._make_rest_call('flowsearch', action_result, params=parameters, method='get')
@@ -670,7 +670,7 @@ class EndaceConnector(BaseConnector):
         config = self.get_config()
 
         self.server = config['server']
-        self.verify_cert = config['verify_cert']
+        self.verify_cert = config.get('verify_cert')
         self.username = config['username']
         self.password = config['password']
         self.max_pcap_size = config['max_pcap_size']
