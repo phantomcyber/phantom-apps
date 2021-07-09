@@ -1,8 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: oletools_connector.py
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -13,8 +12,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom import vault
 
-# Usage of the consts file is recommended
-# from oletools_consts import *
+from oletools_consts import *
 import requests
 import json
 import oletools.oleid
@@ -37,6 +35,37 @@ class OletoolsConnector(BaseConnector):
 
         self._state = None
 
+    def _get_error_message_from_exception(self, e):
+        """
+        Get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {}".format(error_msg)
+            else:
+                error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
+
     def _handle_test_connectivity(self, param):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -51,34 +80,46 @@ class OletoolsConnector(BaseConnector):
 
         vault_id = param['vault_id']
 
-        success, message, info = vault.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=True)
+        try:
+            success, message, info = vault.vault_info(vault_id=vault_id, container_id=self.get_container_id(), trace=True)
+            if phantom.is_fail(success):
+                return action_result.set_status(phantom.APP_ERROR, message)
+            info = list(info)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
-        if phantom.is_fail(success):
-            return action_result.set_status(phantom.APP_ERROR, message)
+        # phantom vault file path
+        vault_path = info[0].get("path")
+        if not vault_path:
+            return action_result.set_status(phantom.APP_ERROR, OLETOOLS_ERR_UNABLE_TO_FETCH_FILE)
 
-        vault_path = info[0]["path"]
-        oid = oletools.oleid.OleID(vault_path)
-        indicators = oid.check()
+        try:
+            oid = oletools.oleid.OleID(vault_path)
+            indicators = oid.check()
 
-        result = {
-            "oleid": {},
-            "mraptor": {}
-        }
+            result = {
+                "oleid": {},
+                "mraptor": {}
+            }
 
-        for i in indicators:
-            result["oleid"][i.id] = {"id": i.id, "name": i.name, "value": str(i.value)}
+            for i in indicators:
+                result["oleid"][i.id] = {"id": i.id, "name": i.name, "value": str(i.value)}
 
-        summary["ftype"] = result["oleid"]["ftype"]["value"]
+            summary["ftype"] = result["oleid"].get("ftype", {}).get("value")
 
-        vba_parser = olevba.VBA_Parser(filename=vault_path)
-        if vba_parser.detect_vba_macros():
-            vba_code_all_modules = ''
-            vba_code_all_modules = vba_parser.get_vba_code_all_modules()
+            vba_parser = olevba.VBA_Parser(filename=vault_path)
+            if vba_parser.detect_vba_macros():
+                vba_code_all_modules = ''
+                vba_code_all_modules = vba_parser.get_vba_code_all_modules()
 
-            mraptor = MacroRaptor(vba_code_all_modules)
-            mraptor.scan()
-            result["mraptor"] = mraptor.__dict__
-            summary['suspicious'] = mraptor.suspicious
+                mraptor = MacroRaptor(vba_code_all_modules)
+                mraptor.scan()
+                result["mraptor"] = mraptor.__dict__
+                summary['suspicious'] = mraptor.suspicious
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
 
         action_result.add_data(result)
 
@@ -96,7 +137,7 @@ class OletoolsConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -110,21 +151,6 @@ class OletoolsConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
-
-        # get the asset config
-        config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
-
-        self._base_url = config.get('base_url')
-
         return phantom.APP_SUCCESS
 
     def finalize(self):

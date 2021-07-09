@@ -4,14 +4,14 @@
     "description": "This app provides actions to analyze Microsoft OLE2 files such as Microsoft Office Documents of Outlook messages. It is based on the oletools toolkit",
     "type": "information",
     "product_vendor": "decalage2",
-    "logo": "oletools.svg",
-    "logo_dark": "oletools_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "product_name": "oletools",
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
     "license": "Copyright (c) 2021 Splunk Inc.",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2021-07-01T09:01:24.184114Z",
     "package_name": "phantom_oletools",
     "main_module": "oletools_connector.py",
@@ -60,8 +60,6 @@
                     "contains": [
                         "vault id"
                     ],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -72,37 +70,31 @@
                     "contains": [
                         "vault id"
                     ],
-                    "column_name": "vault_id",
+                    "column_name": "Vault ID",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.mraptor.autoexec",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.vba.value",
+                    "data_path": "action_result.data.*.mraptor.execute",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.xlm.value",
+                    "data_path": "action_result.data.*.mraptor.suspicious",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.flash.value",
+                    "data_path": "action_result.data.*.mraptor.vba_code",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.ftype.value",
+                    "data_path": "action_result.data.*.mraptor.write",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.ext_rels.value",
+                    "data_path": "action_result.data.*.oleid.ObjectPool.value",
                     "data_type": "string"
                 },
                 {
@@ -114,36 +106,56 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.oleid.ObjectPool.value",
+                    "data_path": "action_result.data.*.oleid.ext_rels.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.mraptor.write",
+                    "data_path": "action_result.data.*.oleid.flash.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.mraptor.execute",
+                    "data_path": "action_result.data.*.oleid.ftype.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.mraptor.autoexec",
+                    "data_path": "action_result.data.*.oleid.vba.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.mraptor.vba_code",
+                    "data_path": "action_result.data.*.oleid.xlm.value",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.mraptor.suspicious",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
