@@ -1,16 +1,7 @@
-# --
-# File: autofocus/autofocus_connector.py
+# File: autofocus_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
 
 # pylint: disable=W0614,W0212,W0201,W0703,W0401,W0403
 
