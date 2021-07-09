@@ -1,7 +1,7 @@
 # File: autofocus_connector.py
+# Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-#
 
 # pylint: disable=W0614,W0212,W0201,W0703,W0401,W0403
 
