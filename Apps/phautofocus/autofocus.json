@@ -1,0 +1,646 @@
+{
+    "appid": "d601fef6-f803-4fc9-8fe9-ae8910b03dd7",
+    "name": "AutoFocus",
+    "description": "This App supports hunting actions and report retrieval on Palo Alto Networks AutoFocus",
+    "publisher": "Phantom",
+    "type": "threat intel",
+    "main_module": "autofocus_connector.pyc",
+    "app_version": "1.0.25",
+    "utctime_updated": "2018-12-20T02:58:32.000000Z",
+    "package_name": "phantom_autofocus",
+    "product_vendor": "Palo Alto Networks",
+    "product_name": "AutoFocus",
+    "product_version_regex": ".*",
+    "min_phantom_version": "3.0.284",
+    "logo": "logo_paloaltonetworks.svg",
+    "logo_dark": "logo_paloaltonetworks_dark.svg",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
+    "configuration": {
+        "api_key": {
+            "data_type": "password",
+            "order": 0,
+            "description": "AutoFocus API Key",
+            "required": true
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validates connectivity to AutoFocus",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt file",
+            "description": "Hunt a file and retrieve a list of associated tags",
+            "verbose": "Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>",
+            "type": "investigate",
+            "identifier": "hunt_file",
+            "read_only": true,
+            "parameters": {
+                "hash": {
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "sha1"
+                    ],
+                    "description": "Hash (MD5, SHA256, or SHA1) of file",
+                    "required": true,
+                    "primary": true
+                },
+                "scope": {
+                    "data_type": "string",
+                    "order": 1,
+                    "value_list": [
+                        "All Samples",
+                        "My Samples",
+                        "Public Samples"
+                    ],
+                    "description": "Scope of search (Default: All Samples)",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Hunt File",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "hash",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.public_tag_name",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ],
+                    "column_name": "Public Tag Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.tag_name",
+                    "data_type": "string",
+                    "column_name": "Tag Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt ip",
+            "description": "Hunt an IP and retrieve a list of associated tags",
+            "verbose": "Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>",
+            "type": "investigate",
+            "identifier": "hunt_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "ip"
+                    ],
+                    "description": "IP Address",
+                    "required": true,
+                    "primary": true
+                },
+                "scope": {
+                    "data_type": "string",
+                    "order": 1,
+                    "value_list": [
+                        "All Samples",
+                        "My Samples",
+                        "Public Samples"
+                    ],
+                    "description": "Scope of search (Default: All Samples)",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Hunt IP",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.public_tag_name",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ],
+                    "column_name": "Public Tag Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.tag_name",
+                    "data_type": "string",
+                    "column_name": "Tag Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt domain",
+            "description": "Hunt a domain and retrieve a list of associated tags",
+            "verbose": "Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>",
+            "type": "investigate",
+            "identifier": "hunt_domain",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain"
+                    ],
+                    "description": "Domain",
+                    "required": true,
+                    "primary": true
+                },
+                "scope": {
+                    "data_type": "string",
+                    "order": 1,
+                    "value_list": [
+                        "All Samples",
+                        "My Samples",
+                        "Public Samples"
+                    ],
+                    "description": "Scope of search (Default: All Samples)",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Hunt Domain",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.public_tag_name",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ],
+                    "column_name": "Public Tag Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.tag_name",
+                    "data_type": "string",
+                    "column_name": "Tag Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "hunt url",
+            "description": "Hunt a URL and retrieve a list of associated tags",
+            "verbose": "Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>",
+            "type": "investigate",
+            "identifier": "hunt_url",
+            "read_only": true,
+            "parameters": {
+                "url": {
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "url"
+                    ],
+                    "description": "URL",
+                    "required": true,
+                    "primary": true
+                },
+                "scope": {
+                    "data_type": "string",
+                    "order": 1,
+                    "value_list": [
+                        "All Samples",
+                        "My Samples",
+                        "Public Samples"
+                    ],
+                    "description": "Scope of search (Default: All Samples)",
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Hunt URL",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.public_tag_name",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ],
+                    "column_name": "Public Tag Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.tag_name",
+                    "data_type": "string",
+                    "column_name": "Tag Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get report",
+            "description": "Get further details about an AutoFocus tag",
+            "type": "investigate",
+            "identifier": "get_report",
+            "read_only": true,
+            "parameters": {
+                "tag": {
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "autofocus tag"
+                    ],
+                    "description": "AutoFocus tag",
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "autofocus_view.get_report",
+                "title": "Get Report"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tag",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.daily_bucket_start",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.daily_points",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.daily_points_remaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.minute_bucket_start",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.minute_points",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.minute_points_remaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.comment_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.customer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.customer_industry",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.submit_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.support_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.tag_comment_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.tag_report_status_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.user_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.visibility",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.customer_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.lasthit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.public_tag_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.refs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.reported",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_class",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_class_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_definition_scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_definition_scope_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_definition_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_definition_status_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.lasthit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.search_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.tag_definition_search_status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.tag_definition_search_status_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag_searches.*.ui_search_definition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
