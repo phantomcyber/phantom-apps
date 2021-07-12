@@ -1,5 +1,5 @@
 # File: checkpoint_connector.py
-# Copyright (c) 2017-2020 Splunk Inc.
+# Copyright (c) 2017-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -180,7 +180,25 @@ class CheckpointConnector(BaseConnector):
         if (not ret_val):
             return action_result.get_status()
 
-        self._headers['X-chkp-sid'] = resp_json.get('sid')
+        self._sid = resp_json.get('sid')
+
+        self._headers['X-chkp-sid'] = self._sid
+
+        return phantom.APP_SUCCESS
+
+    def _logout(self, action_result):
+
+        if (self._sid is None):
+            # logout already called, sid is null
+            return phantom.APP_SUCCESS
+
+        ret_val, resp_json = self._make_rest_call('logout', {}, action_result)
+
+        if phantom.is_fail(ret_val):
+            self.save_progress("Failed to logout: {}".format(action_result.get_status_message()))
+            return action_result.get_status()
+
+        self._sid = None
 
         return phantom.APP_SUCCESS
 
@@ -278,7 +296,10 @@ class CheckpointConnector(BaseConnector):
 
         if (phantom.is_fail(status)):
             self.append_to_message(CHECKPOINT_ERR_CONNECTIVITY_TEST)
+            self._logout(self)
             return self.get_status()
+
+        self._logout(self)
 
         return self.set_status_save_progress(phantom.APP_SUCCESS, CHECKPOINT_SUCC_CONNECTIVITY_TEST)
 
@@ -311,6 +332,9 @@ class CheckpointConnector(BaseConnector):
         else:
             message = "Found no policies"
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _list_layers(self, param):
@@ -342,6 +366,9 @@ class CheckpointConnector(BaseConnector):
         else:
             message = "Found no layers"
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _block_ip(self, param):
@@ -363,7 +390,7 @@ class CheckpointConnector(BaseConnector):
         if (new_name is None):
             return action_result.get_status()
 
-        if (new_name is not ""):
+        if (new_name != ""):
             object_name = new_name
 
         else:
@@ -410,6 +437,9 @@ class CheckpointConnector(BaseConnector):
         if ((not ret_val) and (not resp_json)):
             return action_result.get_status()
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully blocked {0}".format('subnet' if length != '32' else 'IP'))
 
     def _unblock_ip(self, param):
@@ -451,6 +481,9 @@ class CheckpointConnector(BaseConnector):
         if ((not ret_val) and (not resp_json)):
             return action_result.get_status()
 
+        # logout of session
+        self._logout(self)
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully unblocked {0}".format('subnet' if length != '32' else 'IP'))
 
     def handle_action(self, param):
@@ -482,7 +515,7 @@ if __name__ == '__main__':
     # pudb.set_trace()
 
     if (len(sys.argv) < 2):
-        print "No test json specified as input"
+        print("No test json specified as input")
         exit(0)
 
     with open(sys.argv[1]) as f:
@@ -493,6 +526,6 @@ if __name__ == '__main__':
         connector = CheckpointConnector()
         connector.print_progress_message = True
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
