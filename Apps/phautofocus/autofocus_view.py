@@ -1,16 +1,8 @@
-# --
-# File: autofocus/autofocus_view.py
+# File: autofocus_view.py
+# Copyright (c) 2021 Splunk Inc.
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
-#
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
-# --
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+
 import ast
 
 
