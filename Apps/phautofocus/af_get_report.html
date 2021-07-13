@@ -1,0 +1,150 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- 
+File: ./af_get_report.html
+
+Copyright (c) Phantom Cyber Corporation, 2016-2018
+
+This unpublished material is proprietary to Phantom Cyber.
+All rights reserved. The methods and
+techniques described herein are considered trade secrets
+and/or confidential. Reproduction or distribution, in whole
+or in part, is forbidden except by express written permission
+of Phantom Cyber Corporation.
+-->
+
+<style>
+
+
+a:hover {
+  text-decoration:underline;
+}
+
+
+.wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.wf-table-horizontal {
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+  width: 200;
+  overflow: auto;
+}
+
+.wf-h3-style {
+  font-size : 20px
+}
+
+.wf-h4-style {
+  font-size : 16px
+}
+
+.wf-h5-style {
+  font-size : 14px
+}
+.wf-subheader-style {
+  font-size : 12px
+}
+
+.ana_subject_content {
+  margin-bottom: 20px
+}
+
+</style>
+
+<div style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+{% for result in results %} <!-- loop for each result -->
+  <br>
+  <h3 class="wf-h3-style">AutoFocus Get Report</h3>
+  {% if result.message %} <!------------------- Message ---------------------->
+    <p>{% autoescape off %}{{ result.message }}{% endautoescape %}</p>
+  {% else %}
+    <br>
+    <h3 class="wf-h3-style">{{ result.data.tag.tag_name}}</h3>
+    <table class="wf-table-vertical">
+      <tr>
+        <td><b>Owner</b></td>
+        <td>{{ result.data.tag.customer_name }}</td>
+      </tr>
+      <tr>
+        <td><b># Samples</b></td>
+        <td>{{ result.data.tag.count }}</td>
+      </tr>
+      <tr>
+        <td><b>Last Hit</b></td>
+        <td>{{ result.data.tag.lasthit }}</td>
+      </tr>
+      <tr>
+        <td><b>Tag Class</b></td>
+        <td>{{ result.data.tag.tag_class }}</td>
+      </tr>
+    </table>
+    <br>
+    <h5 class="wf-h5-style"><b>Description:</b></h5>
+    <p>{{ result.data.tag.description }}</p>
+    <br>
+    <h5 class="wf-h5-style"><b>References:</b></h5>
+    <p>
+    {% for ref in result.data.tag.refs %}
+      <a href={{ ref.url }}>{{ ref.title }}</a> [ {{ ref.source }} - {{ref.created}} ]<br>
+    {% endfor %}
+    </p>
+    <br>
+    <table class="wf-table-horizontal">
+      <tr><th>Status</th><th>Hits</th><th>Last Seen</th><th>Definition</th></tr>
+      {% for tag_search in result.data.tag_searches %}
+        <tr>
+          <td>{{ tag_search.tag_definition_search_status }}</td>
+          <td>{{ tag_search.count }}</td>
+          <td>{{ tag_search.lasthit }}</td>
+          <td>{% autoescape off %}{{ tag_search.ui_search_string }}{% endautoescape %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <br>
+    {% if result.data.tag.comments %}
+      <h3 class="wf-h3-style">Comments and Reports</h3>
+      {% for comment in result.data.tag.comments %}
+        <p>
+          <b>{{ comment.first_name }} {{ comment.last_name }} from {{ comment.customer }}</b><br>
+          {{ comment.comment_type }} [ {{ comment.submit_time }} ]
+        </p>
+        <p>
+          {{ comment.comment|linebreaksbr }}
+        </p>
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
+{% endblock %}
