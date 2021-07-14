@@ -1,0 +1,1523 @@
+{
+    "appid": "a7a82fb8-e9cc-4e10-94f1-3fe07b27a82d",
+    "name": "Agari",
+    "description": "This app integrates with Agari to implement the investigative and generic actions that protect against phishing and Business Email Compromise (BEC) attacks",
+    "type": "endpoint",
+    "product_vendor": "Agari",
+    "logo": "logo_agari.svg",
+    "logo_dark": "logo_agari_dark.svg",
+    "product_name": "Agari",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Agari",
+    "license": "Copyright (c) Agari, 2021",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-04-22T14:50:09.237588Z",
+    "package_name": "phantom_agari",
+    "main_module": "agari_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "client_secret": {
+            "description": "Client Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "sort": {
+            "data_type": "string",
+            "description": "Sort the result data set based on the 'created_at' field",
+            "default": "oldest_first",
+            "order": 2,
+            "required": true,
+            "value_list": [
+                "oldest_first",
+                "latest_first"
+            ]
+        },
+        "start_date": {
+            "description": "The initial start date for ingestion. The start date should be within the last two weeks",
+            "data_type": "string",
+            "order": 3
+        },
+        "add_fields": {
+            "description": "Fields to add to the default message payload (allows comma-delimited string)",
+            "data_type": "string",
+            "order": 9
+        },
+        "filter": {
+            "description": "Filtering the policy events based on the search filters (allows multiple filters using and/or conjunctions)",
+            "data_type": "string",
+            "order": 4
+        },
+        "policy_name": {
+            "description": "Find by the policy name while fetching the policy events",
+            "data_type": "string",
+            "order": 5
+        },
+        "policy_action": {
+            "description": "Find by the policy action while fetching the policy events",
+            "data_type": "string",
+            "order": 6,
+            "value_list": [
+                "deliver",
+                "move",
+                "inbox",
+                "delete",
+                "none",
+                "all"
+            ]
+        },
+        "policy_enabled": {
+            "description": "Find by the policies enabled while fetching the policy events",
+            "data_type": "string",
+            "default": "True",
+            "order": 7,
+            "value_list": [
+                "True",
+                "False",
+                "All"
+            ]
+        },
+        "exclude_alert_types": {
+            "description": "Exclude the alert type while fetching the policy events",
+            "data_type": "string",
+            "default": "SystemAlert",
+            "order": 8,
+            "value_list": [
+                "MessageAlert",
+                "SystemAlert",
+                "None"
+            ]
+        },
+        "cef_mapping": {
+            "description": "JSON dictionary represented as a serialized JSON string. Each key in the dictionary is a potential key name in the message artifact that is to be renamed to the value",
+            "data_type": "string",
+            "order": 10
+        },
+        "max_results": {
+            "description": "Maximum number of results to ingest. The default value is 100",
+            "data_type": "numeric",
+            "default": 100,
+            "order": 11
+        },
+        "max_workers_for_polling": {
+            "description": "Maximum number of workers to use while fetching the results from the Agari Server. The default value is 1",
+            "data_type": "numeric",
+            "default": 1,
+            "order": 12
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for test connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policy events",
+            "description": "List all the policy events",
+            "type": "investigate",
+            "identifier": "list_policy_events",
+            "read_only": true,
+            "parameters": {
+                "max_results": {
+                    "description": "Max number of policy events to return. The default value is 100",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 11
+                },
+                "offset": {
+                    "description": "This parameter allows the user to set the starting point or offset for the response. The default value is 0",
+                    "data_type": "numeric",
+                    "default": 0,
+                    "order": 12
+                },
+                "sort": {
+                    "description": "A comma-delimited string that specifies the field ordering (with direction) to be applied to the response",
+                    "data_type": "string",
+                    "default": "created_at ASC, id ASC",
+                    "order": 7
+                },
+                "rem_fields": {
+                    "description": "A comma-delimited list of fields to remove from the default payload",
+                    "data_type": "string",
+                    "order": 10
+                },
+                "add_fields": {
+                    "description": "A comma-delimited list of optional fields to add to the default payload",
+                    "data_type": "string",
+                    "order": 9
+                },
+                "filter": {
+                    "description": "Search filters that can be applied to the response",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "fields": {
+                    "description": "A comma-delimited list of fields to include in the payload",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "start_date": {
+                    "description": "The earliest date time (UTC) a search should target (ISO 8601 format)",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "end_date": {
+                    "description": "The latest date time (UTC) a search should target (ISO 8601 format)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "policy_name": {
+                    "description": "Find by policy name",
+                    "data_type": "string",
+                    "order": 2,
+                    "contains": [
+                        "agari policy name"
+                    ],
+                    "primary": true
+                },
+                "policy_action": {
+                    "description": "Find by policy action. Valid values are deliver, move, inbox, delete, none, and all",
+                    "data_type": "string",
+                    "order": 3,
+                    "value_list": [
+                        "deliver",
+                        "move",
+                        "inbox",
+                        "delete",
+                        "none",
+                        "all"
+                    ]
+                },
+                "policy_enabled": {
+                    "description": "Find by enabled policies",
+                    "data_type": "string",
+                    "default": "True",
+                    "order": 4,
+                    "value_list": [
+                        "True",
+                        "False",
+                        "All"
+                    ]
+                },
+                "exclude_alert_types": {
+                    "description": "Exclude Policy types. Valid values are MessageAlert, SystemAlert, and None",
+                    "data_type": "string",
+                    "default": "SystemAlert",
+                    "order": 5,
+                    "value_list": [
+                        "MessageAlert",
+                        "SystemAlert",
+                        "None"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "alert_definition_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-21T12:23:27Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.exclude_alert_types",
+                    "data_type": "string",
+                    "example_values": [
+                        "SystemAlert"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "id, updated_at, created_at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_at.after(2020-04-20T07:21:33Z)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "delete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_enabled",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.policy_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Untrusted Messages"
+                    ],
+                    "contains": [
+                        "agari policy name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rem_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "notified_original_recipients, summary"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "created_at ASC, id ASC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-21T09:58:30Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_definition_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SystemAlert"
+                    ],
+                    "contains": [
+                        "agari policy name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-28T12:04:14Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        646349268
+                    ],
+                    "contains": [
+                        "agari policy event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notified_original_recipients",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policy_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policy_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.summary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updated_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-28T12:04:14Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_policy_events",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total policy events: 32"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "view": "agari_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get policy event",
+            "description": "Fetches a single policy event from Agari for the given policy event ID",
+            "type": "investigate",
+            "identifier": "get_policy_event",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Policy Event ID",
+                    "data_type": "numeric",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "agari policy event id"
+                    ],
+                    "primary": true
+                },
+                "rem_fields": {
+                    "description": "A comma-delimited list of fields to remove from the default payload",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "add_fields": {
+                    "description": "A comma-delimited list of optional fields to add to the default payload",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "fields": {
+                    "description": "A comma-delimited list of fields to include in the payload",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 9,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "collector_message_id, created_at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_name,created_at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        644270112
+                    ],
+                    "contains": [
+                        "agari policy event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rem_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_name,created_at"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.collector_message_id",
+                    "data_type": "string",
+                    "column_name": "Message ID",
+                    "column_order": 3,
+                    "example_values": [
+                        "b78fc523a-a623-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "agari internal message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.conditions.message_trust_score_max",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1.1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.conditions.message_trust_score_min",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.created_at",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 2,
+                    "example_values": [
+                        "2021-04-26T00:09:51Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.id",
+                    "data_type": "numeric",
+                    "column_name": "Policy Event ID",
+                    "column_order": 0,
+                    "example_values": [
+                        644270122
+                    ],
+                    "contains": [
+                        "agari policy event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.links.messages",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.agari.com/v1/ep/messages/0ef8f426-a2ff-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.message_details.date",
+                    "data_type": "string",
+                    "column_name": "Message Date",
+                    "column_order": 6,
+                    "example_values": [
+                        "2021-04-26T00:09:51Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.message_details.from",
+                    "data_type": "string",
+                    "column_name": "Message From",
+                    "column_order": 5,
+                    "example_values": [
+                        "ABC <test@btacase.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.message_details.subject",
+                    "data_type": "string",
+                    "column_name": "Message Subject",
+                    "column_order": 7,
+                    "example_values": [
+                        "Unusual sign-on detected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.message_details.to",
+                    "data_type": "string",
+                    "column_name": "Message To",
+                    "column_order": 4,
+                    "example_values": [
+                        "abc@testing.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.message_details.trust_score",
+                    "data_type": "numeric",
+                    "column_name": "Message Trust Score",
+                    "column_order": 8,
+                    "example_values": [
+                        0.5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert_event.policy_name",
+                    "data_type": "string",
+                    "column_name": "Policy Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "Brand Display Name Impostors"
+                    ],
+                    "contains": [
+                        "agari policy name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Policy Event fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Get Policy Event"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list messages",
+            "description": "List all the messages",
+            "type": "investigate",
+            "identifier": "list_messages",
+            "read_only": true,
+            "parameters": {
+                "max_results": {
+                    "description": "Max number of messages to return. The default value is 100",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 7
+                },
+                "offset": {
+                    "description": "The offset, or starting point, for the paged response. The default value is 0",
+                    "data_type": "numeric",
+                    "default": 0,
+                    "order": 8
+                },
+                "sort": {
+                    "description": "A comma-delimited string that specifies the field ordering (with direction) to be applied to the response",
+                    "data_type": "string",
+                    "default": "date ASC, id ASC",
+                    "order": 3
+                },
+                "rem_fields": {
+                    "description": "A comma-delimited list of fields to remove from the default payload",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "add_fields": {
+                    "description": "A comma-delimited list of optional fields to add to the default payload",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "fields": {
+                    "description": "A comma-delimited list of fields to include in the payload",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "search": {
+                    "description": "Search using the advanced search syntax",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "start_date": {
+                    "description": "The earliest date time (UTC) a search should target (ISO 8601 format)",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "end_date": {
+                    "description": "The latest date time (UTC) a search should target (ISO 8601 format)",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-26T00:09:51Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rem_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.search",
+                    "data_type": "string",
+                    "example_values": [
+                        "policy_ids is not null and domain_tags is null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "date ASC, id ASC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-20T07:21:33Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_extensions",
+                    "data_type": "string",
+                    "example_values": [
+                        "com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_filenames",
+                    "data_type": "string",
+                    "example_values": [
+                        "details_spreadsheet.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attack_types",
+                    "data_type": "string",
+                    "example_values": [
+                        "address_group (Individual display name impostor)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.authenticity",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-28T22:22:34+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain_reputation",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "webmail"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.enforcement_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "delete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.enforcement_result",
+                    "data_type": "string",
+                    "example_values": [
+                        "error"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "<test@test.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.has_attachment",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3ace7cd8-a870-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "agari internal message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "67.231.152.167"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.mail_from_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message_details_link",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.agari.com/v1/ep/messages/3ace7cd8-a870-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<fba004ad8c112300f0df43d713ad6ec5@test.com>"
+                    ],
+                    "contains": [
+                        "agari global message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message_trust_score",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.policy_ids",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9014
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ptr_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc-001ae501.pphosted.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reply_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@test.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sbrs",
+                    "data_type": "string",
+                    "example_values": [
+                        "2.7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sender_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "w (Well-Known)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Valid SMTP 52.41.68.250"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timestamp_ms",
+                    "data_type": "string",
+                    "example_values": [
+                        "1619648554000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@test.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_messsages",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total messsages: 100"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "view": "agari_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get message",
+            "description": "Fetches a single message from Agari for the given message ID",
+            "type": "investigate",
+            "identifier": "get_message",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Message ID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "agari internal message id"
+                    ],
+                    "primary": true
+                },
+                "rem_fields": {
+                    "description": "A comma-delimited list of fields to remove from the default payload",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "add_fields": {
+                    "description": "A comma-delimited list of optional fields to add to the default payload",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "fields": {
+                    "description": "A comma-delimited list of fields to include in the payload",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0ef8f426-a2ff-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "agari internal message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rem_fields",
+                    "data_type": "string",
+                    "example_values": [
+                        "from_domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.attack_class.display_name_impostor",
+                    "data_type": "string",
+                    "example_values": [
+                        "alerts@test.com is not expected to be sent on behalf of abc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.attack_class.lookalike_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        " is an impostor of alerts.test.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.authentication_results",
+                    "data_type": "string",
+                    "example_values": [
+                        "Non-aligned SPF Pass; Non-aligned DKIM Pass; DMARC Pass"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.authenticity_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-04-22T00:09:51+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.dkim_d_tag",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.domain_reputation",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2.7
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.enforcement_action",
+                    "data_type": "string",
+                    "example_values": [
+                        "This message could not be deleted."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "ABC Alerts <alerts@test.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.from_domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0ef8f456-a2ff-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "agari internal message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.mail_from",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.matched_policies",
+                    "data_type": "string",
+                    "example_values": [
+                        "Untrusted Messages"
+                    ],
+                    "contains": [
+                        "agari policy name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<161905019164.262797.551062412555126933@ip-172-31-1-60.us-west-2.compute.internal>"
+                    ],
+                    "contains": [
+                        "agari global message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.message_trust_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.reply_to",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message.risk_reason",
+                    "data_type": "string",
+                    "example_values": [
+                        " from suspicious domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.sbrs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -9.3
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.sending_ip_address.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "37.235.48.209"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.sending_ip_address.ptr_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Your account will be blocked"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.timestamp_ms",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1619050191000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc@testing.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "custom",
+                "view": "agari_view.display_view"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remediate message",
+            "description": "Deletes or moves a message from the inbox for the provided message ID",
+            "type": "generic",
+            "identifier": "remediate_message",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "Message ID",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "agari internal message id"
+                    ],
+                    "primary": true
+                },
+                "remediation_operation": {
+                    "description": "This parameter allows the user to move or delete the suspected message from the inbox",
+                    "data_type": "string",
+                    "default": "move",
+                    "required": true,
+                    "order": 1,
+                    "value_list": [
+                        "delete",
+                        "move"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Message ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "0ef8f426-a2ff-11eb-8180-0242ac130004"
+                    ],
+                    "contains": [
+                        "agari internal message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.remediation_operation",
+                    "data_type": "string",
+                    "example_values": [
+                        "move",
+                        "delete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.enforcement.enforce",
+                    "data_type": "string",
+                    "column_name": "Enforce",
+                    "column_order": 1,
+                    "example_values": [
+                        "move"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.enforcement.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message remediated successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "height": 5,
+                "type": "table",
+                "title": "Remediate Message"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Action handler for the on poll ingest functionality",
+            "verbose": "This action ingests policy events and associated messages from Agari.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_count": {
+                    "description": "Maximum number of containers to ingest",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 1
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 2
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 3
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
