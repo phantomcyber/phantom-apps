@@ -1,20 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# File: bishopfox_connector.py
+# Copyright (c) 2021 Splunk Inc.
 #
-# Copyright 2021 Splunk Inc.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# --
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -51,6 +39,7 @@ class BishopFoxConnector(BaseConnector):
         super(BishopFoxConnector, self).__init__()
 
         self._state = None
+        self._request_session = None
 
         return
 
@@ -60,7 +49,7 @@ class BishopFoxConnector(BaseConnector):
 
         return RetVal(
             action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
+                phantom.APP_ERROR, "Status Code: {}. Empty response and no information in the header".format(response.status_code)
             ), None
         )
 
@@ -70,6 +59,9 @@ class BishopFoxConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split("\n")
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -89,7 +81,7 @@ class BishopFoxConnector(BaseConnector):
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))
+                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))
                 ), None
             )
 
@@ -137,6 +129,38 @@ class BishopFoxConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = consts.ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = consts.ERR_CODE_MSG
+                error_msg = consts.ERR_MSG_UNAVAILABLE
+        except:
+            error_code = consts.ERR_CODE_MSG
+            error_msg = consts.ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in consts.ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(consts.PARSE_ERR_MSG)
+            error_text = consts.PARSE_ERR_MSG
+
+        return error_text
+
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
 
@@ -150,10 +174,19 @@ class BishopFoxConnector(BaseConnector):
                 url,
                 **kwargs
             )
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection Refused from the Server %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))
+                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(self._get_error_message_from_exception(e))
                 ), resp_json
             )
 
@@ -178,7 +211,7 @@ class BishopFoxConnector(BaseConnector):
             )
             auth_token = resp.json()["access_token"]
         except Exception as e:
-            self.save_progress("Failed to get Bishop Fox auth token: {0}".format(e))
+            self.save_progress("Failed to get Bishop Fox auth token: {0}".format(self._get_error_message_from_exception(e)))
             return RetVal(phantom.APP_ERROR, auth_token)
 
         self.save_progress("Successfully retrieved Bishop Fox auth token")
@@ -284,14 +317,7 @@ class BishopFoxConnector(BaseConnector):
         return RetVal(phantom.APP_SUCCESS, findings)
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
-
         self.save_progress("Connecting to Bishop Fox")
 
         # make rest call
@@ -312,13 +338,10 @@ class BishopFoxConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Test Connectivity Passed")
 
     def _handle_get_findings(self, param):
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Access action parameters passed in the "param" dictionary
         ret_val, findings = self._get_findings(action_result=action_result, **param)
 
         if phantom.is_fail(ret_val):
@@ -333,19 +356,12 @@ class BishopFoxConnector(BaseConnector):
             "total_findings": len(findings),
         })
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_status(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the "param" dictionary
 
         # Required values can be accessed directly
         finding_uid = param["finding_uid"]
@@ -358,9 +374,6 @@ class BishopFoxConnector(BaseConnector):
             "status": consts.STATUS_CODES[status]
         }
 
-        # Optional values should use the .get() function
-        # optional_parameter = param.get("optional_parameter", "default_value")
-
         # make rest call
         ret_val, response = self._make_rest_call(
             endpoint,
@@ -373,29 +386,20 @@ class BishopFoxConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         data = [self._parse_subject_json(subj, finding_uid) for subj in response]
         action_result.add_data(data)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_client_id(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the "param" dictionary
 
         # Required values can be accessed directly
         finding_uid = param["finding_uid"]
-        subject_uid = param["subject_uid"]
+        subject_uid = param.get("subject_uid")
         client_id = param["client_id"]
 
         endpoint = "/findings/{0}/subjects/{1}/clientid".format(finding_uid, subject_uid)
@@ -404,9 +408,6 @@ class BishopFoxConnector(BaseConnector):
             "clientId": client_id
         }
 
-        # Optional values should use the .get() function
-        # optional_parameter = param.get("optional_parameter", "default_value")
-
         # make rest call
         ret_val, response = self._make_rest_call(
             endpoint,
@@ -419,29 +420,20 @@ class BishopFoxConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         data = [self._parse_subject_json(subj, finding_uid) for subj in response]
         action_result.add_data(data)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_update_client_note(self, param):
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the "param" dictionary
 
         # Required values can be accessed directly
         finding_uid = param["finding_uid"]
-        subject_uid = param["subject_uid"]
+        subject_uid = param.get("subject_uid")
         client_note = param["client_note"]
 
         endpoint = "/findings/{0}/subjects/{1}/clientnote".format(finding_uid, subject_uid)
@@ -450,9 +442,6 @@ class BishopFoxConnector(BaseConnector):
             "clientNote": client_note
         }
 
-        # Optional values should use the .get() function
-        # optional_parameter = param.get("optional_parameter", "default_value")
-
         # make rest call
         ret_val, response = self._make_rest_call(
             endpoint,
@@ -465,21 +454,15 @@ class BishopFoxConnector(BaseConnector):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
         # Add the response into the data section
         data = [self._parse_subject_json(subj, finding_uid) for subj in response]
         action_result.add_data(data)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCCESS)
 
     def _handle_on_poll(self, param):
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         action_params = {}
@@ -553,15 +536,6 @@ class BishopFoxConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config["required_config_name"]
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get("optional_config_name")
-        """
 
         self._api_base_url = config["api_base_url"]
         self._auth_token_url = config["auth_token_url"]
@@ -569,6 +543,8 @@ class BishopFoxConnector(BaseConnector):
         self._base_url = "{0}/orgs/{1}".format(self._api_base_url, config["org_id"])
 
         ret_val, auth_token = self._get_auth_token()
+        if phantom.is_fail(ret_val):
+            return self.get_status()
 
         # Initialize the requests session that will be used for rest requests
         self._request_session = requests.Session()
@@ -592,7 +568,8 @@ class BishopFoxConnector(BaseConnector):
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
-        self._request_session.close()
+        if self._request_session:
+            self._request_session.close()
         return phantom.APP_SUCCESS
 
 
