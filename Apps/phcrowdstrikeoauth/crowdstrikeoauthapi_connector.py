@@ -1895,9 +1895,9 @@ class CrowdstrikeConnector(BaseConnector):
                 ret_val, resp_data = self._parse_resp_data(resp_data)
 
                 if phantom.is_fail(ret_val):
-                    self.debug_print("On Poll failed for the chunk: ", chunk)
-                    self.save_progress("On Poll failed for the chunk: ", chunk)
-                    return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_UNABLE_TO_PARSE_DATA)
+                    self.debug_print("Failed to parse the chunk: {}".format(chunk))
+                    self.debug_print("Waiting to receive the remaining event data to process the entire event")
+                    continue
 
                 if resp_data and resp_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
                     self._events.append(resp_data)
