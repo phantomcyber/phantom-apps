@@ -46,7 +46,7 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "mraptor scan",
+            "action": "run mraptor scan",
             "identifier": "mraptor_scan",
             "description": "Perform a MacroRaptor scan on a file",
             "type": "investigate",
