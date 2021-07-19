@@ -76,6 +76,12 @@ CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting
 CROWDSTRIKE_CODE_MESSAGE = "Error code: 404"
 CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
 CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
+CROWDSTRIKE_PULLED_EVENTS_MSG = "Pulled {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_NO_DATA_MSG = "No data, terminating loop"
+CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG = "CR/LF received on iteration: {} - terminating loop"
+CROWDSTRIKE_RECEIVED_CR_LF_MSG = "CR/LF received on iteration {} - continuing"
+CROWDSTRIKE_BLANK_LINES_COUNT_MSG = "Total blank lines count: {}"
+CROWDSTRIKE_GOT_EVENTS_MSG = "Got {0} events of type 'DetectionSummaryEvent'"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\

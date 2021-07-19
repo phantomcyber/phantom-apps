@@ -1873,8 +1873,8 @@ class CrowdstrikeConnector(BaseConnector):
 
                 if not chunk:
                     # Done with all the event data for now
-                    self.debug_print("No data, terminating loop")
-                    self.save_progress("No data, terminating loop")
+                    self.debug_print(CROWDSTRIKE_NO_DATA_MSG)
+                    self.save_progress(CROWDSTRIKE_NO_DATA_MSG)
                     break
 
                 if chunk == '\r\n':
@@ -1883,12 +1883,12 @@ class CrowdstrikeConnector(BaseConnector):
                     total_blank_lines_count += 1
 
                     if counter > max_crlf:
-                        self.debug_print("CR/LF received on iteration: {} - terminating loop".format(counter))
-                        self.save_progress("CR/LF received on iteration: {} - terminating loop".format(counter))
+                        self.debug_print(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
+                        self.save_progress(CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG.format(counter))
                         break
                     else:
-                        self.debug_print("CR/LF received on iteration {} - continuing".format(counter))
-                        self.save_progress("CR/LF received on iteration {} - continuing".format(counter))
+                        self.debug_print(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
+                        self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
                         continue
 
                 resp_data += chunk
@@ -1910,8 +1910,8 @@ class CrowdstrikeConnector(BaseConnector):
                     self._events = self._events[:max_events]
                     break
 
-                self.send_progress("Pulled {0} events of type 'DetectionSummaryEvent'".format(len(self._events)))
-                self.debug_print("Pulled {0} events of type 'DetectionSummaryEvent'".format(len(self._events)))
+                self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
+                self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
                 # convert it to string
                 resp_data = ''
         except Exception as e:
@@ -1924,10 +1924,10 @@ class CrowdstrikeConnector(BaseConnector):
 
         self.send_progress(" ")
 
-        self.debug_print("Total blank lines count: {}".format(total_blank_lines_count))
-        self.save_progress("Total blank lines count: {}".format(total_blank_lines_count))
-        self.debug_print("Got {0} events of type 'DetectionSummaryEvent'".format(len(self._events)))   # total events count
-        self.save_progress("Got {0} events of type 'DetectionSummaryEvent'".format(len(self._events)))
+        self.debug_print(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
+        self.save_progress(CROWDSTRIKE_BLANK_LINES_COUNT_MSG.format(total_blank_lines_count))
+        self.debug_print(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))   # total events count
+        self.save_progress(CROWDSTRIKE_GOT_EVENTS_MSG.format(len(self._events)))
 
         if self._events:
             self.send_progress("Parsing the fetched DetectionSummaryEvents...")
