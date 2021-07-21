@@ -1,0 +1,658 @@
+{
+    "appid": "45bb6f37-4478-499b-b4a3-51ecfa62b78c",
+    "name": "SMTP",
+    "description": "This app provides the ability to send email using SMTP",
+    "publisher": "Splunk",
+    "type": "email",
+    "main_module": "smtp_connector.py",
+    "app_version": "2.1.3",
+    "utctime_updated": "2021-07-09T04:53:54.000000Z",
+    "package_name": "phantom_smtp",
+    "product_vendor": "Generic",
+    "product_name": "SMTP",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "license": "Copyright (c) 2014-2021 Splunk Inc.",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "smtp.gmail.com, June 30, 2021"
+    ],
+    "configuration": {
+        "server": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Server IP/Hostname",
+            "required": true
+        },
+        "port": {
+            "data_type": "numeric",
+            "order": 1,
+            "description": "Port"
+        },
+        "username": {
+            "data_type": "string",
+            "order": 2,
+            "description": "Username (or email address)"
+        },
+        "password": {
+            "data_type": "password",
+            "order": 3,
+            "description": "Password"
+        },
+        "sender_address": {
+            "data_type": "string",
+            "order": 4,
+            "description": "Sender Address"
+        },
+        "ssl_config": {
+            "data_type": "string",
+            "order": 5,
+            "description": "SSL Method",
+            "default": "StartTLS",
+            "required": true,
+            "value_list": [
+                "None",
+                "SSL",
+                "StartTLS"
+            ]
+        },
+        "allow_smtputf8": {
+            "data_type": "boolean",
+            "order": 6,
+            "description": "Enable SMTPUTF8 support (Check this only if the SMTP server supports SMTPUTF8 option)",
+            "default": false
+        },
+        "encoding": {
+            "data_type": "boolean",
+            "order": 7,
+            "description": "Enable Unicode support",
+            "default": false
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action logs into the device and sends a test email to check the connection and credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "send email",
+            "description": "Sends an email",
+            "verbose": "Some points to note:<ul><li>Only files present in the <b>vault</b> can be attached to the email.</li><li>To send HTML emails, specify a HTML formatted text (i.e. &lt;html&gt;....&lt;/html&gt;) in the <b>body</b> parameter. The app sends a multipart email containing plain and html <i>Content-Type</i>.</li><li>The <b>to</b> parameter supports comma separated email addresses.</li><li>If the \"Subject\" is provided in the <b>subject</b> and the <b>headers</b> parameter, then the \"Subject\" provided in the <b>headers</b> parameter will be preferred and the action will run accordingly.</li></ul>",
+            "type": "generic",
+            "identifier": "send_email",
+            "read_only": false,
+            "parameters": {
+                "from": {
+                    "description": "From field",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true
+                },
+                "to": {
+                    "description": "List of recipients email addresses",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true
+                },
+                "cc": {
+                    "description": "List of recipients email addresses to include on cc line",
+                    "data_type": "string",
+                    "order": 2,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "primary": true
+                },
+                "bcc": {
+                    "description": "List of recipients email addresses to include on bcc line",
+                    "data_type": "string",
+                    "order": 3,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "primary": true
+                },
+                "subject": {
+                    "description": "Message Subject",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "body": {
+                    "description": "Message body",
+                    "data_type": "string",
+                    "order": 5,
+                    "required": true
+                },
+                "attachments": {
+                    "description": "Vault IDs of files to attach",
+                    "data_type": "string",
+                    "order": 6,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "allow_list": true,
+                    "primary": true
+                },
+                "headers": {
+                    "description": "Custom email headers (formatted as JSON)",
+                    "data_type": "string",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachments",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "example_values": [
+                        "ab2b2ccfba08ea538ef22f521caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.bcc",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "test1@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.body",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test body"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cc",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "test2@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "sender@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"Subject\": \"Test1\", \"To\": \"test3@testdomain.com\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "receiver@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Email sent"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "title": "Send Email",
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "send rawemail",
+            "description": "Takes a fully specified email and sends it unmodified to the smtp server. Sender and Recipient(s) will be extracted from message headers; Suggest using the standard email package to build message and export with the .as_string() method",
+            "type": "generic",
+            "read_only": false,
+            "identifier": "send_rawemail",
+            "parameters": {
+                "raw_email": {
+                    "description": "Fully specified email message including all headers",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.raw_email",
+                    "data_type": "string",
+                    "example_values": [
+                        "to: receiver@testdomain.com\\n from:sender@testdomain.com\\n subject: Test\\n\\nBody Text",
+                        "to: receiver@testdomain.com\\n from:sender@testdomain.com\\n Content-type: text/html\\nsubject: HTML Test\\n<html><body><h2>This is test</h2><br>This is unicode data.</body></html>",
+                        "to: receiver1@testdomain.com,receiver2@testdomain.com\\nfrom: sender@testdomain.com\\nsubject: CommaSeparated Recipients Test\\n\\nThis is test data."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Email sent"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Send Rawemail",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "send htmlemail",
+            "description": "Sends a html email with optional text rendering. Attachments are allowed a Content-ID tag for reference within the html",
+            "verbose": "If the <b>from</b> parameter is not provided, then the action will consider the <b>username</b> parameter provided in the asset configuration as the sender's email address.<br><br>If the \"Subject\" is provided in the <b>subject</b> and the <b>headers</b> parameter, then the \"Subject\" provided in the <b>headers</b> parameter will be preferred and the action will run accordingly.",
+            "type": "generic",
+            "identifier": "send_htmlemail",
+            "read_only": false,
+            "parameters": {
+                "from": {
+                    "description": "From field",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ]
+                },
+                "to": {
+                    "description": "List of recipients email addresses",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true
+                },
+                "cc": {
+                    "description": "List of recipients email addresses to include on cc line",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true
+                },
+                "bcc": {
+                    "description": "List of recipients email addresses to include on bcc line",
+                    "data_type": "string",
+                    "order": 3,
+                    "contains": [
+                        "email"
+                    ],
+                    "allow_list": true,
+                    "primary": true
+                },
+                "subject": {
+                    "description": "Message Subject",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "headers": {
+                    "description": "Serialized json dictionary. Additional email headers to be added to the message",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "html_body": {
+                    "description": "Html rendering of message",
+                    "data_type": "string",
+                    "order": 6,
+                    "required": true
+                },
+                "text_body": {
+                    "description": "Text rendering of message",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "attachment_json": {
+                    "description": "Serialized json list of attachments, including images. Any additional attachments specified will be update this list. Each attachment requires a vault id and an optional unique content-id. The content-id is required if the html refers to the attachment. The format of the json is a list of dictionaries. Each dictionary will contain a vault_id key and optionally a content_id key. ie. [{\"vault_id\": \"first_vault id\", \"content_id\": \"a_unique_content_id\"}, {\"vault_id\": \"second_vault_id\"}]",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "attachment1": {
+                    "description": "Vault id for attachment",
+                    "data_type": "string",
+                    "order": 9
+                },
+                "content_id1": {
+                    "description": "Optional content-id for attachment, typically used in image link referrals",
+                    "data_type": "string",
+                    "order": 10
+                },
+                "attachment2": {
+                    "description": "Vault id for attachment",
+                    "data_type": "string",
+                    "order": 11
+                },
+                "content_id2": {
+                    "description": "Optional content-id for attachment, typically used in image link referrals",
+                    "data_type": "string",
+                    "order": 12
+                },
+                "attachment3": {
+                    "description": "Vault id for attachment",
+                    "data_type": "string",
+                    "order": 13
+                },
+                "content_id3": {
+                    "description": "Optional content-id for attachment, typically used in image link referrals",
+                    "data_type": "string",
+                    "order": 14
+                },
+                "attachment4": {
+                    "description": "Vault id for attachment",
+                    "data_type": "string",
+                    "order": 15
+                },
+                "content_id4": {
+                    "description": "Optional content-id for attachment, typically used in image link referrals",
+                    "data_type": "string",
+                    "order": 16
+                },
+                "attachment5": {
+                    "description": "Vault id for attachment",
+                    "data_type": "string",
+                    "order": 17
+                },
+                "content_id5": {
+                    "description": "Optional content-id for attachment, typically used in image link referrals",
+                    "data_type": "string",
+                    "order": 18
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment1",
+                    "data_type": "string",
+                    "example_values": [
+                        "ab2b2ccfba08ea538ef22f521caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment2",
+                    "data_type": "string",
+                    "example_values": [
+                        "ab2e2ccfba08ea538ef22f529caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment3",
+                    "data_type": "string",
+                    "example_values": [
+                        "ab2e2ccfba08ea538ef22f529caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment4",
+                    "data_type": "string",
+                    "example_values": [
+                        "ab2e2ccfba08ea538ef22f529caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment5",
+                    "data_type": "string",
+                    "example_values": [
+                        "ab2e2ccfba08ea538ef22f529caa01c3c2b17ccf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.attachment_json",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.bcc",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "test1@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cc",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "test2@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content_id1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content_id2",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content_id3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content_id4",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.content_id5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.from",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "sender@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.headers",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"Subject\": \"Test1\", \"To\": \"test3@testdomain.com\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.html_body",
+                    "data_type": "string",
+                    "example_values": [
+                        "<html><h2>HTML heading</h2><body>HTML body.</body></html>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.text_body",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is text body."
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.to",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "receiver@testdomain.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Email sent"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Send Htmlemail",
+                "type": "table",
+                "height": 5
+            }
+        }
+    ]
+}
