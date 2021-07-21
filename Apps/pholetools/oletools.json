@@ -1,0 +1,167 @@
+{
+    "appid": "6549eb4a-d15c-4e01-8e15-91b85dd77087",
+    "name": "Oletools",
+    "description": "This app provides actions to analyze Microsoft OLE2 files such as Microsoft Office Documents of Outlook messages. It is based on the oletools toolkit",
+    "type": "information",
+    "product_vendor": "decalage2",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
+    "product_name": "oletools",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2021-07-01T09:01:24.184114Z",
+    "package_name": "phantom_oletools",
+    "main_module": "oletools_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "colorclass",
+                "input_file": "wheels/colorclass-2.2.0.zip"
+            },
+            {
+                "module": "olefile",
+                "input_file": "wheels/olefile-0.46.zip"
+            },
+            {
+                "module": "oletools",
+                "input_file": "wheels/oletools-0.60-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {},
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run mraptor scan",
+            "identifier": "mraptor_scan",
+            "description": "Perform a MacroRaptor scan on a file",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of the file to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.mraptor.autoexec",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mraptor.execute",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mraptor.suspicious",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mraptor.vba_code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.mraptor.write",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.ObjectPool.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.container.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.encrypted.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.ext_rels.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.flash.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.ftype.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.vba.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.oleid.xlm.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
