@@ -1,0 +1,729 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: display_report_detail.html
+  Copyright (c) 2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+
+.deepsight-display-report-detail a:hover {
+  text-decoration:underline;
+}
+
+
+
+.deepsight-display-report-detail .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.deepsight-display-report-detail .wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.deepsight-display-report-detail .wf-table-vertical tr td:first-child {
+    font-weight: bold;
+}
+
+.deepsight-display-report-detail .wf-table-horizontal {
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.deepsight-display-report-detail .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.deepsight-display-report-detail .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+  word-break: break-normal;
+}
+
+.deepsight-display-report-detail .wf-h3-style {
+  font-size : 16px
+}
+
+.deepsight-display-report-detail .wf-h4-style {
+  font-size : 14px
+}
+
+.deepsight-display-report-detail .wf-h5-style {
+  font-size : 14px
+}
+
+.deepsight-display-report-detail .wf-subheader-style {
+  font-size : 12px
+}
+
+.deepsight-display-report-detail .port_content {
+  margin-bottom: 20px
+}
+
+.deepsight-display-report-detail .wf-table-div {
+  width: 50%;
+  float: left;
+  padding: 5px;
+}
+
+.deepsight-display-report-detail .metadata_div .collapse.in {
+  display: block !important;
+}
+
+.deepsight-display-report-detail .metadata_div .panel{
+  padding: 0px;
+  box-shadow: none;
+}
+
+.deepsight-display-report-detail .metadata_div .panel-title{
+  font-size: 14px;
+}
+
+.deepsight-display-report-detail .metadata_div .panel-body{
+  margin-top:  0px;
+}
+
+.deepsight-display-report-detail .threatdomain_data_div {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+</style>
+<div class="deepsight-display-report-detail" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+  {% for result in results %} <!-- loop for each result -->
+    <br>
+
+<!------------------- For each Result ---------------------->
+    {% if not result.data %}
+      <h4 class="wf-h4-style"> No report available - {{ result.param.mati_id }} </h4>
+    {% elif result.data %}
+    <!-- Header -->
+    {% if result.data.report_summary_data %}
+      {% if result.data.report_summary_data.title %}
+        <h3 class="center wf-h3-style">{{ result.data.report_summary_data.title }}</h3>
+      {% endif %}
+
+      {% if result.data.report_summary_data.id %}
+        <h3 class="center wf-h3-style"> SYMC -
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['deepsight report id'], 'value': '{{ result.data.report_summary_data.id }}' }], 0, {{ container.id }}, null, false);">
+            {{ result.data.report_summary_data.id }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a></h3>
+      {% endif %}
+
+      <!-- Executive Summary -->
+      {% if result.data.report_summary_data.summary %}
+        <br>
+        <h4 class="wf-h4-style"> <b> Executive Summary </b> </h4>
+        <p> SYMC - {{ result.data.report_summary_data.summary }}</p>
+        <br>
+      {% endif %}
+    {% endif %}
+
+
+    <!-- Metadata -->
+    <h4 class="wf-h4-style"> <b> Metadata </b> </h4>
+
+
+    <div class="metadata_div">
+      <div class="panel-group" id="accordion{{ forloop.counter0 }}">
+
+        <!-- Threat Domains-->
+        {% if result.data.threatDomains %}
+          <div class="panel">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#threatdomain_div{{ forloop.counter0 }}">Threat Domains</a>
+              </h4>
+            </div>
+            <div id="threatdomain_div{{ forloop.counter0 }}" class="panel-collapse collapse in">
+              <div class="threatdomain_data_div panel-body">
+                {% for curr_threat_domain in result.data.threatDomains %}
+                  {{ curr_threat_domain }}
+                  {% if not forloop.last %}
+                    <br>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+
+        <!-- Files -->
+        {% if result.data.files %}
+          <div class="panel">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#file_div{{ forloop.counter0 }}">Files</a>
+              </h4>
+            </div>
+            <div id="file_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+              <div class="panel-body">
+                <table class="wf-table-horizonta filetable">
+                  <thead>
+                    <tr>
+                      <th>File</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for curr_file in result.data.files %}
+                    <tr>
+                    <td>
+                      <table class="wf-table-vertical">
+                        <tr>
+                          <td>MD5</td>
+                          <td>
+                            {% if curr_file.md5 %}
+                              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_file.md5 }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.md5 }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Malicious</td>
+                          <td>
+                            {{ curr_file.isMalicious }}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>SHA1</td>
+                          <td>
+                            {% if curr_file.sha1 %}
+                              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha1', 'hash'], 'value': '{{ curr_file.sha1 }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha1 }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>SHA256</td>
+                          <td>
+                            {% if curr_file.sha256 %}
+                              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha256', 'hash'], 'value': '{{ curr_file.sha256 }}' }], 0, {{ container.id }}, null, false);">
+                                {{ curr_file.sha256 }}
+                                &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Detection Name</td>
+                          <td>
+                            {% if curr_file.detectionName %}
+                              {% for curr_name in curr_file.detectionName %}
+                                {{ curr_name }}
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>File Name</td>
+                          <td>
+                            {% if curr_file.filename %}
+                              {% for curr_name in curr_file.filename %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ curr_name }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_name }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>File Size</td>
+                          <td>
+                            {% if curr_file.size %}
+                              {{ curr_file.size }}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Parent MD5</td>
+                          <td>
+                            {% if curr_file.parentMd5s %}
+                              {% for curr_md5 in curr_file.parentMd5s %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_md5 }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_md5 }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Child MD5</td>
+                          <td>
+                            {% if curr_file.childMd5s %}
+                              {% for curr_md5 in curr_file.childMd5s %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5', 'hash'], 'value': '{{ curr_md5 }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_md5 }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Related IPs</td>
+                          <td>
+                            {% if curr_file.relatedIps %}
+                              {% for curr_ip in curr_file.relatedIps %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_ip }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_ip }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Related Domains</td>
+                          <td>
+                            {% if curr_file.relatedDomains %}
+                              {% for curr_domain in curr_file.relatedDomains %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_domain }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Related URLs</td>
+                          <td>
+                            {% if curr_file.relatedUrls %}
+                              {% for curr_url in curr_file.relatedUrls %}
+                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                                  {{ curr_url }}
+                                  &nbsp;
+                                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                </a>
+                                {% if not forloop.last %}
+                                  <br>
+                                {% endif %}
+                              {% endfor %}
+                            {% endif %}
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+
+        <!-- IP Addresses-->
+        {% if result.data.ips %}
+        <div class="panel">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#ipaddr_div{{ forloop.counter0 }}">IP Addresses</a>
+            </h4>
+          </div>
+          <div id="ipaddr_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <table class="datatable wf-table-horizontal">
+                <thead>
+                  <tr>
+                    <th>IP</th>
+                    <th>Type</th>
+                    <th>URI</th>
+                    <th>Related Domains</th>
+                    <th>Related URLs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_ip in result.data.ips %}
+                    <tr>
+                      <td>
+                        {% if curr_ip.ip %}
+                          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_ip.ip }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_ip.ip }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_ip.type %}
+                          {{ curr_ip.type }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_ip.uri %}
+                          {{ curr_ip.uri}}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_ip.relatedDomains %}
+                          {% for curr_domain in curr_ip.relatedDomains %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain }}' }], 0, {{ container.id }}, null, false);">
+                              {{ curr_domain }}
+                              &nbsp;
+                              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                              <br>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_ip.relatedUrls %}
+                          {% for curr_url in curr_ip.relatedUrls %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                              {{ curr_url }}
+                              &nbsp;
+                              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                              <br>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+
+        <!-- Domains-->
+        {% if result.data.domains %}
+        <div class="panel">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#domain_div{{ forloop.counter0 }}">Domains</a>
+            </h4>
+          </div>
+          <div id="domain_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <table class="datatable wf-table-horizontal">
+                <thead>
+                  <tr>
+                    <th>Domain</th>
+                    <th>Type</th>
+                    <th>URI</th>
+                    <th>Related IPs</th>
+                    <th>Related URLs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_domain in result.data.domains %}
+                    <tr>
+                      <td>
+                        {% if curr_domain.domain %}
+                          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_domain.domain }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_domain.domain }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                          </a>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_domain.type %}
+                          {{ curr_domain.type }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_domain.uri %}
+                          {{ curr_domain.uri}}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_domain.relatedIps %}
+                          {% for curr_ip in curr_domain.relatedIps %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_ip }}' }], 0, {{ container.id }}, null, false);">
+                              {{ curr_ip }}
+                              &nbsp;
+                               <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                              {% if not forloop.last %}
+                                <br>
+                              {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_domain.relatedUrls %}
+                          {% for curr_url in curr_domain.relatedUrls %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_url }}
+                            &nbsp;
+                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                              <br>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Emails -->
+        {% if result.data.emails %}
+        <div class="panel">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#email_div{{ forloop.counter0 }}">Emails</a>
+            </h4>
+          </div>
+          <div id="email_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+            <div class="panel-body">
+              <table class="datatable wf-table-horizontal">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Subject</th>
+                    <th>From</th>
+                    <th>Related File Hash</th>
+                    <th>Related URLs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for curr_email in result.data.emails %}
+                    <tr>
+                      <td>
+                        {% if curr_email.date %}
+                            {{ curr_email.date }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_email.subject %}
+                          {{ curr_email.subject }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_email.from %}
+                          {{ curr_email.from }}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_email.relatedFileHashes %}
+                          {% for curr_hash in curr_email.relatedFileHashes %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['hash', 'md5', 'sha256'], 'value': '{{ curr_hash }}' }], 0, {{ container.id }}, null, false);">
+                              {{ curr_hash }}
+                              &nbsp;
+                              <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                              </a>
+                              {% if not forloop.last %}
+                                <br>
+                              {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if curr_email.relatedUrls %}
+                          {% for curr_url in curr_email.relatedUrls %}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_url }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_url }}
+                            &nbsp;
+                             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                            {% if not forloop.last %}
+                              <br>
+                            {% endif %}
+                          {% endfor %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+
+        <!-- Source Regions -->
+        {% if result.data.sources %}
+          {% if result.data.sources.regions  %}
+          <div class="panel">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#sourceregions_div{{ forloop.counter0 }}">Source Regions</a>
+              </h4>
+            </div>
+            <div id="sourceregions_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+              <div class="panel-body">
+                <table class="datatable wf-table-horizontal">
+                  <thead>
+                    <tr>
+                      <th>Region</th>
+                      <th>Sub-region</th>
+                      <th>Countries</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for curr_region in result.data.sources.regions  %}
+                      {% if curr_region.subregions  %}
+                        {% for curr_subregion in curr_region.subregions %}
+                          <tr>
+                            <td>{{ curr_region.regionName }} </td>
+                            <td> {{ curr_subregion.subregionName }} </td>
+                            {% if curr_subregion.countries  %}
+                              <td>
+                                {% for curr_country in curr_subregion.countries %}
+                                  {{ curr_country.name }} <br>
+                                {% endfor %}
+                              </td>
+                            {% endif %}
+                          </tr>
+                        {% endfor %}
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endif %}
+
+
+        <!-- Target Industries-->
+        {% if result.data.targets %}
+          {% if result.data.targets.industries  %}
+          <div class="panel">
+            <div class="panel-heading">
+              <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion{{ forloop.counter0 }}" href="#targetindustry_div{{ forloop.counter0 }}">Target Industries</a>
+              </h4>
+            </div>
+            <div id="targetindustry_div{{ forloop.counter0 }}" class="panel-collapse collapse">
+              <div class="panel-body">
+                <table class="datatable wf-table-horizontal">
+                  <thead>
+                    <tr>
+                      <th>NAICS Code</th>
+                      <th>Name</th>
+                      <th>% of Victims</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for curr_industry in result.data.targets.industries  %}
+                      <tr>
+                        <td>
+                          {% if curr_industry.naics %}
+                            {{ curr_industry.naics}}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if curr_industry.name %}
+                            {{ curr_industry.name }}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if curr_industry.percentage %}
+                            {{ curr_industry.percentage }}
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        {% endif %}
+
+
+      </div>
+    </div>
+
+  {% endif %}
+  {% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+<script>
+  $.extend(true, $.fn.dataTable.defaults, {
+    "searching": false,
+    "bLengthChange": false,
+    "info": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      }
+    },
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.filetable').DataTable({
+    "pageLength": 1
+  });
+  $('.datatable').DataTable();
+</script>
+{% endblock %} <!-- Main Start Block -->
+

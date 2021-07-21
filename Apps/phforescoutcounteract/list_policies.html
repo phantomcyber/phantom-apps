@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: list_policies.html
-  Copyright (c) 2018-2019 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -67,6 +67,10 @@
   font-size : 12px
 }
 
+a.no-word-wrap {
+  text-decoration: None !important;
+}
+
 </style>
 <div class="forescoutcounteract-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
   {% for result in results %} <!-- loop for each result -->
@@ -83,25 +87,51 @@
           </tr>
           <tr>
             <td>Policy ID</td>
-            <td>{{ items.policyId }}</td>
+            <td>
+              {% if items.policyId %}
+                <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout policy id'], 'value':'{{ items.policyId }}' }], 0, {{ container.id }}, null, false);">
+                  {{ items.policyId }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              {% else %}
+                None
+              {% endif %}
+            </td>
           </tr>
         </table>
         <br>
-        <table class="wf-table-horizontal">
-          <tr>
-            <th>Rule Name</th>
-            <th>ID</th>
-            <th>Description</th>
-          </tr>
-        {% for rule in items.rules %}
+        {% if items.rules %}
+          <table class="wf-table-horizontal">
             <tr>
-              <td>{{ rule.name }}</td>
-              <td>{{ rule.ruleId }}</td>
-              <td>{{ rule.description }}</td>
+              <th>Rule Name</th>
+              <th>ID</th>
+              <th>Description</th>
             </tr>
-          {% endfor %}
+              {% for rule in items.rules %}
+                  <tr>
+                    <td>{{ rule.name }}</td>
+                    <td>
+                      {% if rule.ruleId %}
+                        <a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['forescout rule id'], 'value':'{{ rule.ruleId }}' }], 0, {{ container.id }}, null, false);">
+                          {{ rule.ruleId }}
+                          &nbsp;
+                          <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                      {% else %}
+                        None
+                      {% endif %}
+                    </td>
+                    <td>{{ rule.description }}</td>
+                  </tr>
+              {% endfor %}
           </table>
+        {% else %}
+          <b>No rules found for {{ items.name }} policy</b>
+        {% endif %}
       {% endfor %}
+    {% else %}
+      <h3 class="wf-h4-style">No data found</h3>
     {% endif %}
 
     <br>

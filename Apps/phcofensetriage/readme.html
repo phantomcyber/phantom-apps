@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2020 Splunk Inc.
+  Copyright (c) 2020-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -71,7 +71,7 @@
       <td>JSON dictionary is represented as a serialized JSON string. Only applicable if ingesting new artifacts</td>
       <td>This parameter is a JSON dictionary represented as a serialized JSON string, such as the result of
         json.dumps(). Each key in the dictionary is a potential key name in an artifact that is to be renamed to the
-        value. For example, if the cef_mapping is {"website": "requestURL"} your artifact will have request-URL cef
+        value. For example, if the cef_mapping is {"website": "requestURL"} your artifact will have requestURL cef
         fields
         in place of website cef fields.</td>
     </tr>
@@ -166,7 +166,7 @@
   </table>
   <p>
 
-    <b>NOTE</b>: The Triage devices fetch data according to its own rules. If you look carefully at the logs or the
+    <b>NOTE</b>: The Triage devices fetch data according to their own rules. If you look carefully at the logs or the
     output of the poll-now,
     you may see the last result from the previous ingestion, reingested and marked as a duplicate container. This is to
     guarantee we do not miss any

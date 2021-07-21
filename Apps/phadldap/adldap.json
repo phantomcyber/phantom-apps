@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2021 Splunk Inc.",
-    "app_version": "2.0.1",
-    "utctime_updated": "2021-03-10T18:38:20.000000Z",
+    "app_version": "2.0.4",
+    "utctime_updated": "2021-06-04T19:14:01.000000Z",
     "package_name": "phantom_adldap",
     "main_module": "adldap_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -87,8 +87,8 @@
         {
             "action": "add group members",
             "identifier": "add_group_members",
-            "description": "Adds one more more AD objects to one or more groups",
-            "type": "custom",
+            "description": "Adds one or more Active Directory objects to one or more groups",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -220,8 +220,8 @@
         {
             "action": "remove group members",
             "identifier": "remove_group_members",
-            "description": "Removes one more more AD objects to one or more groups",
-            "type": "custom",
+            "description": "Removes one or more Active Directory objects from one or more groups",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -354,7 +354,7 @@
             "action": "unlock account",
             "identifier": "unlock_account",
             "description": "Unlocks a locked Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -367,7 +367,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the user dn to unlock",
+                    "description": "Specify the user to unlock. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -468,7 +468,7 @@
             "action": "disable account",
             "identifier": "disable_account",
             "description": "Disables an Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "undo": "enable account",
             "versions": "EQ(*)",
@@ -482,7 +482,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to disable",
+                    "description": "Specify the user to disable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -575,7 +575,7 @@
             "action": "enable account",
             "identifier": "enable_account",
             "description": "Enables a disabled Active Directory account",
-            "type": "custom",
+            "type": "generic",
             "read_only": false,
             "undo": "disable account",
             "versions": "EQ(*)",
@@ -589,7 +589,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to enable",
+                    "description": "Specify the user to enable. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -681,8 +681,119 @@
         {
             "action": "reset password",
             "identifier": "reset_password",
-            "description": "Reset a user's password",
-            "type": "custom",
+            "description": "Resets the password of a user, requiring the user to change password at next login",
+            "type": "generic",
+            "read_only": false,
+            "versions": "EQ(*)",
+            "parameters": {
+                "use_samaccountname": {
+                    "description": "Use sAMAccountName instead of distinguishedName",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 0
+                },
+                "user": {
+                    "description": "User whose attributes are to be modified",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "user name"
+                    ],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.reset",
+                    "data_type": "numeric",
+                    "column_name": "Password Was Reset",
+                    "column_order": 1,
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user_dn",
+                    "data_type": "string",
+                    "example_values": [
+                        "CN=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.samaccountname",
+                    "data_type": "string",
+                    "example_values": [
+                        "SVC-SPLUNK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Reset: True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.reset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "target user",
+                    "column_order": 0,
+                    "example_values": [
+                        "SVC-SPLUNK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            }
+        },
+        {
+            "action": "set password",
+            "identifier": "set_password",
+            "description": "Set a user's password",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -695,7 +806,7 @@
                     "order": 0
                 },
                 "user": {
-                    "description": "Specify the dn to enable",
+                    "description": "Specify the user whose password will be set. If 'use samaccountname' is false, then this must be the user's distinguishedName",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -736,9 +847,9 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.reset",
+                    "data_path": "action_result.data.*.set",
                     "data_type": "boolean",
-                    "column_name": "Was Reset",
+                    "column_name": "Password Was Set",
                     "column_order": 1,
                     "example_values": [
                         true
@@ -791,11 +902,11 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Reset: True"
+                        "Set: True"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.reset",
+                    "data_path": "action_result.summary.set",
                     "data_type": "numeric",
                     "example_values": [
                         true
@@ -823,8 +934,8 @@
         {
             "action": "move object",
             "identifier": "move_object",
-            "description": "Moves an entry in active directory",
-            "type": "custom",
+            "description": "Moves an entry in Active Directory",
+            "type": "generic",
             "read_only": false,
             "versions": "EQ(*)",
             "parameters": {
@@ -837,7 +948,7 @@
                     "order": 0
                 },
                 "destination_ou": {
-                    "description": "The OU the specified object will move to",
+                    "description": "The distinguishedName of the OU the specified object will move to",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -927,7 +1038,7 @@
             "read_only": true,
             "parameters": {
                 "filter": {
-                    "description": "The LDAP filter",
+                    "description": "The LDAP filter (must be in LDAP Syntax)",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -935,7 +1046,7 @@
                     "order": 0
                 },
                 "search_base": {
-                    "description": "The search base to use. If not specified, the 'defaultNamingContext' will be used",
+                    "description": "The search base to use in its distinguishedName format. If not specified, the 'defaultNamingContext' will be used",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -1031,13 +1142,13 @@
                 "type": "custom",
                 "width": 10,
                 "height": 5,
-                "view": "query_view.display_attributes",
+                "view": "adldap_view.display_attributes",
                 "title": "AD Query"
             },
             "versions": "EQ(*)"
         },
         {
-            "action": "get attribute",
+            "action": "get attributes",
             "identifier": "get_attributes",
             "description": "Get attributes of various principals",
             "verbose": "This action takes any number of principals (sAMAccountName, distinguishedName, or userprincipalname) and returns requested attributes. Separate with semi-colon (';').",
@@ -1138,7 +1249,7 @@
                 "type": "custom",
                 "width": 10,
                 "height": 5,
-                "view": "query_view.display_attributes",
+                "view": "adldap_view.display_attributes",
                 "title": "AD Query"
             },
             "versions": "EQ(*)"
@@ -1148,7 +1259,7 @@
             "identifier": "set_attribute",
             "description": "Add, delete, or replace an attribute of a user",
             "type": "generic",
-            "read_only": true,
+            "read_only": false,
             "parameters": {
                 "use_samaccountname": {
                     "description": "Use sAMAccountName instead of distinguishedName",
@@ -1199,11 +1310,20 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.use_samaccountname",
-                    "data_type": "boolean",
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
                     "example_values": [
-                        false
+                        "Success"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "status",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.message",
@@ -1213,8 +1333,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully Set Attributes"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.user",
@@ -1225,8 +1348,27 @@
                     "column_name": "user",
                     "column_order": 0,
                     "example_values": [
-                        "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB"
+                        "Cn=SVC-SPLUNK,OU=SPLUNK,DC=SPLUNK,DC=LAB",
+                        "SVC-SPLUNK"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "column_name": "new value",
+                    "column_order": 2,
+                    "example_values": [
+                        "svc_splunk@splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "REPLACE"
+                    ],
+                    "column_name": "action",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.attribute",
@@ -1238,45 +1380,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.value",
-                    "data_type": "string",
-                    "column_name": "new value",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.parameter.action",
-                    "data_type": "string",
-                    "column_name": "action",
-                    "column_order": 3,
+                    "data_path": "action_result.parameter.use_samaccountname",
+                    "data_type": "numeric",
                     "example_values": [
-                        "DELETE"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "boolean",
-                    "column_name": "status",
-                    "column_order": 4,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.attributes",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.summary",
-                    "data_type": "string",
-                    "example_values": [
-                        "Successfully Set Attributes"
+                        true
                     ]
                 },
                 {

@@ -2,17 +2,21 @@
     "appid": "0bea98e9-a480-4638-923d-67aecb612e4f",
     "name": "RSA Security Analytics",
     "description": "This App supports ingestion and investigative actions on RSA Security Analytics",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "package_name": "phantom_rsasa",
     "type": "siem",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2017-2018",
-    "main_module": "rsasa_connector.pyc",
-    "app_version": "1.0.36",
-    "utctime_updated": "2019-01-24T21:21:06.000000Z",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "main_module": "rsasa_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-06-28T12:20:33.000000Z",
     "product_vendor": "RSA",
     "product_name": "RSA Security Analytics",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.190",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "On-prem v10.6.0.0.22075-5"
+    ],
     "logo": "logo_rsa.svg",
     "logo_dark": "logo_rsa_dark.svg",
     "configuration": {
@@ -25,7 +29,6 @@
         "verify_server_cert": {
             "data_type": "boolean",
             "description": "Verify server certificate",
-            "required": false,
             "order": 1,
             "default": false
         },
@@ -103,7 +106,6 @@
                 "container_count": {
                     "data_type": "numeric",
                     "description": "Maximum number of incidents to ingest during poll now",
-                    "required": false,
                     "default": 10
                 },
                 "artifact_count": {
@@ -128,6 +130,7 @@
                     "primary": true,
                     "description": "Device ID/Name",
                     "data_type": "string",
+                    "order": 0,
                     "contains": [
                         "rsa sa device"
                     ]
@@ -136,7 +139,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -169,19 +176,16 @@
             "read_only": true,
             "parameters": {
                 "start_time": {
-                    "required": false,
                     "description": "Start time in format YYYY-MM-DD HH:MM:SS (UTC)",
                     "data_type": "string",
                     "order": 0
                 },
                 "end_time": {
-                    "required": false,
                     "description": "End time in format YYYY-MM-DD HH:MM:SS (UTC)",
                     "data_type": "string",
                     "order": 1
                 },
                 "limit": {
-                    "required": false,
                     "description": "Maximum number of incidents to list",
                     "data_type": "numeric",
                     "default": 100,
@@ -325,7 +329,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -349,7 +357,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.limit",
-                    "data_type": "string"
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -371,7 +379,6 @@
             "read_only": true,
             "parameters": {
                 "id": {
-                    "required": false,
                     "primary": true,
                     "description": "Incident ID",
                     "data_type": "string",
@@ -381,7 +388,6 @@
                     ]
                 },
                 "limit": {
-                    "required": false,
                     "default": 100,
                     "description": "Maximum number of alerts to list",
                     "data_type": "numeric",
@@ -536,7 +542,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -587,7 +597,6 @@
                     ]
                 },
                 "limit": {
-                    "required": false,
                     "default": 100,
                     "description": "Maximum number of events to list",
                     "data_type": "numeric",
@@ -867,7 +876,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -993,7 +1006,11 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",

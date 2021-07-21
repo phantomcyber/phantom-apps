@@ -1,0 +1,1005 @@
+{
+    "appid": "81dc508f-210e-47de-a513-b2c1f3067f7f",
+    "name": "Request Tracker",
+    "description": "This app allows ticket management on Request Tracker",
+    "publisher": "Splunk",
+    "type": "ticketing",
+    "main_module": "requesttracker_connector.py",
+    "app_version": "2.0.2",
+    "utctime_updated": "2021-04-21T03:43:19.000000Z",
+    "package_name": "phantom_requesttracker",
+    "product_vendor": "Best Practical Solutions",
+    "product_name": "Request Tracker",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.10.0.40961",
+    "logo": "logo_bestpractical.svg",
+    "logo_dark": "logo_bestpractical_dark.svg",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "python_version": "3",
+    "configuration": {
+        "device_url": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Device URL, e.g. http://rt.enterprise.com",
+            "required": true
+        },
+        "ph": {
+            "data_type": "ph",
+            "order": 1
+        },
+        "username": {
+            "data_type": "string",
+            "order": 2,
+            "description": "Username",
+            "required": false
+        },
+        "password": {
+            "data_type": "password",
+            "order": 3,
+            "description": "Password",
+            "required": false
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action runs a quick query on the device to check the connection and credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create ticket",
+            "description": "Create a ticket",
+            "type": "generic",
+            "identifier": "create_ticket",
+            "read_only": false,
+            "parameters": {
+                "queue": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Queue to add the ticket to",
+                    "contains": [
+                        "rt queue"
+                    ],
+                    "required": false,
+                    "primary": true
+                },
+                "subject": {
+                    "description": "Subject of the ticket",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true
+                },
+                "text": {
+                    "description": "Text of the ticket",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": true
+                },
+                "priority": {
+                    "description": "Priority of the ticket",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false,
+                    "default": 0
+                },
+                "owner": {
+                    "description": "Owner (Assigned to)",
+                    "data_type": "string",
+                    "order": 4,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Create Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.owner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.queue",
+                    "data_type": "string",
+                    "contains": [
+                        "rt queue"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.text",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_name": "Subject",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.new_ticket_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update ticket",
+            "description": "Updates an existing ticket",
+            "verbose": "Use this action to set the <b>subject</b> or add a <b>comment</b> to an existing ticket. If the <b>subject</b> paramter is set and the <b>fields</b> parameter contains a subject field, the <b>subject</b> parameter will take priority.",
+            "type": "generic",
+            "identifier": "update_ticket",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Ticket ID to update",
+                    "contains": [
+                        "rt ticket id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "fields": {
+                    "description": "Fields to update (JSON format)",
+                    "data_type": "string",
+                    "verbose": "The <b>fields parameter</b> is provided to allow flexibility in updating a ticket. The parameter allows you to update all fields exposed via the request tracker API. In order to look at available fields, please visit the API documentation at https://rt-wiki.bestpractical.com/wiki/REST#Ticket_Create. Data needs to be in valid JSON format. Example: {\"Status\": \"open\"}. If unknown fields are included, the action will pass, but the unknown fields will be logged.",
+                    "order": 1,
+                    "required": false
+                },
+                "comment": {
+                    "description": "Comment to add to ticket history",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                },
+                "subject": {
+                    "description": "Subject of ticket to be updated",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Update Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.fields",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.admin_cc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.due",
+                    "data_type": "string",
+                    "column_name": "Due",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.final_Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.initial_priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string",
+                    "column_name": "Owner",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.queue",
+                    "data_type": "string",
+                    "column_name": "Queue",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.requestors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resolved",
+                    "data_type": "string",
+                    "column_name": "Resolved",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.started",
+                    "data_type": "string",
+                    "column_name": "Started",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.starts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_name": "Subject",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.time_estimated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_left",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_worked",
+                    "data_type": "string",
+                    "column_name": "Time Worked",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.told",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list tickets",
+            "description": "Get a list of tickets",
+            "verbose": "The value for the <b>query</b> parameter can be generated by Request Tracker's query builder.",
+            "type": "generic",
+            "identifier": "list_tickets",
+            "read_only": true,
+            "parameters": {
+                "queue": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Queue to get the list from",
+                    "contains": [
+                        "rt queue"
+                    ],
+                    "primary": true,
+                    "default": "1"
+                },
+                "query": {
+                    "description": "Additional parameters to query for",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Tickets",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.queue",
+                    "data_type": "string",
+                    "contains": [
+                        "rt queue"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.due",
+                    "data_type": "string",
+                    "column_name": "Due",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.final_Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.initial_priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string",
+                    "column_name": "Owner",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.queue",
+                    "data_type": "string",
+                    "column_name": "Queue",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.requestors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resolved",
+                    "data_type": "string",
+                    "column_name": "Resolved",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.started",
+                    "data_type": "string",
+                    "column_name": "Started",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.starts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_name": "Subject",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.time_estimated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_left",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_worked",
+                    "data_type": "string",
+                    "column_name": "Time Worked",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.told",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_issues",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ticket",
+            "description": "Get information about a single ticket",
+            "type": "generic",
+            "identifier": "get_ticket",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Ticket ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Ticket",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.due",
+                    "data_type": "string",
+                    "column_name": "Due",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.final_Priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.initial_priority",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string",
+                    "column_name": "Owner",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.priority",
+                    "data_type": "string",
+                    "column_name": "Priority",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.queue",
+                    "data_type": "string",
+                    "column_name": "Queue",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.requestors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resolved",
+                    "data_type": "string",
+                    "column_name": "Resolved",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.started",
+                    "data_type": "string",
+                    "column_name": "Started",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.starts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_name": "Subject",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.time_estimated",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_left",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.time_worked",
+                    "data_type": "string",
+                    "column_name": "Time Worked",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.told",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_issues",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list attachments",
+            "description": "List all attachments for a ticket",
+            "type": "investigate",
+            "identifier": "list_attachments",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Ticket ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ],
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "List Attachments",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_id",
+                    "data_type": "string",
+                    "column_name": "Attachment Id",
+                    "column_order": 1,
+                    "contains": [
+                        "rt attachment id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.content_type",
+                    "data_type": "string",
+                    "column_name": "Content-Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "Path",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.ticket_id",
+                    "data_type": "string",
+                    "column_name": "Ticket Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.attachments",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.failed_tickets",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.succesful_tickets",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get attachment",
+            "description": "Download attachment to vault",
+            "type": "investigate",
+            "identifier": "get_attachment",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Ticket ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "attachment_id": {
+                    "description": "Attachment ID",
+                    "data_type": "string",
+                    "order": 1,
+                    "contains": [
+                        "rt attachment id"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Get Attachments",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.attachment_id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt attachment id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachment_id",
+                    "data_type": "string",
+                    "column_name": "Attachment Id",
+                    "column_order": 1,
+                    "contains": [
+                        "rt attachment id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_name": "Id",
+                    "column_order": 0,
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "column_name": "MD5",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string",
+                    "column_name": "Path",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "column_name": "SHA1",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "column_name": "SHA256",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "string",
+                    "column_name": "Size",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "column_name": "Vault id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.attachments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add attachment",
+            "description": "Uploads vaulted file as attachment to ticket",
+            "type": "generic",
+            "identifier": "add_attachment",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Ticket ID",
+                    "contains": [
+                        "rt ticket id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "vault_id": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "Vault ID",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "comment": {
+                    "description": "Comment to include with upload",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Add Attachment",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "rt ticket id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
