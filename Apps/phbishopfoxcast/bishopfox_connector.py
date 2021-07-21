@@ -23,6 +23,7 @@ from datetime import datetime
 
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from urllib.parse import unquote
 
 
 class RetVal(tuple):
@@ -70,7 +71,7 @@ class BishopFoxConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
-
+        message = unquote(message)
         message = message.replace(u"{", "{{").replace(u"}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -219,51 +220,53 @@ class BishopFoxConnector(BaseConnector):
 
     def _parse_finding_json(self, finding):
         subjects = []
-        for subject in finding["subjects"]:
-            subjects.append({
-                "category": finding["category"],
-                "clientId": subject["clientId"],
-                "clientNote": subject["clientNote"],
-                "createdAt": subject["createdAt"],
-                "definition": finding["definition"],
-                "details": finding["details"],
-                "findingId": finding["findingId"],
-                "findingUid": finding["uid"],
-                "orgUid": finding["orgUid"],
-                "recommendations": finding["recommendations"],
-                "remediatedAt": subject["remediatedAt"],
-                "remediatedDays": subject["remediatedDays"],
-                "report": finding["report"],
-                "resources": finding["additionalResources"],
-                "severity": finding["severity"],
-                "status": subject["status"],
-                "subject": subject["subject"],
-                "subjectUid": subject["uid"],
-                "target": subject["target"],
-                "updatedAt": subject["updatedAt"],
-                "reportedAt": finding["reportedAt"]
-            })
+        if finding.get("subjects"):
+            for subject in finding["subjects"]:
+                subjects.append({
+                    "category": finding.get("category"),
+                    "clientId": subject.get("clientId"),
+                    "clientNote": subject.get("clientNote"),
+                    "createdAt": subject.get("createdAt"),
+                    "definition": finding.get("definition"),
+                    "details": finding.get("details"),
+                    "findingId": finding.get("findingId"),
+                    "findingUid": finding.get("uid"),
+                    "orgUid": finding.get("orgUid"),
+                    "recommendations": finding.get("recommendations"),
+                    "remediatedAt": subject.get("remediatedAt"),
+                    "remediatedDays": subject.get("remediatedDays"),
+                    "report": finding.get("report"),
+                    "resources": finding.get("additionalResources"),
+                    "severity": finding.get("severity"),
+                    "status": subject.get("status"),
+                    "subject": subject.get("subject"),
+                    "subjectUid": subject.get("uid"),
+                    "target": subject.get("target"),
+                    "updatedAt": subject.get("updatedAt"),
+                    "reportedAt": finding.get("reportedAt")
+                })
         return subjects
 
     def _parse_subject_json(self, subject, finding_uid):
         subject["findingUid"] = finding_uid
-        subject["subjectUid"] = subject["uid"]
-        del subject["uid"]
+        subject["subjectUid"] = subject.get("uid")
+        if subject.get("uid"):
+            del subject["uid"]
         return subject
 
     def _build_container_json(self, finding):
         label = self.get_config().get("ingest", {}).get("container_label")
         severity = consts.SEVERITY_MAP[finding["severity"]]
         container_json = {
-            "name": finding["category"],
+            "name": finding.get("category"),
             "label": label,
             "severity": severity,
-            "source_data_identifier": finding["subjectUid"],
+            "source_data_identifier": finding.get("subjectUid"),
             "artifacts": [{
-                "name": finding["subject"],
+                "name": finding.get("subject"),
                 "label": label,
                 "severity": severity,
-                "source_data_identifier": finding["subjectUid"],
+                "source_data_identifier": finding.get("subjectUid"),
                 "cef": finding
             }]
         }
@@ -281,7 +284,11 @@ class BishopFoxConnector(BaseConnector):
             params["uid"] = kwargs["finding_uid"]
         if kwargs.get("since"):
             # the 'since' parameter does not include time information, only the date
-            params["since"] = dateutil.parser.isoparse(kwargs["since"]).strftime("%Y-%m-%d")
+            try:
+                params["since"] = dateutil.parser.isoparse(kwargs["since"]).strftime("%Y-%m-%d")
+            except:
+                error_message = "Please provide a valid 'since' action parameter"
+                return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), None)
         if kwargs.get("status"):
             params["status"] = kwargs["status"]
         if kwargs.get("severity"):
@@ -329,7 +336,6 @@ class BishopFoxConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             self.save_progress("Test Connectivity Failed.")
-            self.save_progress(action_result.get_message())
             return action_result.get_status()
 
         # Return success
@@ -367,6 +373,9 @@ class BishopFoxConnector(BaseConnector):
         finding_uid = param["finding_uid"]
         subject_uid = param["subject_uid"]
         status = param["status"]
+        if status not in consts.STATUS_CODES:
+            err_msg = "Please provide a valid 'status' action parameter from the value list"
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         endpoint = "/findings/{0}/subjects/{1}/status".format(finding_uid, subject_uid)
 
