@@ -72,7 +72,7 @@ class BishopFoxConnector(BaseConnector):
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
         message = unquote(message)
-        message = message.replace(u"{", "{{").replace(u"}", "}}")
+        message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_json_response(self, r, action_result):
@@ -93,7 +93,7 @@ class BishopFoxConnector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u"{", "{{").replace(u"}", "}}")
+            r.text.replace("{", "{{").replace("}", "}}")
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -136,6 +136,9 @@ class BishopFoxConnector(BaseConnector):
         :return: error message
         """
 
+        error_code = consts.ERR_CODE_MSG
+        error_msg = consts.ERR_MSG_UNAVAILABLE
+
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -144,23 +147,10 @@ class BishopFoxConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = consts.ERR_CODE_MSG
                     error_msg = e.args[0]
-            else:
-                error_code = consts.ERR_CODE_MSG
-                error_msg = consts.ERR_MSG_UNAVAILABLE
         except:
-            error_code = consts.ERR_CODE_MSG
-            error_msg = consts.ERR_MSG_UNAVAILABLE
+            pass
 
-        try:
-            if error_code in consts.ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
-            else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-        except:
-            self.debug_print(consts.PARSE_ERR_MSG)
-            error_text = consts.PARSE_ERR_MSG
-
-        return error_text
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
         # **kwargs can be any additional parameters that requests.request accepts
@@ -176,13 +166,13 @@ class BishopFoxConnector(BaseConnector):
                 **kwargs
             )
         except requests.exceptions.InvalidSchema:
-            error_message = 'Error connecting to server. No connection adapters were found for %s' % (url)
+            error_message = 'Error connecting to server. No connection adapters were found for {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.InvalidURL:
-            error_message = 'Error connecting to server. Invalid URL %s' % (url)
+            error_message = 'Error connecting to server. Invalid URL {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
-            error_message = 'Error Details: Connection Refused from the Server %s' % (url)
+            error_message = 'Error Details: Connection Refused from the Server {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             return RetVal(
@@ -348,10 +338,11 @@ class BishopFoxConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        findings = []
         ret_val, findings = self._get_findings(action_result=action_result, **param)
 
         if phantom.is_fail(ret_val):
-            # action failed, this shoudl already be captured in the action result
+            # action failed, this should already be captured in the action result
             return action_result.get_status()
 
         # Add the response into the data section
@@ -467,7 +458,7 @@ class BishopFoxConnector(BaseConnector):
         data = [self._parse_subject_json(subj, finding_uid) for subj in response]
         action_result.add_data(data)
 
-        return action_result.set_status(phantom.APP_SUCCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_on_poll(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -572,7 +563,7 @@ class BishopFoxConnector(BaseConnector):
         self._request_session.mount("http://", retry_adapter)
         self._request_session.mount("https://", retry_adapter)
 
-        return ret_val
+        return phantom.APP_SUCCESS
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
