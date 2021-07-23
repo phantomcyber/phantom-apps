@@ -1,0 +1,248 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+{% block widget_content %}
+
+<!-- File: info.html
+  Copyright (c) 2016-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+  .threatgrid-info h3 {
+  }
+  .sandbox-info {
+    min-width: 250px;
+    display: inline-block;
+    padding-right: 30px;
+    white-space: nowrap;
+    height: 2em;
+    text-align: left;
+  }
+
+  .threatgrid .wf-table-vertical {
+      width: initial;
+      font-size: 12px;
+  }
+
+  .threatgrid .wf-table-vertical td{
+      padding: 5px;
+      border: 1px solid !important;
+  }
+
+  .threatgrid .wf-table-vertical tr td:first-child {
+      font-weight: bold;
+  }
+
+  #threatgrid-iocs .hover {
+    cursor: pointer;
+  }
+  .threatgrid-param {
+    display: inline-block;
+    padding-right: 15px;
+    width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    overflow-text: ellipsis;
+  }
+  .threatgrid-iocs-extra-info {
+  }
+
+  .threatgrid-iocs-extra-info div {
+    padding: 5px;
+  }
+  .slide-handle {
+    display: none !important;
+  }
+
+</style>
+<div id="threatgrid-info" style="overflow: auto; width: 100% height: 100%; padding-left:10px; padding-right:10px">
+  {% if not data or data|length == 0 %}
+      <h4 class="wf-h4-style">No data found</h4>
+  {% else %}
+  {% for item in data %}
+    <h3>ThreatGRID Analysis</h3>
+
+    <h3>Info</h3>
+    <table class="wf-table-vertical">
+      {% if item.threat or item.report or item.status %}
+
+        {% if item.status%}
+          <tr>
+            <td>ID &nbsp; &nbsp;</td>
+            <td>
+                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5', 'threatgrid task id'], 'value':'{{ item.status.id }}' }], 0, {{ container.id }}, null, false);">
+                {{ item.status.id }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+          </tr>
+          <tr>
+              <td>Started On &nbsp; &nbsp;</td>
+              <td>{{ item.status.started_at|human_datetime }}</td>
+          </tr>
+          <tr>
+              <td>Ended &nbsp; &nbsp;</td>
+              <td>{{ item.status.completed_at|human_datetime }}</td>
+          </tr>
+          <tr>
+              <td>SHA256 &nbsp; &nbsp;</td>
+              <td>{{ item.status.sha256 }}</td>
+          </tr>
+        {% endif %}
+
+        <tr>
+            <td>Target &nbsp; &nbsp;</td>
+            <td>
+                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['file name'], 'value':'{{ item.target }}' }], 0, {{ container.id }}, null, false);">
+                {{ item.target }}
+                &nbsp;
+                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            </td>
+        </tr>
+
+        {% if item.threat%}
+          <tr>
+              <td>Score &nbsp; &nbsp;</td>
+              <td>{{ item.threat.score }}</td>
+          </tr>
+          <tr>
+              <td>Max Severity &nbsp; &nbsp;</td>
+              <td>{{ item.threat|by_key:'max-severity' }}</td>
+          </tr>
+          <tr>
+              <td>Max Confidence &nbsp; &nbsp;</td>
+              <td>{{ item.threat|by_key:'max-confidence' }}</td>
+          </tr>
+        {% endif %}
+
+        {% if item.report%}
+          <tr>
+              <td>Type &nbsp; &nbsp;</td>
+              <td>{{ item.report.metadata.malware_desc.0.magic }} ({{ item.report.metadata.malware_desc.0.type }})</td>
+          </tr>
+          <tr>
+              <td>Size &nbsp; &nbsp;</td>
+              <td>{{ item.report.metadata.malware_desc.0.size }}</td>
+          </tr>
+          <tr>
+              <td>VM OS &nbsp; &nbsp;</td>
+              <td>{{ item.report.metadata.sandcastle_env.current_os }}</td>
+          </tr>
+        {% endif %}
+
+        <tr>
+            <td>Source Link &nbsp; &nbsp;</td>
+            <td><a href="{{ item.results_url }}" target="_blank">Task {{ item.status.id }}</a></td>
+        </tr>
+
+      {% else %}
+        <tr>
+          <td colspan="2">No data found</td>
+        </tr>
+      {% endif %}
+    </table>
+
+    <h3>Behaviors</h3>
+    <table class="phantom-table" id="threatgrid-iocs" style="min-width: 100%; margin: 0px;">
+      <thead>
+        <th>NAME</th>
+        <th>SEVERITY</th>
+        <th>CONFIDENCE</th>
+        <th>TAGS</th>
+        <th>CATEGORIES</th>
+        <th></th>
+      </thead>
+      <tbody>
+        {% if not item.report %}
+          <tr>
+            <td colspan="6">No data found</td>
+          </tr>
+        {% else %}
+          {% for ioc in item.report.iocs|dictsort:'title' %}
+            <tr>
+              <td>{{ ioc.title }}</td>
+              <td>{{ ioc.severity }}</td>
+              <td>{{ ioc.confidence }}</td>
+              <td>{{ ioc.tags|join:', ' }}</td>
+              <td>{{ ioc.category|join:', ' }}</td>
+              <td>
+                <div>
+                  {% for data in ioc.data %}
+                    {% if data.Antivirus_Result %}
+                      <div>{% if data.Antivirus_Product %}Scanner: {{ data.Antivirus_Product }}&nbsp; - &nbsp;{% endif %}Signature: {{ data.Antivirus_Result }}</div>
+                    {% endif %}
+                  {% endfor %}
+                  {{ ioc.description }}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      </tbody>
+    </table>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<script>
+  try {
+    var tbl = $('#threatgrid-iocs');
+    var datatbl = $(tbl).dataTable({
+      columns: [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {visible: false},
+      ],
+      "fnRowCallback": function(tr,data,iDisplayIndex,iDisplayIndexFull) {
+        $(tr).addClass('hover');
+      },
+      scrollX: 1,
+      scrollY: 2,
+      paging: false,
+      searching: false,
+      order: [2],
+      bAutoWidth: false,
+      infoCallback: function() { return ''; }
+    });
+    tbl.find('tr').on('click', function() {
+      var tr = $(this);
+      var row = datatbl.api().row( tr );
+      if (row.child.isShown()) {
+        row.child.hide();
+        tr.removeClass('shown');
+      } else {
+        var table = $(row.data()[5]);
+        row.child(table, 'threatgrid-iocs-extra-info').show();
+        tr.addClass('shown');
+      }
+      threatgrid_behavior_resize_table(tbl);
+    });
+    tbl[0].ph_datatable = datatbl;
+    $(tbl).attr('onwidgetresize', 'threatgrid_behavior_resize_table(this);');
+    threatgrid_behavior_resize_table(tbl);
+  } catch (e) {
+    console.error("Error while loading DataTable")
+  }
+  function threatgrid_behavior_resize_table(table) {
+    var scroll_body = $(table).parent();
+    var new_height = $(table).height() + 20;
+    scroll_body.css('height', new_height + 'px');
+    $(table).css('width', $(table).parent().parent().parent().parent().width() - 20);
+    new_height = $(table).height() + 20;
+    scroll_body.css('height', new_height + 'px');
+    $(table)[0].ph_datatable.fnAdjustColumnSizing();
+  }
+</script>
+{% endblock %}
