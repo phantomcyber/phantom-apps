@@ -9,26 +9,26 @@
     "product_name": "WAF",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
-    "app_version": "1.0.4",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "1.1.0",
     "utctime_updated": "2019-04-25T23:07:28.000000Z",
     "package_name": "phantom_awswaf",
     "main_module": "awswaf_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.9.96-py2.py3-none-any.whl"
+                "input_file": "wheels/boto3-1.17.30-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
+                "input_file": "wheels/s3transfer-0.3.4-py2.py3-none-any.whl"
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.12.96-py2.py3-none-any.whl"
+                "input_file": "wheels/botocore-1.20.30-py2.py3-none-any.whl"
             },
             {
                 "module": "futures",
@@ -36,11 +36,11 @@
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
-                "input_file": "wheels/jmespath-0.9.3-py2.py3-none-any.whl"
+                "input_file": "wheels/jmespath-0.10.0-py2.py3-none-any.whl"
             }
         ]
     },
