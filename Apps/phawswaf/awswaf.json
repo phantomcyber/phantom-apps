@@ -14,6 +14,7 @@
     "utctime_updated": "2019-04-25T23:07:28.000000Z",
     "package_name": "phantom_awswaf",
     "main_module": "awswaf_connector.pyc",
+    "python_version": "2.7",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -58,7 +59,7 @@
             "order": 1
         },
         "region": {
-            "description": "region",
+            "description": "Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -102,7 +103,7 @@
             "action": "add ip",
             "identifier": "add_ip",
             "description": "Add a new IP to an existing IP set OR a new IP set",
-            "verbose": "ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
             "type": "correct",
             "undo": "delete ip",
             "read_only": false,
@@ -290,7 +291,7 @@
             "action": "delete ip",
             "identifier": "delete_ip",
             "description": "Removes IP from an existing IP set",
-            "verbose": "ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for adding an IP to the IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input",
             "type": "contain",
             "undo": "add ip",
             "read_only": false,
