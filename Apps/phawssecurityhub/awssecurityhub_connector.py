@@ -222,7 +222,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         self.save_progress("Connecting to endpoint")
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         ret_val, _ = self._make_boto_call(action_result, 'get_findings', MaxResults=1)
@@ -346,7 +346,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
     def _poll_from_security_hub(self, action_result, max_containers, param):
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return None
 
         end_date = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
@@ -440,7 +440,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         limit = param.get('limit')
@@ -585,7 +585,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         findings_id = param['findings_id']
@@ -656,7 +656,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         note = param.get('note')
@@ -708,7 +708,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         note = param.get('note')
@@ -760,7 +760,7 @@ class AwsSecurityHubConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result, param)):
+        if phantom.is_fail(self._create_client(action_result, 'securityhub', param)):
             return action_result.get_status()
 
         findings_id = param['findings_id']
