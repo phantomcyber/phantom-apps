@@ -48,13 +48,11 @@
         "access_key_id": {
             "description": "Access Key ID",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "access_key_secret": {
             "description": "Access Key Secret",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "scope": {
@@ -101,6 +99,9 @@
             "description": "Use attached role when running Phantom in EC2",
             "data_type": "boolean",
             "default": false,
+            "visibility": [
+                "onprem"
+            ],
             "order": 4
         }
     },
