@@ -1,0 +1,2780 @@
+{
+    "appid": "3f44599f-d242-412f-892f-48c1d99fc0d0",
+    "name": "FireEye HX",
+    "description": "FireEye HX Endpoint Security",
+    "type": "endpoint",
+    "product_vendor": "FireEye",
+    "logo": "logo_fireeye.svg",
+    "logo_dark": "logo_fireeye_dark.svg",
+    "product_name": "FireEye HX",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "app_version": "1.0.27",
+    "utctime_updated": "2020-10-15T20:49:54.000000Z",
+    "package_name": "phantom_fireeyehx",
+    "main_module": "fireeyehx_connector.pyc",
+    "min_phantom_version": "4.0.1068",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "hx_hostname": {
+            "description": "HX Appliance URL Eg. https://hx.customer.com",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "hx_port": {
+            "description": "HX Port. Eg. 3000",
+            "data_type": "numeric",
+            "required": true,
+            "order": 1
+        },
+        "hx_username": {
+            "description": "HX API Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "hx_password": {
+            "description": "HX API Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "zip_password": {
+            "description": "ZIP Archive Password",
+            "data_type": "password",
+            "required": false,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get system info",
+            "identifier": "get_system_info",
+            "description": "Get system information for an endpoint",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Agent ID to get system info of",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2012-01-12T22:36:22Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "A390C269-EE66-409E-B262-13F7D577588D"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.MAC",
+                    "data_type": "string",
+                    "column_name": "MAC",
+                    "column_order": 3,
+                    "example_values": [
+                        "a2-ac-75-70-ec-ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.OS",
+                    "data_type": "string",
+                    "column_name": "OS",
+                    "column_order": 4,
+                    "example_values": [
+                        "Windows 7 Enterprise 7601 Service Pack 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.OSbitness",
+                    "data_type": "string",
+                    "example_values": [
+                        "32-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.appCreated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-08-08T12:34:56Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.appVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.availphysical",
+                    "data_type": "string",
+                    "example_values": [
+                        "1434546176"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.biosInfo.biosDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "09/13/2011"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.biosInfo.biosVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "Xen 4.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.buildNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        "7601"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014-08-09T06:55:07Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.directory",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "marketing.abc.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.gmtoffset",
+                    "data_type": "string",
+                    "example_values": [
+                        "-PT8H"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
+                    "data_type": "string",
+                    "column_name": "Hostname",
+                    "column_order": 1,
+                    "example_values": [
+                        "random_565_4"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.installDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-11-16T17:02:17Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machine",
+                    "data_type": "string",
+                    "example_values": [
+                        "CORAL-WIN7SP164"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.MAC",
+                    "data_type": "string",
+                    "example_values": [
+                        "a2-ac-75-70-ec-ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.adapter",
+                    "data_type": "string",
+                    "example_values": [
+                        "{C8CD9531-F96E-4B48-995E-9C34552FFDD0}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Citrix PV Ethernet Adapter"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.dhcpLeaseExpires",
+                    "data_type": "string",
+                    "example_values": [
+                        "2012-01-20T09:02:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.dhcpLeaseObtained",
+                    "data_type": "string",
+                    "example_values": [
+                        "2012-01-12T09:02:03Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.dhcpServerArray.dhcpServer",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.6.6.7"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.ipArray.ipInfo.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.6.6.6"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.ipArray.ipInfo.ipv6Address",
+                    "data_type": "string",
+                    "example_values": [
+                        "::1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.ipArray.ipInfo.ipv6SubnetMask",
+                    "data_type": "string",
+                    "example_values": [
+                        "FFFF:FFFF:FFFF:FC00:0:0:0:0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.ipArray.ipInfo.subnetMask",
+                    "data_type": "string",
+                    "example_values": [
+                        "255.255.255.0"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.networkArray.networkInfo.*.ipGatewayArray.ipGateway",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.patchLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service Pack 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryIpAddress",
+                    "data_type": "string",
+                    "column_name": "Primary IP",
+                    "column_order": 2,
+                    "example_values": [
+                        "10.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.procType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Multiprocessor Free"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.processor",
+                    "data_type": "string",
+                    "example_values": [
+                        "Intel(R) Xeon(R) CPU X5670 @ 2.93GHz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.productID",
+                    "data_type": "string",
+                    "example_values": [
+                        "55041-050-0818515-86383"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.productName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows XP SP3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.regOrg",
+                    "data_type": "string",
+                    "example_values": [
+                        "FireEye"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.regOwner",
+                    "data_type": "string",
+                    "example_values": [
+                        "dgoodman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timezoneDST",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Daylight Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timezoneStandard",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.totalphysical",
+                    "data_type": "string",
+                    "example_values": [
+                        "2142883840"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.uptime",
+                    "data_type": "string",
+                    "example_values": [
+                        "PT2468377S"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "SYSTEM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "random_565_4"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Primary IP",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value",
+                        "Primary ip: 10.1.1.1, Hostname: random_565_4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "quarantine device",
+            "identifier": "quarantine_device",
+            "description": "Request to contain the endpoint",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "undo": "unquarantine device",
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Endpoint Agent ID you want to contain",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Accepted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/agent_id/containment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get quarantine status",
+            "identifier": "get_quarantine_status",
+            "description": "Get the containment status for an endpoint",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Endpoint Agent ID you want to check the status",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "96D2CB1414691242160B26"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.contained_by_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1007
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.contained_by_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "api_analyst_contain"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.contained_on",
+                    "data_type": "string",
+                    "column_name": "Date Contained",
+                    "column_order": 3,
+                    "example_values": [
+                        "2014-10-30T17:47:22.261Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.excluded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_sysinfo",
+                    "data_type": "string",
+                    "example_values": [
+                        "2013-10-27T11:16:47.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.queued",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_by_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1007
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_by_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "api_analyst_contain"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_on",
+                    "data_type": "string",
+                    "column_name": "Date Requested",
+                    "column_order": 2,
+                    "example_values": [
+                        "2014-10-30T17:47:22.261Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 1,
+                    "example_values": [
+                        "contain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state_update_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014-10-30T17:47:22.261Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/96D2CB1414691242160B26"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set quarantine approved",
+            "identifier": "set_quarantine_approved",
+            "description": "Approve containment request for host",
+            "verbose": "",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Endpoint Agent ID you want to approve containment",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 1,
+                    "example_values": [
+                        "Created"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/agent_id/containment"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "unquarantine device",
+            "identifier": "unquarantine_device",
+            "description": "Containment cancellation for host",
+            "verbose": "",
+            "type": "correct",
+            "read_only": false,
+            "undo": "quarantine device",
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Endpoint Agent ID you want to cancel containment",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get acquisition status",
+            "identifier": "get_acquisition_status",
+            "description": "Get status of file acquisition",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "acquisition_id": {
+                    "description": "Acquisition ID from (get file) action to query status",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx acquisition id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.acquisition_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx acquisition id"
+                    ],
+                    "column_name": "acquisition_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "2494"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2494
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._revision",
+                    "data_type": "string",
+                    "example_values": [
+                        "20180523191059963547881830"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.condition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.error_message",
+                    "data_type": "string",
+                    "example_values": [
+                        "The acquisition completed with issues."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.external_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.finish_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-23T19:10:59.963Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "NV4HPControllerSetup.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Users\\aeh11\\AppData\\Local\\Temp\\1\\NVFiles_7e7bc015-0db1-4605-a9cf-9d81754054e9\\"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_use_api",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1012
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "bckapi"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-23T19:10:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/acqs/files/id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPLETE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/acqs/files/2494"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.zip_passphrase",
+                    "data_type": "string",
+                    "example_values": [
+                        "unzip-me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get triage",
+            "identifier": "get_triage",
+            "description": "Request Endpoint Host Triage Package",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Agent ID to get Triage Package",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                },
+                "req_timestamp": {
+                    "description": "The triage collection time in ISO-8601_DATE format",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 1
+                },
+                "external_id": {
+                    "description": "External correlation ID",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "external_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.req_timestamp",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "req_timestamp",
+                    "column_order": 1,
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "numeric",
+                    "column_name": "ID",
+                    "column_order": 4,
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._revision",
+                    "data_type": "string",
+                    "example_values": [
+                        "20141030174717969373100031"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert._id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.alert.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.condition._id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.condition.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.error_message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.external_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.finish_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "F114BC21414691237913B9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/F114BC21414691237913B9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator._id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.indicator.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1002
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "api_analyst"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2014-10-30T17:47:17.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/agent_id/triages"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "column_name": "URL",
+                    "column_order": 3,
+                    "example_values": [
+                        "/hx/api/v3/acqs/triages/5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ID",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.State",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "State: NEW, Id: 5"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list device groups",
+            "identifier": "list_host_sets",
+            "description": "Retrieve a list of host sets in HX optionally filtered by name",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "name": {
+                    "description": "Host set name for filtering",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        1069
+                    ],
+                    "contains": [
+                        "fireeye hostsetid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._revision",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "venn",
+                        "static"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device group",
+            "identifier": "get_host_set",
+            "description": "List endpoints in a host set",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "host_set_id": {
+                    "description": "ID of the Host Set",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx hostsetid"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_set_id",
+                    "contains": [
+                        "fireeyehx hostsetid"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "HX Agent ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.containment_missing_software",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.containment_queued",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.containment_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 3,
+                    "example_values": [
+                        "hr.fireeye.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.excluded_from_containment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.gmt_offset_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -28800
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
+                    "data_type": "string",
+                    "column_name": "Hostname",
+                    "column_order": 1,
+                    "example_values": [
+                        "random_164_1"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last _exploit_block",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_alert_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_audit_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-07-30T04:12:23.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_exploit_block_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_poll_ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_poll_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os.bitness",
+                    "data_type": "string",
+                    "example_values": [
+                        "32-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os.patch_level",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service Pack 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.os.product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows XP SP1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primary_ip_address",
+                    "data_type": "string",
+                    "column_name": "Primary IP",
+                    "column_order": 2,
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primary_mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "a2-ac-75-70-ec-ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reported_clone",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.stats.acqs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.stats.alerting_conditions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.stats.alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.stats.exploit_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.stats.exploit_blocks",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sysinfo.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58/sysinfo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list endpoints",
+            "identifier": "list_endpoints",
+            "description": "List and search the endpoints on HX",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "limit": {
+                    "description": "Limit the number of hosts returned. (HX Defaults to 50)",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 0
+                },
+                "search": {
+                    "description": "Search all hosts connected to the HX appliance. Search for hostname, IP address or Agent ID",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "host name",
+                        "ip",
+                        "fireeyehx agentid"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "contains": []
+                },
+                {
+                    "data_path": "action_result.parameter.search",
+                    "contains": [
+                        "host name",
+                        "ip",
+                        "fireeyehx agentid"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*._id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "HX Agent ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.agent_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.containment_missing_software",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.containment_queued",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.containment_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 3,
+                    "example_values": [
+                        "hr.fireeye.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.excluded_from_containment",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.gmt_offset_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -28800
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.hostname",
+                    "data_type": "string",
+                    "column_name": "Hostname",
+                    "column_order": 1,
+                    "example_values": [
+                        "random_164_1"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last _exploit_block",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_alert_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_audit_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2015-07-30T04:12:23.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_exploit_block_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_poll_ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.last_poll_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.os.bitness",
+                    "data_type": "string",
+                    "example_values": [
+                        "32-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.os.patch_level",
+                    "data_type": "string",
+                    "example_values": [
+                        "Service Pack 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.os.product_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows XP SP1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.primary_ip_address",
+                    "data_type": "string",
+                    "column_name": "Primary IP",
+                    "column_order": 2,
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "10.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.primary_mac",
+                    "data_type": "string",
+                    "example_values": [
+                        "a2-ac-75-70-ec-ae"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.reported_clone",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.stats.acqs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.stats.alerting_conditions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.stats.alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.stats.exploit_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.stats.exploit_blocks",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.sysinfo.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58/sysinfo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.entries.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list acquisitions",
+            "identifier": "list_acquisitions",
+            "description": "Retireve a list of all acquisitions with optional filters",
+            "verbose": "",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Agent ID for the host",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                },
+                "req_filename": {
+                    "description": "Name of the file acquired",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.req_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "req_filename",
+                    "column_order": 2,
+                    "example_values": [
+                        "NV4HPControllerSetup.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2494
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._revision",
+                    "data_type": "string",
+                    "example_values": [
+                        "20180523191000077103881827"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.condition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.error_message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.external_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.finish_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "NV4HPControllerSetup.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Users\\aeh11\\AppData\\Local\\Temp\\1\\NVFiles_7e7bc015-0db1-4605-a9cf-9d81754054e9\\"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_use_api",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1012
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "bckapi"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-23T19:10:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/agent_id/files"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW",
+                        "COMPLETE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/acqs/files/2494"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.zip_passphrase",
+                    "data_type": "string",
+                    "example_values": [
+                        "unzip-me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start acquisition",
+            "identifier": "start_acquisition",
+            "description": "Request a file to be acquired into FireEye HX",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "agent_id": {
+                    "description": "HX Agent ID for the host",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "order": 0
+                },
+                "req_path": {
+                    "description": "Path of the file that you want to acquire.",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "file path"
+                    ],
+                    "order": 1
+                },
+                "req_filename": {
+                    "description": "Name of the file you want to acquire",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 2
+                },
+                "req_use_api": {
+                    "description": "Whether to use RAW or API mode",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 3
+                },
+                "comment": {
+                    "description": "General Comment",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 4
+                },
+                "external_id": {
+                    "description": "External correlation ID from a SIEM solution.",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.agent_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx agentid"
+                    ],
+                    "column_name": "agent_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "column_name": "comment",
+                    "column_order": 4,
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.external_id",
+                    "data_type": "string",
+                    "column_name": "external_id",
+                    "column_order": 5,
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.req_filename",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "req_filename",
+                    "column_order": 2,
+                    "example_values": [
+                        "NV4HPControllerSetup.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.req_path",
+                    "data_type": "string",
+                    "contains": [
+                        "file path"
+                    ],
+                    "column_name": "req_path",
+                    "column_order": 1,
+                    "example_values": [
+                        "C:\\Users\\aeh11\\AppData\\Local\\Temp\\1\\NVFiles_7e7bc015-0db1-4605-a9cf-9d81754054e9\\"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.req_use_api",
+                    "data_type": "boolean",
+                    "column_name": "req_use_api",
+                    "column_order": 3,
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2494
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._revision",
+                    "data_type": "string",
+                    "example_values": [
+                        "20180523191000077103881827"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.alert",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.condition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.error_message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.external_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "null"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.finish_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/E8kw2d9uRcjgkfDjWKQqnv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicator",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Created"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "NV4HPControllerSetup.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Users\\aeh11\\AppData\\Local\\Temp\\1\\NVFiles_7e7bc015-0db1-4605-a9cf-9d81754054e9\\"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.req_use_api",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor._id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1012
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_actor.username",
+                    "data_type": "string",
+                    "example_values": [
+                        "bckapi"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.request_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-05-23T19:10:00.000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/agent_id/files"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "NEW"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/acqs/files/2494"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.zip_passphrase",
+                    "data_type": "string",
+                    "example_values": [
+                        "unzip-me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file",
+            "identifier": "get_file",
+            "description": "Pull the acquired file into Phantom Vault",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "acquisition_id": {
+                    "description": "HX Acquisition ID for the acquired file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "fireeyehx acquisition id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.acquisition_id",
+                    "data_type": "string",
+                    "contains": [
+                        "fireeyehx acquisition id"
+                    ],
+                    "column_name": "acquisition_id",
+                    "column_order": 0,
+                    "example_values": [
+                        "2496"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        544
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "0f3c4ff28f354aede202d54e9d1c5529a3bf87d8"
+                    ],
+                    "contains": [
+                        "hash"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        345088
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.succeeded",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "0f3c4ff28f354aede202d54e9d1c5529a3bf87d8"
+                    ],
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

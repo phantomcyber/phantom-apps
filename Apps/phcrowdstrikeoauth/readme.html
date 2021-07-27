@@ -114,6 +114,54 @@ The user can add a script file in the configuration parameter [<b>Script with fu
 <p>Each of the sub-events has a CEF key called <b>parentSdi</b> that stands for Parent Source Data Identifier. This is the value of the SDI of the main event that the sub-events were generated from.</p>
 
 
+<h2>Falcon X Sandbox Actions</h2>
+<b>This is different from Falcon Sandbox.</b>
+  <li><b>Action -</b> File Reputation, Url reputation</li>
+      <ul>
+        <li>
+          Report of the resource will be fetched if it has been detonated previously on the CrowdStrike Server otherwise no data found message will be displayed to the user.
+        </li>
+      </ul>
+
+      <li><b>Action -</b> Download Report </li>
+      <ul>
+        <li>
+          This action will download the resource report based on the provided artifact id. Currently we are supported the following Strict IOC CSV, Strict IOC JSON, Strict IOC STIX2.1, Strict IOC MAEC5.0, Broad IOC CSV, Broad IOC JSON, Broad IOC STIX2.1, Broad IOC MAEC5.0, Memory Strings, Icon, Screenshot artifact ids.
+        </li>
+      </ul>
+
+      <li><b>Action -</b> Detonate File </li>
+      <ul>
+        <li>
+          This action will upload the given file to the CrowdStrike sandbox and will submit it for analysis with the entered environment details. If the report of the given file is already present with the same environment, it will fetch the result and the file won't be submitted again.
+        </li>
+        <li>
+          If the analysis is in progress and reaches the time entered in the detonate_timeout parameter, then this action will return the resource_id of the submitted file using which the submission status can be checked.
+        </li>
+        <li>
+          If the submitted file will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently these file types are supported .exe, .scr, .pif, .dll, .com, .cpl, etc., .doc, .docx, .ppt, .pps, .pptx, .ppsx, .xls, .xlsx, .rtf, .pub, .pdf, Executable JAR, .sct, .lnk, .chm, .hta, .wsf, .js, .vbs, .vbe, .swf, pl, .ps1, .psd1, .psm1, .svg, .py, Linux ELF executables, .eml, .msg.
+        </li>
+      </ul>
+
+      <li><b>Action -</b> Detonate Url </li>
+      <ul>
+        <li>
+          This action will submit the given URL for analysis with the entered environment details. If the report of the given URL is already present with the same environment, it will fetch the result and the url won't be submitted again.
+        </li>
+        <li>
+          If the analysis is in progress and it reaches the time entered in the detonate_timeout parameter, then this action will return the resource_id of the submitted URL using which the status of the submission can be checked. If the analysis status is running then do not re-run the detonate URL action, otherwise, the URL will be again submitted for the analysis.
+        </li>
+        <li>
+          If the submitted URL will be analyzed within the entered time in the detonate_timeout parameter, its report will be fetched. Currently 3 domains of URL are supported http, https, and ftp.
+        </li>
+      </ul>
+      <li><b>Action -</b> Check Status </li>
+      <ul>
+        <li>
+          This action will return the status of the given resource_id in case of timeout in detonate file and detonate URL actions.
+        </li>
+      </ul>
+
 <h2>Notes</h2>
   <li><b>Action -</b> List Groups</li>
     <ul>

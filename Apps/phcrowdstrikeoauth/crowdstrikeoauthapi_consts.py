@@ -26,6 +26,7 @@ CROWDSTRIKE_SEARCH_IOCS_TYPE = "indicator_type"
 CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION = "from_expiration"
 CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION = "to_expiration"
 CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
+CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
 
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
@@ -37,7 +38,6 @@ CROWDSTRIKE_ERR_CONNECTIVITY_TEST = "Test connectivity failed"
 CROWDSTRIKE_ERR_CONNECTING = "Error connecting to server"
 CROWDSTRIKE_ERR_FROM_SERVER = "Error from Server, Status Code: {status}, Message: {message}"
 CROWDSTRIKE_ERR_END_TIME_LT_START_TIME = "End time less than start time"
-CROWDSTRIKE_UNABLE_TO_PARSE_DATA = "Unable to parse data from server"
 CROWDSTRIKE_INVALID_LIMIT = 'Please provide non-zero positive integer in limit parameter'
 CROWDSTRIKE_HTML_ERROR = 'Bad Request - Invalid URL HTTP Error 400. The request URL is invalid'
 CROWDSTRIKE_NO_PARAMETER_ERROR = "One of the parameters (device_id or hostname) must be provided"
@@ -55,7 +55,6 @@ CROWDSTRIKE_NO_MORE_FEEDS_AVAILABLE = "No more feeds available"
 CROWDSTRIKE_MSG_GETTING_EVENTS = "Getting maximum {max_events} events from id {lower_id} onwards (ids might not be contiguous)"
 CROWDSTRIKE_ERR_CONNECTING = "Error connecting to server"
 CROWDSTRIKE_ERR_FROM_SERVER = "Error from Server, Status Code: {status}, Message: {message}"
-CROWDSTRIKE_UNABLE_TO_PARSE_DATA = "Unable to parse data from server"
 CROWDSTRIKE_USING_BASE_URL = "Using base url: {base_url}"
 CROWDSTRIKE_ERR_META_KEY_EMPTY = "Meta key empty or not present"
 CROWDSTRIKE_ERR_RESOURCES_KEY_EMPTY = "Resources key empty or not present. Please try after sometime"
@@ -74,6 +73,15 @@ CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in 
 CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
 CROWDSTRIKE_ERROR_MESSAGE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 CROWDSTRIKE_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE = "Error occurred while connecting to the Crowdstrike server. Please check the asset configuration and|or the action parameters."
+CROWDSTRIKE_CODE_MESSAGE = "Error code: 404"
+CROWDSTRIKE_STATUS_CODE_MESSAGE = "Status Code: 404"
+CROWDSTRIKE_NO_DATA_MESSAGE = "No data found"
+CROWDSTRIKE_PULLED_EVENTS_MSG = "Pulled {0} events of type 'DetectionSummaryEvent'"
+CROWDSTRIKE_NO_DATA_MSG = "No data, terminating loop"
+CROWDSTRIKE_REACHED_CR_LF_COUNT_MSG = "CR/LF received on iteration: {} - terminating loop"
+CROWDSTRIKE_RECEIVED_CR_LF_MSG = "CR/LF received on iteration {} - continuing"
+CROWDSTRIKE_BLANK_LINES_COUNT_MSG = "Total blank lines count: {}"
+CROWDSTRIKE_GOT_EVENTS_MSG = "Got {0} events of type 'DetectionSummaryEvent'"
 
 CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
@@ -118,5 +126,20 @@ CROWDSTRIKE_GET_USER_INFO_ENDPOINT = "/users/entities/users/v1"
 CROWDSTRIKE_GET_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-user-uuid/v1"
 CROWDSTRIKE_GET_ROLE_ENDPOINT = "/user-roles/entities/user-roles/v1"
 CROWDSTRIKE_LIST_USER_ROLES_ENDPOINT = "/user-roles/queries/user-role-ids-by-cid/v1"
+CROWDSTRIKE_QUERY_REPORT_ENDPOINT = "/falconx/queries/reports/v1"
+CROWDSTRIKE_QUERY_FILE_ENDPOINT = "/falconx/queries/submissions/v1"
+CROWDSTRIKE_GET_REPORT_SUMMARY_ENDPOINT = "/falconx/entities/report-summaries/v1"
+CROWDSTRIKE_GET_FULL_REPORT_ENDPOINT = "/falconx/entities/reports/v1"
+CROWDSTRIKE_DOWNLOAD_REPORT_ENDPOINT = "/falconx/entities/artifacts/v1"
+CROWDSTRIKE_UPLOAD_FILE_ENDPOINT = "/samples/entities/samples/v2"
+CROWDSTRIKE_DETONATE_RESOURCE_ENDPOINT = "/falconx/entities/submissions/v1"
 
 CROWDSTRIKE_BASE_ENDPOINT = "/sensors/entities/datafeed/v2"
+CROWDSTRIKE_FALCONX_API_LIMIT = 5000
+CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
+    'linux ubuntu 16.04, 64-bit': 300,
+    'android (static analysis)': 200,
+    'windows 10, 64-bit': 160,
+    'windows 7, 64-bit': 110,
+    'windows 7, 32-bit': 100
+}
