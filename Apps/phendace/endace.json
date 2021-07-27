@@ -51,6 +51,7 @@
             "description": "Maximum pcap size in bytes (0 = no max)",
             "data_type": "numeric",
             "default": "0",
+            "required": true,
             "order": 4
         }
     },
