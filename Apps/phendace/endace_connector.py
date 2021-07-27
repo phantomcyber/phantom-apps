@@ -14,9 +14,6 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom import vault as Vault
 
-# from phantom.vault import Vault
-
-# Usage of the consts file is recommended
 from endace_consts import *
 import requests
 import tempfile
@@ -55,6 +52,9 @@ class EndaceConnector(BaseConnector):
         :return: error message
         """
 
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -63,23 +63,10 @@ class EndaceConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
-            else:
-                error_code = ERR_CODE_MSG
-                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERR_CODE_MSG
-            error_msg = ERR_MSG_UNAVAILABLE
+            pass
 
-        try:
-            if error_code in ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
-            else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-        except:
-            self.debug_print(PARSE_ERR_MSG)
-            error_text = PARSE_ERR_MSG
-
-        return error_text
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
         """
@@ -284,7 +271,7 @@ class EndaceConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Invalid method: {0}'.format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             r = request_func(url,
@@ -300,7 +287,7 @@ class EndaceConnector(BaseConnector):
             error_message = 'Error connecting to server. Invalid URL {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except requests.exceptions.ConnectionError:
-            error_message = 'Error Details: Connection Refused from the Server {}'.format(url)
+            error_message = 'Error connecting to server. Connection refused from server for {}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
@@ -402,7 +389,7 @@ class EndaceConnector(BaseConnector):
 
         endpoint = "datamines/{}/download/download.pcap".format(param['pcap_id'])
 
-        self.send_progress('Download starting.')
+        self.send_progress('Download starting')
         # Start download of PCAP file
         dl_ret_val, dl_response = self._make_rest_call(endpoint, action_result, method='get')
 
@@ -410,7 +397,7 @@ class EndaceConnector(BaseConnector):
         if phantom.is_fail(dl_ret_val):
             return action_result.get_status()
 
-        self.send_progress('Checking status of download.')
+        self.send_progress('Checking status of download')
         # Run get_status to check if the download fully completed or if it had been canceled
         endpoint = "datamines/{}".format(param['pcap_id'])
         status_ret_val, status_response = self._make_rest_call(endpoint, action_result, method='get')
@@ -424,11 +411,11 @@ class EndaceConnector(BaseConnector):
         summary_data['state'] = state
         if state != 'COMPLETED':
             action_result.add_data(all_response)
-            return action_result.set_status(phantom.APP_ERROR, 'Error downloading file.', state)
+            return action_result.set_status(phantom.APP_ERROR, 'Error downloading file. {}'.format(state))
 
         filename = "{}.pcap".format(param['pcap_id'])
 
-        self.send_progress('Saving file to disk.')
+        self.send_progress('Saving file to disk')
         # Creating file
         temp_dir = tempfile.mkdtemp()
         try:
@@ -436,7 +423,7 @@ class EndaceConnector(BaseConnector):
             with open(file_path, 'wb') as file_obj:
                 file_obj.write(dl_response)
         except Exception as e:
-            self.debug_print('Error creating file.')
+            self.debug_print('Error creating file')
             shutil.rmtree(temp_dir)
             err_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, 'Error creating file. Error Details: {}'.format(err_msg))
@@ -456,7 +443,7 @@ class EndaceConnector(BaseConnector):
             # Iterate through each vault item in the container and compare name and size of file
             for vault in vault_list[2]:
                 if vault.get('name') == filename and vault.get('size') == os.path.getsize(file_path):
-                    self.send_progress('PCAP already available in Vault.')
+                    self.send_progress('PCAP already available in Vault')
                     vault_details = {phantom.APP_JSON_SIZE: vault.get('size'),
                                     phantom.APP_JSON_VAULT_ID: vault.get(phantom.APP_JSON_VAULT_ID),
                                     'filename': filename}
@@ -469,7 +456,7 @@ class EndaceConnector(BaseConnector):
                                                                     file_path, action_result)
             # Check if something went wrong while moving file to vault
             if phantom.is_fail(vault_ret_val):
-                return action_result.set_status(phantom.APP_ERROR, 'Could not move file to vault.')
+                return action_result.set_status(phantom.APP_ERROR, 'Could not move file to vault')
 
         shutil.rmtree(temp_dir)
 
@@ -479,7 +466,7 @@ class EndaceConnector(BaseConnector):
         all_response['vault'] = vault_details
         action_result.add_data(all_response)
 
-        message = 'PCAP downloaded to Vault: {0}.'.format(vault_details[phantom.APP_JSON_VAULT_ID])
+        message = 'PCAP downloaded to Vault: {0}'.format(vault_details[phantom.APP_JSON_VAULT_ID])
 
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
@@ -596,7 +583,7 @@ class EndaceConnector(BaseConnector):
             parameters['startTime3339'] = param.get('start_time')
             parameters['endTime3339'] = param.get('end_time')
         else:
-            message = 'Missing parameters. Either ("time") or ("start_time" and "end_time") are required to run this action.'
+            message = 'Missing parameters. Either ("time") or ("start_time" and "end_time") are required to run this action'
             return action_result.set_status(phantom.APP_ERROR, message)
 
         if 'port1' in param:
@@ -622,7 +609,7 @@ class EndaceConnector(BaseConnector):
             # the call to Endace failed, action result should contain all the error details.
             return action_result.get_status()
 
-        self.save_progress('Flow search complete.')
+        self.save_progress('Flow search complete')
 
         all_response = {'flow': flow_resp}
 
@@ -635,10 +622,10 @@ class EndaceConnector(BaseConnector):
                 message = 'Exceeded maximum pcap size. {0} > {1}'.format(byte_count, self.max_pcap_size)
                 return action_result.set_status(phantom.APP_ERROR, message)
             if byte_count == -1:
-                message = 'Unable to parse byte count from response.'
+                message = 'Unable to parse byte count from response'
                 return action_result.set_status(phantom.APP_ERROR, message)
 
-        self.save_progress('Creating datamine.')
+        self.save_progress('Creating datamine')
 
         # Create datamine ######
         dm_parameters = {}
@@ -648,7 +635,7 @@ class EndaceConnector(BaseConnector):
                 try:
                     dm_parameters[field['name']] = field['value']
                 except:
-                    message = 'Error parsing flow search links.'
+                    message = 'Error parsing flow search links'
                     return action_result.set_status(phantom.APP_ERROR, message)
 
         # make rest call

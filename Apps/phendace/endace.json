@@ -1,21 +1,21 @@
 {
     "appid": "3c681976-e5d1-4ccc-84de-4232fd25acbc",
     "name": "Endace",
-    "description": "App integrates with the Endace Packet Capture device to implement investigative actions",
+    "description": "This app integrates with the Endace Packet Capture device to implement investigative actions",
     "type": "investigative",
     "product_vendor": "Endace",
     "logo": "logo_endace.svg",
     "logo_dark": "logo_endace_dark.svg",
     "product_name": "Endace",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
+    "publisher": "Splunk Community",
     "contributors": [
       {
         "name": "Soumen Chakraborty"
       }
     ],
     "license": "Copyright (C) Endace Technology Limited, 2018-2021",
-    "app_version": "1.1.7",
+    "app_version": "2.0.0",
     "python_version": "3",
     "utctime_updated": "2021-04-15T10:15:23.000000Z",
     "package_name": "phantom_endace",
@@ -50,8 +50,7 @@
         "max_pcap_size": {
             "description": "Maximum pcap size in bytes (0 = no max)",
             "data_type": "numeric",
-            "required": true,
-            "default": 0,
+            "default": "0",
             "order": 4
         }
     },
@@ -88,6 +87,18 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.pcap_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f411b785-2507-4320-bbf3-83d3ecf69290"
+                    ],
+                    "contains": [
+                        "pcap id"
+                    ],
+                    "column_name": "PCAP ID",
+                    "column_order": 0
+                },
                 {
                     "data_path": "action_result.data.*.status.datamine.status.bytesTotal",
                     "data_type": "numeric",
@@ -279,18 +290,6 @@
                     "contains": [
                         "file name"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.pcap_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "f411b785-2507-4320-bbf3-83d3ecf69290"
-                    ],
-                    "contains": [
-                        "pcap id"
-                    ],
-                    "column_name": "PCAP ID",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.vault.contains",
@@ -558,6 +557,18 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.parameter.pcap_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "17147e4b-e73e-4888-9599-f38d43e814f0"
+                    ],
+                    "contains": [
+                        "pcap id"
+                    ],
+                    "column_name": "PCAP ID",
+                    "column_order": 0
+                },
+                {
                     "data_path": "action_result.data.*.datamine.status.bytesTotal",
                     "data_type": "numeric",
                     "example_values": [
@@ -781,18 +792,6 @@
                         "COMPLETED",
                         "RUNNING; 35% complete"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.pcap_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "17147e4b-e73e-4888-9599-f38d43e814f0"
-                    ],
-                    "contains": [
-                        "pcap id"
-                    ],
-                    "column_name": "PCAP ID",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.summary.state",
