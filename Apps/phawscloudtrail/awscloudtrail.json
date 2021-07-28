@@ -21,18 +21,20 @@
         "Cloud tested on 10-02-2021"
     ],
     "configuration": {
-        "access_key": {
-            "description": "Access Key",
+        "Access Key": {
+            "description": "AWS Access Key",
             "data_type": "password",
+            "required": true,
             "order": 0
         },
-        "secret_key": {
-            "description": "Secret Key",
+        "Secret Key": {
+            "description": "AWS Secret Key",
             "data_type": "password",
+            "required": true,
             "order": 1
         },
-        "region": {
-            "description": "Default Region",
+        "Region": {
+            "description": "AWS Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -61,12 +63,6 @@
                 "South America (S\u00e3o Paulo)"
             ],
             "order": 2
-        },
-        "use_role": {
-            "description": "Use attached role when running Phantom in EC2",
-            "data_type": "boolean",
-            "default": false,
-            "order": 3
         }
     },
     "pip_dependencies": {
@@ -116,15 +112,6 @@
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
-                },
-                "credentials": {
-                    "description": "Assumed role credentials",
-                    "data_type": "string",
-                    "primary": true,
-                    "contains": [
-                        "aws credentials"
-                    ],
-                    "order": 1
                 }
             },
             "output": [
@@ -270,16 +257,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
-                    ]
                 }
             ],
             "render": {
@@ -329,15 +306,6 @@
                     "data_type": "numeric",
                     "default": 50,
                     "order": 4
-                },
-                "credentials": {
-                    "description": "Assumed role credentials",
-                    "data_type": "string",
-                    "primary": true,
-                    "contains": [
-                        "aws credentials"
-                    ],
-                    "order": 5
                 }
             },
             "output": [
@@ -1329,16 +1297,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.credentials",
-                    "data_type": "string",
-                    "example_values": [
-                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
-                    ],
-                    "contains": [
-                        "aws credentials"
                     ]
                 }
             ],
