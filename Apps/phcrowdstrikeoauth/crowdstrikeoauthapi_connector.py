@@ -2729,7 +2729,7 @@ class CrowdstrikeConnector(BaseConnector):
         # Try to stream the response to a file
         if response.status_code == 200:
             try:
-                compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup.encode('utf-8')
+                compressed_file_path = UnicodeDammit(compressed_file_path).unicode_markup
                 with open(compressed_file_path, 'wb') as f:
                     f.write(response.content)
             except IOError as e:
