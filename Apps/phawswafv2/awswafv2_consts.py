@@ -31,6 +31,7 @@ AWSWAF_ADD_IP_SUCCESS = 'IP(s) added successfully'
 AWSWAF_ADD_IP_FAILED = 'IP could not be added'
 AWSWAF_DELETE_IP_FAILED = 'IP could not be deleted'
 AWSWAF_DELETE_IP_SUCCESS = 'IP(s) deleted successfully'
+AWSWAF_BAD_ASSET_CFG_ERR_MSG = "Please provide access keys or select assume role check box in asset configuration"
 AWSWAF_INFO_CHECK_CREDENTIALS = "Querying AWS to check credentials"
 AWSWAF_INFO_SCOPE = "To work with CloudFront scope, you must specify the Region US East (N. Virginia)"
 AWSWAF_INFO_ACTION = "In action handler for: {0}"

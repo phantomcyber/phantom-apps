@@ -1,8 +1,7 @@
 # File: awswaf_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
-# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-# without a valid written license from Splunk Inc. is PROHIBITED.
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -214,7 +213,7 @@ class AwsWafConnector(BaseConnector):
 
     def _validate_ip(self, ip_address):
         type = ""
-        x = re.search(".*\/[0-9]+$", ip_address)
+        x = re.search(".*\\/[0-9]+$", ip_address)
         if not (x):
             return None
 
