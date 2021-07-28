@@ -553,6 +553,13 @@ class BishopFoxConnector(BaseConnector):
             "Authorization": "Bearer {0}".format(auth_token)
         })
 
+        self._request_session.proxies = {}
+        env_vars = config.get('_reserved_environment_variables', {})
+        if 'HTTP_PROXY' in env_vars:
+            self._request_session.proxies['http'] = env_vars['HTTP_PROXY']['value']
+        if 'HTTPS_PROXY' in env_vars:
+            self._request_session.proxies['https'] = env_vars['HTTPS_PROXY']['value']
+
         # Use the retry adapter to retry requests based on certain status codes
         retry = Retry(
             total=3,
