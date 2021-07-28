@@ -9,7 +9,8 @@
 <body>
 <h2>Asset Configuration</h2>
 There are two ways to configure an AWS Athena asset. The first is to configure the <b>access_key</b>, <b>secret_key</b> and <b>region</b> variables. If it is preferred to use a role and Phantom is running as an EC2 instance, the <b>use_role</b> checkbox can be checked instead. This will allow the role that is attached to the instance to be used. Please see the <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html">AWS EC2 and IAM documentation</a> for more information.
-
+<br>
+<br>
 This app also requires some integration with AWS S3. Query results will be stored in a folder on S3 specified during a query action. These results can be encrypted using various encryption schemes, some of which require a KMS key. This KMS key should be provided when configuring the asset and must be applicable for the given region.
 
 <h2>Assumed Role Credentials</h2>
