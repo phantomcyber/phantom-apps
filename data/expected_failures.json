@@ -13,6 +13,13 @@
       ]
     }
   },
+  "phantom_athena": {
+      "Data Path Wildcards": {
+          "verbose": [
+            "Action 'run query' contains an output data path with *.*"
+          ]
+      }
+  },
   "phantom_awslambda": {
     "Action Names": {
       "verbose": [
