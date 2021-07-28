@@ -13,8 +13,9 @@ import athena_consts as consts
 import time
 import json
 import re
-from boto3 import client
+from boto3 import client, Session
 from botocore.config import Config
+import ast
 
 
 class RetVal(tuple):
@@ -34,6 +35,8 @@ class AthenaConnector(BaseConnector):
         self._region = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
+        self._proxy = None
 
     def initialize(self):
 
@@ -54,6 +57,22 @@ class AthenaConnector(BaseConnector):
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
 
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, "Failed to get EC2 role credentials")
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get(consts.ATHENA_JSON_ACCESS_KEY)
+        self._secret_key = config.get(consts.ATHENA_JSON_SECRET_KEY)
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, consts.ATHENA_BAD_ASSET_CONFIG_MSG)
+
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -62,12 +81,31 @@ class AthenaConnector(BaseConnector):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
-    def _create_client(self, action_result):
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
+    def _create_client(self, action_result, param=None):
 
         boto_config = None
         if self._proxy:
             boto_config = Config(proxies=self._proxy)
 
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Failed to get temporary credentials: {0}".format(e))
         try:
 
             if self._access_key and self._secret_key:
@@ -79,6 +117,7 @@ class AthenaConnector(BaseConnector):
                         region_name=self._region,
                         aws_access_key_id=self._access_key,
                         aws_secret_access_key=self._secret_key,
+                        aws_session_token=self._session_token,
                         config=boto_config)
 
             else:
@@ -113,7 +152,7 @@ class AthenaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp_json = self._make_boto_call(action_result, 'list_named_queries')
@@ -129,7 +168,7 @@ class AthenaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp_json = self._make_boto_call(action_result, 'list_named_queries')
@@ -177,7 +216,7 @@ class AthenaConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "KMS encryption requires asset to have KMS key configured.")
                 encrypt_config['KmsKey'] = kms_key
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         reg_exp = re.compile('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
