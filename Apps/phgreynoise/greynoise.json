@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "GreyNoise",
     "license": "Copyright (c) GreyNoise, 2021",
-    "app_version": "2.0.0",
+    "app_version": "2.1.0",
     "utctime_updated": "2020-11-17T20:57:49.506493Z",
     "package_name": "phantom_greynoise",
     "main_module": "greynoise_connector.py",
@@ -47,7 +47,7 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity using the supplied configuration",
-            "verbose": "Tests the connection to the GreyNoise API.",
+            "verbose": "Tests the connection to the paid GreyNoise API.",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -152,6 +152,154 @@
                 "type": "custom",
                 "view": "greynoise_view.report",
                 "title": "GreyNoise IP Lookup"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "riot lookup ip",
+            "description": "Lookup IP using GreyNoise's RIOT (Rule It OuT) Endpoint",
+            "verbose": "RIOT identifies IPs from known benign services and organizations that commonly cause false positives in network security and threat intelligence products. The collection of IPs in RIOT is continually curated and verified to provide accurate results.",
+            "type": "investigate",
+            "identifier": "riot_lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "contains": [
+                      "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "71.6.135.131"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.riot",
+                    "data_type": "boolean",
+                    "contains": [
+                        "riot"
+                    ],
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                  "data_path": "action_result.data.*.category",
+                  "data_type": "string",
+                  "contains": [
+                      "greynoise category"
+                  ],
+                  "example_values": [
+                      "public_dns"
+                  ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise name"
+                    ],
+                    "example_values": [
+                        "Google Public DNS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise description"
+                    ],
+                    "example_values": [
+                        "Google's global domain name system (DNS) resolution service."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.explanation",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise explanation"
+                    ],
+                    "example_values": [
+                        "Public DNS services are used as alternatives to ISP's name servers. You may see devices on your network communicating with Google Public DNS over port 53/TCP or 53/UDP to resolve DNS lookups."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_updated",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise last updated"
+                    ],
+                    "example_values": [
+                        "2021-05-26T17:55:35Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.logo_url",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise logo url"
+                    ],
+                    "example_values": [
+                        "https://www.gstatic.com/devrel-devsite/prod/v9d82702993bc22f782b7874a0f933b5e39c1f0889acab7d1fce0d6deb8e0f63d/cloud/images/cloud-logo.svg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.reference",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise reference"
+                    ],
+                    "example_values": [
+                        "https://developers.google.com/speed/public-dns/docs/isp#alternative"                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }  
+            ],
+            "render": {
+                "type": "custom",
+                "view": "greynoise_view.report",
+                "title": "GreyNoise RIOT IP Lookup"
             },
             "versions": "EQ(*)"
         },
@@ -610,6 +758,140 @@
             "read_only": true,
             "parameters": {},
             "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "community lookup ip",
+            "description": "Lookup IP using GreyNoise's free community endpoint",
+            "verbose": "The Community API provides community users with a free tool to query IPs in the GreyNoise dataset and retrieve a subset of the full IP context data returned by the IP Lookup API.",
+            "type": "investigate",
+            "identifier": "community_lookup_ip",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to query",
+                    "data_type": "string",
+                    "contains": [
+                      "ip"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "71.6.135.131"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.riot",
+                    "data_type": "boolean",
+                    "contains": [
+                        "riot"
+                    ],
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.noise",
+                    "data_type": "boolean",
+                    "contains": [
+                        "noise"
+                    ],
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                  "data_path": "action_result.data.*.classification",
+                  "data_type": "string",
+                  "contains": [
+                      "greynoise classification"
+                  ],
+                  "example_values": [
+                      "benign",
+                      "malicious"
+                  ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise name"
+                    ],
+                    "example_values": [
+                        "Cloudflare"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.link",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise vizualization link"
+                    ],
+                    "example_values": [
+                        "https://viz.greynoise.io/riot/1.2.3.4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.last_seen",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise last seen"
+                    ],
+                    "example_values": [
+                        "2020-01-01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "contains": [
+                        "greynoise message"
+                    ],
+                    "example_values": [
+                        "Success",
+                        "You have hit your daily rate limit of 100 requests per day. Please create a free account or upgrade your plan at https://greynoise.io/pricing."
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }  
+            ],
+            "render": {
+                "type": "custom",
+                "view": "greynoise_view.report",
+                "title": "GreyNoise Community IP Lookup"
+            },
             "versions": "EQ(*)"
         }
     ]
