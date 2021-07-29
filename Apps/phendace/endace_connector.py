@@ -364,9 +364,9 @@ class EndaceConnector(BaseConnector):
                 self.send_progress('Success adding file to Vault. Vault ID: {}'.format(vault_id))
             return RetVal(phantom.APP_SUCCESS, vault_details)
 
-            # Error while adding file to vault
-            self.debug_print('ERROR: Adding file to vault:', info)
-            action_result.append_to_message('. {}'.format(message))
+        # Error while adding file to vault
+        self.debug_print('ERROR: Adding file to vault:', message)
+        action_result.append_to_message('. {}'.format(message))
 
         # set the action_result status to error, the handler function
         # will most probably return as is
@@ -732,7 +732,7 @@ class EndaceConnector(BaseConnector):
         config = self.get_config()
 
         self.server = config['server']
-        self.verify_cert = config.get('verify_cert')
+        self.verify_cert = config.get('verify_cert', False)
         self.username = config['username']
         self.password = config['password']
         max_pcap_size = config['max_pcap_size']

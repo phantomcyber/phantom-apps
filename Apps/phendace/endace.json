@@ -835,8 +835,8 @@
             "action": "run query",
             "identifier": "run_query",
             "description": "Run a query to create a PCAP",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "time": {
                     "description": "The time of interest, in RFC-3339 format",
