@@ -18,7 +18,7 @@
     <h2>Playbook Backward Compatibility</h2>
       <p>
         <ul>
-          <li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+          <li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks, or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
           <ul>
             <li>List Devices - The 'IP' option has been removed from the value list of the [input_type] action parameter in the app version 3.0.0 because there is no specific API currently available to support the filtering of devices based on the IP in the Defender ATP.</li>
             <li>List Devices - The new [query] parameter has been added to support the additional OData V4 filters.</li>
@@ -44,7 +44,7 @@
           <li>Tenant ID - It is the Directory ID of the Microsoft Azure Active Directory on the Microsoft Azure portal.</li>
           <li>Client ID - It is the Application ID of an application configured in the Microsoft Azure Active Directory.</li>
           <li>Client Secret - It is the secret string used by the application to prove its identity when requesting a token. It can be generated for the configured application on the Microsoft Azure Active Directory.</li>
-          <li>Non Interactive Auth - It is used to determine the authentication method. If it is checked then non-interactive auth will be used otherwise interactive auth will be used. Whenever this checkbox is toggled then test-connectivity action must be run again.</li>
+          <li>Non Interactive Auth - It is used to determine the authentication method. If it is checked then non interactive auth will be used otherwise interactive auth will be used. Whenever this checkbox is toggled then the test connectivity action must be run again.</li>
         </ul>
       </p>
 
@@ -70,7 +70,7 @@
               <li>In the navigation pane, select Settings > APIs (section) > SIEM.</li>
               <li>Select 'Enable SIEM connector' (this activates the SIEM connector access details section with pre-populated values and an application is created under your Azure Active Directory (AAD) tenant).</li>
               <li>In the 'Choose the SIEM you want to configure and download details to file' section, select the 'Generic API' option.</li>
-              <li>Copy the individual pre-populated values displayed on the screen or click the 'Save details to file' button to download a file that contains all these values (these details are required to run the 'Test Connectivity' action).</li>
+              <li>Copy the individual pre-populated values displayed on the screen or click the 'Save details to file' button to download a file that contains all these values (these details are required to run the test connectivity action).</li>
               <li> After enabling the SIEM connector on the Microsoft Defender Security Center, the app 'WindowsDefenderATPSiemConnector' will be created on the Microsoft Azure portal.</li>
             </ol>
         </li>
@@ -103,7 +103,7 @@
                   <li>Machine.StopAndQuarantine</li>
                   <li>User.Read.All</li>
                 </ul>
-              <li><b>Deligated Permissions</b></li>
+              <li><b>Delegated Permissions</b></li>
                 <ul>
                   <li>Alert.ReadWrite</li>
                   <li>File.Read.All</li>
@@ -124,7 +124,7 @@
           <li>Click on the 'Microsoft Graph' option.</li>
           <li>Provide the following Delegated permission to the app.
             <ul>
-              <li><b>Deligated Permission</b></li>
+              <li><b>Delegated Permission</b></li>
                 <ul>
                   <li>offline_access</li>
                 </ul>
@@ -183,7 +183,7 @@
           <li>Finally, close the browser tab and come back to the 'Test Connectivity' browser tab. The pop-up window should display a 'Test Connectivity Passed' message.</li>
         </ul>
       </p>
-      <h2>Non-interactive Method to run Test Connectivity</h2>
+      <h2>Non Interactive Method to run Test Connectivity</h2>
       <p>
         <ul>
           <li>Here make sure that the 'Non Interactive Auth' checkbox is checked in asset configuration.</li>
@@ -201,14 +201,14 @@
             <ul>
               <li>The first step is to get an application created in a specific tenant on the Microsoft Azure Active Directory. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
               <li>Configure the Windows Defender ATP app's asset with appropriate values for [tenant_id], [client_id], and [client_secret] configuration parameters.</li>
-              <li>Run the Test Connectivity action for Interactive method.</li>
+              <li>Run the test connectivity action for Interactive method.</li>
               <ul>
                 <li>Internally, the connectivity creates a URL for hitting the /authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
                 <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and [refresh_token] pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
-                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the Test Connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
+                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the test connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
                 <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Defender ATP instance.</li>
               </ul>
-              <li>Run the Test Connectivity action for Non Interactive method.</li>
+              <li>Run the test connectivity action for Non Interactive method.</li>
               <ul>
                 <li>Internally, the application authenticates to Azure AD token issuance endpoint and requests an [access_token] then it will generate the [access_token].</li>
                 <li>The [access_token] generated in the above step is used by the test connectivity to make the next API call to verify the [access_token]. The generated [access_token] is stored in the state file of the app on the Phantom server.</li>
