@@ -349,7 +349,6 @@ class AwsCloudtrailConnector(BaseConnector):
         # Load required configs
         self._region = AWS_CLOUDTRAIL_REGIONS.get(config['Region'])
 
-
         # handle proxies
         self._proxy = {}
         env_vars = config.get('_reserved_environment_variables', {})
