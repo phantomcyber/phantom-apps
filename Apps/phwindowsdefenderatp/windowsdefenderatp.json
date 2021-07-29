@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.1.1",
+    "app_version": "3.2.0",
     "utctime_updated": "2021-06-03T01:11:07.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
@@ -105,6 +105,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -276,14 +284,6 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -360,6 +360,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -514,14 +522,6 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -584,6 +584,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.event_id",
                     "data_type": "string",
@@ -757,14 +765,6 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_status",
                     "data_type": "string",
                     "example_values": [
@@ -841,6 +841,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -1009,14 +1017,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -1102,6 +1102,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -1310,14 +1318,6 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -1406,6 +1406,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
@@ -1613,14 +1621,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_devices",
                     "data_type": "numeric",
                     "example_values": [
@@ -1696,6 +1696,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
                     "example_values": [
@@ -1741,9 +1749,7 @@
                     "example_values": [
                         "2018-07-06T06:14:57.3215921Z",
                         "2019-05-03T01:20:51.8699882Z"
-                    ],
-                    "column_name": "Creation Time",
-                    "column_order": 7
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.assignedTo",
@@ -1754,18 +1760,14 @@
                     ],
                     "contains": [
                         "email"
-                    ],
-                    "column_name": "Assigned To",
-                    "column_order": 8
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.category",
                     "data_type": "string",
                     "example_values": [
                         "General"
-                    ],
-                    "column_name": "Category",
-                    "column_order": 6
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.classification",
@@ -1800,9 +1802,7 @@
                     "data_type": "string",
                     "example_values": [
                         "win10atp1"
-                    ],
-                    "column_name": "Computer DNS Name",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.description",
@@ -1834,9 +1834,7 @@
                     "data_type": "string",
                     "example_values": [
                         "636924432519012302_1685044642"
-                    ],
-                    "column_name": "Alert ID",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.incidentId",
@@ -1902,18 +1900,14 @@
                     "data_type": "string",
                     "example_values": [
                         "Informational"
-                    ],
-                    "column_name": "Severity",
-                    "column_order": 5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
                         "Resolved"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 4
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.threatFamilyName",
@@ -1921,25 +1915,13 @@
                     "example_values": [
                         "EICAR_Test_File",
                         "Fuery"
-                    ],
-                    "column_name": "Threat Family",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
                         "Windows Defender AV detected 'Fuery' malware"
-                    ],
-                    "column_name": "Title",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
                     ]
                 },
                 {
@@ -1973,7 +1955,11 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.display_alerts",
+                "title": "Get Report"
             },
             "versions": "EQ(*)"
         },
@@ -1997,6 +1983,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
@@ -2114,14 +2108,6 @@
                     "data_type": "string",
                     "contains": [
                         "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
                     ]
                 },
                 {

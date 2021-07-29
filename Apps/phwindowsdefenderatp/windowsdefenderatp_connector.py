@@ -301,9 +301,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # Check whether the response contains error and error description fields
         # This condition will be used in test_connectivity
         if not isinstance(resp_json.get('error'), dict) and resp_json.get('error_description'):
-            err = "Error:{0}, Error Description:{1}".format(
+            err = "Error:{0}, Error Description:{1} Please check your asset configuration parameters and run the test connectivity".format(
                     self._handle_py_ver_compat_for_input_str(resp_json.get('error')), self._handle_py_ver_compat_for_input_str(resp_json.get('error_description')))
-            err += " Please check your asset configuration parameters and run the test connectivity"
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, err)
 
         # For other actions
@@ -643,9 +642,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         # So we have to check that token from response and token which are saved to state file after successful generation of new token are same or not.
 
         if self._access_token != self._state.get(DEFENDERATP_TOKEN_STRING, {}).get(DEFENDERATP_ACCESS_TOKEN_STRING):
-            message = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."
-            message += " Please check the owner, owner group, and the permissions of the state file. The Phantom "
-            message += "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)"
+            message = "Error occurred while saving the newly generated access token (in place of the expired token) in the state file."\
+                      " Please check the owner, owner group, and the permissions of the state file. The Phantom "\
+                      "user should have the correct access rights and ownership for the corresponding state file (refer to readme file for more information)"
             return action_result.set_status(phantom.APP_ERROR, message)
 
         return phantom.APP_SUCCESS
@@ -1432,7 +1431,7 @@ if __name__ == '__main__':
     if username and password:
         try:
             print("Accessing the Login page")
-            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
+            r = requests.get("{}login".format(BaseConnector._get_phantom_base_url()), verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1442,10 +1441,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
-            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
+            headers['Referer'] = "{}login".format(BaseConnector._get_phantom_base_url())
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            r2 = requests.post("{}login".format(BaseConnector._get_phantom_base_url()), verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: {0}".format(str(e)))
