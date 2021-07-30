@@ -570,7 +570,7 @@ class BishopFoxConnector(BaseConnector):
         self._request_session.mount("http://", retry_adapter)
         self._request_session.mount("https://", retry_adapter)
 
-        return phantom.APP_SUCCESS
+        return ret_val
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
