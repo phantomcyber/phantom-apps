@@ -1,0 +1,880 @@
+{
+    "appid": "e601640d-5e18-4e82-a3d6-fbd1e51a180c",
+    "name": "Bishop Fox CAST",
+    "description": "This app works with the Bishop Fox Continuous Attack Surface Testing (CAST) API to ingest and manage CAST findings",
+    "type": "information",
+    "product_vendor": "Bishop Fox",
+    "product_name": "CAST",
+    "logo": "logo_bishopfox.svg",
+    "logo_dark": "logo_bishopfox_dark.svg",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-05-19T18:23:1621448604Z",
+    "package_name": "phantom_bishopfox",
+    "main_module": "bishopfox_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_base_url": {
+            "description": "API Base URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://api.portal.bishopfox.com/v1",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Server Certificate",
+            "data_type": "boolean",
+            "required": true,
+            "default": true,
+            "order": 1
+        },
+        "auth_token_url": {
+            "description": "Auth Token URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://bishopfox.auth0.com/oauth/token",
+            "order": 2
+        },
+        "org_id": {
+            "description": "Organization ID",
+            "data_type": "string",
+            "required": true,
+            "order": 3
+        },
+        "api_key": {
+            "description": "API Key (client id)",
+            "data_type": "password",
+            "required": true,
+            "order": 4
+        },
+        "api_secret": {
+            "description": "API Secret (client secret)",
+            "data_type": "password",
+            "required": true,
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get findings",
+            "identifier": "get_findings",
+            "description": "Get findings based on provided filters",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "finding_uid": {
+                    "description": "Get a specific finding (may have multiple subjects)",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "order": 0
+                },
+                "subject_uid": {
+                    "description": "Specify a specific subject. This should only return 1 result",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox subject uid"
+                    ],
+                    "order": 1
+                },
+                "since": {
+                    "description": "Date parameter of the form 'YYYY-MM-DD' corresponding to the 'reportedAt' field of a finding. Only findings published after this are returned",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "status": {
+                    "description": "Used to search for findings with a specific status. Only findings with this status are returned",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox status"
+                    ],
+                    "value_list": [
+                        "new",
+                        "acknowledged",
+                        "request re-test",
+                        "re-test validated",
+                        "re-test failed",
+                        "remediated",
+                        "won't fix",
+                        "not applicable"
+                    ],
+                    "order": 3
+                },
+                "severity": {
+                    "description": "Used to search for findings with a specific severity. Only findings with this severity are returned",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox severity"
+                    ],
+                    "value_list": [
+                        "Critical",
+                        "High",
+                        "Medium",
+                        "Low"
+                    ],
+                    "order": 4
+                },
+                "client_id": {
+                    "description": "Used to search for a finding using the client defined identifier for a finding",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox client id"
+                    ],
+                    "default": "",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.finding_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.since",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.client_id",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.clientId",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.clientNote",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.definition",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.details",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.findingId",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.findingUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox org id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.recommendations",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedDays",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.report",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subjectUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.target",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox target"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.reportedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_value": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_findings",
+                    "data_type": "numeric",
+                    "column_name": "Total Findings",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update status",
+            "identifier": "update_status",
+            "description": "Sets a findings's status",
+            "verbose": "Sets an individual finding's status.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "finding_uid": {
+                    "description": "Finding UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "order": 0
+                },
+                "subject_uid": {
+                    "description": "Subject UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox subject uid"
+                    ],
+                    "order": 1
+                },
+                "status": {
+                    "description": "Status to set",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox status"
+                    ],
+                    "value_list": [
+                        "new",
+                        "acknowledged",
+                        "request re-test",
+                        "re-test validated",
+                        "re-test failed",
+                        "remediated",
+                        "won't fix",
+                        "not applicable"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.finding_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "column_name": "Finding UUID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.subject_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ],
+                    "column_name": "New Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.clientNote",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.findingUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedDays",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subjectUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.target",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox target"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.clientId",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_value": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update client id",
+            "identifier": "update_client_id",
+            "description": "Updates a finding's clientId",
+            "verbose": "Sets an individual finding's ClientID. ClientID is an field that can be set to an identifier of your choice for easy access to a specific finding.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "finding_uid": {
+                    "description": "Finding UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "order": 0
+                },
+                "subject_uid": {
+                    "description": "Subject UUID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox subject uid"
+                    ],
+                    "order": 1
+                },
+                "client_id": {
+                    "description": "ClientID to set",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox client id"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.finding_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "column_name": "Finding UUID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.subject_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.client_id",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ],
+                    "column_name": "Client ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.clientId",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.clientNote",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.findingUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedDays",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subjectUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.target",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox target"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_value": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update client note",
+            "identifier": "update_client_note",
+            "description": "Updates a finding's client note",
+            "verbose": "Sets an individual finding's client note. The field 'clientNote' is for setting a note of your choice about this finding.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "finding_uid": {
+                    "description": "Finding UUID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "order": 0
+                },
+                "subject_uid": {
+                    "description": "Subject UUID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "bishopfox subject uid"
+                    ],
+                    "order": 1
+                },
+                "client_note": {
+                    "description": "Client note to set",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "bishopfox client note"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.finding_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ],
+                    "column_name": "Finding UUID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.subject_uid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.client_note",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client note"
+                    ],
+                    "column_name": "Client Note",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.clientId",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox client id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.clientNote",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.findingUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox finding uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.remediatedDays",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox status"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subjectUid",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox subject uid"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.target",
+                    "data_type": "string",
+                    "contains": [
+                        "bishopfox target"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_value": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Ingest findings from Bishop Fox",
+            "verbose": "This ingesting findings from Bishop Fox CAST into containers in Phantom.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 0
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 1
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter ignored in this app",
+                    "order": 2
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of findings to be ingested during poll now",
+                    "default": 1,
+                    "order": 3
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Parameter ignored in this app",
+                    "order": 4
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}
