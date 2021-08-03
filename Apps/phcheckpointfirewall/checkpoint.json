@@ -216,7 +216,7 @@
         {
             "action": "block ip",
             "description": "Block an IP/subnet",
-            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to block an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID</li><li>Check for an existing network object for the supplied IP/subnet</li><li>Add the network object if it does not already exist</li><li>Check for a rule associated with the network object if it already exists</li><li>Create a rule at the top of the policy that drops all traffic going to the supplied IP/subnet</li><li>Publish the session</li><li>Push the changes to the policy's configured firewalls</li></ul>",
+            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to block an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID.</li><li>Check for an existing network object for the supplied IP/subnet.</li><li>Add the network object if it does not already exist.</li><li>Check for a rule associated with the network object if it already exists.</li><li>Create a rule at the top of the policy that drops all traffic going to the supplied IP/subnet.</li><li>Publish the session.</li><li>Push the changes to the policy's configured firewalls.</li></ul>",
             "type": "contain",
             "identifier": "block_ip",
             "undo": "unblock ip",
@@ -631,7 +631,7 @@
         {
             "action": "unblock ip",
             "description": "Unblock an IP/subnet ",
-            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to unblock an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID</li><li>Check for an existing network object for the supplied IP/subnet</li><li>Check for a rule associated with the network object if it exists</li><li>Delete the rule if it exists</li><li>Publish the session</li><li>Push the changes to the policy's configured firewalls</li></ul>",
+            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>Simple IP: For example 123.123.123.123</li><li>IP, Subnet mask: 123.123.0.0 255.255.0.0</li><li>CIDR Notation: 123.123.0.0/16</li></ul>This action takes multiple steps to unblock an IP/subnet:<ul><li>Log in to the REST endpoint on Check Point to get a session ID.</li><li>Check for an existing network object for the supplied IP/subnet.</li><li>Check for a rule associated with the network object if it exists.</li><li>Delete the rule if it exists.</li><li>Publish the session.</li><li>Push the changes to the policy's configured firewalls.</li></ul>",
             "type": "correct",
             "identifier": "unblock_ip",
             "undo": "block ip",
