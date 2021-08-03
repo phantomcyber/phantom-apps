@@ -1,7 +1,7 @@
 {
     "appid": "3af2ef2d-6e4a-4e74-8f20-4d6030625561",
     "name": "GreyNoise",
-    "description": "This app provides investigative capabilities using GreyNoise plugin",
+    "description": "This app provides investigative capabilities using the GreyNoise plugin",
     "type": "reputation",
     "product_vendor": "GreyNoise",
     "logo": "logo_greynoise.svg",
@@ -183,17 +183,6 @@
                     ],
                     "example_values": [
                         "71.6.135.131"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.riot",
-                    "data_type": "boolean",
-                    "contains": [
-                        "riot"
-                    ],
-                    "example_values": [
-                        true,
-                        false
                     ]
                 },
                 {
@@ -791,28 +780,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.riot",
-                    "data_type": "boolean",
-                    "contains": [
-                        "riot"
-                    ],
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.noise",
-                    "data_type": "boolean",
-                    "contains": [
-                        "noise"
-                    ],
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
                   "data_path": "action_result.data.*.classification",
                   "data_type": "string",
                   "contains": [
@@ -837,7 +804,7 @@
                     "data_path": "action_result.data.*.link",
                     "data_type": "string",
                     "contains": [
-                        "greynoise vizualization link"
+                        "greynoise visualization link"
                     ],
                     "example_values": [
                         "https://viz.greynoise.io/riot/1.2.3.4"
@@ -862,6 +829,14 @@
                     "example_values": [
                         "Success",
                         "You have hit your daily rate limit of 100 requests per day. Please create a free account or upgrade your plan at https://greynoise.io/pricing."
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
                     ]
                 },
                 {

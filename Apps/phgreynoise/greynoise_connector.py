@@ -161,14 +161,20 @@ class GreyNoiseConnector(BaseConnector):
         self.save_progress("Testing API key")
         ret_val, response_json, status_code = self._make_rest_call(
             action_result, "get", API_KEY_CHECK_URL, headers=self._headers)
-        license_type = response_json.get("offering")
-        expiration = str(response_json.get("expiration"))
-        past = datetime.strptime(expiration, "%Y-%m-%d")
-        present = datetime.now()
 
         if phantom.is_fail(ret_val):
             self.save_progress("API key check Failed")
             return ret_val
+
+        license_type = response_json.get("offering")
+        expiration = str(response_json.get("expiration"))
+        try:
+            past = datetime.strptime(expiration, "%Y-%m-%d")
+        except Exception as e:
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(self._get_error_message_from_exception(e))
+            )
+        present = datetime.now()
 
         if response_json is None:
             self.save_progress("No response from API")
@@ -400,7 +406,7 @@ class GreyNoiseConnector(BaseConnector):
                         ("scroll", scroll_token),
                     ),
                 )
-                full_response["complete"] = response_json["complete"]
+                full_response["complete"] = response_json.get("complete")
                 if "scroll" in response_json:
                     full_response["scroll"] = response_json["scroll"]
                 for item in response_json["data"]:
@@ -495,8 +501,8 @@ class GreyNoiseConnector(BaseConnector):
 
     def _process_query(self, data):
         # spawn container for every item returned
-        if data["count"] > 0:
-            try:
+        try:
+            if data["count"] > 0:
                 for entry in data["data"]:
                     ip = entry["ip"]
                     self.save_progress("Processing IP address {}".format(ip))
@@ -550,16 +556,16 @@ class GreyNoiseConnector(BaseConnector):
                         self.save_progress("Error occurred while saving the container")
                         self.debug_print(container_creation_msg)
                         continue
-                    self.save_progress("Created %s" % container_id)
-            except Exception as e:
+                    self.save_progress("Created {}".format(container_id))
+                return phantom.APP_SUCCESS
+            else:
+                self.save_progress("No results matching your GNQL query were found")
+                return phantom.APP_SUCCESS
+        except Exception as e:
                 err = self._get_error_message_from_exception(e)
                 err_msg = "Error occurred while processing query data. {}".format(err)
                 self.debug_print(err_msg)
                 return phantom.APP_ERROR
-            return phantom.APP_SUCCESS
-        else:
-            self.save_progress("No results matching your GNQL query were found")
-            return phantom.APP_SUCCESS
 
     def _on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
