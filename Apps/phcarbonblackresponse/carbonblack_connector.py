@@ -1262,9 +1262,11 @@ class CarbonblackConnector(BaseConnector):
 
         # any time in the future should work, but the official API uses now + 24h, so we will use that as well
         # the timezone is hard-coded to match what was seen in the web interface
-        sensor['event_log_flush_time'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        updated_sensor = dict()
+        updated_sensor['event_log_flush_time'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
+        updated_sensor['group_id'] = sensor.get("group_id")
 
-        ret_val, body = self._make_rest_call("/v1/sensor/{0}".format(sensor_id), action_result, data=sensor, method="put", additional_succ_codes={204: []})
+        ret_val, body = self._make_rest_call("/v1/sensor/{0}".format(sensor_id), action_result, data=updated_sensor, method="put", additional_succ_codes={204: []})
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -1414,11 +1416,13 @@ class CarbonblackConnector(BaseConnector):
         endpoint_id = data['id']
 
         # set the isolation status
-        data['network_isolation_enabled'] = state
+        updated_data = dict()
+        updated_data['network_isolation_enabled'] = state
+        updated_data['group_id'] = data.get('group_id')
 
         # make a rest call to set the endpoint state
         ret_val, response = self._make_rest_call("/v1/sensor/{0}".format(endpoint_id), action_result, method="put",
-                data=data, params=query_parameters, parse_response_json=False, additional_succ_codes={204: []})
+                data=updated_data, params=query_parameters, parse_response_json=False, additional_succ_codes={204: []})
 
         if (phantom.is_fail(ret_val)):
             return (action_result.get_status(), None)
