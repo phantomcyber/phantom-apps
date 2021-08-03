@@ -562,10 +562,10 @@ class GreyNoiseConnector(BaseConnector):
                 self.save_progress("No results matching your GNQL query were found")
                 return phantom.APP_SUCCESS
         except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                err_msg = "Error occurred while processing query data. {}".format(err)
-                self.debug_print(err_msg)
-                return phantom.APP_ERROR
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing query data. {}".format(err)
+            self.debug_print(err_msg)
+            return phantom.APP_ERROR
 
     def _on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
