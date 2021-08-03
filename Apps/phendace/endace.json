@@ -8,7 +8,7 @@
     "logo_dark": "logo_endace_dark.svg",
     "product_name": "Endace",
     "product_version_regex": ".*",
-    "publisher": "Splunk Community",
+    "publisher": "Endace Technology Ltd",
     "contributors": [
       {
         "name": "Soumen Chakraborty"
@@ -882,7 +882,7 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ],
                     "required": true,
                     "primary": true,
@@ -893,7 +893,7 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ],
                     "required": true,
                     "primary": true,
@@ -988,7 +988,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
@@ -1010,7 +1010,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
@@ -1119,7 +1119,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
@@ -1131,7 +1131,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
