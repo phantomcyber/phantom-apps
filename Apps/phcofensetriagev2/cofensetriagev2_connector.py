@@ -1638,7 +1638,7 @@ class CofenseTriageConnector(BaseConnector):
         response = resp_json.get("data")
         action_result.add_data(response)
 
-        response_id = response["id"]
+        response_id = response.get("id")
         summary_data["response_id"] = response_id
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully created the response.")
