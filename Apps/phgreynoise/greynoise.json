@@ -87,9 +87,6 @@
                 {
                   "data_path": "action_result.data.*.code",
                   "data_type": "string",
-                  "contains": [
-                      "greynoise code"
-                  ],
                   "example_values": [
                       "0x00",
                       "0x01"
@@ -98,9 +95,6 @@
                 {
                     "data_path": "action_result.data.*.code_meaning",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise code meaning"
-                    ],
                     "example_values": [
                         "The IP has never been observed scanning the Internet",
                         "The IP has been observed by the GreyNoise sensor network"
@@ -109,9 +103,6 @@
                 {
                     "data_path": "action_result.data.*.noise",
                     "data_type": "boolean",
-                    "contains": [
-                        "greynoise noise"
-                    ],
                     "example_values": [
                         true,
                         false
@@ -188,9 +179,6 @@
                 {
                   "data_path": "action_result.data.*.category",
                   "data_type": "string",
-                  "contains": [
-                      "greynoise category"
-                  ],
                   "example_values": [
                       "public_dns"
                   ]
@@ -198,9 +186,6 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise name"
-                    ],
                     "example_values": [
                         "Google Public DNS"
                     ]
@@ -208,9 +193,6 @@
                 {
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise description"
-                    ],
                     "example_values": [
                         "Google's global domain name system (DNS) resolution service."
                     ]
@@ -218,9 +200,6 @@
                 {
                     "data_path": "action_result.data.*.explanation",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise explanation"
-                    ],
                     "example_values": [
                         "Public DNS services are used as alternatives to ISP's name servers. You may see devices on your network communicating with Google Public DNS over port 53/TCP or 53/UDP to resolve DNS lookups."
                     ]
@@ -228,9 +207,6 @@
                 {
                     "data_path": "action_result.data.*.last_updated",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise last updated"
-                    ],
                     "example_values": [
                         "2021-05-26T17:55:35Z"
                     ]
@@ -238,9 +214,6 @@
                 {
                     "data_path": "action_result.data.*.logo_url",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise logo url"
-                    ],
                     "example_values": [
                         "https://www.gstatic.com/devrel-devsite/prod/v9d82702993bc22f782b7874a0f933b5e39c1f0889acab7d1fce0d6deb8e0f63d/cloud/images/cloud-logo.svg"
                     ]
@@ -248,9 +221,6 @@
                 {
                     "data_path": "action_result.data.*.reference",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise reference"
-                    ],
                     "example_values": [
                         "https://developers.google.com/speed/public-dns/docs/isp#alternative"                    ]
                 },
@@ -325,9 +295,6 @@
                 {
                   "data_path": "action_result.data.*.seen",
                   "data_type": "boolean",
-                  "contains": [
-                      "greynoise seen"
-                  ],
                   "example_values": [
                       true,
                       false
@@ -336,9 +303,6 @@
                 {
                     "data_path": "action_result.data.*.classification",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise classification"
-                    ],
                     "example_values": [
                         "benign",
                         "malicious"
@@ -347,9 +311,6 @@
                 {
                     "data_path": "action_result.data.*.first_seen",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise date"
-                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -357,9 +318,6 @@
                 {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise date"
-                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -367,9 +325,6 @@
                 {
                     "data_path": "action_result.data.*.actor",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise actor"
-                    ],
                     "example_values": [
                         "Shodan.io"
                     ]
@@ -377,9 +332,6 @@
                 {
                     "data_path": "action_result.data.*.tags.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise tags"
-                    ],
                     "example_values": [
                         "Mirai",
                         "Telnet Worm"
@@ -388,9 +340,6 @@
                 {
                     "data_path": "action_result.data.*.metadata.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise metadata key value pairs"
-                    ],
                     "example_values": [
                         "{\n\"country\":\"United States\"\n\"country_code\":\"US\"\n\"city\":\"Seattle\"\n\"organization\":\"Org. Name\"\n\"rdns\":\"crawl-66-249-79-17.testbot.com\"\n\"asn\":\"AS521\"\n\"tor\":false\n\"category\":\"education\"\n\"os\":\"Windows 7/8\"\n}"
                     ]
@@ -398,9 +347,6 @@
                 {
                     "data_path": "action_result.data.*.raw_data.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise raw data key value pairs"
-                    ],
                     "example_values": [
                         "{\n\"scan\":[\n0:{\n\"port\":80\n\"protocol\":\"TCP\"\n}\n]\n\"web\":{\n\"paths\":[\n0:\"/robots.txt\"\n]\n\"useragents\":[\n0:\"test/5.0 (compatible; testbot/2.1; +http://www.test.com/bot.html)\"\n]\n}\n\"ja3\":[\n0:{\n\"fingerprint\":\"c3a6cf0bf2e690ac8e1ecf6081f17a50\"\n\"port\":443\n}\n]\n}"
                     ]
@@ -464,9 +410,6 @@
                 "size": {
                     "description": "The number of results to return (warning: returning over 1000 results may degrade widget performance)",
                     "data_type": "numeric",
-                    "contains": [
-                        "greynoise size"
-                    ],
                     "primary": true,
                     "required": true,
                     "default": 100,
@@ -488,9 +431,6 @@
                 {
                     "data_path": "action_result.parameter.size",
                     "data_type": "numeric",
-                    "contains": [
-                        "greynoise size"
-                    ],
                     "example_values": [
                         1000
                     ]
@@ -508,9 +448,6 @@
                 {
                     "data_path": "action_result.data.*.seen",
                     "data_type": "boolean",
-                    "contains": [
-                        "greynoise seen"
-                    ],
                     "example_values": [
                         true,
                         false
@@ -519,9 +456,6 @@
                 {
                     "data_path": "action_result.data.*.classification",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise classification"
-                    ],
                     "example_values": [
                         "benign",
                         "malicious"
@@ -530,9 +464,6 @@
                 {
                     "data_path": "action_result.data.*.first_seen",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise date"
-                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -540,9 +471,6 @@
                 {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise date"
-                    ],
                     "example_values": [
                         "2020-12-25"
                     ]
@@ -550,9 +478,6 @@
                 {
                     "data_path": "action_result.data.*.actor",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise actor"
-                    ],
                     "example_values": [
                         "Shodan.io"
                     ]
@@ -560,9 +485,6 @@
                 {
                     "data_path": "action_result.data.*.tags.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise tags"
-                    ],
                     "example_values": [
                         "Mirai",
                         "Telnet Worm"
@@ -571,9 +493,6 @@
                 {
                     "data_path": "action_result.data.*.metadata.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise metadata key value pairs"
-                    ],
                     "example_values": [
                         "{\n\"country\":\"United States\"\n\"country_code\":\"US\"\n\"city\":\"Seattle\"\n\"organization\":\"Org. Name\"\n\"rdns\":\"crawl-66-249-79-17.testbot.com\"\n\"asn\":\"AS521\"\n\"tor\":false\n\"category\":\"education\"\n\"os\":\"Windows 7/8\"\n}"
                     ]
@@ -581,9 +500,6 @@
                 {
                     "data_path": "action_result.data.*.raw_data.*",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise raw data key value pairs"
-                    ],
                     "example_values": [
                         "{\n\"scan\":[\n0:{\n\"port\":80\n\"protocol\":\"TCP\"\n}\n]\n\"web\":{\n\"paths\":[\n0:\"/robots.txt\"\n]\n\"useragents\":[\n0:\"test/5.0 (compatible; testbot/2.1; +http://www.test.com/bot.html)\"\n]\n}\n\"ja3\":[\n0:{\n\"fingerprint\":\"c3a6cf0bf2e690ac8e1ecf6081f17a50\"\n\"port\":443\n}\n]\n}"
                     ]
@@ -591,9 +507,6 @@
                 {
                     "data_path": "action_result.complete",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise status"
-                    ],
                     "example_values": [
                         "true",
                         "false"
@@ -671,9 +584,6 @@
                 {
                     "data_path": "action_result.data.*.code",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise code"
-                    ],
                     "example_values": [
                         "0x00",
                         "0x01"
@@ -682,9 +592,6 @@
                 {
                     "data_path": "action_result.data.*.code_meaning",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise code meaning"
-                    ],
                     "example_values": [
                         "The IP has never been observed scanning the Internet",
                         "The IP has been observed by the GreyNoise sensor network"
@@ -693,9 +600,6 @@
                 {
                     "data_path": "action_result.data.*.noise",
                     "data_type": "boolean",
-                    "contains": [
-                        "greynoise noise"
-                    ],
                     "example_values": [
                         true,
                         false
@@ -782,9 +686,6 @@
                 {
                   "data_path": "action_result.data.*.classification",
                   "data_type": "string",
-                  "contains": [
-                      "greynoise classification"
-                  ],
                   "example_values": [
                       "benign",
                       "malicious"
@@ -793,9 +694,6 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise name"
-                    ],
                     "example_values": [
                         "Cloudflare"
                     ]
@@ -803,9 +701,6 @@
                 {
                     "data_path": "action_result.data.*.link",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise visualization link"
-                    ],
                     "example_values": [
                         "https://viz.greynoise.io/riot/1.2.3.4"
                     ]
@@ -813,9 +708,6 @@
                 {
                     "data_path": "action_result.data.*.last_seen",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise last seen"
-                    ],
                     "example_values": [
                         "2020-01-01"
                     ]
@@ -823,9 +715,6 @@
                 {
                     "data_path": "action_result.data.*.message",
                     "data_type": "string",
-                    "contains": [
-                        "greynoise message"
-                    ],
                     "example_values": [
                         "Success",
                         "You have hit your daily rate limit of 100 requests per day. Please create a free account or upgrade your plan at https://greynoise.io/pricing."
