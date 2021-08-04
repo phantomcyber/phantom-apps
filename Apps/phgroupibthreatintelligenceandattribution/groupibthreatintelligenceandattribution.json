@@ -1,7 +1,7 @@
 {
     "appid": "35b2d7ea-098e-4a0a-9b71-e93824865226",
     "name": "Group IB Threat Intelligence and Attribution",
-    "description": "This app ingests incidents and IOCs from Group-IB Threat Intelligence and Attribution.",
+    "description": "This app ingests incidents and IOCs from Group-IB Threat Intelligence and Attribution",
     "type": "information",
     "product_vendor": "Group-IB",
     "logo": "groupibthreatintelligenceandattribution.svg",
@@ -31,7 +31,7 @@
     "utctime_updated": "2021-05-26T17:12:04.190864Z",
     "package_name": "phantom_groupibthreatintelligenceandattribution",
     "main_module": "groupibthreatintelligenceandattribution_connector.py",
-    "min_phantom_version": "4.10.3.51237",
+    "min_phantom_version": "4.10.3",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
@@ -189,7 +189,7 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "This action make a simple API request to Group-IB with provided credentials to validate them",
+            "verbose": "This action make a simple API request to Group-IB with provided credentials to validate them.",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -198,7 +198,7 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality.",
+            "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": true,
