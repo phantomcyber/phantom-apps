@@ -213,8 +213,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                         return action_result.set_status(phantom.APP_ERROR, error_message)
                     else:
                         message = """
-                        Container for feed with id: {0} successfully saved. 
-                        ret_val: {1}, message: {2}, container_id: {3}
+                        Container for feed with id: {0} saved. ret_val: {1}, message: {2}, container_id: {3}.
                         """.format(feed.get("source_data_identifier"), ret_val, message, container_id)
                         if is_manual_poll:
                             container_count += 1
@@ -297,7 +296,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
             modified_collection = collection.replace('/', '_')
             if config.get(modified_collection):
                 try:
-                    parsed_date = parse(config.get(modified_collection+"_start")).strftime(GIB_DATE_FORMAT)
+                    parsed_date = parse(config.get(modified_collection + "_start")).strftime(GIB_DATE_FORMAT)
                 except Exception as e:
                     message = 'Inappropriate first_fetch format, ' \
                               'please use something like this: 2020-01-01 or January 1 2020 or 3 days'
