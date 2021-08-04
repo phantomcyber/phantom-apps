@@ -44,11 +44,7 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(
-            action_result.set_status(
-                phantom.APP_ERROR, "Empty response and no information in the header"
-            ), None
-        )
+        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -58,16 +54,18 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, "html.parser")
             error_text = soup.text
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(
-            status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
 
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -77,12 +75,7 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(
-                        str(e))
-                ), None
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -91,7 +84,7 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
             r.status_code,
-            r.text.replace(u'{', '{{').replace(u'}', '}}')
+            r.text.replace('{', '{{').replace('}', '}}')
         )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
@@ -140,14 +133,10 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Invalid method: {0}".format(method)),
-                resp_json
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = self._base_url + '/v3' + endpoint
 
         try:
             r = request_func(
@@ -157,12 +146,7 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
                 **kwargs
             )
         except Exception as e:
-            return RetVal(
-                action_result.set_status(
-                    phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(
-                        str(e))
-                ), resp_json
-            )
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -173,10 +157,9 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
 
         self.save_progress("Connecting to watson language translator")
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/v3/identifiable_languages?version={}'.format(self._version), action_result)
+        ret_val, response = self._make_rest_call('/identifiable_languages?version={}'.format(self._version), action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             self.save_progress("Test Connectivity Failed")
@@ -190,37 +173,33 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
 
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Required values can be accessed directly
         text = param['text']
+        headers = {"content-type": "text/plain", "accept": "application/json"}
+        json = {"text": text}
 
         # make rest call
-        ret_val, response = self._make_rest_call('/v3/identify?version={}'.format(self._version), action_result, method='post',
-                                                 headers={
-                                                     "content-type": "text/plain", "accept": "application/json"},
-                                                 json={"text": text})
+        ret_val, response = self._make_rest_call('/identify?version={}'.format(self._version), action_result, method='post', headers=headers, json=json)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         languages = response.get('languages')
 
-        if (type(languages) != list):
+        if type(languages) != list:
             languages = [languages]
 
         for curr_item in languages:
             action_result.add_data(curr_item)
 
-        action_result.update_summary(
-            {'total_languages': action_result.get_data_size()})
+        action_result.update_summary({'total_languages': action_result.get_data_size()})
         try:
-            action_result.update_summary(
-                {'high_confidence_match': languages[0]['language']})
+            action_result.update_summary({'high_confidence_match': languages[0]['language']})
         except:
             pass
 
@@ -230,29 +209,26 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
 
         # Implement the handler here
         # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/v3/identifiable_languages?version={}'.format(self._version), action_result)
+        ret_val, response = self._make_rest_call('/identifiable_languages?version={}'.format(self._version), action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         languages = response.get('languages')
 
-        if (type(languages) != list):
+        if type(languages) != list:
             languages = [languages]
 
         for curr_item in languages:
             action_result.add_data(curr_item)
 
-        action_result.update_summary(
-            {'total_languages': action_result.get_data_size()})
+        action_result.update_summary({'total_languages': action_result.get_data_size()})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -262,53 +238,46 @@ class WatsonLanguageTranslatorV3Connector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
-        ret_val, response = self._make_rest_call(
-            '/v3/models?version={}'.format(self._version), action_result)
+        ret_val, response = self._make_rest_call('/models?version={}'.format(self._version), action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         models = response.get('models')
 
-        if (type(models) != list):
+        if type(models) != list:
             models = [models]
 
         for curr_item in models:
             action_result.add_data(curr_item)
 
-        action_result.update_summary(
-            {'total_models': action_result.get_data_size()})
+        action_result.update_summary({'total_models': action_result.get_data_size()})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_translate_text(self, param):
 
         # use self.save_progress(...) to send progress messages back to the platform
-        self.save_progress("In action handler for: {0}".format(
-            self.get_action_identifier()))
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         if ('model_id' not in param):
-            if (('source' not in param) or ('target' not in param)):
+            if ('source' not in param or 'target' not in param):
                 return action_result.set_status(phantom.APP_ERROR, "Please specify either model_id or source and target to use")
 
-        # make rest call
-        ret_val, response = self._make_rest_call('/v3/translate?version={}'.format(self._version), action_result,
-                                                 headers={
-                                                     "accept": "application/json"},
-                                                 json=param, method='post')
+        headers = {"accept": "application/json"}
 
-        if (phantom.is_fail(ret_val)):
+        # make rest call
+        ret_val, response = self._make_rest_call('/translate?version={}'.format(self._version), action_result,
+                                                headers=headers, json=param, method='post')
+
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
         action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        # summary = action_result.update_summary({})
-        # summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -390,8 +359,7 @@ def main():
 
     if username and password:
         try:
-            login_url = WatsonLanguageTranslatorV3Connector._get_phantom_base_url() + \
-                '/login'
+            login_url = WatsonLanguageTranslatorV3Connector._get_phantom_base_url() + '/login'
 
             print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
