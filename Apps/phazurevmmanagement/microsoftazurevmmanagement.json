@@ -1,0 +1,3803 @@
+{
+    "appid": "39c7128b-666b-4a16-9d44-afab6a9b825d",
+    "name": "Microsoft Azure Compute",
+    "description": "This app implements virtualization actions for Microsoft Azure Virtual Machines",
+    "type": "virtualization",
+    "product_vendor": "Microsoft",
+    "logo": "microsoftazurevmmanagement.svg",
+    "logo_dark": "microsoftazurevmmanagement_dark.svg",
+    "product_name": "Azure Compute",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
+    "app_version": "2.0.13",
+    "utctime_updated": "2021-07-02T19:19:12.000000Z",
+    "package_name": "phantom_microsoftazurecompute",
+    "main_module": "microsoftazurevmmanagement_connector.py",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud tested 2020-09-28"
+    ],
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "rest_handler": "microsoftazurevmmanagement_connector._handle_rest_request",
+    "configuration": {
+        "subscription_id": {
+            "description": "Subscription ID",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "tenant_id": {
+            "description": "Tenant ID",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "client_id": {
+            "description": "Application (client) ID assigned to your Azure Compute app",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "client_secret": {
+            "description": "Client Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "admin_access": {
+            "description": "Admin Access Required",
+            "data_type": "boolean",
+            "default": true,
+            "order": 4
+        },
+        "admin_consent": {
+            "description": "Admin consent already provided",
+            "data_type": "boolean",
+            "default": true,
+            "order": 5
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "generate token",
+            "identifier": "generate_token",
+            "description": "Generates a token",
+            "verbose": "This action generated a new token whenever any action fails because of an invalid or expired token.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Token generated"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get system info",
+            "identifier": "get_system_info",
+            "description": "Get information about a VM",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/virtualMachines/testVM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diagnosticsProfile.bootDiagnostics.enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diagnosticsProfile.bootDiagnostics.storageUri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://myresourcegroup1diag311.blob.core.windows.net/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.hardwareProfile.vmSize",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard_B1s"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.networkProfile.networkInterfaces.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/networkInterfaces/testvm133"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.adminUsername",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.allowExtensionOperations",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.computerName",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.disablePasswordAuthentication",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.provisionVMAgent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.windowsConfiguration.enableAutomaticUpdates",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.windowsConfiguration.provisionVMAgent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.offer",
+                    "data_type": "string",
+                    "example_values": [
+                        "UbuntuServer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.publisher",
+                    "data_type": "string",
+                    "example_values": [
+                        "Canonical"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.sku",
+                    "data_type": "string",
+                    "example_values": [
+                        "18.04-LTS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "latest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.caching",
+                    "data_type": "string",
+                    "example_values": [
+                        "ReadWrite"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.createOption",
+                    "data_type": "string",
+                    "example_values": [
+                        "FromImage"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.diskSizeGB",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.managedDisk.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/disks/testVM_OsDisk_1_1c75b0f4f5df46ba88997aac183d8ad6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.managedDisk.storageAccountType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Premium_LRS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "testVM_OsDisk_1_1c75b0f4f5df46ba88997aac183d8ad6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.osType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.vhd.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testdisks466.blob.core.windows.net/vhds/unmanagedVM20190125164741.vhd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.vmId",
+                    "data_type": "string",
+                    "example_values": [
+                        "58a871bc-1cbb-4a86-8603-a73527071c74"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myresourcegroup1/providers/Microsoft.Compute/virtualMachines/virtualMachine1/extensions/OmsAgentForLinux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "eastus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "OmsAgentForLinux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.autoUpgradeMinorVersion",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.publisher",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.EnterpriseCloud.Monitoring"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.settings.azureResourceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.settings.stopOnMultipleConnections",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.settings.workspaceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "4a6116d3-9349-40bb-8b06-ac937da327b6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "OmsAgentForLinux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.properties.typeHandlerVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Compute/virtualMachines/extensions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.company",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Compute/virtualMachines"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "The system info was successfully retrieved"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Get System Info",
+                "view": "microsoftazurevmmanagement_view.display_get_system_info"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list vms",
+            "identifier": "list_vms",
+            "description": "Get the list of registered VMs",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "Name of the resource group",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/MYRESOURCEGROUP1/providers/Microsoft.Compute/virtualMachines/virtualMachine1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "eastus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "virtualMachine1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diagnosticsProfile.bootDiagnostics.enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diagnosticsProfile.bootDiagnostics.storageUri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://myresourcegroup1diag406.blob.core.windows.net/"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.hardwareProfile.vmSize",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard_B1s"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.networkProfile.networkInterfaces.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/networkInterfaces/virtualmachine1259"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.adminUsername",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.allowExtensionOperations",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.computerName",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "virtualMachine1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.disablePasswordAuthentication",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.provisionVMAgent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.ssh.publicKeys.*.path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/home/azureuser/.ssh/authorized_keys"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.linuxConfiguration.ssh.publicKeys.*.keyData",
+                    "data_type": "string",
+                    "example_values": [
+                        "ssh-rsa sample_rsa_AAAbWxYa/Cw\r\nI3pXrnLZbh2obel1riER4uqamt1mbM+maPPxCCyBDyDIy31\r\nKTDYhRJ7j2vNbaa5Oyt6H8Zasypmpzth2jEwKDDi62EkQTyrNsm/CFkycMuflVZx\r\neVxXjIFG2ix0ENkSg1VXbAb6Nz0r+zBFXkOppdpSe/j+oqKihw7KjFLe0YtIwxiN\r\nFu0MHCBBvdSBmFtzrhkk3g7bnMqbD8JQdzKgkNW4xM9\r\nZRjXtwdsn7XOVcNsJ2K0e4u5xJfb6RmBQAh3IplVXX\r\nGOMl3d9S/AWmL2FLO/j9250ntbi2BsU+g0G6E\r\ncpC9JxMu5laUd/Cee2EhG+27U51nzE4O/eaVQwNAEKdYRYP9rocOisx\r\npeqy6TbUwnrrir/4y8woNYso+R4k= generated-by-azure\r\n"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.windowsConfiguration.enableAutomaticUpdates",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osProfile.windowsConfiguration.provisionVMAgent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.offer",
+                    "data_type": "string",
+                    "example_values": [
+                        "UbuntuServer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.publisher",
+                    "data_type": "string",
+                    "example_values": [
+                        "Canonical"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.sku",
+                    "data_type": "string",
+                    "example_values": [
+                        "18.04-LTS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.imageReference.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "latest"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.caching",
+                    "data_type": "string",
+                    "example_values": [
+                        "ReadWrite"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.createOption",
+                    "data_type": "string",
+                    "example_values": [
+                        "FromImage"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.diskSizeGB",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.managedDisk.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/disks/virtualMachine1_OsDisk_1_3475f0acf8aa4d3e8daa84c7327adde1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.managedDisk.storageAccountType",
+                    "data_type": "string",
+                    "example_values": [
+                        "StandardSSD_LRS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "virtualMachine1_OsDisk_1_3475f0acf8aa4d3e8daa84c7327adde1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.osType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.storageProfile.osDisk.vhd.uri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testdisks466.blob.core.windows.net/vhds/unmanagedVM20190125164741.vhd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.vmId",
+                    "data_type": "string",
+                    "example_values": [
+                        "6ead047c-7405-4f68-a0da-0b12fd99e185"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/MYRESOURCEGROUP1/providers/Microsoft.Compute/virtualMachines/virtualMachine1/extensions/OmsAgentForLinux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.company",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "vm"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Compute/virtualMachines"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_vms",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num vms: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "List Virtual Machines",
+                "view": "microsoftazurevmmanagement_view.display_list_vms"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "snapshot vm",
+            "identifier": "snapshot_vm",
+            "verbose": "While creating a snapshot using the COPY option, 'source_resource_id' parameter is required and while using the IMPORT option, 'source_uri' parameter is required.",
+            "description": "Take a snapshot of the VM",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "snapshot_name": {
+                    "description": "The name of the snapshot that is being created. The name can't be changed after the snapshot is created. Supported characters for the name are a-z, A-Z, 0-9, and _. The max name length is 80 characters",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "location": {
+                    "description": "Resource location",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Australia East",
+                        "Australia Southeast",
+                        "Brazil South",
+                        "Canada Central",
+                        "Canada East",
+                        "Central India",
+                        "Central US",
+                        "East Asia",
+                        "East US",
+                        "East US 2",
+                        "France Central",
+                        "Japan East",
+                        "Japan West",
+                        "Korea Central",
+                        "Korea South",
+                        "North Central US",
+                        "North Europe",
+                        "South Central US",
+                        "South India",
+                        "Southeast Asia",
+                        "UK South",
+                        "UK West",
+                        "West Central US",
+                        "West Europe",
+                        "West India",
+                        "West US",
+                        "West US 2"
+                    ],
+                    "order": 2
+                },
+                "create_option": {
+                    "description": "Source for disk's creation",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Copy",
+                        "Import"
+                    ],
+                    "order": 3
+                },
+                "source_resource_id": {
+                    "description": "If create_option is Copy, this is the ARM ID of the source snapshot or disk",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "source_uri": {
+                    "description": "If create_option is Import, this is the URI of a blob to be imported into a managed disk",
+                    "data_type": "string",
+                    "order": 5
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.create_option",
+                    "data_type": "string",
+                    "example_values": [
+                        "Copy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "West US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.snapshot_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_new_snapshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source_resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/snapshots/mySnapshot1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source_uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "West US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_new_snapshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.createOption",
+                    "data_type": "string",
+                    "example_values": [
+                        "Copy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.sourceResourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/snapshots/mySnapshot1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.sourceUri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testdisks466.blob.core.windows.net/vhds/unmanagedVM20190125164741.vhd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diskSizeBytes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        13636730880
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diskSizeGB",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.faultDomain",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.isArmResource",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sku.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard_LRS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sku.tier",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.provisioning_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created snapshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully created snapshot, Provisioning state: Updating"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Snapshot Virtual Machine",
+                "view": "microsoftazurevmmanagement_view.display_snapshot_vm"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start vm",
+            "identifier": "start_vm",
+            "description": "Start a stopped or suspended VM",
+            "undo": "stop vm",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully started VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully started VM"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "stop vm",
+            "identifier": "stop_vm",
+            "description": "Stop a VM",
+            "undo": "start vm",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully stopped VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully stopped VM"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete vm",
+            "identifier": "delete_vm",
+            "description": "Delete a VM",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "DefaultResourceGroup-EUS"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "test"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully deleted the vm"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deallocate vm",
+            "identifier": "deallocate_vm",
+            "description": "Shut down the virtual machine and release the compute resources. You are not billed for the compute resource that this virtual machine uses",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "testVM"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deallocated VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully deallocated VM"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list tags",
+            "identifier": "list_tags",
+            "description": "Get the names and values of all resource tags that are defined in the subscription",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count.value",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/tagNames/author"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tagName",
+                    "data_type": "string",
+                    "example_values": [
+                        "author"
+                    ],
+                    "contains": [
+                        "vm management tag name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.*.count.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.*.count.value",
+                    "data_type": "numeric",
+                    "example_values": [
+                        22
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/tagNames/author/tagValues/appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.values.*.tagValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_tags",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num tags: 6"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "List Tags",
+                "view": "microsoftazurevmmanagement_view.display_list_tags"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create tag",
+            "identifier": "create_tag",
+            "description": "Create or update a tag",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "tag_name": {
+                    "description": "The name of the tag",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management tag name"
+                    ],
+                    "order": 0
+                },
+                "tag_value": {
+                    "description": "The value of the tag to create or update",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.tag_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management tag name"
+                    ],
+                    "example_values": [
+                        "company"
+                    ],
+                    "column_name": "Tag Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.tag_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ],
+                    "column_name": "Tag Value",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count.value",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/tagNames/QA1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tagName",
+                    "data_type": "string",
+                    "example_values": [
+                        "QA1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully created tag"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list resource groups",
+            "identifier": "list_resource_groups",
+            "description": "Get the list of resource groups for the subscription",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/DefaultResourceGroup-EUS"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "eastus"
+                    ],
+                    "column_name": "Location",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "DefaultResourceGroup-EUS"
+                    ],
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "column_name": "Resource Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Provisioning State",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.tags.company",
+                    "data_type": "string",
+                    "example_values": [
+                        "mycomp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.{\"keyname\": \"keyvalue\"}",
+                    "data_type": "string",
+                    "example_values": [
+                        "abcd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_resource_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num resource groups: 4"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list snapshots",
+            "identifier": "list_snapshots",
+            "description": "Get the list of snapshots under the subscription",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Compute/snapshots/mySnapshot1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "mySnapshot1"
+                    ],
+                    "contains": [
+                        "vm management tag name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.createOption",
+                    "data_type": "string",
+                    "example_values": [
+                        "Copy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.sourceResourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/MYRESOURCEGROUP1/providers/Microsoft.Compute/disks/testVM_OsDisk_1_1c75b0f4f5df46ba88997aac183d8ad6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.creationData.sourceUri",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://testdisks466.blob.core.windows.net/vhds/unmanagedVM20190125164741.vhd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diskSizeGB",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.diskState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unattached"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.osType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Linux"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.timeCreated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-01-17T20:55:06.9032116+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sku.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard_LRS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sku.tier",
+                    "data_type": "string",
+                    "example_values": [
+                        "Standard"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "snapshot"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Compute/snapshots"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_snapshots",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num snapshots: 3"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "List Snapshots",
+                "view": "microsoftazurevmmanagement_view.display_list_snapshots"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list security groups",
+            "identifier": "list_security_groups",
+            "description": "Get the list of all security groups in a resource group",
+            "verbose": "API limitation: Network Security Group (classic) is not part of the response.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "group_type": {
+                    "description": "Type of security group to query",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "network",
+                        "application"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.group_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "network",
+                        "application"
+                    ],
+                    "column_name": "Type",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"bc870279-4d7a-4ced-a4b1-0311c27b5111\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/applicationSecurityGroups/appSGtest"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus"
+                    ],
+                    "column_name": "Location",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "appSGtest"
+                    ],
+                    "contains": [
+                        "vm management group name"
+                    ],
+                    "column_name": "Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"d086e328-28dc-4534-8f54-1373c8d4f255\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/test/providers/Microsoft.Network/networkSecurityGroups/aaaaa-nsg/defaultSecurityRules/AllowVnetInBound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AllowVnetInBound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.access",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allow inbound traffic from all VMs in VNET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.destinationAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "VirtualNetwork"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.destinationPortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.priority",
+                    "data_type": "numeric",
+                    "example_values": [
+                        65000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.sourceAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "VirtualNetwork"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.sourcePortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.networkInterfaces.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/test/providers/Microsoft.Network/networkInterfaces/aaaaa382"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Provisioning State",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.properties.resourceGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "93cab2f8-f56e-44f1-b804-886405bd362a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/4c357906-2c22-4d91-98aa-180d9a85a370/resourceGroups/Phantom_Test/providers/Microsoft.Network/networkSecurityGroups/phantom.vm-3-nsg/securityRules/SSH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"1c2086b4-b285-41f2-8ce0-9898a57f60ad\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSH"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/networkSecurityGroups/securityRules"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.access",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.priority",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "TCP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.sourcePortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "ction_result.data.*.properties.securityRules.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.sourceAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationPortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "22"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.securityRules.*.properties.destinationAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/applicationSecurityGroups"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_security_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num security groups: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add network group",
+            "identifier": "add_network_security_group",
+            "description": "Add a network security group in a resource group",
+            "verbose": "Refer to https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate for more information on adding a network security group.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "group_name": {
+                    "description": "Name of security group to add",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management group name"
+                    ],
+                    "required": true,
+                    "primary": true,
+                    "order": 1
+                },
+                "location": {
+                    "description": "Resource location",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Australia East",
+                        "Australia Southeast",
+                        "Brazil South",
+                        "Canada Central",
+                        "Canada East",
+                        "Central India",
+                        "Central US",
+                        "East Asia",
+                        "East US",
+                        "East US 2",
+                        "France Central",
+                        "Japan East",
+                        "Japan West",
+                        "Korea Central",
+                        "Korea South",
+                        "North Central US",
+                        "North Europe",
+                        "South Central US",
+                        "South India",
+                        "Southeast Asia",
+                        "UK South",
+                        "UK West",
+                        "West Central US",
+                        "West Europe",
+                        "West India",
+                        "West US",
+                        "West US 2"
+                    ],
+                    "order": 2
+                },
+                "tags": {
+                    "description": "String object of resource tags",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "default_security_rules": {
+                    "description": "Comma separated list of default security rules for the network security group",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "provisioning_state": {
+                    "description": "The provisioning state of the public IP resource",
+                    "data_type": "string",
+                    "value_list": [
+                        "Updating",
+                        "Deleting",
+                        "Failed"
+                    ],
+                    "order": 5
+                },
+                "resource_guid": {
+                    "description": "The resource GUID property of the network security group resource",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "security_rules": {
+                    "description": "Comma separated list of security rules of the network security group",
+                    "data_type": "string",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.default_security_rules",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management group name"
+                    ],
+                    "example_values": [
+                        "netwGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "West US 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.provisioning_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.security_rules",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"author\":\"Phantom\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"12b43767-ecc7-4ed4-af5f-0c13b78dae0e\"",
+                        "W/\"d62d2fcf-970a-4955-b996-d586ea2f8a3c\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/networkSecurityGroups/netwGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "netwGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"12b43767-ecc7-4ed4-af5f-0c13b78dae0e\"",
+                        "W/\"d62d2fcf-970a-4955-b996-d586ea2f8a3c\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/networkSecurityGroups/netwGroup1/defaultSecurityRules/AllowVnetInBound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "AllowVnetInBound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.access",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allow"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allow inbound traffic from all VMs in VNET"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.destinationAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "VirtualNetwork"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.destinationPortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.direction",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inbound"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.priority",
+                    "data_type": "numeric",
+                    "example_values": [
+                        65000
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded",
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.sourceAddressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "VirtualNetwork"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.properties.sourcePortRange",
+                    "data_type": "string",
+                    "example_values": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.defaultSecurityRules.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/networkSecurityGroups/defaultSecurityRules"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded",
+                        "Updating"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.resourceGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "0214f54b-2274-470c-b87a-85578d05b942"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/networkSecurityGroups"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Add Network Security Group",
+                "view": "microsoftazurevmmanagement_view.display_add_network_security_group"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add application group",
+            "identifier": "add_application_security_group",
+            "description": "Add an application security groups in a resource group",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "group_name": {
+                    "description": "Name of security group to add",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management group name"
+                    ],
+                    "required": true,
+                    "primary": true,
+                    "order": 1
+                },
+                "location": {
+                    "description": "Resource location",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Australia East",
+                        "Australia Southeast",
+                        "Brazil South",
+                        "Canada Central",
+                        "Canada East",
+                        "Central India",
+                        "Central US",
+                        "East Asia",
+                        "East US",
+                        "East US 2",
+                        "France Central",
+                        "Japan East",
+                        "Japan West",
+                        "Korea Central",
+                        "Korea South",
+                        "North Central US",
+                        "North Europe",
+                        "South Central US",
+                        "South India",
+                        "Southeast Asia",
+                        "UK South",
+                        "UK West",
+                        "West Central US",
+                        "West Europe",
+                        "West India",
+                        "West US",
+                        "West US 2"
+                    ],
+                    "order": 2
+                },
+                "tags": {
+                    "description": "String object of resource tags",
+                    "data_type": "string",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management group name"
+                    ],
+                    "example_values": [
+                        "asdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "West US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"author\":\"Splunk\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"b6eab29d-32f4-48d2-80e1-06f8dfb3616a\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/applicationSecurityGroups/asdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "asdf"
+                    ],
+                    "contains": [
+                        "vm management group name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/applicationSecurityGroups"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "Add Application Security Group",
+                "view": "microsoftazurevmmanagement_view.display_add_application_security_group"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list virtual networks",
+            "identifier": "list_virtual_networks",
+            "description": "Get the list of virtual networks",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"afd6a89a-57fd-4eb4-bcbf-49ee9d377fc5\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/virtualNetworks/myNetworkInterface1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string",
+                    "example_values": [
+                        "westus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "myNetworkInterface1"
+                    ],
+                    "contains": [
+                        "vm management virtual network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.addressSpace.addressPrefixes",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.enableDdosProtection",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.enableVmProtection",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.resourceGuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b6e07c0-a869-4a24-abfe-e93390cd0095"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"afd6a89a-57fd-4eb4-bcbf-49ee9d377fc5\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/virtualNetworks/myNetworkInterface1/subnets/default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.properties.addressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.0.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.properties.ipConfigurations.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/networkInterfaces/testvm133/ipConfigurations/ipconfig1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.subnets.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/virtualNetworks/subnets"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags.author",
+                    "data_type": "string",
+                    "example_values": [
+                        "appdev"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/virtualNetworks"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_virtual_networks",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num virtual networks: 3"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 10,
+                "title": "List Virtual Networks",
+                "view": "microsoftazurevmmanagement_view.display_list_virtual_networks"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list subnets",
+            "identifier": "list_subnets",
+            "description": "Get the list of subnets",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "virtual_network_name": {
+                    "description": "The name of the virtual network",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual network"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.virtual_network_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual network"
+                    ],
+                    "example_values": [
+                        "myNetworkInterface1"
+                    ],
+                    "column_name": "Virtual Network Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string",
+                    "example_values": [
+                        "W/\"2290fbd6-434f-410c-a80a-3e66f030cdb2\""
+                    ],
+                    "column_name": "Etag",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/myResourceGroup1/providers/Microsoft.Network/virtualNetworks/myNetworkInterface1/subnets/default"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.properties.addressPrefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.0.0/24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.ipConfigurations.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/a81fccf8-0405-43ae-990c-ab1389e40c6d/resourceGroups/test/providers/Microsoft.Network/networkInterfaces/unmanagedvm260/ipConfigurations/ipconfig1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.properties.provisioningState",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.Network/virtualNetworks/subnets"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_subnets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num subnets: 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ip availability",
+            "identifier": "check_address_availability",
+            "description": "Check if a private IP address is available for use",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "virtual_network_name": {
+                    "description": "The name of the virtual network",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual network"
+                    ],
+                    "order": 1
+                },
+                "ip_address": {
+                    "description": "The private IP address to be verified",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "required": true,
+                    "primary": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.0.0"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP Address",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.virtual_network_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual network"
+                    ],
+                    "example_values": [
+                        "myNetworkInterface1"
+                    ],
+                    "column_name": "Virtual Network Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.availableAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.0.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Available IP Addresses",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.available",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_ips_available",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Available: False, Num ips available: 5"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "generalize vm",
+            "identifier": "generalize_vm",
+            "description": "Set the state of the virtual machine to be generalized",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "aGroup"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "abc"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully generalized the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully generalized the vm"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "redeploy vm",
+            "identifier": "redeploy_vm",
+            "description": "Redeploy a virtual machine",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "myResourceGroup1"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "virtualMachine1"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully redeployed the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully redeployed the vm"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run command",
+            "identifier": "run_command",
+            "description": "Run a command on the virtual machine",
+            "verbose": "Run a command or a script in an Azure Windows or Linux VM. Refer to https://docs.microsoft.com/en-us/rest/api/compute/virtual%20machines%20run%20commands/runcommand for more information.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "resource_group_name": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "order": 0
+                },
+                "vm_name": {
+                    "description": "The name of the virtual machine",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "order": 1
+                },
+                "body": {
+                    "description": "The request body in JSON format. 'commandId' is required",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.body",
+                    "data_type": "string",
+                    "example_values": [
+                        "{   \"commandId\": \"ipconfig\" }"
+                    ],
+                    "column_name": "Body",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.resource_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management resource group"
+                    ],
+                    "example_values": [
+                        "test"
+                    ],
+                    "column_name": "Resource Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.vm_name",
+                    "data_type": "string",
+                    "contains": [
+                        "vm management virtual machine"
+                    ],
+                    "example_values": [
+                        "unmanagedVM"
+                    ],
+                    "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully executed command"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

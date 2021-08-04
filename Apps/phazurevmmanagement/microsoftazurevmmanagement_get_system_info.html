@@ -1,0 +1,229 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%;
+background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %}
+<!-- Main Start Block -->
+
+<!-- File: microsoftazurevmmanagement_get_system_info.html
+  Copyright (c) 2019-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+    .microsoftazurevmmanagement-app a:hover {
+        text-decoration: underline;
+    }
+
+    .microsoftazurevmmanagement-app .wf-table-vertical {
+        width: initial;
+        font-size: 12px;
+    }
+
+    .microsoftazurevmmanagement-app .wf-table-vertical td {
+        padding: 5px;
+        border: 1px solid;
+    }
+
+    .microsoftazurevmmanagement-app .wf-table-horizontal {
+        margin-right: 10px;
+        width: initial;
+        border: 1px solid;
+        font-size: 12px;
+    }
+
+    .microsoftazurevmmanagement-app .wf-table-horizontal th {
+        text-align: center;
+        border: 1px solid;
+        text-transform: uppercase;
+        font-weight: normal;
+        padding: 5px;
+    }
+
+    .microsoftazurevmmanagement-app .wf-table-horizontal td {
+        border: 1px solid;
+        padding: 5px;
+        padding-left: 4px;
+    }
+
+    .microsoftazurevmmanagement-app .wf-h3-style {
+        font-size: 20px
+    }
+
+    .microsoftazurevmmanagement-app .wf-h4-style {
+        font-size: 16px
+    }
+
+    .microsoftazurevmmanagement-app .wf-h5-style {
+        font-size: 14px
+    }
+
+    .microsoftazurevmmanagement-app .wf-subheader-style {
+        font-size: 12px
+    }
+</style>
+<div class="microsoftazurevmmanagement-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px">
+    <!-- Main Div -->
+    {% for result in results %}
+        <!-- loop for each result -->
+        {% if result.data %}
+            <div class="info">
+            <h4 class="wf-h4-style">Info</h4>
+            <table class="wf-table-vertical">
+                <tr>
+                    <td>Resource Group Name</td>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management resource group'],
+                        'value':'{{ result.param.resource_group_name }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ result.param.resource_group_name }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>VM Name</td>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management virtual machine'],
+                        'value':'{{ result.param.vm_name }}' }], 0,
+                        {{ container.id }}, null, false);">
+                            {{ result.param.vm_name }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+            </div>
+            {% for data in result.data %}
+                <h3 class="wf-h4-style">{{ data.name }}</h3>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <th>Location</th>
+                        <td>{{ data.location }}</td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ data.type }}</td>
+                    </tr>
+                    <tr>
+                        <th>ID</th>
+                        <td>{{ data.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>VM ID</th>
+                        <td>{{ data.properties.vmId }}</td>
+                    </tr>
+                </table>
+                <br>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <th colspan="2">OS Profile</th>
+                    </tr>
+                    <tr>
+                        <th>Admin Username</th>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'],
+                            'value':'{{ data.properties.osProfile.adminUsername }}' }], 0, {{ container.id }}, null, false);">
+                            {{ data.properties.osProfile.adminUsername }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Computer Name</th>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['vm management virtual machine'],
+                            'value':'{{ data.properties.osProfile.computerName }}' }], 0, {{ container.id }}, null, false);">
+                            {{ data.properties.osProfile.computerName }}
+                            &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+                <br>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <th>Network Profile Interfaces</th>
+                    </tr>
+                    {% for i in data.properties.networkProfile.networkInterfaces%}
+                        <tr>
+                            <td>{{ i.id }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+                <br>
+                <table class="wf-table-vertical">
+                    <tr>
+                        <th colspan="2">Storage Profile</th>
+                    </tr>
+                    <tr>
+                        <th>Image Reference Sku</th>
+                        <td>{{ data.properties.storageProfile.imageReference.sku }}</td>
+                    </tr>
+                    <tr>
+                        <th>Image Reference Publisher</th>
+                        <td>{{ data.properties.storageProfile.imageReference.publisher }}</td>
+                    </tr>
+                    <tr>
+                        <th>Image Reference Version</th>
+                        <td>{{ data.properties.storageProfile.imageReference.version }}</td>
+                    </tr>
+                    <tr>
+                        <th>Image Reference Offer</th>
+                        <td>{{ data.properties.storageProfile.imageReference.offer }}</td>
+                    </tr>
+                    <tr>
+                        <th>OS Disk Name</th>
+                        <td>{{ data.properties.storageProfile.osDisk.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>OS Disk Size (GB)</th>
+                        <td>{{ data.properties.storageProfile.osDisk.diskSizeGB }}</td>
+                    </tr>
+                    <tr>
+                        <th>OS Disk Type</th>
+                        <td>{{ data.properties.storageProfile.osDisk.osType }}</td>
+                    </tr>
+                </table>
+
+                {% if data.tags %}
+                    <br>
+                    <table class="wf-table-horizontal">
+                        <tr>
+                            <th>Tag Name</th>
+                            <th>Tag Value</th>
+                        </tr>
+                        {% for key, val in data.tags.items %}
+                        <tr>
+                            <td>{{ key }}</td>
+                            <td>{{ val }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+                <br>
+
+            {% endfor %}
+            <!-- loop for each data end -->
+        {% else %}
+            <h4 class="wf-h4-style">No data found</h4>
+        {% endif %}
+        <!-- loop for each data end -->
+
+    {% endfor %}
+    <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+{% endblock %}
+<!-- Main Start Block -->
