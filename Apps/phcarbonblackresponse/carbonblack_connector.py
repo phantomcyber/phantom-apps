@@ -1180,12 +1180,16 @@ class CarbonblackConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR,
                     "Unable to create temporary folder {0}. {1}".format(temp_dir, error_msg))
 
-            zip_file_path = "{0}/{1}.zip".format(local_dir, file_source)
+            safe_char_file_source = six.moves.urllib.parse.quote_plus(file_source)
+            zip_file_path = "{0}/{1}.zip".format(local_dir, safe_char_file_source)
 
-            # open and download the file
-            with open(zip_file_path, 'wb') as fd:
-                for chunk in response.iter_content(chunk_size=128):
-                    fd.write(chunk)
+            try:
+                # open and download the file
+                with open(zip_file_path, 'wb') as fd:
+                    for chunk in response.iter_content(chunk_size=128):
+                        fd.write(chunk)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while downloading the file")
 
             file_name = file_source.replace('\\\\', '\\')
 
