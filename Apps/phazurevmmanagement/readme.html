@@ -1,0 +1,93 @@
+<!-- File: readme.html
+  Copyright (c) 2019-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<html>
+
+<head></head>
+
+<body>
+  <ul>
+    <li>For an admin user, you can run the test connectivity directly.
+    <li>For a non-admin user, you need to get the admin consent first. This can be done by granting admin consent in the Azure portal.
+  </ul>
+  <h2>Authentication</h2>
+  This app requires creating a Microsoft Graph Application. To do so, navigate to <a href="https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade">https://apps.dev.microsoft.com</a>
+  in a browser and log in with a Microsoft account, then select <b>New registration</b>.
+  <br><br>
+  On the next page, give your application a name and select <b>Register</b>.
+  <br><br>
+  Once the app is created, three steps need to be taken on the next page:
+  <br><br>
+  Under <b>Certificates and Secrets</b>, select <b>New client secret</b>. Note this key somewhere secure, as it
+  cannot be retrieved after closing the window.
+  <br><br>
+  <b>For Interactive OAuth</b>
+  <ul>
+    <li>Under <b>Authentication</b> select <b>Add a platform</b>. In the <b>Add a platform</b> window, select <b>Web</b>. The <b>Redirect
+        URLs</b> should be filled right here. It should look somehting like: </li>
+      <p>
+        https://&lt;phantom_host&gt;/rest/handler/microsoftazurecompute_39c7128b-666b-4a16-9d44-afab6a9b825d/&lt;asset_name&gt;/result
+      </p>
+    <li>Under <b>API permissions</b> the following <b>Delegated Permissions</b> need to be added:
+      <ul>
+        <li>Group.ReadWrite.All</li>
+        <li>offline_access</li>
+        <li>User.ReadWrite.All</li>
+      </ul>
+  </ul>
+  <b>For Non-Interactive OAuth</b>
+  <ul>
+    <li>Under <b>API permissions</b> the following <b>Application Permissions</b> need to be added:
+      <ul>
+        <li>Group.ReadWrite.All</li>
+        <li>User.ReadWrite.All</li>
+      </ul>
+    <li>On the Azure portal, go to subscriptions and select your subscription.</li>
+    <li>Go to Access control(IAM) section and click on add role assignment.</li>
+    <li>Select <b>Contributer</b> in the <b>Role</b> field from the drop down and select your application in the <b>Select</b> field.</li>
+  </ul>
+  After making these changes, click <b>Save</b> at the bottom of the screen.
+  <h2>Configure the Microsoft Azure Compute Phantom app Asset</h2>
+  When creating an asset for the <b>Microsoft Azure Compute</b> app, place <b>Subscription Id</b> of the app in the <b>Subscription ID</b> field,
+  place <b>Application Id</b> of the app created during the previous step in the <b>Client ID</b> field,
+  and place the password generated during the app creation process in the <b>Client Secret</b> field.
+  Then, after filling out the <b>Tenant ID</b> field, click <b>SAVE</b>.
+  <br><br>
+  After saving, a new field will appear in the <b>Asset Settings</b> tab. Take the URL found in the <b>POST incoming
+    for Microsoft Azure Compute to this location</b> field and place it in the <b>Redirect URLs</b> field mentioned in a
+  previous step. To this URL, add <b>/result</b>. After doing so the URL should look something like:
+  <br><br>
+  <p>
+    https://&lt;phantom_host&gt;/rest/handler/microsoftazurecompute_39c7128b-666b-4a16-9d44-afab6a9b825d/&lt;asset_name&gt;/result
+    </p>
+  <br>
+  Once again, click save at the bottom of the screen.
+  <h2>Method to run test connectivity</h2>
+  After setting up the asset and user, click the <b>TEST CONNECTIVITY</b> button. A window should pop up and display a
+  URL. Navigate to this URL in a separate browser tab. This new tab will redirect to a Microsoft login page. Log in to
+  a Microsoft account. After logging in, review the requested permissions listed, then click <b>Accept</b>. Finally,
+  close that tab. The test connectivity window should show a success.<br>
+  If the admin consent is required then, the display url will occur twice. The first one will be for admin access.
+  <br><br>
+  The app should now be ready to be used.
+  <h2>State file permissions</h2>
+  <p>
+    Please check the permissions for the state file as mentioned below.
+    <h4>State file path</h4>
+    <ul>
+      <li>For Non-NRI instance: /opt/phantom/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+      <li>For NRI instance: /&lt;PHANTOM_HOME_DIRECTORY&gt;/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+    </ul>
+    <h4>State file permissions</h4>
+    <ul>
+      <li>File rights: rw-rw-r-- (664) (The phantom user should have read and write access for the state file)</li>
+      <li>File owner: Appropriate phantom user</li>
+    </ul>
+  </p>
+
+</body>
+
+</html>
