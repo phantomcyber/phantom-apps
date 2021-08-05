@@ -169,7 +169,13 @@
                 </tr>
                 <tr>
                     <td>
-                        {{result.data.ip}}
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                     </td>
                     <td>
                         {{result.data.noise}}
@@ -197,7 +203,13 @@
                 </tr>
                 <tr>
                     <td>
-                        {{result.data.ip}}
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                     </td>
                     <td>
                         {{result.data.noise}}
@@ -233,7 +245,13 @@
                 </tr>
                 <tr>
                     <td>
-                        {{result.data.ip}}
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                     </td>
                     <td>
                         {{result.data.noise}}
@@ -286,7 +304,13 @@
                 </tr>
                 <tr>
                     <td>
-                        {{result.data.ip}}
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                     </td>
                     <td>
                         {{result.data.riot}}
@@ -323,7 +347,13 @@
                 </tr>
                 <tr>
                     <td>
-                        {{result.data.ip}}
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                     </td>
                     <td>
                         {{result.data.riot}}
@@ -342,7 +372,13 @@
                 {% for entry in result.data.lookup_ips %}
                     <tr>
                         <td>
-                            {{entry.ip}}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ entry.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{entry.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
                         </td>
                         <td>
                             {{entry.noise}}
@@ -368,7 +404,13 @@
                                         IP
                                     </td>
                                     <td style="width: 80%">
-                                        {{result.data.ip}}
+                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                            'value':'{{ result.data.ip }}' }], 0,
+                                            {{ container.id }}, null, false);">
+                                                {{result.data.ip}}
+                                                &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
                                     </td>
                                 </tr>
                             </table>
@@ -491,7 +533,13 @@
                     </tr>
                     <tr>
                         <td>
-                            {{result.data.ip}}
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                'value':'{{ result.data.ip }}' }], 0,
+                                {{ container.id }}, null, false);">
+                                    {{result.data.ip}}
+                                    &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
                         </td>
                         <td>
                             {{result.data.first_seen}}
@@ -539,7 +587,13 @@
                                                 IP
                                             </td>
                                             <td style="width: 80%">
-                                                {{entry.ip}}
+                                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                                    'value':'{{ entry.ip }}' }], 0,
+                                                    {{ container.id }}, null, false);">
+                                                        {{entry.ip}}
+                                                        &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
                                             </td>
                                         </tr>
                                         <tr>

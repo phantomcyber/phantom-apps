@@ -17,11 +17,11 @@
     "main_module": "greynoise_connector.py",
     "min_phantom_version": "4.9.39220",
     "pip_dependencies": {
-      "pypi": [
-          {
-              "module": "requests"
-          }
-      ]
+        "pypi": [
+            {
+                "module": "requests"
+            }
+        ]
     },
     "configuration": {
         "api_key": {
@@ -66,7 +66,7 @@
                     "description": "IP to query",
                     "data_type": "string",
                     "contains": [
-                      "ip"
+                        "ip"
                     ],
                     "primary": true,
                     "required": true,
@@ -158,7 +158,7 @@
                     "description": "IP to query",
                     "data_type": "string",
                     "contains": [
-                      "ip"
+                        "ip"
                     ],
                     "primary": true,
                     "required": true,
@@ -665,7 +665,7 @@
                     "description": "IP to query",
                     "data_type": "string",
                     "contains": [
-                      "ip"
+                        "ip"
                     ],
                     "primary": true,
                     "required": true,

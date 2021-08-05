@@ -33,11 +33,6 @@ class GreyNoiseConnector(BaseConnector):
         self._app_version = None
         self._api_key = None
 
-    def validate_parameters(self, param):
-        # Disable BaseConnector's validate functionality, since this App supports unicode domains and the
-        # validation routines don't
-        return phantom.APP_SUCCESS
-
     def _get_error_message_from_exception(self, e):
         """This method is used to get appropriate error messages from the exception.
         :param e: Exception object
@@ -138,6 +133,9 @@ class GreyNoiseConnector(BaseConnector):
                     phantom.APP_ERROR,
                     "HTTP error occurred while making REST call: {0}".format(err_msg),
                 )
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error connecting to server. Connection refused from server'
+            ret_val = action_result.set_status(phantom.APP_ERROR, err_msg)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             ret_val = action_result.set_status(
@@ -245,7 +243,7 @@ class GreyNoiseConnector(BaseConnector):
                 phantom.APP_ERROR, "Error occurred while processing API response"
             )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "IP Lookup action successfully completed")
 
     def _riot_lookup_ip(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -282,7 +280,7 @@ class GreyNoiseConnector(BaseConnector):
                 phantom.APP_ERROR, "Error occurred while processing API response"
             )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "RIOT Lookup IP action successfully completed")
 
     def _community_lookup_ip(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -316,7 +314,7 @@ class GreyNoiseConnector(BaseConnector):
                 phantom.APP_ERROR, "Error occurred while processing API response"
             )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "Community Lookup IP action successfully completed")
 
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -348,7 +346,7 @@ class GreyNoiseConnector(BaseConnector):
                 phantom.APP_ERROR, "Error occurred while processing API response"
             )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "IP reputation action successfully completed")
 
     def _gnql_query(self, param, is_poll=False, action_result=None):
         if not is_poll:
@@ -445,7 +443,7 @@ class GreyNoiseConnector(BaseConnector):
         if is_poll:
             return ret_val, result_data
         else:
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS, "GNQL Query action successfully completed")
 
     def _lookup_ips(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -493,7 +491,7 @@ class GreyNoiseConnector(BaseConnector):
                 result["visualization"] = VISUALIZATION_URL.format(ip=result["ip"])
                 result_data.append(result)
 
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS, "Lookup IPs action successfully completed")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             err_msg = "Error occurred while processing results: {0}".format(err)
