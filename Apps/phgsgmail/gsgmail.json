@@ -1,0 +1,797 @@
+{
+    "appid": "9c73f233-2c4a-406a-855e-41d8d2497d0e",
+    "name": "G Suite for GMail",
+    "logo": "logo_google.svg",
+    "logo_dark": "logo_google_dark.svg",
+    "description": "Integrates with G Suite for various investigative and containment actions",
+    "publisher": "Splunk",
+    "type": "email",
+    "main_module": "gsgmail_connector.py",
+    "package_name": "phantom_gsgmail",
+    "product_vendor": "Google",
+    "product_name": "GMail",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, June 7, 2021"
+    ],
+    "app_version": "2.1.6",
+    "product_version_regex": ".*",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "utctime_updated": "2021-06-14T14:47:53.000000Z",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa-4.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.9.2-py2-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google_auth-1.11.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools/cachetools-2.0.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/googleapiclient_wheel/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip3_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa_wheel/rsa-4.7.2-py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.19.1-py3-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google-auth/google_auth-1.30.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-4.0.0-py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/google-api-python-client-1.7.11.tar.gz"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "login_email": {
+            "required": true,
+            "description": "Login (Admin) email",
+            "data_type": "string",
+            "order": 0
+        },
+        "key_json": {
+            "required": true,
+            "description": "Contents of Service Account JSON file",
+            "data_type": "password",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "description": "Get the list of users",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul><br>The action will limit the number of users returned to <b>max_items</b> or (if not specified) 500. If the system has any more users, a next page token will be returned in <b>action_result.summary.next_page_token</b>. Use this value as input to <b>page_token</b> in subsequent calls to <b>list users</b>.",
+            "type": "investigate",
+            "identifier": "get_users",
+            "read_only": true,
+            "render": {
+                "width": 2,
+                "height": 5,
+                "type": "custom",
+                "title": "List Users",
+                "view": "gsgmail_view.list_users"
+            },
+            "parameters": {
+                "max_items": {
+                    "description": "Max users to get (max 500)",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "Token to specify next page in list",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gsuite page token"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_items",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "contains": [
+                        "gsuite page token"
+                    ],
+                    "example_values": [
+                        "0a38f80195e2ffffffff9c9e8c8c9e919b8d9ed19c9e9691bf979a8d929e919c908d8fd19d9685ff00fefffecccfc9c7c6c6c8c7ccc8c7cbfffe100221b346550b02f34e6639000000001d6afe00480150005a0b09f1d40ed2266dadd0100360f4b2c2bc03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agreedToTerms",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.archived",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.changePasswordAtNextLogin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.customerId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.address",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.includeInGlobalAddressList",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipWhitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isAdmin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isDelegatedAdmin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isEnforcedIn2Sv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isEnrolledIn2Sv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isMailboxSetup",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.kind",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.lastLoginTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.fullName",
+                    "data_type": "string",
+                    "column_name": "Full Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name.givenName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.nonEditableAliases",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUnitPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phones.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phones.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "9898989898"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryEmail",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Primary Email",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.recoveryEmail",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.suspended",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.next_page_token",
+                    "data_type": "string",
+                    "contains": [
+                        "gsuite page token"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users_returned",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 10 users"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "Search emails with query/filtering options",
+            "verbose": "Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter).<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul><br>If none of the filtering parameters are specified the action will return all emails in the mailbox. If the <b>query</b> parameter is specified, all other filtering parameters are ignored.<br>The query parameter uses the same filtering options (operators) as the GMail search box. A brief description of these can be found <a href=\"https://support.google.com/mail/answer/7190?hl=en\">at this link</a>.<br>To page through results, execute the action without a <b>page_token</b> parameter and a valid <b>max_results</b> value. If the query matches more than <b>max_results</b>, the action will return a value in the <b>action_result.summary.next_page_token</b> data path. This value should be used as the input value to the <b>page_token</b> parameter in the next call to <b>run query</b> to get the next set of results.",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "description": "User's Email (Mailbox to search in)",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "label": {
+                    "description": "Label (to search in)",
+                    "data_type": "string",
+                    "order": 1,
+                    "default": "Inbox",
+                    "contains": [
+                        "gmail label"
+                    ],
+                    "primary": true
+                },
+                "subject": {
+                    "description": "Substring to search in Subject",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "sender": {
+                    "description": "Sender Email address to match",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 3,
+                    "primary": true
+                },
+                "body": {
+                    "description": "Substring to search in Body",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "internet_message_id": {
+                    "description": "Internet Message ID",
+                    "data_type": "string",
+                    "order": 5,
+                    "primary": true,
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                "query": {
+                    "description": "Gmail Query string",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "max_results": {
+                    "description": "Max Results",
+                    "data_type": "numeric",
+                    "order": 7,
+                    "default": 100
+                },
+                "page_token": {
+                    "description": "Next page token",
+                    "data_type": "string",
+                    "order": 8
+                }
+            },
+            "render": {
+                "width": 12,
+                "title": "Run Query",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.body",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mail content"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.internet_message_id",
+                    "data_type": "string",
+                    "contains": [
+                        "internet message id"
+                    ],
+                    "example_values": [
+                        "<EgJbSMFdx8wUfrVUc7r7Jg@notifications.google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail label"
+                    ],
+                    "example_values": [
+                        "Inbox"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "0a38f80195e2ffffffff9c9e8c8c9e919b8d9ed19c9e9691bf979a8d929e919c908d8fd19d9685ff00fefffecccfc9c7c6c6c8c7ccc8c7cbfffe100221b346550b02f34e6639000000001d6afe00480150005a0b09f1d40ed2266dadd0100360f4b2c2bc03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "in:sent after:1388552400"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "no-reply@accounts.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Password reset"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.delivered_to",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "From",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.historyId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Email ID",
+                    "contains": [
+                        "gmail email id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internalDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labelIds",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message_id",
+                    "data_type": "string",
+                    "column_order": 4,
+                    "column_name": "Internet Message ID",
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sizeEstimate",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.snippet",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.threadId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "To",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.next_page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "01274238709826297998"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_messages_returned",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total messages returned: 20"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete email",
+            "description": "Delete emails",
+            "type": "contain",
+            "verbose": "Action uses the GMail API. Requires authorization with the following scope:<ul><li>https://mail.google.com/</li></ul>",
+            "read_only": false,
+            "identifier": "delete_email",
+            "render": {
+                "width": 12,
+                "title": "Delete Email",
+                "type": "table",
+                "height": 5
+            },
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Message IDs to delete(Comma seperated IDs allowed)",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "primary": true,
+                    "allow_list": true,
+                    "order": 0
+                },
+                "email": {
+                    "required": true,
+                    "description": "Email of the mailbox owner",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Email ID",
+                    "column_order": 0,
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.deleted_emails",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ignored_ids",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "All the provided emails were already deleted"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
