@@ -67,8 +67,8 @@ class GreyNoiseConnector(BaseConnector):
 
         return error_text
 
-    def _validate_integer(self, action_result, parameter, key):
-        if parameter:
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        if parameter is not None:
             try:
                 if not float(parameter).is_integer():
                     return (
@@ -94,6 +94,8 @@ class GreyNoiseConnector(BaseConnector):
                     ),
                     None,
                 )
+            if not allow_zero and parameter == 0:
+                return (action_result.set_status(phantom.APP_ERROR, NON_NEG_NON_ZERO_INT_MSG.format(key=key)), None)
 
         return phantom.APP_SUCCESS, parameter
 

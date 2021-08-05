@@ -37,6 +37,7 @@ ONPOLL_SIZE_CONFIG_PARAM = "'on_poll_size' config parameter"
 # Integer validation constants
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {key}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-negative integer value in the {key}"
+NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in {key}"
 
 # exception handling
 ERR_CODE_MSG = "Error code unavailable"

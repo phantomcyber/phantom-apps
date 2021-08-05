@@ -16,13 +16,6 @@
     "package_name": "phantom_greynoise",
     "main_module": "greynoise_connector.py",
     "min_phantom_version": "4.9.39220",
-    "pip_dependencies": {
-        "pypi": [
-            {
-                "module": "requests"
-            }
-        ]
-    },
     "configuration": {
         "api_key": {
             "description": "API Key for GreyNoise",
