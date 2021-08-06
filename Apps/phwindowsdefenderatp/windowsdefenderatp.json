@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.1.1",
+    "app_version": "3.2.0",
     "utctime_updated": "2021-06-03T01:11:07.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
@@ -65,7 +65,7 @@
         {
             "action": "quarantine device",
             "description": "Quarantine the device",
-            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>The maximum timeout period for a status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>For parameter <i>type</i>, <b>&quotFull&quot</b> will completely quarantine the device while <b>&quotSelective&quot</b> will allow Skype and Outlook to be accessed.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
             "identifier": "quarantine_device",
             "read_only": false,
@@ -106,11 +106,18 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "selective quarantine",
-                        "test"
+                        "selective quarantine"
                     ],
                     "column_name": "Comment",
                     "column_order": 2
@@ -119,8 +126,7 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
                     "example_values": [
-                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768",
-                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
                     ],
                     "contains": [
                         "sha1"
@@ -132,7 +138,6 @@
                     "data_path": "action_result.parameter.timeout",
                     "data_type": "numeric",
                     "example_values": [
-                        30,
                         130
                     ]
                 },
@@ -140,7 +145,6 @@
                     "data_path": "action_result.parameter.type",
                     "data_type": "string",
                     "example_values": [
-                        "Selective",
                         "Full"
                     ],
                     "column_name": "Quarantine Type",
@@ -179,7 +183,6 @@
                     "data_path": "action_result.data.*.creationDateTimeUtc",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-10T12:30:33.8322656Z",
                         "2019-05-03T08:50:05.8076226Z"
                     ]
                 },
@@ -259,9 +262,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "Succeeded",
-                        "InProgress",
-                        "Pending"
+                        "Succeeded"
                     ],
                     "column_name": "Quarantine Status",
                     "column_order": 5
@@ -274,14 +275,6 @@
                     ],
                     "column_name": "Event Type",
                     "column_order": 4
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.event_id",
@@ -297,7 +290,6 @@
                     "data_path": "action_result.summary.quarantine_status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
                         "Pending"
                     ]
                 },
@@ -331,7 +323,7 @@
         {
             "action": "unquarantine device",
             "description": "Unquarantine the device",
-            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "correct",
             "identifier": "unquarantine_device",
             "read_only": false,
@@ -361,11 +353,18 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
-                        "unquarantine the device",
-                        "test"
+                        "unquarantine the device"
                     ],
                     "column_name": "Comment",
                     "column_order": 1
@@ -498,7 +497,6 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
                         "Pending"
                     ],
                     "column_name": "Unquarantine Status",
@@ -512,14 +510,6 @@
                     ],
                     "column_name": "Event Type",
                     "column_order": 3
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.event_id",
@@ -584,6 +574,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.event_id",
                     "data_type": "string",
@@ -750,19 +748,10 @@
                     "data_path": "action_result.data.*.type",
                     "data_type": "string",
                     "example_values": [
-                        "RunAntiVirusScan",
-                        "Isolate"
+                        "RunAntiVirusScan"
                     ],
                     "column_name": "Event Type",
                     "column_order": 1
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
                 },
                 {
                     "data_path": "action_result.summary.event_status",
@@ -801,7 +790,7 @@
         {
             "action": "scan device",
             "description": "Scan a device for virus",
-            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 hour.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 hour.",
             "type": "investigate",
             "identifier": "scan_device",
             "read_only": true,
@@ -841,6 +830,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
@@ -995,8 +992,7 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "InProgress",
-                        "Pending"
+                        "InProgress"
                     ],
                     "column_name": "Scan Status",
                     "column_order": 3
@@ -1006,14 +1002,6 @@
                     "data_type": "string",
                     "example_values": [
                         "RunAntiVirusScan"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
                     ]
                 },
                 {
@@ -1063,7 +1051,7 @@
         {
             "action": "quarantine file",
             "description": "Quarantine a file",
-            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
+            "verbose": "This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "contain",
             "identifier": "quarantine_file",
             "read_only": false,
@@ -1103,6 +1091,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
                     "example_values": [
@@ -1139,7 +1135,6 @@
                     "data_path": "action_result.parameter.timeout",
                     "data_type": "numeric",
                     "example_values": [
-                        30,
                         125
                     ]
                 },
@@ -1310,14 +1305,6 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -1407,6 +1394,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
                     "example_values": [
@@ -1448,7 +1443,6 @@
                     "data_path": "action_result.data.*.agentVersion",
                     "data_type": "string",
                     "example_values": [
-                        "10.4850.17134.1",
                         "10.5850.17763.404"
                     ]
                 },
@@ -1456,8 +1450,7 @@
                     "data_path": "action_result.data.*.computerDnsName",
                     "data_type": "string",
                     "example_values": [
-                        "desktop-ph2a1ro",
-                        "desktop-hq2fctd"
+                        "desktop-ph2a1ro"
                     ],
                     "contains": [
                         "domain"
@@ -1516,7 +1509,6 @@
                     "data_path": "action_result.data.*.lastExternalIpAddress",
                     "data_type": "string",
                     "example_values": [
-                        "203.88.139.34",
                         "204.107.141.240"
                     ],
                     "contains": [
@@ -1529,7 +1521,6 @@
                     "data_path": "action_result.data.*.lastIpAddress",
                     "data_type": "string",
                     "example_values": [
-                        "10.0.1.87",
                         "10.1.66.140"
                     ],
                     "contains": [
@@ -1556,7 +1547,6 @@
                     "data_path": "action_result.data.*.osBuild",
                     "data_type": "numeric",
                     "example_values": [
-                        17134,
                         17763
                     ]
                 },
@@ -1613,14 +1603,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_devices",
                     "data_type": "numeric",
                     "example_values": [
@@ -1657,7 +1639,7 @@
         {
             "action": "list alerts",
             "description": "List all alerts of a given type",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 devices by default.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/get-alerts\" target=\"_blank\">List Alerts API Documentation</a>), the user can get alerts last updated in the past 30 days; the maximum page size is 10,000; rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 alerts by default.",
             "type": "investigate",
             "identifier": "list_alerts",
             "read_only": true,
@@ -1696,6 +1678,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.input",
                     "data_type": "string",
                     "example_values": [
@@ -1715,10 +1705,7 @@
                     "data_path": "action_result.parameter.input_type",
                     "data_type": "string",
                     "example_values": [
-                        "All",
-                        "Domain",
-                        "File Hash",
-                        "IP"
+                        "All"
                     ]
                 },
                 {
@@ -1739,33 +1726,25 @@
                     "data_path": "action_result.data.*.alertCreationTime",
                     "data_type": "string",
                     "example_values": [
-                        "2018-07-06T06:14:57.3215921Z",
                         "2019-05-03T01:20:51.8699882Z"
-                    ],
-                    "column_name": "Creation Time",
-                    "column_order": 7
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.assignedTo",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@example.com",
-                        "Automation"
+                        "testuser@example.com"
                     ],
                     "contains": [
                         "email"
-                    ],
-                    "column_name": "Assigned To",
-                    "column_order": 8
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.category",
                     "data_type": "string",
                     "example_values": [
                         "General"
-                    ],
-                    "column_name": "Category",
-                    "column_order": 6
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.classification",
@@ -1800,9 +1779,7 @@
                     "data_type": "string",
                     "example_values": [
                         "win10atp1"
-                    ],
-                    "column_name": "Computer DNS Name",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.description",
@@ -1834,9 +1811,7 @@
                     "data_type": "string",
                     "example_values": [
                         "636924432519012302_1685044642"
-                    ],
-                    "column_name": "Alert ID",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.incidentId",
@@ -1902,51 +1877,33 @@
                     "data_type": "string",
                     "example_values": [
                         "Informational"
-                    ],
-                    "column_name": "Severity",
-                    "column_order": 5
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
                         "Resolved"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 4
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.threatFamilyName",
                     "data_type": "string",
                     "example_values": [
-                        "EICAR_Test_File",
                         "Fuery"
-                    ],
-                    "column_name": "Threat Family",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
                         "Windows Defender AV detected 'Fuery' malware"
-                    ],
-                    "column_name": "Title",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.total_alerts",
                     "data_type": "numeric",
                     "example_values": [
-                        7,
                         12
                     ]
                 },
@@ -1973,7 +1930,11 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.display_alerts",
+                "title": "Get Report"
             },
             "versions": "EQ(*)"
         },
@@ -1997,6 +1958,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "string",
@@ -2070,10 +2039,7 @@
                         false
                     ],
                     "column_name": "Domain Admin",
-                    "column_order": 4,
-                    "contains": [
-                        "domain"
-                    ]
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.isOnlyNetworkUser",
@@ -2114,14 +2080,6 @@
                     "data_type": "string",
                     "contains": [
                         "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
                     ]
                 },
                 {
