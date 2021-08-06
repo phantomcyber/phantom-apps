@@ -3772,7 +3772,7 @@
                       "RunShellScript"
                     ],
                     "column_name": "Command Id",
-                    "column_order": 3
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.script",
@@ -3784,7 +3784,7 @@
                       "echo $arg1 $arg2"
                     ],
                     "column_name": "Script",
-                    "column_order": 4
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.script_parameters",
@@ -3796,7 +3796,7 @@
                       "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
                     ],
                     "column_name": "Parameters",
-                    "column_order": 5
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
@@ -3808,7 +3808,7 @@
                         "sample_vm_group"
                     ],
                     "column_name": "Resource Group Name",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -3820,7 +3820,7 @@
                         "sample_vm"
                     ],
                     "column_name": "VM Name",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data",
@@ -3868,7 +3868,7 @@
                         "Successfully executed command"
                     ],
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -3901,7 +3901,7 @@
             "action": "get results",
             "identifier": "get_results",
             "description": "Fetch the results of a previously executed run_command action",
-            "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command",
+            "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command for more information.",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -3916,7 +3916,7 @@
                     "contains": [
                         "vm management results url"
                     ],
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
@@ -3938,7 +3938,7 @@
                       "vm management results url"
                     ],
                     "column_name": "Results URL",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data",
@@ -3984,7 +3984,7 @@
                         "Successfully executed command"
                     ],
                     "column_name": "Status",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",

@@ -1620,22 +1620,22 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
         vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
-        script = None
-        script_parameters = None
+        script = param.get('script')
+        script_parameters = param.get('script_parameters')
 
         # If script or parameters were provided, ensure they are both wrapped inside a list to be accepted by Azure
-        if param.get('script'):
+        if script:
             try:
-                script_json = json.loads(param['script'])
+                script_json = json.loads(script)
             except ValueError:
                 # If param['script'] is not JSON then treat it as a regular string
-                script = [param['script']]
+                script = [script]
             else:
                 if not isinstance(script_json, list):
                     script = [script_json]
-        if param.get('script_parameters'):
+        if script_parameters:
             try:
-                script_param_json = json.loads(param['script_parameters'])
+                script_param_json = json.loads(script_parameters)
             except ValueError:
                 return action_result.set_status(phantom.APP_ERROR, "'script_parameters' input is not a JSON dictionary")
             else:
