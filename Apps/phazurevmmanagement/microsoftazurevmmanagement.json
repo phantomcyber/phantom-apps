@@ -3763,42 +3763,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.command_id",
-                    "data_type": "string",
-                    "contains": [
-                      "vm management command id"
-                    ],
-                    "example_values": [
-                      "RunShellScript"
-                    ],
-                    "column_name": "Command Id",
-                    "column_order": 4
-                },
-                {
-                    "data_path": "action_result.parameter.script",
-                    "data_type": "string",
-                    "contains": [
-                      "vm management script"
-                    ],
-                    "example_values": [
-                      "echo $arg1 $arg2"
-                    ],
-                    "column_name": "Script",
-                    "column_order": 5
-                },
-                {
-                    "data_path": "action_result.parameter.script_parameters",
-                    "data_type": "string",
-                    "contains": [
-                      "vm management parameters"
-                    ],
-                    "example_values": [
-                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
-                    ],
-                    "column_name": "Parameters",
-                    "column_order": 6
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -3808,7 +3772,7 @@
                         "sample_vm_group"
                     ],
                     "column_name": "Resource Group Name",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.vm_name",
@@ -3820,7 +3784,43 @@
                         "sample_vm"
                     ],
                     "column_name": "VM Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.command_id",
+                    "data_type": "string",
+                    "contains": [
+                      "vm management command id"
+                    ],
+                    "example_values": [
+                      "RunShellScript"
+                    ],
+                    "column_name": "Command Id",
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.script",
+                    "data_type": "string",
+                    "contains": [
+                      "vm management script"
+                    ],
+                    "example_values": [
+                      "echo $arg1 $arg2"
+                    ],
+                    "column_name": "Script",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.script_parameters",
+                    "data_type": "string",
+                    "contains": [
+                      "vm management parameters"
+                    ],
+                    "example_values": [
+                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
+                    ],
+                    "column_name": "Parameters",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data",
@@ -3868,7 +3868,7 @@
                         "Successfully executed command"
                     ],
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
@@ -3916,7 +3916,7 @@
                     "contains": [
                         "vm management results url"
                     ],
-                    "order": 1
+                    "order": 0
                 }
             },
             "output": [
@@ -3938,7 +3938,7 @@
                       "vm management results url"
                     ],
                     "column_name": "Results URL",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data",
@@ -3984,7 +3984,7 @@
                         "Successfully executed command"
                     ],
                     "column_name": "Status",
-                    "column_order": 1
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
