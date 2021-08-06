@@ -526,8 +526,10 @@ class CarbonblackConnector(BaseConnector):
                 desc=resp.get('result_desc', 'Not Specified'))
             if result_code == 2147942480:
                 msg = CARBONBLACK_ERR_FILE_EXISTS + msg
-            if result_code == 2147942403:
+            elif result_code == 2147942403:
                 msg = "Windows cannot find specified path " + msg
+            elif result_code == 2147942417:
+                msg = "Please check if the destination filename already exists at the specified path " + msg
             return (action_result.set_status(phantom.APP_ERROR, msg), resp)
 
         return (phantom.APP_SUCCESS, resp)
