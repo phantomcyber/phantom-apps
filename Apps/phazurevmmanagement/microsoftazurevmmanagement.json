@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.0.12",
-    "utctime_updated": "2021-05-04T23:03:22.000000Z",
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-08-06T12:17:02.000000Z",
     "package_name": "phantom_microsoftazurecompute",
     "main_module": "microsoftazurevmmanagement_connector.py",
     "python_version": "3",
@@ -3698,6 +3698,9 @@
                     "contains": [
                         "vm management resource group"
                     ],
+                    "example_values": [
+                        "sample_vm_group"
+                    ],
                     "order": 0
                 },
                 "vm_name": {
@@ -3708,13 +3711,46 @@
                     "contains": [
                         "vm management virtual machine"
                     ],
+                    "example_values": [
+                        "sample_vm"
+                    ],
                     "order": 1
                 },
-                "body": {
-                    "description": "The request body in JSON format. 'commandId' is required",
+                "command_id": {
+                    "description": "The command to run against the VM",
+                    "contains": [
+                      "vm management command id"
+                    ],
+                    "example_values": [
+                      "RunShellScript"
+                    ],
                     "data_type": "string",
                     "required": true,
                     "order": 2
+                },
+                "script": {
+                    "description": "The script to be executed. When this value is given, the given script will override the default script of the command",
+                    "contains": [
+                      "vm management script"
+                    ],
+                    "example_values": [
+                      "echo $arg1 $arg2"
+                    ],
+                    "data_type": "string",
+                    "required": false,
+                    "order": 3
+                },
+                "script_parameters": {
+                  "description": "The run command parameters",
+                  "contains": [
+                    "vm management parameters"
+                  ],
+                  "example_values": [
+                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
+                  ],
+                  "data_type": "string",
+                  "required": false,
+                  "order": 4
                 }
             },
             "output": [
@@ -3727,13 +3763,40 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.body",
+                    "data_path": "action_result.parameter.command_id",
                     "data_type": "string",
-                    "example_values": [
-                        "{   \"commandId\": \"ipconfig\" }"
+                    "contains": [
+                      "vm management command id"
                     ],
-                    "column_name": "Body",
+                    "example_values": [
+                      "RunShellScript"
+                    ],
+                    "column_name": "Command Id",
                     "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.script",
+                    "data_type": "string",
+                    "contains": [
+                      "vm management script"
+                    ],
+                    "example_values": [
+                      "echo $arg1 $arg2"
+                    ],
+                    "column_name": "Script",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.script_parameters",
+                    "data_type": "string",
+                    "contains": [
+                      "vm management parameters"
+                    ],
+                    "example_values": [
+                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
+                    ],
+                    "column_name": "Parameters",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
@@ -3742,7 +3805,7 @@
                         "vm management resource group"
                     ],
                     "example_values": [
-                        "test"
+                        "sample_vm_group"
                     ],
                     "column_name": "Resource Group Name",
                     "column_order": 1
@@ -3754,7 +3817,7 @@
                         "vm management virtual machine"
                     ],
                     "example_values": [
-                        "unmanagedVM"
+                        "sample_vm"
                     ],
                     "column_name": "VM Name",
                     "column_order": 2
@@ -3762,6 +3825,157 @@
                 {
                     "data_path": "action_result.data",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.results_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                      "ComponentStatus/StdOut/succeeded",
+                      "ComponentStatus/StdErr/succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.level",
+                    "data_type": "string",
+                    "example_values": [
+                      "Info",
+                      "Error",
+                      "Warning"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.displayStatus",
+                    "data_type": "string",
+                    "example_values": [
+                      "Provisioning succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully executed command"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully executed command"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get results",
+            "identifier": "get_results",
+            "description": "Fetch the results of a previously executed run_command action",
+            "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "results_url": {
+                    "description": "The name of the resource group",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "example_values": [
+                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                    ],
+                    "contains": [
+                        "vm management results url"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.results_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                    ],
+                    "contains": [
+                      "vm management results url"
+                    ],
+                    "column_name": "Results URL",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.results_url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                      "ComponentStatus/StdOut/succeeded",
+                      "ComponentStatus/StdErr/succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.level",
+                    "data_type": "string",
+                    "example_values": [
+                      "Info"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.results.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.displayStatus",
+                    "data_type": "string",
+                    "example_values": [
+                      "Provisioning succeeded"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.status",

@@ -568,6 +568,87 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, resp_json
 
+    def _make_redirect_call(self, endpoint, action_result, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+        """ Function that handles instances where a redirect may be required.
+        Default timeout for following the redirect location is 60 seconds.
+
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param action_result: object of ActionResult class
+        :param headers: request headers
+        :param params: request parameters
+        :param data: request body
+        :param json: JSON object
+        :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
+        :param verify: verify server certificate (Default True)
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message), response, result_location
+        """
+
+        url = "{0}{1}".format(MS_BASE_URL.format(subscriptionId=self._subscription), endpoint)
+        if (headers is None):
+            headers = {}
+
+        token = self._state.get('token', {})
+        if not token.get('access_token'):
+            ret_val = self._get_token(action_result)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+        headers.update({
+                'Authorization': 'Bearer {0}'.format(self._access_token),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'})
+
+        try:
+            request_func = getattr(requests, method)
+        except AttributeError:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json, None
+
+        if self._python_version == 2:
+            url = url.decode('utf-8')
+
+        try:
+            r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), r.text, None
+
+        if r.text and ('token is invalid' in r.text or 'Access token has expired' in r.text or 'ExpiredAuthenticationToken' in r.text or 'AuthenticationFailed' in r.text):
+            ret_val = self._get_token(action_result)
+            headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+
+            r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+
+        # Azure returns a status code 202 for Run Command if there is an Asyncronous Operation running
+        if r.status_code == 202:
+            # Headers for the response store the AsyncOperation url which is used to track the operation status.
+            # The Location field stores the results of the command when it is finished running
+            request_func = getattr(requests, "get")
+            operation_status = r.headers.get('Azure-AsyncOperation')
+            location_url = r.headers.get('Location')
+            if operation_status:
+                status = "InProgress"
+                count = 0
+                # It can take some time for the results to be ready.
+                # A default count of 60 seconds is provided to check results.
+                while count < 20 or (status and status == "InProgress"):
+                    time.sleep(3)
+                    resp_json = request_func(operation_status, headers=headers, verify=verify).json()
+                    status = resp_json.get('status')
+                    count += 1
+                r = request_func(location_url, headers=headers, verify=verify)
+                ret_val, response = self._process_response(r, action_result)
+                return ret_val, response, location_url
+        elif r.status_code == 200:
+            ret_val, response = self._process_response(r, action_result)
+            return ret_val, response, None
+        else:
+            message = "Can't process response from server. {0}".format(
+                MS_AZURE_ERR_MSG.format(status_code=r.status_code,
+                err_msg=self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}'))))
+
+        return action_result.set_status(phantom.APP_ERROR, message), resp_json, None
+
     def _get_admin_access(self, action_result, app_rest_url, app_state):
         """ This function is used to get admin access for given credentials.
 
@@ -1539,26 +1620,107 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
         vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        script = None
+        script_parameters = None
 
-        try:
-            body = json.loads(param.get('body', {}))
-        except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+        # If script or parameters were provided, ensure they are both wrapped inside a list to be accepted by Azure
+        if param.get('script'):
+            try:
+                script_json = json.loads(param['script'])
+            except ValueError:
+                # If param['script'] is not JSON then treat it as a regular string
+                script = [param['script']]
+            else:
+                if not isinstance(script_json, list):
+                    script = [script_json]
+        if param.get('script_parameters'):
+            try:
+                script_param_json = json.loads(param['script_parameters'])
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR, "'script_parameters' input is not a JSON dictionary")
+            else:
+                if not isinstance(script_param_json, list):
+                    script_parameters = [script_param_json]
+
+        data = {"commandId": param['command_id'], "script": script, "parameters": script_parameters}
 
         # make rest call
         endpoint = VM_RUN_COMMAND_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name)
-        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='post')
+        ret_val, response, results_url = self._make_redirect_call(endpoint, action_result, params=None, headers=None, json=data, method='post')
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        # Add the response into the data section
-        action_result.add_data(response)
+        # Add a cleaner response into the data section
+        if isinstance(response, list):
+            data = {'results_url': results_url, 'results': [item for item in response]}
+            for index, result in enumerate(data['results']):
+                if result.get('message'):
+                    try:
+                        message_json = json.loads(result.get('message'))
+                    except Exception as e:
+                        self.debug_print("No json data in results message: {}".format(e))
+                    else:
+                        data['results'][index]['message'] = message_json
+            action_result.add_data(data)
+        else:
+            data = {'results_url': results_url, 'results': response}
+            action_result.add_data(data)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['status'] = "Successfully executed command"
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_results(self, param):
+        """ This function is used to handle the get run command results action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+
+        """
+        # Implement the handler here
+        # use self.save_progress(...) to send progress messages back to the platform
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        results_url = param['results_url']
+        # Capture information from param results_url and ensure that the subscription id matches the asset
+        pattern = re.compile(r'https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)')
+        subscription_id, endpoint = re.search(pattern, results_url).groups()
+
+        if subscription_id != self._subscription:
+            return RetVal(action_result.set_status(phantom.APP_ERROR,
+                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset"),
+                None)
+
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='get')
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # Add a cleaner response into the data section
+        if isinstance(response, list):
+            data = {'results_url': results_url, 'results': [item for item in response]}
+            for index, result in enumerate(data['results']):
+                if result.get('message'):
+                    try:
+                        message_json = json.loads(result.get('message'))
+                    except Exception as e:
+                        self.debug_print("No json data in results message: {}".format(e))
+                    else:
+                        data['results'][index]['message'] = message_json
+            action_result.add_data(data)
+        else:
+            data = {'results_url': results_url, 'results': response}
+            action_result.add_data(data)
+
+        summary = action_result.update_summary({})
+        summary['status'] = "Succesfully executed command"
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1717,6 +1879,9 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         elif action_id == 'run_command':
             ret_val = self._handle_run_command(param)
+
+        elif action_id == 'get_results':
+            ret_val = self._handle_get_results(param)
 
         elif action_id == 'generate_token':
             ret_val = self._handle_generate_token(param)
