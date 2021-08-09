@@ -11,8 +11,8 @@
     "product_version_regex": ".*",
     "publisher": "Cofense",
     "license": "Copyright (c) 2021 Cofense",
-    "app_version": "1.0.1",
-    "utctime_updated": "2021-03-16T05:44:39.732882Z",
+    "app_version": "1.0.3",
+    "utctime_updated": "2021-08-09T11:10:51.000000Z",
     "package_name": "phantom_cofensetriagev2",
     "main_module": "cofensetriagev2_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -2122,7 +2122,7 @@
         },
         {
             "action": "get responses",
-            "description": "Retrieve responses from the Cofense Triage Platform",
+            "description": "Retrieve responses from the Cofense Triage Platform. This action is supported for Cofense Triage with version older than 1.23",
             "type": "investigate",
             "identifier": "get_responses",
             "read_only": true,
@@ -2338,7 +2338,7 @@
         },
         {
             "action": "create response",
-            "description": "Create a response",
+            "description": "Create a response. This action is supported for Cofense Triage with version older than 1.23",
             "type": "generic",
             "identifier": "create_response",
             "read_only": false,
@@ -2385,7 +2385,6 @@
                         "email"
                     ],
                     "primary": true,
-                    "default": false,
                     "order": 6
                 },
                 "attach_original": {
