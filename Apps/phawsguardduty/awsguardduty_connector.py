@@ -988,6 +988,14 @@ class AwsGuarddutyConnector(BaseConnector):
             return self.get_status()
 
         self._filter_name = config.get('filter_name')
+        self._region = AWSGUARDDUTY_REGION_DICT.get(config[AWSGUARDDUTY_JSON_REGION])
+
+        self._proxy = {}
+        env_vars = config.get('_reserved_environment_variables', {})
+        if 'HTTP_PROXY' in env_vars:
+            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
+        if 'HTTPS_PROXY' in env_vars:
+            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
 
         if config.get('use_role'):
             credentials = self._handle_get_ec2_role()
@@ -1004,15 +1012,6 @@ class AwsGuarddutyConnector(BaseConnector):
 
         if not (self._access_key and self._secret_key):
             return self.set_status(phantom.APP_ERROR, AWSGUARDDUTY_BAD_ASSET_CONFIG_ERR_MSG)
-
-        self._region = AWSGUARDDUTY_REGION_DICT.get(config[AWSGUARDDUTY_JSON_REGION])
-
-        self._proxy = {}
-        env_vars = config.get('_reserved_environment_variables', {})
-        if 'HTTP_PROXY' in env_vars:
-            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
-        if 'HTTPS_PROXY' in env_vars:
-            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
 
         return phantom.APP_SUCCESS
 
