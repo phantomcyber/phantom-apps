@@ -1,0 +1,521 @@
+{
+    "appid": "1545cc79-cd8f-47ca-99e3-c60c4bbaf532",
+    "name": "Watson - Language Translator V3",
+    "description": "Leverage IBM Watson for language translation using API version V3",
+    "type": "information",
+    "product_vendor": "IBM",
+    "logo": "logo_ibmwatson.svg",
+    "logo_dark": "logo_ibmwatson_dark.svg",
+    "product_name": "Watson Language Translator V3",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-08-02T06:35:57.737531Z",
+    "package_name": "phantom_watsonlanguagev3",
+    "main_module": "watsonv3_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "latest_tested_versions": [
+        "Cloud, API Watson V3 tested on August 04, 2021"
+    ],
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Watson URL",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": false,
+            "order": 1
+        },
+        "api_key": {
+            "description": "Watson API key",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "version": {
+            "description": "Watson current API version (YYYY-MM-DD)",
+            "data_type": "string",
+            "default": "2018-05-01",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get language",
+            "identifier": "get_language",
+            "description": "Identifies the language of a given body of text",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "text": {
+                    "description": "Text to identify",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Il s'agit d'un nouveau test",
+                        "Bonjour comment allez-vous"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.confidence",
+                    "data_type": "numeric",
+                    "column_name": "Confidence",
+                    "column_order": 1,
+                    "example_values": [
+                        0.836794
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.language",
+                    "data_type": "string",
+                    "column_name": "Language",
+                    "column_order": 0,
+                    "contains": [
+                        "language"
+                    ],
+                    "example_values": [
+                        "fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.languages.*.confidence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0.995919
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.languages.*.language",
+                    "data_type": "string",
+                    "example_values": [
+                        "fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.high_confidence_match",
+                    "data_type": "string",
+                    "contains": [
+                        "language"
+                    ],
+                    "example_values": [
+                        "fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_languages",
+                    "data_type": "numeric",
+                    "example_values": [
+                        62
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "High confidence match: fr, Total languages: 62"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list languages",
+            "identifier": "list_languages",
+            "description": "List languages that can be used for translation",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.language",
+                    "data_type": "string",
+                    "column_name": "Language",
+                    "column_order": 1,
+                    "contains": [
+                        "language"
+                    ],
+                    "example_values": [
+                        "fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0,
+                    "example_values": [
+                        "French"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_languages",
+                    "data_type": "numeric",
+                    "example_values": [
+                        62
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total languages: 62"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list translations",
+            "identifier": "list_translations",
+            "description": "List languages translation models",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.base_model_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.customizable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.default_model",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "conversational"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.model_id",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Model ID",
+                    "contains": [
+                        "watson translation model"
+                    ],
+                    "example_values": [
+                        "en-fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "en-es-conversational"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "en"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "available"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.target",
+                    "data_type": "string",
+                    "example_values": [
+                        "es"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.training_log",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_models",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total models: 32"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "translate text",
+            "identifier": "translate_text",
+            "description": "Translate text from one language to another",
+            "verbose": "If model_id is specified the source and target parameters are ignored.<br>If the action fails with the error <i>Model not found</i>, it means the service cannot translate the text as is and a customized model needs to be created. Please see the Watson Language Translator documentation for instructions on creating a customized model.",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "text": {
+                    "description": "Text to translate",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "ph": {
+                    "data_type": "ph",
+                    "order": 1
+                },
+                "source": {
+                    "description": "Source language",
+                    "data_type": "string",
+                    "contains": [
+                        "language"
+                    ],
+                    "order": 2,
+                    "primary": true
+                },
+                "target": {
+                    "description": "Target language",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "language"
+                    ],
+                    "order": 3
+                },
+                "model_id": {
+                    "description": "Translation Model",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "watson translation model"
+                    ],
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.model_id",
+                    "data_type": "string",
+                    "contains": [
+                        "watson translation model"
+                    ],
+                    "column_name": "Model",
+                    "column_order": 2,
+                    "example_values": [
+                        "en-fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source",
+                    "data_type": "string",
+                    "contains": [
+                        "language"
+                    ],
+                    "column_name": "Source",
+                    "column_order": 0,
+                    "example_values": [
+                        "en"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.target",
+                    "data_type": "string",
+                    "contains": [
+                        "language"
+                    ],
+                    "column_name": "Target",
+                    "column_order": 1,
+                    "example_values": [
+                        "fr"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.text",
+                    "data_type": "string",
+                    "column_name": "Text",
+                    "column_order": 3,
+                    "example_values": [
+                        "this is a test again"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.character_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        20
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.translations.*.translation",
+                    "data_type": "string",
+                    "column_name": "Translated Text",
+                    "column_order": 4,
+                    "example_values": [
+                        "Il s'agit d'un nouveau test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.word_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
