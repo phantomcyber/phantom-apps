@@ -886,8 +886,8 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_panorama_version(action_result)
         if phantom.is_fail(status):
-            error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
         major_version = int(self._version.split('.')[0])
         if major_version < 9:

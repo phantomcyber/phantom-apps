@@ -87,12 +87,13 @@ IP_GRP_SEC_POL_ELEM_SRC = "<source><member>{ip_group_name}</member></source>"
 APP_GRP_SEC_POL_ELEM = "<application><member>{app_group_name}</member></application>"
 
 URL_PROF_XPATH = "{config_xpath}/profiles/url-filtering/entry[@name='{url_profile_name}']"
-# URL_PROF_ELEM for version 8 and below.
+# URL_PROF_ELEM for version 8 and below. block-list is no longer supported from 9.0 and above.
 URL_PROF_ELEM = "<description>Created by Phantom for Panorama</description><action>block</action><block-list><member>{url}</member></block-list>"
 # URL_PROF_ELEM for version 9 and above.
 URL_PROF_ELEM_9 = "<credential-enforcement><mode><disabled/></mode><block><member>{url_category_name}</member></block></credential-enforcement><block><member>{url_category_name}</member></block>"
 URL_CATEGORY_XPATH = "{config_xpath}/profiles/custom-url-category/entry[@name='{url_profile_name}']"
 URL_CATEGORY_ELEM = "<description>Created by Phantom for Panorama</description><list><member>{url}</member></list><type>URL List</type>"
+DEL_URL_CATEGORY_XPATH = "/list/member[text()='{url}']']"
 DEL_URL_XPATH = "/block-list/member[text()='{url}']"
 
 APP_GRP_XPATH = "{config_xpath}/application-group/entry[@name='{app_group_name}']"
