@@ -921,7 +921,6 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-
         status = self._get_panorama_version(action_result)
         if phantom.is_fail(status):
             return action_result.set_status(
@@ -938,8 +937,9 @@ class PanoramaConnector(BaseConnector):
             device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
-        del_xpath = "/list/member[text()='{block_url}']".format(block_url=block_url)
-        xpath = URL_CATEGORY_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name) + del_xpath
+        xpath = "{0}{1}".format(
+            URL_CATEGORY_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
+            DEL_URL_CATEGORY_XPATH.format(url=block_url))
 
         data = {'type': 'config',
                 'action': 'delete',
