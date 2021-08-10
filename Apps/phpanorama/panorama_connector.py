@@ -154,7 +154,6 @@ class PanoramaConnector(BaseConnector):
     def _get_panorama_version(self, action_result):
         data = {'type': 'version', 'key': self._key}
         status = self._make_rest_call(data, action_result)
-
         if phantom.is_fail(status):
             return action_result.set_status(
                 phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
@@ -164,6 +163,7 @@ class PanoramaConnector(BaseConnector):
             return phantom.APP_ERROR
 
         result_data = result_data.pop(0)
+        # Version should be in this format '7.1.4', where the 1st digit determines the major version.
         self._version = result_data.get('sw-version')
 
         if not self._version:
@@ -921,9 +921,10 @@ class PanoramaConnector(BaseConnector):
 
         status = self._get_panorama_version(action_result)
         if phantom.is_fail(status):
-            error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
+        # Pick BlockUrl handlers based on the major version of Panorama.
         major_version = int(self._version.split('.')[0])
         if major_version < 9:
             return self._block_url_8_and_below(param, action_result)
@@ -941,8 +942,8 @@ class PanoramaConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
         if not policy_present:
-            error_msg = PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE
-            return action_result.set_status(phantom.APP_ERROR, error_msg)
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
 
         url_prof_name = BLOCK_URL_PROF_NAME.format(
             device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
@@ -952,9 +953,6 @@ class PanoramaConnector(BaseConnector):
         if phantom.is_fail(status):
             error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
             return action_result.set_status(phantom.APP_ERROR, error_msg)
-
-        # Cached url category message?
-        message = action_result.get_message()
 
         status = self._create_or_update_url_filtering(param, action_result, url_prof_name)
         if phantom.is_fail(status):
@@ -971,7 +969,8 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+        return action_result.set_status(
+            phantom.APP_SUCCESS, "Response Received: {}".format(action_result.get_message()))
 
     def _block_url_8_and_below(self, param, action_result):
         if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
