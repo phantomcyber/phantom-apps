@@ -1292,6 +1292,97 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_get_alert(self, param):
+        """ This function is used to handle the get alert action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        alert_id = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_ALERT_ID])
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_ALERTS_ID_ENDPOINT
+                                   .format(input=alert_id))
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
+        else:
+            action_result.add_data(response)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+
+        summary = action_result.update_summary({})
+        summary['action_taken'] = "Retrieved Alert"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_update_alert(self, param):
+        """ This function is used to handle the update alert action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        alert_id = self._handle_py_ver_compat_for_input_str(param[DEFENDERATP_ALERT_ID])
+        status = param.get(DEFENDERATP_JSON_STATUS, None)
+        assigned_to = param.get(DEFENDERATP_JSON_ASSIGNED_TO, None)
+        classification = param.get(DEFENDERATP_JSON_CLASSIFICATION, None)
+        determination = param.get(DEFENDERATP_JSON_DETERMINATION, None)
+        comment = param.get(DEFENDERATP_JSON_COMMENT, None)
+
+        request_body = {}
+
+        if status:
+            request_body["status"] = status
+
+        if assigned_to:
+            request_body["assignedTo"] = assigned_to
+
+        if classification:
+            request_body["classification"] = classification
+
+        if determination:
+            request_body["determination"] = determination
+
+        if comment:
+            request_body["comment"] = comment
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_ALERTS_ID_ENDPOINT
+                                   .format(input=alert_id))
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method="patch",
+                                                 data=json.dumps(request_body))
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, "No data found")
+        else:
+            action_result.add_data(response)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+
+        summary = action_result.update_summary({})
+        summary['action_taken'] = "Updated Alert"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_list_sessions(self, param):
         """ This function is used to handle the list sessions action.
 
@@ -1339,7 +1430,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'quarantine_file': self._handle_quarantine_file,
             'list_devices': self._handle_list_devices,
             'list_alerts': self._handle_list_alerts,
-            'list_sessions': self._handle_list_sessions
+            'list_sessions': self._handle_list_sessions,
+            'get_alert': self._handle_get_alert,
+            'update_alert': self._handle_update_alert
         }
 
         action = self.get_action_identifier()
