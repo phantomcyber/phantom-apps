@@ -92,6 +92,7 @@ URL_PROF_ELEM = "<description>Created by Phantom for Panorama</description><acti
 # URL_PROF_ELEM for version 9 and above.
 URL_PROF_ELEM_9 = "<credential-enforcement><log-severity>medium</log-severity><mode><disabled/></mode><block><member>{url_category_name}</member></block></credential-enforcement><block><member>{url_category_name}</member></block>"
 URL_CATEGORY_XPATH = "{config_xpath}/profiles/custom-url-category/entry[@name='{url_profile_name}']"
+# We can make this work on version 8 and below as well by removing <type>URL List</type>. However, </list><type>URL List</type> is required for version 9 and above.
 URL_CATEGORY_ELEM = "<description>Created by Phantom for Panorama</description><list><member>{url}</member></list><type>URL List</type>"
 DEL_URL_CATEGORY_XPATH = "/list/member[text()='{url}']"
 DEL_URL_XPATH = "/block-list/member[text()='{url}']"
