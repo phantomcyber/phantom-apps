@@ -38,6 +38,7 @@ class PanoramaConnector(BaseConnector):
 
         self._base_url = None
         self._key = None
+        self._version = None
         self._param = None
         self._dev_sys_key = None
         self._device_groups = {}
@@ -149,6 +150,26 @@ class PanoramaConnector(BaseConnector):
                 response_message = "{} message: '{}'".format(response_message, msg)
                 action_result.append_to_message(msg)
         return response_message
+
+    def _get_panorama_version(self, action_result):
+        data = {'type': 'version', 'key': self._key}
+        status = self._make_rest_call(data, action_result)
+
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        result_data = action_result.get_data()
+        if len(result_data) == 0:
+            return phantom.APP_ERROR
+
+        result_data = result_data.pop(0)
+        self._version = result_data.get('sw-version')
+
+        if not self._version:
+            return phantom.APP_ERROR
+
+        return status
 
     def _parse_response(self, response_dict, action_result):
 
