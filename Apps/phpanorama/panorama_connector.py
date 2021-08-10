@@ -962,6 +962,9 @@ class PanoramaConnector(BaseConnector):
             error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
             return action_result.set_status(phantom.APP_ERROR, error_msg)
 
+        # We need to capture the url filter message here before it gets updated below.
+        url_filter_message = action_result.get_message()
+
         # Link the URL filtering profile to the given policy.
         status = self._update_security_policy(param, SEC_POL_URL_TYPE, action_result, url_prof_name)
 
@@ -972,8 +975,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(
-            phantom.APP_SUCCESS, "Response Received: {}".format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(url_filter_message))
 
     def _block_url_8_and_below(self, param, action_result):
         if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
