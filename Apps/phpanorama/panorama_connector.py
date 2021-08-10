@@ -932,15 +932,13 @@ class PanoramaConnector(BaseConnector):
 
     def _block_url_9_and_above(self, param, action_result):
         if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
-            return action_result.set_status(
-                phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
+            return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
 
         # Check if policy is present or not
         status, policy_present = self._does_policy_exist(param, action_result)
         action_result.set_data_size(0)
         if phantom.is_fail(status):
-            return action_result.set_status(
-                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
         if not policy_present:
             error_msg = PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE
