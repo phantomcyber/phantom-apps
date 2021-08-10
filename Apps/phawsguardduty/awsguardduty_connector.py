@@ -123,7 +123,7 @@ class AwsGuarddutyConnector(BaseConnector):
             try:
                 temp_credentials = ast.literal_eval(param['credentials'])
                 self._access_key = temp_credentials.get('AccessKeyId', '')
-                self._secret_key = temp_credentials.get('SecretAccesKey', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
                 self._session_token = temp_credentials.get('SessionToken', '')
 
                 self.save_progress("Using temporary assume role credentials for action")
