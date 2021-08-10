@@ -888,12 +888,12 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        status = self._get_panorama_version(action_result)
+        status = self._load_pan_version(action_result)
         if phantom.is_fail(status):
             return action_result.set_status(
                 phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
-        major_version = int(self._version.split('.')[0])
+        major_version = self._get_pan_major_version()
         if major_version < 9:
             return self._unblock_url_8_and_below(param, action_result)
 
@@ -925,7 +925,7 @@ class PanoramaConnector(BaseConnector):
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        status = self._get_panorama_version(action_result)
+        status = self._load_pan_version(action_result)
         if phantom.is_fail(status):
             return action_result.set_status(
                 phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
