@@ -2301,7 +2301,7 @@
                         "defender atp machine id"
                     ],
                     "column_name": "Machine ID",
-                    "column_order": 5
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.assignedTo",
@@ -2375,7 +2375,7 @@
                     "data_path": "action_result.data.*.computerDnsName",
                     "data_type": "string",
                     "column_name": "Computer Name",
-                    "column_order": 4
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.detectionSource",
