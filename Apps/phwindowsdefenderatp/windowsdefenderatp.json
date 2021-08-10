@@ -2123,7 +2123,7 @@
         },
         {
             "action": "get alert",
-            "description": "Retrieves specific Alert by its ID.",
+            "description": "Retrieves specific Alert by its ID",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-alert-info-by-id\" target=\"_blank\">Get Alert Information by ID API Documentation</a>), user can get alerts last updated according to your configured retention period.; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
             "identifier": "get_alert",
@@ -2432,7 +2432,7 @@
         },
         {
             "action": "update alert",
-            "description": "Updates properties of existing Alert.",
+            "description": "Updates properties of existing Alert",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/update-alert\" target=\"_blank\">Get Alert Information by ID API Documentation</a>), user can update alerts that available in the API. See List Alerts for more information.; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
             "identifier": "update_alert",
