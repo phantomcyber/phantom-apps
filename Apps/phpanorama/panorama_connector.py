@@ -900,8 +900,7 @@ class PanoramaConnector(BaseConnector):
 
         # Add the block url, will create the url profile if not present
         block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
-        url_prof_name = BLOCK_URL_PROF_NAME.format(
-            device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
+        url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
         xpath = "{0}{1}".format(
