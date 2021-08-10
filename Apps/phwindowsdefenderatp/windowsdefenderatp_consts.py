@@ -28,7 +28,7 @@ DEFENDERATP_MACHINEACTIONS_ENDPOINT = '/machineactions/{action_id}'
 DEFENDERATP_SCAN_DEVICE_ENDPOINT = '/machines/{device_id}/runAntiVirusScan'
 DEFENDERATP_UNBLOCK_HASH_ENDPOINT = '/files/{file_hash}/unblock'
 DEFENDERATP_FILE_BLOCK_ENDPOINT = '/files/{file_hash}/block'
-DEFENDERATP_TOKEN_EXPIRED = 'Status Code: 401. Error: Empty response and no information in the header'
+DEFENDERATP_TOKEN_EXPIRED = 'Status Code: 401'
 DEFENDERATP_TOKEN_NOT_AVAILABLE_MSG = 'Token not available. Please run test connectivity first'
 DEFENDERATP_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                      'Please specify this value in System Settings'
