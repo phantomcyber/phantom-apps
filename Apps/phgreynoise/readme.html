@@ -9,7 +9,7 @@
     <h2>Playbook Backward Compatibility</h2>
     <p>
         <ul>
-            <li>The new version of this application is a complete rewrite and is not backward compatible. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks to ensure the correct functioning of the playbooks created on the earlier versions of the app. If the end-user does not want to upgrade their playbooks, they can remain on or downgrade to the old version(v1.0.0).</li>
+            <li>Version 2.0.0 of this application is a complete rewrite and is not backward compatible with version 1.0.0. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks to ensure the correct functioning of the playbooks created on the earlier versions of the app. If the end-user does not want to upgrade their playbooks, they can remain on or downgrade to the old version(v1.0.0).</li>
         </ul>
     </p>
     
@@ -26,6 +26,12 @@
   
     <h4>lookup ip</h4>
     <p>Check to see if a given IP has been seen by GreyNoise engaging in internet scanning behavior.</p>
+
+    <h4>riot lookup ip</h4>
+    <p>Identifies IPs from known benign services and organizations that commonly cause false positives.</p>
+
+    <h4>community lookup ip</h4>
+    <p>An action requiring at least a free community API key to query IPs in the GreyNoise dataset and retrieve a subset of the IP reputation data returned by the lookup ip and lookup reputation actions. A free API key can be obtained at <a target="_blank" rel="noopener noreferrer" href="https://www.greynoise.io/viz/signup">https://www.greynoise.io/viz/signup</a></p>
   
     <h4>lookup ips</h4>
     <p>Check whether IP addresses in a set have been seen engaging in internet scanning behavior.
@@ -63,7 +69,7 @@
     </ul>
     
     <h4>test connectivity</h4>
-    <p>Test connectivity to GreyNoise. Requires a valid API key.</p>
+    <p>Test connectivity to GreyNoise. Requires a valid paid or free community API key.</p>
   
     <h2>Legal</h2>
     <p>For terms and legal information, please visit <a target="_blank" rel="noopener noreferrer" href="https://greynoise.io/terms">https://greynoise.io/terms</a></p>
