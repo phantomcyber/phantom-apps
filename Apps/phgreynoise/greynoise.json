@@ -141,7 +141,7 @@
         },
         {
             "action": "riot lookup ip",
-            "description": "Lookup IP using GreyNoise's RIOT (Rule It OuT) Endpoint",
+            "description": "Lookup IP using GreyNoise's RIOT (Rule It OuT) endpoint",
             "verbose": "RIOT identifies IPs from known benign services and organizations that commonly cause false positives in network security and threat intelligence products. The collection of IPs in RIOT is continually curated and verified to provide accurate results.",
             "type": "investigate",
             "identifier": "riot_lookup_ip",
@@ -180,21 +180,21 @@
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "Google Public DNS"
+                        "Public DNS"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Google's global domain name system (DNS) resolution service."
+                        "Global domain name system (DNS) resolution service."
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.explanation",
                     "data_type": "string",
                     "example_values": [
-                        "Public DNS services are used as alternatives to ISP's name servers. You may see devices on your network communicating with Google Public DNS over port 53/TCP or 53/UDP to resolve DNS lookups."
+                        "Public DNS services are used as alternatives to ISP's name servers. You may see devices on your network communicating with Public DNS over port XX/TCP or XX/UDP to resolve DNS lookups."
                     ]
                 },
                 {

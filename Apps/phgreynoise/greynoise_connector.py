@@ -556,7 +556,7 @@ class GreyNoiseConnector(BaseConnector):
                         self.save_progress("Error occurred while saving the container")
                         self.debug_print(container_creation_msg)
                         continue
-                    self.save_progress("Created {}".format(container_id))
+                    self.save_progress("Created Container ID: {}".format(container_id))
                 return phantom.APP_SUCCESS
             else:
                 self.save_progress("No results matching your GNQL query were found")
