@@ -994,18 +994,10 @@ class PanoramaConnector(BaseConnector):
 
         self.debug_print("Adding the Block URL")
         # Add the block url, will create the url profile if not present
-        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
         url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
-        data = {'type': 'config',
-                'action': 'set',
-                'key': self._key,
-                'xpath': URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
-                'element': URL_PROF_ELEM.format(url=block_url)}
-
-        status = self._make_rest_call(data, action_result)
-
+        status = self._create_or_update_url_filtering(param, action_result, url_prof_name)
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
@@ -1041,7 +1033,12 @@ class PanoramaConnector(BaseConnector):
 
     def _create_or_update_url_filtering(self, param, action_result, url_prof_name):
         xpath = URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name)
-        element = URL_PROF_ELEM_9.format(url_category_name=url_prof_name)
+
+        if self._get_pan_major_version() < 9:
+            block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+            element = URL_PROF_ELEM.format(url=block_url)
+        else:
+            element = URL_PROF_ELEM_9.format(url_category_name=url_prof_name)
 
         data = {'type': 'config',
                 'action': 'set',
