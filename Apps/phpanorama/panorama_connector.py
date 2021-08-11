@@ -917,20 +917,15 @@ class PanoramaConnector(BaseConnector):
                 'xpath': xpath}
 
         status = self._make_rest_call(data, action_result)
-
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
 
-        message = action_result.get_message()
+        url_category_del_msg = action_result.get_message()
+
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        status = self._load_pan_version(action_result)
-        if phantom.is_fail(status):
-            return action_result.set_status(
-                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(url_category_del_msg))
 
     def _unblock_url_9_and_above(self, param, action_result):
         self.debug_print("Removing the Blocked URL")
@@ -955,11 +950,12 @@ class PanoramaConnector(BaseConnector):
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
 
-        message = action_result.get_message()
+        block_list_del_msg = action_result.get_message()
+
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(block_list_del_msg))
 
     def _block_url(self, param):
 
