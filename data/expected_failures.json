@@ -66,5 +66,23 @@
         "JSON config param `auth_token_url` should probably be of data_type `password` or `file`"
       ]
     }
+  },
+  "phantom_gsgmail": {
+    "Verbose Periods": {
+      "verbose": [
+        "`Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>` does not contain a period",
+        "`Action uses the GMail API. Requires authorization with the following scope:<ul><li>https://mail.google.com/</li></ul>` does not contain a period"
+      ]
+    },
+    "Optional Parameters": {
+      "verbose": [
+        "`run_query` action parameter on line 278",
+        "`run_query` action parameter on line 288",
+        "`run_query` action parameter on line 272",
+        "`run_query` action parameter on line 275",
+        "`run_query` action parameter on line 281",
+        "`run_query` action parameter on line 284"
+      ]
+    }
   }
 }
