@@ -87,7 +87,7 @@ class AwsIamConnector(BaseConnector):
         credentials = session.get_credentials()
         return credentials
 
-    def _create_client(self, action_result, service='iam', param=None)
+    def _create_client(self, action_result, service='iam', param=None):
 
         boto_config = Config(signature_version='v4')
 
