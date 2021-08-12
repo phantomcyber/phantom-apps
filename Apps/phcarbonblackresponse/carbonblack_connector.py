@@ -1637,7 +1637,9 @@ class CarbonblackConnector(BaseConnector):
             query = "cb.urlver=1&" + query
 
         if "q=" not in query:
-            query = "q=" + query
+            query_parts = query.split("&")
+            query_parts[1] = "{}{}".format("q=", query_parts[1])
+            query = "".join(query_parts)
 
         name = param[CARBONBLACK_JSON_NAME]
         read_only = param.get(CARBONBLACK_JSON_READONLY, False)
