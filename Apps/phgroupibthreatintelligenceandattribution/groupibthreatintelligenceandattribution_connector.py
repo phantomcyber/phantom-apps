@@ -150,6 +150,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
     def _on_poll(self, param):
         is_manual_poll = self.is_poll_now()
         action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result.set_status(phantom.APP_SUCCESS)
         container_count = 0
         artifacts_count = 0
         flag = 0
