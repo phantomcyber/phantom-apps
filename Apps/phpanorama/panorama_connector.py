@@ -38,6 +38,7 @@ class PanoramaConnector(BaseConnector):
 
         self._base_url = None
         self._key = None
+        self._version = None
         self._param = None
         self._dev_sys_key = None
         self._device_groups = {}
@@ -149,6 +150,30 @@ class PanoramaConnector(BaseConnector):
                 response_message = "{} message: '{}'".format(response_message, msg)
                 action_result.append_to_message(msg)
         return response_message
+
+    def _load_pan_version(self, action_result):
+        data = {'type': 'version', 'key': self._key}
+        status = self._make_rest_call(data, action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        result_data = action_result.get_data()
+        if len(result_data) == 0:
+            return phantom.APP_ERROR
+
+        result_data = result_data.pop(0)
+        # Version should be in this format '7.1.4', where the 1st digit determines the major version.
+        self._version = result_data.get('sw-version')
+
+        if not self._version:
+            return phantom.APP_ERROR
+
+        return status
+
+    def _get_pan_major_version(self):
+        # version follows this format '7.1.4'.
+        return int(self._version.split('.')[0])
 
     def _parse_response(self, response_dict, action_result):
 
@@ -863,6 +888,18 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        status = self._load_pan_version(action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        major_version = self._get_pan_major_version()
+        if major_version < 9:
+            return self._unblock_url_8_and_below(param, action_result)
+
+        return self._unblock_url_9_and_above(param, action_result)
+
+    def _unblock_url_8_and_below(self, param, action_result):
         self.debug_print("Removing the Blocked URL")
 
         # Add the block url, will create the url profile if not present
@@ -870,8 +907,38 @@ class PanoramaConnector(BaseConnector):
         url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
-        xpath = "{0}{1}".format(URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
-                DEL_URL_XPATH.format(url=block_url))
+        xpath = "{0}{1}".format(
+            URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
+            DEL_URL_XPATH.format(url=block_url))
+
+        data = {'type': 'config',
+                'action': 'delete',
+                'key': self._key,
+                'xpath': xpath}
+
+        status = self._make_rest_call(data, action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
+
+        url_category_del_msg = action_result.get_message()
+
+        # Now Commit the config
+        self._commit_and_commit_all(param, action_result)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(url_category_del_msg))
+
+    def _unblock_url_9_and_above(self, param, action_result):
+        self.debug_print("Removing the Blocked URL")
+
+        # Add the block url, will create the url profile if not present
+        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+        url_prof_name = BLOCK_URL_PROF_NAME.format(
+            device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
+        url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
+
+        xpath = "{0}{1}".format(
+            URL_CATEGORY_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
+            DEL_URL_CATEGORY_XPATH.format(url=block_url))
 
         data = {'type': 'config',
                 'action': 'delete',
@@ -883,11 +950,12 @@ class PanoramaConnector(BaseConnector):
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
 
-        message = action_result.get_message()
+        block_list_del_msg = action_result.get_message()
+
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(block_list_del_msg))
 
     def _block_url(self, param):
 
@@ -898,32 +966,81 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        status = self._load_pan_version(action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        # Pick BlockUrl handlers based on the major version of Panorama.
+        major_version = self._get_pan_major_version()
+        if major_version < 9:
+            return self._block_url_8_and_below(param, action_result)
+
+        return self._block_url_9_and_above(param, action_result)
+
+    def _block_url_9_and_above(self, param, action_result):
         if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
             return action_result.set_status(phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
 
-        # Check if policy is present or not
         status, policy_present = self._does_policy_exist(param, action_result)
         action_result.set_data_size(0)
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
         if not policy_present:
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
+
+        url_prof_name = BLOCK_URL_PROF_NAME.format(
+            device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
+        url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
+
+        status = self._create_or_update_url_category(param, action_result, url_prof_name)
+        if phantom.is_fail(status):
+            error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        status = self._create_or_update_url_filtering(param, action_result, url_prof_name)
+        if phantom.is_fail(status):
+            error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        # We need to capture the url filter message here before it gets updated below.
+        url_filter_message = action_result.get_message()
+
+        # Link the URL filtering profile to the given policy.
+        status = self._update_security_policy(param, SEC_POL_URL_TYPE, action_result, url_prof_name)
+
+        if phantom.is_fail(status):
+            error_msg = PAN_ERR_MSG.format("blocking url", action_result.get_message())
+            return action_result.set_status(phantom.APP_ERROR, error_msg)
+
+        # Now Commit the config
+        self._commit_and_commit_all(param, action_result)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(url_filter_message))
+
+    def _block_url_8_and_below(self, param, action_result):
+        if param['policy_type'] not in POLICY_TYPE_VALUE_LIST:
+            return action_result.set_status(
+                phantom.APP_ERROR, VALUE_LIST_VALIDATION_MSG.format(POLICY_TYPE_VALUE_LIST, 'policy_type'))
+
+        # Check if policy is present or not
+        status, policy_present = self._does_policy_exist(param, action_result)
+        action_result.set_data_size(0)
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        if not policy_present:
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_POLICY_NOT_PRESENT_CONFIG_DONT_CREATE)
 
         self.debug_print("Adding the Block URL")
         # Add the block url, will create the url profile if not present
-        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
         url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
-        data = {'type': 'config',
-                'action': 'set',
-                'key': self._key,
-                'xpath': URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
-                'element': URL_PROF_ELEM.format(url=block_url)}
-
-        status = self._make_rest_call(data, action_result)
-
+        status = self._create_or_update_url_filtering(param, action_result, url_prof_name)
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
 
@@ -939,6 +1056,42 @@ class PanoramaConnector(BaseConnector):
         self._commit_and_commit_all(param, action_result)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+
+    def _create_or_update_url_category(self, param, action_result, url_prof_name):
+        # Add the block url, will create the url profile if not present
+        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+
+        xpath = URL_CATEGORY_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name)
+        element = URL_CATEGORY_ELEM.format(url=block_url)
+
+        data = {'type': 'config',
+                'action': 'set',
+                'key': self._key,
+                'xpath': xpath,
+                'element': element}
+
+        status = self._make_rest_call(data, action_result)
+
+        return status
+
+    def _create_or_update_url_filtering(self, param, action_result, url_prof_name):
+        xpath = URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name)
+
+        if self._get_pan_major_version() < 9:
+            block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+            element = URL_PROF_ELEM.format(url=block_url)
+        else:
+            element = URL_PROF_ELEM_9.format(url_category_name=url_prof_name)
+
+        data = {'type': 'config',
+                'action': 'set',
+                'key': self._key,
+                'xpath': xpath,
+                'element': element}
+
+        status = self._make_rest_call(data, action_result)
+
+        return status
 
     def _get_dgs(self, action_result):
 
