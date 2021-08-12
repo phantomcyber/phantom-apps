@@ -202,7 +202,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                         """.format(container.get("source_data_identifier"), ret_val, message, container_id)
                     elif phantom.is_fail(ret_val):
                         message = """
-                        Error occurred while ingesting feed with id: {0} for {1} collection. 
+                        Error occurred while ingesting feed with id: {0} for {1} collection.
                         Error: {2}. Aborting the polling process
                         """.format(container.get("source_data_identifier"), collection_name, message)
                         action_result.set_status(phantom.APP_ERROR, message)
