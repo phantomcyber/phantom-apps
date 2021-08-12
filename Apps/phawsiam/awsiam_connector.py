@@ -1,5 +1,5 @@
 # File: awsiam_connector.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -15,6 +15,11 @@ import xmltodict
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
 from awsiam_consts import *
+import ast
+import botocore.response as br
+import botocore.paginate as bp
+from boto3 import client, Session
+from botocore.config import Config
 
 try:
     from urllib import urlencode, unquote
@@ -42,8 +47,97 @@ class AwsIamConnector(BaseConnector):
         self._state = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._response_metadata_dict = None
         self._python_version = None
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        """
+        error_code = AWSIAM_ERR_CODE_UNAVAILABLE
+        error_msg = AWSIAM_ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSIAM_ERR_CODE_UNAVAILABLE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            if error_code in AWSIAM_ERR_CODE_UNAVAILABLE:
+                error_text = "Error Message: {0}".fromat(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except Exception:
+            self.debug_print("Error occurred while parsing error message")
+            error_text = AWSIAM_PARSE_ERR_MSG
+
+        return error_text
+
+    def _handle_get_ec2_role(self):
+        """
+        This method will retrieve credentials from the EC2 role, if assigned to the instance
+        """
+        session = Session()
+        credentials = session.get_credentials()
+        return credentials
+
+    def _create_client(self, action_result, service='iam', param=None)
+
+        boto_config = Config(signature_version='v4')
+
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get temporary credentials:{0}".format(e))
+
+        try:
+            if self._access_key and self._secret_key:
+                self.debug_print("Creating boto3 client with API keys")
+                self._client(
+                    service,
+                    aws_access_key_id=self._access_key,
+                    aws_secret_access_key=self._secret_key,
+                    aws_session_token=self._session_token,
+                    config=boto_config)
+            else:
+                self.debug_print("Creating boto3 client without API keys")
+                    service,
+                    config=boto_config)
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_BOTO3_CLIENT_NOT_CREATED.format(err=err))
+
+        return phantom.APP_SUCCESS
+
+    def _make_boto_call(self.action_result, method, **kwargs):
+
+        try:
+            boto_func = getattr(self._client, method)
+        except AttributeError:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_INVALID_METHOD.format(method=method)), None)
+               
+        try:
+            resp_json = boto_func(**kwargs)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_BOTO3_CALL_FAILED.format(err=err)), None)
+
+        return phantom.APP_SUCCESS, resp_json
 
     def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
         """
