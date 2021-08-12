@@ -54,20 +54,16 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*cnc",
-                    "type": "*network",
-                    "start_time": "dateDetected",
-                },
-                "cef_list": BASE_CNC
+                "name": "*cnc",
+                "type": "*network",
+                "start_time": "dateDetected",
+                "cef": BASE_CNC
             },
             {
-                "artifact_list": {
-                    "name": "*Compromised account",
-                    "type": "*network",
-                    "start_time": "dateDetected",
-                },
-                "cef_list": {
+                "name": "*Compromised account",
+                "type": "*network",
+                "start_time": "dateDetected",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "login",
                     "deviceCustomString1label": "*login",
@@ -78,11 +74,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_ADDITIONAL_INFO,
                     "duser": "dropEmail.email",
                     "deviceCustomString4": "company",
@@ -103,12 +97,10 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Data breach",
-                    "type": "*network",
-                    "start_time": "uploadTime",
-                },
-                "cef_list": {
+                "name": "*Data breach",
+                "type": "*network",
+                "start_time": "uploadTime",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "leakName",
                     "deviceCustomString1label": "*leakName",
@@ -128,20 +120,16 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*cnc",
-                    "type": "*network",
-                    "start_time": "dateDetected",
-                },
-                "cef_list": BASE_CNC
+                "name": "*cnc",
+                "type": "*network",
+                "start_time": "dateDetected",
+                "cef": BASE_CNC
             },
             {
-                "artifact_list": {
-                    "name": "*Compromised card",
-                    "type": "*other",
-                    "start_time": "dateDetected",
-                },
-                "cef_list": {
+                "name": "*Compromised card",
+                "type": "*other",
+                "start_time": "dateDetected",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "cardInfo.number",
                     "deviceCustomString1label": "*cardNumber",
@@ -158,11 +146,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Owner",
-                    "type": "*other"
-                },
-                "cef_list": {
+                "name": "*Owner",
+                "type": "*other",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "owner.name",
                     "deviceCustomString1label": "*name",
@@ -170,11 +156,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_ADDITIONAL_INFO,
                     "deviceCustomString4": "company",
                     "deviceCustomString4label": "*company",
@@ -192,12 +176,10 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Targeted malware",
-                    "type": "*file",
-                    "start_time": "date",
-                },
-                "cef_list": {
+                "name": "*Targeted malware",
+                "type": "*file",
+                "start_time": "date",
+                "cef": {
                     **BASE_CEF_LIST,
                     "fileName": "fileName",
                     "fileType": "fileType",
@@ -213,11 +195,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_ADDITIONAL_INFO,
                     "deviceCustomString4": "source",
                     "deviceCustomString4label": "*source",
@@ -237,11 +217,9 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_CEF_LIST,
                     "fileHash": "hash",
                     "fileSize": "size",
@@ -264,11 +242,9 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_CEF_LIST,
                     "fileName": "name",
                     "deviceCustomString1": "source",
@@ -292,12 +268,10 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Phishing",
-                    "type": "*network",
-                    "start_time": "dateDetected",
-                },
-                "cef_list": {
+                "name": "*Phishing",
+                "type": "*network",
+                "start_time": "dateDetected",
+                "cef": {
                     **BASE_CEF_LIST,
                     "sourceHostName": "phishingDomain.domain",
                     "sourceAddress": "ipv4.ip",
@@ -317,11 +291,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "company",
                     "deviceCustomString1label": "*company",
@@ -351,13 +323,11 @@ INCIDENT_COLLECTIONS_INFO = {
         },
         "artifacts": [
             {
-                "artifact_list": {
-                    "name": "*Phishing_kit",
-                    "type": "*file",
-                    "start_time": "dateDetected",
-                    "end_time": "dateLastSeen"
-                },
-                "cef_list": {
+                "name": "*Phishing_kit",
+                "type": "*file",
+                "start_time": "dateDetected",
+                "end_time": "dateLastSeen",
+                "cef": {
                     **BASE_CEF_LIST,
                     "fileHash": "hash",
                     "sourceDomain": "downloadedFrom.domain",
@@ -366,11 +336,9 @@ INCIDENT_COLLECTIONS_INFO = {
                 }
             },
             {
-                "artifact_list": {
-                    "name": "*Additional info",
-                    "type": "*other",
-                },
-                "cef_list": {
+                "name": "*Additional info",
+                "type": "*other",
+                "cef": {
                     **BASE_CEF_LIST,
                     "deviceCustomString1": "company",
                     "deviceCustomString1label": "*company",

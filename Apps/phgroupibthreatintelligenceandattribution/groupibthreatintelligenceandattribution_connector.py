@@ -55,19 +55,19 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                                                                         date_to=date_end)
         return generator, collection_info
 
+    def _transform_severity(self, feed):
+        severity = None
+        if feed["severity"] == "green":
+            severity = "low"
+        elif feed["severity"] == "orange":
+            severity = "medium"
+        elif feed["severity"] == "red":
+            severity = "high"
+        return severity
+
     def _parse_artifacts(self, chunk, collection_info, collection_name):
-        artifacts_list = []
         artifact_keys_list = collection_info.get("artifacts", [])
-        for artifact_keys in artifact_keys_list:
-            chunk.set_keys({**BASE_MAPPING_ARTIFACT, **artifact_keys.get("artifact_list", {})})
-            artifacts = chunk.parse_portion()
-            if artifact_keys.get("cef_list"):
-                chunk.set_keys(artifact_keys.get("cef_list"))
-                cef_list = chunk.parse_portion()
-                for i in range(len(artifacts)):
-                    artifacts[i]["cef"] = cef_list[i]
-            artifacts_list.append(artifacts)
-        artifacts_list = list(zip(*artifacts_list))
+        artifacts_list = chunk.bulk_parse_portion([{**BASE_MAPPING_ARTIFACT, **a} for a in artifact_keys_list])
 
         if collection_name == "osi/public_leak":
             for i, item in enumerate(chunk.raw_dict.get("items")):
@@ -92,7 +92,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                     }
                     additional_artifacts.append(artifact)
 
-                artifacts_list[i] = [*artifacts_list[i], *additional_artifacts]
+                artifacts_list[i].extend(additional_artifacts)
 
         elif collection_name == "osi/git_leak":
             for i, item in enumerate(chunk.raw_dict.get("items")):
@@ -115,7 +115,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                     }
                     additional_artifacts.append(artifact)
 
-                artifacts_list[i] = [*artifacts_list[i], *additional_artifacts]
+                artifacts_list[i].extend(additional_artifacts)
 
         return artifacts_list
 
@@ -174,15 +174,10 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
 
                 for i, feed in enumerate(portion):
                     feed["name"] = "{0}: {1}".format(collection_info.get("prefix", ''), feed["name"])
-                    severity = None
-                    if feed["severity"] == "green":
-                        severity = "low"
-                    elif feed["severity"] == "orange":
-                        severity = "medium"
-                    elif feed["severity"] == "red":
-                        severity = "high"
 
+                    severity = self._transform_severity(feed)
                     feed["severity"] = severity
+
                     last_fetch = feed.pop("last_fetch")
                     if feed.get('start_time'):
                         feed['start_time'] = parse(feed.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
@@ -203,18 +198,17 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                         message = """
                         Container for feed with id: {0} already exists, updating data.
                         ret_val: {1}, message: {2}, container_id: {3}
-                        """.format(feed.get("source_data_identifier"), ret_val, message, container_id)
+                        """.format(container.get("source_data_identifier"), ret_val, message, container_id)
                     elif phantom.is_fail(ret_val):
-                        error_message = """
-                        Error occurred while ingesting feed with id: {0} for {1} collection. Error: {2}
-                        """.format(feed.get("source_data_identifier"), collection_name, message)
-                        self.debug_print(error_message)
-                        self.save_progress('Aborting the polling process')
-                        return action_result.set_status(phantom.APP_ERROR, error_message)
+                        message = """
+                        Error occurred while ingesting feed with id: {0} for {1} collection. 
+                        Error: {2}. Aborting the polling process
+                        """.format(container.get("source_data_identifier"), collection_name, message)
+                        action_result.set_status(phantom.APP_ERROR, message)
                     else:
                         message = """
                         Container for feed with id: {0} saved. ret_val: {1}, message: {2}, container_id: {3}.
-                        """.format(feed.get("source_data_identifier"), ret_val, message, container_id)
+                        """.format(container.get("source_data_identifier"), ret_val, message, container_id)
                         if is_manual_poll:
                             container_count += 1
                             if container_count >= param.get('container_count', BASE_MAX_CONTAINERS_COUNT):
@@ -222,6 +216,8 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
 
                     self.debug_print(message)
                     self.save_progress(message)
+                    if phantom.is_fail(action_result.get_status()):
+                        return action_result.get_status()
 
                     if not is_manual_poll:
                         self._state[collection_name] = last_fetch
