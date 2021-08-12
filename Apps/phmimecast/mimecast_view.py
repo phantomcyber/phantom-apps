@@ -1,5 +1,5 @@
 # File: mimecast_view.py
-# Copyright (c) 2019-2020 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -32,5 +32,5 @@ def display_get_email(provides, all_app_runs, context):
             if (not ctx_result):
                 continue
             results.append(ctx_result)
-    # print context
+
     return 'display_get_email.html'
