@@ -5,7 +5,7 @@
     "publisher": "Splunk",
     "type": "firewall",
     "main_module": "panorama_connector.py",
-    "app_version": "3.0.0",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T01:35:49.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
@@ -60,7 +60,7 @@
         {
             "action": "block url",
             "description": "Block an URL",
-            "verbose": "This action does the following to block a URL:<ul><li>Create an URL Filtering profile object named '<b>Phantom URL List for [device_group]</b>' containing the URL to block.</br>If the profile is already present, then it will be updated to include the URL to block. IMPORTANT: For Version 9 and above, a URL Filtering profile no longer includes allow-list/block-list. The official workaround is to use a Custom URL category instead. Therefore, we create a new Custom URL category with the same name as the profile and link it to the profile. Then, We configure the profile to block the URL category on both 'SITE ACCESS' and 'USER CREDENTIAL SUBMISSION' columns.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created URL Filtering profile.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>",
+            "verbose": "This action does the following to block a URL:<ul><li>Create an URL Filtering profile object named '<b>Phantom URL List for [device_group]</b>' containing the URL to block.</br>If the profile is already present, then it will be updated to include the URL to block.</li><li>Re-Configure the policy (specified in the <b>policy_name</b> parameter) to use the created URL Filtering profile.</br>If the policy is not found on the device, the action will return an error.</li><li>The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.</li></ul>",
             "type": "contain",
             "identifier": "block_url",
             "read_only": false,
@@ -173,7 +173,7 @@
         {
             "action": "unblock url",
             "description": "Unblock an URL",
-            "verbose": "For Version 8 and below, this action will remove the URL from the URL Filtering profile that was created/updated in the <b>block url</b> action. For Version 9 and above, this action will remove the URL from the Custom URL category that was created/updated in the <b>block url</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
+            "verbose": "This action will remove the URL from the URL Filtering profile that was created/updated in the <b>block url</b> action. The action then proceeds to <b>commit</b> the changes to Panorama, followed by a commit to the device group. If the device group happens to be <b>shared</b>, then a commit will be sent to all the device groups belonging to it.",
             "type": "correct",
             "identifier": "unblock_url",
             "read_only": false,
