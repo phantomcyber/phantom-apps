@@ -398,7 +398,7 @@ class HackerOneConnector(BaseConnector):
         core_report = {}
         report_template = None
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        with open(os.path.join(__location__, 'hackerone_report_template.json')) as json_file:
+        with open(os.path.join(__location__, 'templates', 'hackerone_report_template.json')) as json_file:
             report_template = json.load(json_file)
         report_template = eval(json.dumps(report_template))
         self._get_leaves(report_template, report, core_report)
