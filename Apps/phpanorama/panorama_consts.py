@@ -90,7 +90,9 @@ IP_GRP_SEC_POL_ELEM_SRC = "<source><member>{ip_group_name}</member></source>"
 APP_GRP_SEC_POL_ELEM = "<application><member>{app_group_name}</member></application>"
 
 URL_PROF_XPATH = "{config_xpath}/profiles/url-filtering/entry[@name='{url_profile_name}']"
-# URL_PROF_ELEM for version 8 and below.
+DEL_URL_CATEGORY_XPATH = "/list/member[text()='{url}']"
+
+# URL_PROF_ELEM for version 8 and below. block-list is no longer supported from 9.0 and above.
 URL_PROF_ELEM = "<description>Created by Phantom for Panorama</description>"
 URL_PROF_ELEM += "<action>block</action><block-list><member>{url}</member></block-list>"
 
@@ -103,6 +105,7 @@ URL_PROF_ELEM_9 += "<block><member>{url_category_name}</member></block>"
 
 URL_CATEGORY_XPATH = "{config_xpath}/profiles/custom-url-category/entry[@name='{url_profile_name}']"
 
+# We can make this work on version 8 and below as well by removing <type>URL List</type>. However, </list><type>URL List</type> is required for version 9 and above.
 URL_CATEGORY_ELEM = "<description>Created by Phantom for Panorama</description>"
 URL_CATEGORY_ELEM += "<list><member>{url}</member></list>"
 URL_CATEGORY_ELEM += "<type>URL List</type>"

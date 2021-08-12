@@ -888,6 +888,18 @@ class PanoramaConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        status = self._load_pan_version(action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(
+                phantom.APP_ERROR, PAN_ERR_MSG.format("blocking url", action_result.get_message()))
+
+        major_version = self._get_pan_major_version()
+        if major_version < 9:
+            return self._unblock_url_8_and_below(param, action_result)
+
+        return self._unblock_url_9_and_above(param, action_result)
+
+    def _unblock_url_8_and_below(self, param, action_result):
         self.debug_print("Removing the Blocked URL")
 
         # Add the block url, will create the url profile if not present
@@ -895,8 +907,38 @@ class PanoramaConnector(BaseConnector):
         url_prof_name = BLOCK_URL_PROF_NAME.format(device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
         url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
 
-        xpath = "{0}{1}".format(URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
-                DEL_URL_XPATH.format(url=block_url))
+        xpath = "{0}{1}".format(
+            URL_PROF_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
+            DEL_URL_XPATH.format(url=block_url))
+
+        data = {'type': 'config',
+                'action': 'delete',
+                'key': self._key,
+                'xpath': xpath}
+
+        status = self._make_rest_call(data, action_result)
+        if phantom.is_fail(status):
+            return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
+
+        url_category_del_msg = action_result.get_message()
+
+        # Now Commit the config
+        self._commit_and_commit_all(param, action_result)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(url_category_del_msg))
+
+    def _unblock_url_9_and_above(self, param, action_result):
+        self.debug_print("Removing the Blocked URL")
+
+        # Add the block url, will create the url profile if not present
+        block_url = self._handle_py_ver_compat_for_input_str(param[PAN_JSON_URL])
+        url_prof_name = BLOCK_URL_PROF_NAME.format(
+            device_group=self._handle_py_ver_compat_for_input_str(param[PAN_JSON_DEVICE_GRP]))
+        url_prof_name = url_prof_name[:MAX_NODE_NAME_LEN].strip()
+
+        xpath = "{0}{1}".format(
+            URL_CATEGORY_XPATH.format(config_xpath=self._get_config_xpath(param), url_profile_name=url_prof_name),
+            DEL_URL_CATEGORY_XPATH.format(url=block_url))
 
         data = {'type': 'config',
                 'action': 'delete',
@@ -908,11 +950,12 @@ class PanoramaConnector(BaseConnector):
         if phantom.is_fail(status):
             return action_result.set_status(phantom.APP_ERROR, PAN_ERR_MSG.format("unblocking url", action_result.get_message()))
 
-        message = action_result.get_message()
+        block_list_del_msg = action_result.get_message()
+
         # Now Commit the config
         self._commit_and_commit_all(param, action_result)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(message))
+        return action_result.set_status(phantom.APP_SUCCESS, "Response Received: {}".format(block_list_del_msg))
 
     def _block_url(self, param):
 
