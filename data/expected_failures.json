@@ -84,5 +84,22 @@
         "`run_query` action parameter on line 284"
       ]
     }
+  },
+  "phantom_thehive": {
+    "Sequential Column Ordering": {
+      "verbose": [
+        "Ordering of action output parameters for `search task` are not sequential or do not start at zero"
+      ]
+    },
+    "Data Path Wildcards": {
+      "verbose": [
+        "Action 'get observables' contains an output data path with *.*"
+      ]
+    },
+    "Optional Parameters": {
+      "verbose": [
+        "`create_ticket` action parameter on line 220"
+      ]
+    }
   }
 }
