@@ -382,6 +382,11 @@ class GreyNoiseConnector(BaseConnector):
                     headers=self._headers,
                     params=(("query", param["query"]), ("size", size)),
                 )
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
                 full_response.update(response_json)
 
             if "scroll" in full_response:
@@ -406,6 +411,11 @@ class GreyNoiseConnector(BaseConnector):
                         ("scroll", scroll_token),
                     ),
                 )
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
                 full_response["complete"] = response_json.get("complete")
                 if "scroll" in response_json:
                     full_response["scroll"] = response_json["scroll"]
@@ -421,12 +431,6 @@ class GreyNoiseConnector(BaseConnector):
                     remaining_results_flag = False
             else:
                 remaining_results_flag = True
-
-        if phantom.is_fail(ret_val):
-            if is_poll:
-                return ret_val, None
-            else:
-                return ret_val
 
         result_data = {}
         action_result.add_data(result_data)
