@@ -1805,16 +1805,16 @@
         {
             "action": "search task",
             "identifier": "search_task",
-            "description": "Search Task",
+            "description": "Search task",
             "verbose": "For example, {\"query\": {\"_in\": {\"_field\": \"title\", \"_values\": [\"bill\"]}}}<br>Note: \"_values\" field should be in lowercase only.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "search_task": {
-                    "description": "Search String",
+                    "description": "Search string",
                     "data_type": "string",
-                    "required": true,
-                    "order": 0
+                    "order": 0,
+                    "required": true
                 }
             },
             "output": [
