@@ -12,7 +12,7 @@
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "2.1.0",
     "python_version": "3",
-    "utctime_updated": "2020-10-26T08:53:47.000000Z",
+    "utctime_updated": "2021-08-13T05:58:03.000000Z",
     "package_name": "phantom_mimecast",
     "main_module": "mimecast_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -2311,7 +2311,6 @@
                 }
             },
             "output": [
-
                 {
                     "data_path": "action_result.parameter.to",
                     "data_type": "string",
