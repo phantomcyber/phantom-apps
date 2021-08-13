@@ -1,5 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+# File: groupibthreatintelligenceandattribution_connector.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
 
 # Python 3 Compatibility imports
 from __future__ import print_function, unicode_literals
@@ -37,6 +39,28 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         self._gib_tia_connector = TIAPoller("", "", "")
         self._collections = {}
 
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
     def _setup_generator(self, collection_name, date_start, date_end=None, last_fetch=None):
         collection_info = INCIDENT_COLLECTIONS_INFO.get(collection_name, {})
         keys = {**BASE_MAPPING_CONTAINER, **collection_info.get("container", {})}
@@ -72,7 +96,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         if collection_name == "osi/public_leak":
             for i, item in enumerate(chunk.raw_dict.get("items")):
                 additional_artifacts = []
-                for link in item.get("linkList"):
+                for link in item.get("linkList", []):
                     cef = {
                         "deviceCustomString1": link.get("author"),
                         "deviceCustomString1label": "author",
@@ -97,7 +121,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         elif collection_name == "osi/git_leak":
             for i, item in enumerate(chunk.raw_dict.get("items")):
                 additional_artifacts = []
-                for revision in item.get("revisions"):
+                for revision in item.get("revisions", []):
                     info = revision.get("info")
                     cef = {
                         "deviceCustomString1": info.get("authorEmail"),
@@ -120,31 +144,24 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         return artifacts_list
 
     def _handle_test_connectivity(self, param):
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         action_result.set_status(phantom.APP_SUCCESS)
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
 
         self.save_progress("Connecting to endpoint")
         # make rest call
         try:
             self._gib_tia_connector.get_seq_update_dict()
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "{0}".format(e))
+            err_msg = self._get_error_message_from_exception(e)
+            action_result.set_status(phantom.APP_ERROR, "{0}".format(err_msg))
 
         if phantom.is_fail(action_result.get_status()):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # for now the return is commented out, but after implementation, return from here
-            self.save_progress("Test Connectivity Failed.")
+            self.save_progress("Test Connectivity Failed")
             self.debug_print("Test Connectivity Failed: ", action_result.get_status())
             return action_result.get_status()
 
         # Return success
-        self.save_progress("Test Connectivity Passed.")
+        self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _on_poll(self, param):
@@ -174,7 +191,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                 artifacts_list = self._parse_artifacts(chunk, collection_info, collection_name)
 
                 for i, feed in enumerate(portion):
-                    feed["name"] = "{0}: {1}".format(collection_info.get("prefix", ''), feed["name"])
+                    feed["name"] = "{0}: {1}".format(collection_info.get("prefix", ''), feed.get("name"))
 
                     severity = self._transform_severity(feed)
                     feed["severity"] = severity
@@ -297,7 +314,8 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                 except Exception as e:
                     message = 'Inappropriate first_fetch format, ' \
                               'please use something like this: 2020-01-01 or January 1 2020 or 3 days'
-                    self.set_status(phantom.APP_ERROR, "{0}. Error message: {1}".format(message, str(e)))
+                    err_msg = self._get_error_message_from_exception(e)
+                    self.set_status(phantom.APP_ERROR, "{0}. Error message: {1}".format(message, err_msg))
                     return phantom.APP_ERROR
                 self._collections.update({collection: parsed_date})
 

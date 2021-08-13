@@ -1,3 +1,8 @@
+# File: groupibthreatintelligenceandattribution_consts.py
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+#
+
 BASE_CONTAINER = {"tags": ["gib"]}
 BASE_ARTIFACT = {
     "label": "gib indicator",
@@ -361,3 +366,7 @@ SPLUNK_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 BASE_MAX_CONTAINERS_COUNT = 100
 BASE_MAX_ARTIFACTS_COUNT = 1000
+
+# Constants relating to '_get_error_message_from_exception'
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"

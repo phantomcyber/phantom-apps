@@ -31,15 +31,13 @@
     "utctime_updated": "2021-05-26T17:12:04.190864Z",
     "package_name": "phantom_groupibthreatintelligenceandattribution",
     "main_module": "groupibthreatintelligenceandattribution_connector.py",
-    "min_phantom_version": "4.10.3",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
             "description": "Username",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "api_key": {
@@ -52,134 +50,108 @@
             "description": "Group-IB API URL",
             "data_type": "string",
             "required": true,
-            "value_list": [],
             "default": "https://tap.group-ib.com/api/v2/",
             "order": 2
         },
         "insecure": {
             "description": "Verify server certificate",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 3
         },
         "compromised_account": {
             "description": "Ingest incidents from compromised/account collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 4
         },
         "compromised_account_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 5
         },
         "compromised_breached": {
             "description": "Ingest incidents from compromised/breached collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 6
         },
         "compromised_breached_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 7
         },
         "compromised_card": {
             "description": "Ingest incidents from compromised/card collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 8
         },
         "compromised_card_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 9
         },
         "bp_phishing": {
             "description": "Ingest incidents from bp/phishing collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 10
         },
         "bp_phishing_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 11
         },
         "bp_phishing_kit": {
             "description": "Ingest incidents from bp/phishing_kit collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 12
         },
         "bp_phishing_kit_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 13
         },
         "osi_git_leak": {
             "description": "Ingest incidents from osi/git_leak collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 14
         },
         "osi_git_leak_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 15
         },
         "osi_public_leak": {
             "description": "Ingest incidents from osi/public_leak collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 16
         },
         "osi_public_leak_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 17
         },
         "malware_targeted_malware": {
             "description": "Ingest incidents from malware/targeted_malware collection",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 18
         },
         "malware_targeted_malware_start": {
             "description": "Date to start",
             "data_type": "string",
-            "required": false,
-            "value_list": [],
             "default": "3 days",
             "order": 19
         }
