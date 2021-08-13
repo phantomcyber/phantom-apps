@@ -10,8 +10,8 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.1.0",
-    "utctime_updated": "2021-07-26T16:15:12.000000Z",
+    "app_version": "2.1.1",
+    "utctime_updated": "2021-08-09T19:29:06.000000Z",
     "package_name": "phantom_awsguardduty",
     "main_module": "awsguardduty_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -56,13 +56,11 @@
         "access_key": {
             "description": "AWS Access Key",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "secret_key": {
             "description": "AWS Secret Key",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "region": {
