@@ -1289,7 +1289,7 @@
                         "Completed",
                         "Cancel"
                     ],
-                    "order": 1
+                    "order": 2
                 }
             },
             "output": [
@@ -2034,7 +2034,7 @@
                 "task_title": {
                     "description": "Task Title",
                     "data_type": "string",
-                    "order": 0
+                    "order": 1
                 },
                 "task_owner": {
                     "description": "Task Owner",
@@ -2043,7 +2043,7 @@
                     "contains": [
                         "thehive username"
                     ],
-                    "order": 0
+                    "order": 2
                 },
                 "task_status": {
                     "description": "Task Status",
@@ -2054,12 +2054,12 @@
                         "Completed",
                         "Cancel"
                     ],
-                    "order": 0
+                    "order": 3
                 },
                 "task_description": {
                     "description": "Task Description",
                     "data_type": "string",
-                    "order": 0
+                    "order": 4
                 }
             },
             "output": [
