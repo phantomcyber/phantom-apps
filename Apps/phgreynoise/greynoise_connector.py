@@ -106,8 +106,9 @@ class GreyNoiseConnector(BaseConnector):
         return self._session
 
     def _make_rest_call(
-        self, action_result, method, *args, error_on_404=False, **kwargs
+        self, action_result, method, *args, **kwargs
     ):
+        error_on_404 = False
         session = self.get_session()
 
         response_json = None
