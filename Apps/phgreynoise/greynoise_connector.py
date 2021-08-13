@@ -182,14 +182,14 @@ class GreyNoiseConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "No response from API")
         elif response_json.get("message") == "pong":
             if past < present:
-                self.save_progress(f"Validated API Key. License type: {license_type}, Expiration: {expiration}")
-                self.save_progress("Your licence is expired and therefore your API key has community permissions.")
-                self.debug_print(f"Validated API Key. License type: {license_type}, Expiration: {expiration}")
-                self.debug_print("Your licence is expired and therefore your API key has community permissions.")
+                self.save_progress("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.save_progress("Your licence is expired and therefore your API key has community permissions")
+                self.debug_print("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.debug_print("Your licence is expired and therefore your API key has community permissions")
                 return phantom.APP_SUCCESS
             else:
-                self.save_progress(f"Validated API Key. License type: {license_type}, Expiration: {expiration}")
-                self.debug_print(f"Validated API Key. License type: {license_type}, Expiration: {expiration}")
+                self.save_progress("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.debug_print("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
                 return phantom.APP_SUCCESS
         else:
             self.save_progress("Invalid response from API")
