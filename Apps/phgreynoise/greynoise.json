@@ -12,7 +12,7 @@
     "publisher": "GreyNoise",
     "license": "Copyright (c) GreyNoise, 2021",
     "app_version": "2.1.0",
-    "utctime_updated": "2020-11-17T20:57:49.506493Z",
+    "utctime_updated": "2021-08-13T10:42:41.000000Z",
     "package_name": "phantom_greynoise",
     "main_module": "greynoise_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -78,12 +78,12 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.data.*.code",
-                  "data_type": "string",
-                  "example_values": [
-                      "0x00",
-                      "0x01"
-                  ]
+                    "data_path": "action_result.data.*.code",
+                    "data_type": "string",
+                    "example_values": [
+                        "0x00",
+                        "0x01"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.code_meaning",
@@ -130,7 +130,7 @@
                     "example_values": [
                         1
                     ]
-                }  
+                }
             ],
             "render": {
                 "type": "custom",
@@ -170,11 +170,11 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.data.*.category",
-                  "data_type": "string",
-                  "example_values": [
-                      "public_dns"
-                  ]
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "string",
+                    "example_values": [
+                        "public_dns"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -215,7 +215,8 @@
                     "data_path": "action_result.data.*.reference",
                     "data_type": "string",
                     "example_values": [
-                        "https://developers.google.com/speed/public-dns/docs/isp#alternative"                    ]
+                        "https://developers.google.com/speed/public-dns/docs/isp#alternative"
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -246,7 +247,7 @@
                     "example_values": [
                         1
                     ]
-                }  
+                }
             ],
             "render": {
                 "type": "custom",
@@ -286,12 +287,12 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.data.*.seen",
-                  "data_type": "boolean",
-                  "example_values": [
-                      true,
-                      false
-                  ]
+                    "data_path": "action_result.data.*.seen",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.classification",
@@ -373,7 +374,7 @@
                     "example_values": [
                         1
                     ]
-                }             
+                }
             ],
             "render": {
                 "type": "custom",
@@ -677,12 +678,12 @@
                     ]
                 },
                 {
-                  "data_path": "action_result.data.*.classification",
-                  "data_type": "string",
-                  "example_values": [
-                      "benign",
-                      "malicious"
-                  ]
+                    "data_path": "action_result.data.*.classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "benign",
+                        "malicious"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
@@ -742,7 +743,7 @@
                     "example_values": [
                         1
                     ]
-                }  
+                }
             ],
             "render": {
                 "type": "custom",
