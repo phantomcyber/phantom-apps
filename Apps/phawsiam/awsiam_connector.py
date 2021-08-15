@@ -388,7 +388,13 @@ class AwsIamConnector(BaseConnector):
             return action_result.get_status()
 
         params = dict()
-        params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
+        config = self.get_config()
+
+        # Need to use different testing endpoint when using non-user credentials (assume role checkbox), since there is no user associated with the credentials
+        if config.get('use_role'):
+            params[AWSIAM_JSON_ACTION] = AWSIAM_LIST_ROLES_ENDPOINT
+        else:
+            params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
 
         # make rest call
         ret_val, response = self._make_rest_call(action_result=action_result, params=params, timeout=AWSIAM_TIMEOUT)
@@ -1492,9 +1498,10 @@ class AwsIamConnector(BaseConnector):
             self._access_key = credentials.access_key
             self._secret_key = credentials.secret_key
             self._session_token = credentials.token
+        else:
+            self._access_key = config.get(AWSIAM_ACCESS_KEY)
+            self._secret_key = config.get(AWSIAM_SECRET_KEY)
 
-        self._access_key = config.get(AWSIAM_ACCESS_KEY)
-        self._secret_key = config.get(AWSIAM_SECRET_KEY)
         self._response_metadata_dict = self._get_response_metadata_dict()
 
         if not (self._access_key and self._secret_key):
