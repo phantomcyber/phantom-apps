@@ -72,21 +72,6 @@ class AwsIamConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _make_boto_call(self, action_result, method, **kwargs):
-
-        try:
-            boto_func = getattr(self._client, method)
-        except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_INVALID_METHOD.format(method=method)), None)
-
-        try:
-            resp_json = boto_func(**kwargs)
-        except Exception as e:
-            err = self._get_error_message_from_exception(e)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_BOTO3_CALL_FAILED.format(err=err)), None)
-
-        return phantom.APP_SUCCESS, resp_json
-
     def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
         """
         This method returns the encoded|original string based on the Python version.
@@ -1382,11 +1367,6 @@ class AwsIamConnector(BaseConnector):
 
             # make rest call
             ret_val, response = self._make_rest_call(action_result=action_result, params=params)
-
-            # if not self._create_client(action_result, params):
-            #    return action_result.get_status()
-
-            # ret_val, resp = self._make_boto_call(action_result, "")
 
             if phantom.is_fail(ret_val):
                 return None
