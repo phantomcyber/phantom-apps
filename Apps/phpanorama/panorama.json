@@ -5,14 +5,14 @@
     "publisher": "Splunk",
     "type": "firewall",
     "main_module": "panorama_connector.py",
-    "app_version": "3.0.0",
+    "app_version": "3.1.0",
     "utctime_updated": "2018-12-07T01:35:49.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
     "product_name": "Panorama",
     "product_version_regex": ".*",
     "latest_tested_versions": [
-        "On prem v7.0.4"
+        "On prem v10.1.0"
     ],
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
