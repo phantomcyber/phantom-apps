@@ -6,7 +6,7 @@
     "type": "firewall",
     "main_module": "panorama_connector.py",
     "app_version": "3.0.0",
-    "utctime_updated": "2018-12-07T01:35:49.000000Z",
+    "utctime_updated": "2021-08-17T21:12:08.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
     "product_name": "Panorama",
@@ -1057,7 +1057,7 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "example_values":[
+                    "example_values": [
                         "Total applications: 2421"
                     ]
                 },
@@ -1067,7 +1067,6 @@
                     "example_values": [
                         1
                     ]
-
                 },
                 {
                     "data_path": "summary.total_objects",
