@@ -5,14 +5,14 @@
     "publisher": "Splunk",
     "type": "firewall",
     "main_module": "panorama_connector.py",
-    "app_version": "3.0.0",
-    "utctime_updated": "2018-12-07T01:35:49.000000Z",
+    "app_version": "3.0.1",
+    "utctime_updated": "2021-08-17T22:02:42.000000Z",
     "package_name": "phantom_panorama",
     "product_vendor": "Palo Alto Networks",
     "product_name": "Panorama",
     "product_version_regex": ".*",
     "latest_tested_versions": [
-        "On prem v7.0.4"
+        "On prem v10.1.0"
     ],
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
@@ -1057,7 +1057,7 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-                    "example_values":[
+                    "example_values": [
                         "Total applications: 2421"
                     ]
                 },
@@ -1067,7 +1067,6 @@
                     "example_values": [
                         1
                     ]
-
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1231,7 +1230,7 @@
                     "data_path": "action_result.data.*.log.logs.entry.*.dst",
                     "data_type": "string",
                     "column_name": "Destination IP",
-                    "column_order": 3,
+                    "column_order": 4,
                     "example_values": [
                         "10.18.3.2"
                     ],
@@ -1243,7 +1242,7 @@
                     "data_path": "action_result.data.*.log.logs.entry.*.src",
                     "data_type": "string",
                     "column_name": "Source IP",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "10.10.0.18"
                     ],
@@ -1290,7 +1289,7 @@
                     "data_path": "action_result.data.*.log.logs.entry.*.dport",
                     "data_type": "string",
                     "column_name": "Destination Port",
-                    "column_order": 4,
+                    "column_order": 5,
                     "example_values": [
                         "161"
                     ],
@@ -1323,7 +1322,7 @@
                     "data_path": "action_result.data.*.log.logs.entry.*.sport",
                     "data_type": "string",
                     "column_name": "Source Port",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "64453"
                     ],
@@ -1499,7 +1498,7 @@
                     "data_path": "action_result.data.*.log.logs.entry.*.sessionid",
                     "data_type": "string",
                     "column_name": "Session ID",
-                    "column_order": 0,
+                    "column_order": 1,
                     "example_values": [
                         "58"
                     ]
@@ -1703,6 +1702,8 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
                     "example_values": [
                         "success",
                         "failed"
