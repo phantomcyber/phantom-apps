@@ -178,7 +178,7 @@
                 "container_id": {
                     "data_type": "string",
                     "order": 0,
-                    "description": "The parameter isn't used in this app."
+                    "description": "The parameter isn't used in this app"
                 },
                 "start_time": {
                     "data_type": "numeric",
@@ -195,12 +195,12 @@
                 "container_count": {
                     "data_type": "numeric",
                     "order": 3,
-                    "description": "Maximum number of container records to query for."
+                    "description": "Maximum number of container records to query for"
                 },
                 "artifact_count": {
                     "data_type": "numeric",
                     "order": 4,
-                    "description": "Maximum number of artifact records to query for."
+                    "description": "Maximum number of artifact records to query for"
                 }
             },
             "output": [],

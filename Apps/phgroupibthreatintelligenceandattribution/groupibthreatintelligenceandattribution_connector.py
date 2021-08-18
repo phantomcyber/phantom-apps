@@ -177,102 +177,106 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
             self.save_progress('Starting polling process for {0} collection'.format(collection_name))
 
             last_fetch = self._state.get(collection_name)
-            if is_manual_poll:
-                start_time = parse(
-                    str(param.get('start_time'))).strftime(GIB_DATE_FORMAT) if param.get('start_time') else None
-                end_time = parse(
-                    str(param.get('end_time'))).strftime(GIB_DATE_FORMAT) if param.get('end_time') else None
-                generator, collection_info = self._setup_generator(collection_name, start_time, end_time)
-            else:
-                generator, collection_info = self._setup_generator(collection_name, date_start, last_fetch=last_fetch)
+            try:
+                if is_manual_poll:
+                    start_time = parse(
+                        str(param.get('start_time'))).strftime(GIB_DATE_FORMAT) if param.get('start_time') else None
+                    end_time = parse(
+                        str(param.get('end_time'))).strftime(GIB_DATE_FORMAT) if param.get('end_time') else None
+                    generator, collection_info = self._setup_generator(collection_name, start_time, end_time)
+                else:
+                    generator, collection_info = self._setup_generator(collection_name, date_start, last_fetch=last_fetch)
 
-            for chunk in generator:
-                portion = chunk.parse_portion()
-                artifacts_list = self._parse_artifacts(chunk, collection_info, collection_name)
+                for chunk in generator:
+                    portion = chunk.parse_portion()
+                    artifacts_list = self._parse_artifacts(chunk, collection_info, collection_name)
 
-                for i, feed in enumerate(portion):
-                    feed["name"] = "{0}: {1}".format(collection_info.get("prefix", ''), feed.get("name"))
+                    for i, feed in enumerate(portion):
+                        feed["name"] = "{0}: {1}".format(collection_info.get("prefix", ''), feed.get("name"))
 
-                    severity = self._transform_severity(feed)
-                    feed["severity"] = severity
+                        severity = self._transform_severity(feed)
+                        feed["severity"] = severity
 
-                    last_fetch = feed.pop("last_fetch")
-                    if feed.get('start_time'):
-                        feed['start_time'] = parse(feed.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
-                    if feed.get('end_time'):
-                        feed['end_time'] = parse(feed.get('end_time')).strftime(SPLUNK_DATE_FORMAT)
+                        last_fetch = feed.pop("last_fetch")
+                        if feed.get('start_time'):
+                            feed['start_time'] = parse(feed.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
+                        if feed.get('end_time'):
+                            feed['end_time'] = parse(feed.get('end_time')).strftime(SPLUNK_DATE_FORMAT)
 
-                    container = {**feed, **BASE_CONTAINER}
-                    ret_val, message, container_id = self.save_container(container)
-                    base_artifact = BASE_ARTIFACT
-                    if message == 'Duplicate container found':
-                        duplication_container_info = self.get_container_info(container_id)
-                        status = duplication_container_info[1].get('status')
-                        if status in ["resolved", "closed"]:
-                            self.debug_print("Skipping adding artifacts to {0} container".format(status))
-                            continue
+                        container = {**feed, **BASE_CONTAINER}
+                        ret_val, message, container_id = self.save_container(container)
+                        base_artifact = BASE_ARTIFACT
+                        if message == 'Duplicate container found':
+                            duplication_container_info = self.get_container_info(container_id)
+                            status = duplication_container_info[1].get('status')
+                            if status in ["resolved", "closed"]:
+                                self.debug_print("Skipping adding artifacts to {0} container".format(status))
+                                continue
 
-                        base_artifact['label'] = "gib update indicator"
-                        message = """
-                        Container for feed with id: {0} already exists, updating data.
-                        ret_val: {1}, message: {2}, container_id: {3}
-                        """.format(container.get("source_data_identifier"), ret_val, message, container_id)
-                    elif phantom.is_fail(ret_val):
-                        message = """
-                        Error occurred while ingesting feed with id: {0} for {1} collection.
-                        Error: {2}. Aborting the polling process
-                        """.format(container.get("source_data_identifier"), collection_name, message)
-                        action_result.set_status(phantom.APP_ERROR, message)
-                    else:
-                        message = """
-                        Container for feed with id: {0} saved. ret_val: {1}, message: {2}, container_id: {3}.
-                        """.format(container.get("source_data_identifier"), ret_val, message, container_id)
-                        if is_manual_poll:
-                            container_count += 1
-                            if container_count >= param.get('container_count', BASE_MAX_CONTAINERS_COUNT):
-                                flag = 1
+                            base_artifact['label'] = "gib update indicator"
+                            message = """
+                            Container for feed with id: {0} already exists, updating data.
+                            ret_val: {1}, message: {2}, container_id: {3}
+                            """.format(container.get("source_data_identifier"), ret_val, message, container_id)
+                        elif phantom.is_fail(ret_val):
+                            message = """
+                            Error occurred while ingesting feed with id: {0} for {1} collection.
+                            Error: {2}. Aborting the polling process
+                            """.format(container.get("source_data_identifier"), collection_name, message)
+                            action_result.set_status(phantom.APP_ERROR, message)
+                        else:
+                            message = """
+                            Container for feed with id: {0} saved. ret_val: {1}, message: {2}, container_id: {3}.
+                            """.format(container.get("source_data_identifier"), ret_val, message, container_id)
+                            if is_manual_poll:
+                                container_count += 1
+                                if container_count >= param.get('container_count', BASE_MAX_CONTAINERS_COUNT):
+                                    flag = 1
 
-                    self.debug_print(message)
-                    self.save_progress(message)
-                    if phantom.is_fail(action_result.get_status()):
-                        return action_result.get_status()
-
-                    if not is_manual_poll:
-                        self._state[collection_name] = last_fetch
-
-                    artifacts = []
-                    for artifact in artifacts_list[i]:
-                        if artifact.get('start_time'):
-                            artifact['start_time'] = parse(artifact.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
-                        if artifact.get('end_time'):
-                            artifact['end_time'] = parse(artifact.get('end_time')).strftime(SPLUNK_DATE_FORMAT)
-                        artifacts.append({**artifact, **base_artifact,
-                                          "container_id": container_id, "severity": severity})
-
-                        if is_manual_poll:
-                            artifacts_count += 1
-                            if artifacts_count >= param.get('artifact_count', BASE_MAX_ARTIFACTS_COUNT):
-                                flag = 1
-                                break
-
-                    if artifacts:
-                        ret_val, message, _ = self.save_artifacts(artifacts)
-                        message = """
-                        Status {0} for ingesting artifacts for container with id: {1} for {2} collection.
-                        Message: {3}""".format(ret_val, container_id, collection_name, message)
                         self.debug_print(message)
                         self.save_progress(message)
+                        if phantom.is_fail(action_result.get_status()):
+                            return action_result.get_status()
+
+                        if not is_manual_poll:
+                            self._state[collection_name] = last_fetch
+
+                        artifacts = []
+                        for artifact in artifacts_list[i]:
+                            if artifact.get('start_time'):
+                                artifact['start_time'] = parse(artifact.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
+                            if artifact.get('end_time'):
+                                artifact['end_time'] = parse(artifact.get('end_time')).strftime(SPLUNK_DATE_FORMAT)
+                            artifacts.append({**artifact, **base_artifact,
+                                            "container_id": container_id, "severity": severity})
+
+                            if is_manual_poll:
+                                artifacts_count += 1
+                                if artifacts_count >= param.get('artifact_count', BASE_MAX_ARTIFACTS_COUNT):
+                                    flag = 1
+                                    break
+
+                        if artifacts:
+                            ret_val, message, _ = self.save_artifacts(artifacts)
+                            message = """
+                            Status {0} for ingesting artifacts for container with id: {1} for {2} collection.
+                            Message: {3}""".format(ret_val, container_id, collection_name, message)
+                            self.debug_print(message)
+                            self.save_progress(message)
+
+                        if flag:
+                            break
 
                     if flag:
                         break
 
+                self.debug_print('Polling process for {0} collection has finished.'.format(collection_name))
+                self.save_progress('Polling process for {0} collection has finished.'.format(collection_name))
                 if flag:
                     break
-
-            self.debug_print('Polling process for {0} collection has finished.'.format(collection_name))
-            self.save_progress('Polling process for {0} collection has finished.'.format(collection_name))
-            if flag:
-                break
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         self.debug_print('Polling process for all collections has finished.')
         self.save_progress('Polling process for all collections has finished.')
