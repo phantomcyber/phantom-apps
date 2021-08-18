@@ -400,7 +400,10 @@ class CarbonblackConnector(BaseConnector):
             return ""
 
         # Convert to an unsigned int
-        input_ip = int(input_ip)
+        try:
+            input_ip = int(input_ip)
+        except:
+            return ""
         input_ip = ctypes.c_uint32(input_ip).value
         # long(input_ip) & 0xffffffff
         # input_ip = long(input_ip)
