@@ -11,12 +11,13 @@ from phantom.action_result import ActionResult
 import requests
 import json
 import time
-from boto3 import client
+from boto3 import client, Session
 from datetime import datetime, timedelta
 from botocore.config import Config
 from awsguardduty_consts import *
 from bs4 import UnicodeDammit
 import sys
+import ast
 
 
 class RetVal(tuple):
@@ -35,6 +36,7 @@ class AwsGuarddutyConnector(BaseConnector):
         self._region = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._base_url = None
         self._proxy = None
 
@@ -109,11 +111,25 @@ class AwsGuarddutyConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, parameter
 
-    def _create_client(self, action_result):
+    def _create_client(self, action_result, param=None):
 
         boto_config = None
         if self._proxy:
             boto_config = Config(proxies=self._proxy)
+
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR,
+                                                "Failed to get temporary credentials: {}".format(e))
 
         try:
             if self._access_key and self._secret_key:
@@ -123,6 +139,7 @@ class AwsGuarddutyConnector(BaseConnector):
                         region_name=self._region,
                         aws_access_key_id=self._access_key,
                         aws_secret_access_key=self._secret_key,
+                        aws_session_token=self._session_token,
                         config=boto_config)
             else:
                 self.debug_print("Creating boto3 client without API keys")
@@ -173,7 +190,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         self.save_progress("Connecting to endpoint")
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         ret_val, _ = self._make_boto_call(action_result, 'list_invitations', MaxResults=1)
@@ -238,7 +255,7 @@ class AwsGuarddutyConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         filter_name = self._filter_name
@@ -416,7 +433,7 @@ class AwsGuarddutyConnector(BaseConnector):
         """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -525,7 +542,7 @@ class AwsGuarddutyConnector(BaseConnector):
         """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -567,7 +584,7 @@ class AwsGuarddutyConnector(BaseConnector):
         """
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -646,7 +663,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -695,7 +712,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -799,7 +816,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -847,7 +864,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         detector_id = param['detector_id']
@@ -891,7 +908,7 @@ class AwsGuarddutyConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if phantom.is_fail(self._create_client(action_result)):
+        if phantom.is_fail(self._create_client(action_result, param)):
             return action_result.get_status()
 
         list_detectors = self._paginator('list_detectors', None, action_result)
@@ -945,6 +962,12 @@ class AwsGuarddutyConnector(BaseConnector):
 
         return action_execution_status
 
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
     def initialize(self):
 
         self._state = self.load_state()
@@ -965,12 +988,6 @@ class AwsGuarddutyConnector(BaseConnector):
             return self.get_status()
 
         self._filter_name = config.get('filter_name')
-
-        if 'access_key' in config:
-            self._access_key = config['access_key']
-        if 'secret_key' in config:
-            self._secret_key = config['secret_key']
-
         self._region = AWSGUARDDUTY_REGION_DICT.get(config[AWSGUARDDUTY_JSON_REGION])
 
         self._proxy = {}
@@ -979,6 +996,22 @@ class AwsGuarddutyConnector(BaseConnector):
             self._proxy['http'] = env_vars['HTTP_PROXY']['value']
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, "Failed to get EC2 role credentials")
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get('access_key')
+        self._secret_key = config.get('secret_key')
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSGUARDDUTY_BAD_ASSET_CONFIG_ERR_MSG)
 
         return phantom.APP_SUCCESS
 
