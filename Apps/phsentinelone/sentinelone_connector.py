@@ -426,7 +426,7 @@ class SentineloneConnector(BaseConnector):
     def _get_agent_id(self, search_text, action_result):
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
-        params = {"computerName": search_text}
+        params = {"query": search_text}
         ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params, method='get')
         if phantom.is_fail(ret_val):
             return str(-1)

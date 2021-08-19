@@ -11,7 +11,7 @@
     "product_version_regex": ".*",
     "publisher": "SentinelOne",
     "license": "Copyright (c) SentinelOne, 2018-2021",
-    "app_version": "2.1.1",
+    "app_version": "2.2.0",
     "utctime_updated": "2021-02-25T13:25:33.000000Z",
     "package_name": "phantom_sentinelone",
     "main_module": "sentinelone_connector.py",
@@ -224,7 +224,9 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "host name"
+                        "host name",
+                        "ip"
+
                     ],
                     "order": 0
                 }
@@ -295,7 +297,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "host name"
+                        "host name",
+                        "ip"
                     ],
                     "order": 0
                 }
