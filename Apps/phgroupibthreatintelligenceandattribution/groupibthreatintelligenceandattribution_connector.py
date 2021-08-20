@@ -270,16 +270,16 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                     if flag:
                         break
 
-                self.debug_print('Polling process for {0} collection has finished.'.format(collection_name))
-                self.save_progress('Polling process for {0} collection has finished.'.format(collection_name))
+                self.debug_print('Polling process for {0} collection has finished'.format(collection_name))
+                self.save_progress('Polling process for {0} collection has finished'.format(collection_name))
                 if flag:
                     break
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
 
-        self.debug_print('Polling process for all collections has finished.')
-        self.save_progress('Polling process for all collections has finished.')
+        self.debug_print('Polling process for all collections has finished')
+        self.save_progress('Polling process for all collections has finished')
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
@@ -302,6 +302,12 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Reseting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, GIB_STATE_FILE_CORRUPT_ERR)
 
         # get the asset config
         config = self.get_config()

@@ -370,3 +370,5 @@ BASE_MAX_ARTIFACTS_COUNT = 1000
 # Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+
+GIB_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again."
