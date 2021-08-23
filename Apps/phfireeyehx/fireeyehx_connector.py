@@ -946,6 +946,49 @@ class FireeyeHxConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_get_alert(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Starting HX Auth Token Block
+
+        self.save_progress("Auth Token Starting")
+        hx_uri = "/hx/api/v3/token"
+        ret_val, response = self.hx_auth_make_rest_call(hx_uri, action_result, params=None, headers=None)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        self.save_progress("Auth Token Complete")
+
+        fe_auth_token = response
+
+        # Ending HX Auth Token Block
+
+        # Starting Get Alert API Call
+        alert_id = param["alert_id"]
+
+        hx_uri = "/hx/api/v3/alerts/" + str(alert_id)
+        token_header = {'x-feapi-token': fe_auth_token, 'Accept': 'application/json'}
+
+        # make rest call
+        ret_val, response = self._make_rest_call(hx_uri, action_result, params=None, headers=token_header, method='get')
+
+        # flatten out data
+        response = self._flatten_response_data(response)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        # summary = action_result.update_summary({})
+        # summary['important_data'] = "value"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def handle_action(self, param):
 
         ret_val = phantom.APP_SUCCESS
@@ -997,6 +1040,9 @@ class FireeyeHxConnector(BaseConnector):
         elif action_id == 'get_host_set':
             ret_val = self._handle_get_host_set(param)
 
+        elif action_id == 'get_alert':
+            ret_val = self._handle_get_alert(param)
+
         return ret_val
 
     def initialize(self):
@@ -1009,7 +1055,7 @@ class FireeyeHxConnector(BaseConnector):
         config = self.get_config()
 
         self._zip_password = config.get('zip_password', 'unzip-me')
-        
+
         return phantom.APP_SUCCESS
 
     def finalize(self):
