@@ -3086,6 +3086,165 @@
                 "view": "thehive_view.display_get_observables"
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "create task log",
+            "identifier": "create_task_log",
+            "description": "Create Task Log",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "task_id": {
+                    "description": "Task ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "thehive task id"
+                    ],
+                    "order": 0
+                },
+                "message": {
+                    "description": "Message",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1,
+                    "example_values": [
+                        "This is expected activity. Closing Task"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "thehive ticket id"
+                    ],
+                    "example_values": [
+                        "AWG00KRH38eA2eAzW_gI",
+                        "AWQfCcret-_WVPphkhQq"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 2,
+                    "example_values": [
+                        "This is expected activity. Closing Task"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._id",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWQfCdsmt-_WVPphkhQv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._routing",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWQfCcret-_WVPphkhQq"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._type",
+                    "data_type": "string",
+                    "example_values": [
+                        "case_task_log"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdAt",
+                    "data_type": "numeric",
+                    "column_name": "Created At",
+                    "column_order": 1,
+                    "example_values": [
+                        1519157031533,
+                        1529529096997
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "testUser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "thehive task log id"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "AWG00LJx38eA2eAzW_gL",
+                        "AWQfCdsmt-_WVPphkhQv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.order",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Waiting"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created Tasks"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
         }
     ]
 }

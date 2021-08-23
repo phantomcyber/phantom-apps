@@ -572,6 +572,27 @@ class ThehiveConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully created Observable")
 
+    def _handle_create_task_log(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        task_id = param['task_id']
+        message = param['message']
+        data = dict()
+        data.update({'message': message})
+        endpoint = 'api/case/task/' + task_id + '/log'
+        authToken = "Bearer " + self._api_key
+        headers = {'Content-Type': 'application/json', 'Authorization': authToken}
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, data=data, headers=headers,
+                                                 method="post")
+        if (phantom.is_fail(ret_val)):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            # so just return from here
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created Task Log")
+    
     def handle_action(self, param):
 
         ret_val = phantom.APP_SUCCESS
@@ -613,6 +634,9 @@ class ThehiveConnector(BaseConnector):
 
         elif action_id == 'create_observable':
             ret_val = self._handle_create_observable(param)
+
+        elif action_id == 'create_task_log':
+            ret_val = self._handle_create_task_log(param)
 
         return ret_val
 
