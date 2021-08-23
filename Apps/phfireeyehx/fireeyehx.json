@@ -8,7 +8,7 @@
     "logo_dark": "logo_fireeye_dark.svg",
     "product_name": "FireEye HX",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "contributors": [
         {
             "name": "Erica Pescio"
@@ -61,7 +61,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -72,7 +71,6 @@
             "action": "get system info",
             "identifier": "get_system_info",
             "description": "Get system information for an endpoint",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -496,7 +494,6 @@
             "action": "quarantine device",
             "identifier": "quarantine_device",
             "description": "Request to contain the endpoint",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "undo": "unquarantine device",
@@ -586,7 +583,6 @@
             "action": "get quarantine status",
             "identifier": "get_quarantine_status",
             "description": "Get the containment status for an endpoint",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -766,7 +762,6 @@
             "action": "set quarantine approved",
             "identifier": "set_quarantine_approved",
             "description": "Approve containment request for host",
-            "verbose": "",
             "type": "contain",
             "read_only": false,
             "parameters": {
@@ -857,7 +852,6 @@
             "action": "unquarantine device",
             "identifier": "unquarantine_device",
             "description": "Containment cancellation for host",
-            "verbose": "",
             "type": "correct",
             "read_only": false,
             "undo": "quarantine device",
@@ -911,7 +905,6 @@
             "action": "get acquisition status",
             "identifier": "get_acquisition_status",
             "description": "Get status of file acquisition",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -1135,7 +1128,6 @@
             "action": "get triage",
             "identifier": "get_triage",
             "description": "Request Endpoint Host Triage Package",
-            "verbose": "",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -1374,7 +1366,6 @@
             "action": "list device groups",
             "identifier": "list_host_sets",
             "description": "Retrieve a list of host sets in HX optionally filtered by name",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -1463,7 +1454,6 @@
             "action": "get device group",
             "identifier": "get_host_set",
             "description": "List endpoints in a host set",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -1755,7 +1745,6 @@
             "action": "list endpoints",
             "identifier": "list_endpoints",
             "description": "List and search the endpoints on HX",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2091,7 +2080,6 @@
             "action": "list acquisitions",
             "identifier": "list_acquisitions",
             "description": "Retireve a list of all acquisitions with optional filters",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -2339,7 +2327,6 @@
             "action": "start acquisition",
             "identifier": "start_acquisition",
             "description": "Request a file to be acquired into FireEye HX",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2657,7 +2644,6 @@
             "action": "get file",
             "identifier": "get_file",
             "description": "Pull the acquired file into Phantom Vault",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -2788,7 +2774,6 @@
             "action": "get alert",
             "identifier": "get_alert",
             "description": "Pull single alert info by ID",
-            "verbose": "",
             "type": "investigate",
             "read_only": true,
             "parameters": {
