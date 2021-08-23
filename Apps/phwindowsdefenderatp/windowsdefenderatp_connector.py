@@ -1426,7 +1426,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         look_back_hours = param.get(DEFENDERATP_LOOK_BACK_HOURS_PARAM_CONST, 720)
 
         # Check for integer value
-        ret_val, look_back_hours = self._validate_integer(action_result, look_back_hours, DEFENDERATP_LOOK_BACK_HOURS_PARAM_CONST, allow_zero=False)
+        ret_val, look_back_hours = self._validate_integer(action_result, look_back_hours, LOOK_BACK_HOURS_KEY, allow_zero=False)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 

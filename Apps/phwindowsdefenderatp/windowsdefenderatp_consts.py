@@ -109,6 +109,7 @@ TYPE_ERR_MSG = "Error occurred while connecting to the Windows Defender ATP Serv
 VALID_INTEGER_MSG = "Please provide a valid integer value in the {}"
 NON_NEGATIVE_INTEGER_MSG = "Please provide a valid non-zero positive integer value in the {}"
 POSITIVE_INTEGER_MSG = "Please provide non-zero positive integer in {}"
+LOOK_BACK_HOURS_KEY = "'look_back_hours' action parameter"
 TIMEOUT_KEY = "'timeout' action parameter"
 LIMIT_KEY = "'limit' action parameter"
 
