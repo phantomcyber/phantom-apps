@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.2.0",
+    "app_version": "3.3.0",
     "utctime_updated": "2021-08-08T12:07:47.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
@@ -1816,6 +1816,9 @@
                     "data_type": "string",
                     "example_values": [
                         "636924432519012302_1685044642"
+                    ],
+                    "contains": [
+                        "defender atp alert id"
                     ]
                 },
                 {
@@ -2123,7 +2126,7 @@
         },
         {
             "action": "get alert",
-            "description": "Retrieves specific Alert by its ID",
+            "description": "Retrieve specific Alert by its ID",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-alert-info-by-id\" target=\"_blank\">Get Alert Information by ID API Documentation</a>), user can get alerts last updated according to your configured retention period.; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
             "identifier": "get_alert",
@@ -2145,7 +2148,10 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "column_name": "Alert ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "contains": [
+                        "defender atp alert id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.title",
@@ -2399,15 +2405,26 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Action taken: Retrieved Alert"
+                    ]
+
                 },
                 {
                     "data_path": "action_result.summary.action_taken",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Retrieved Alert"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.alert_id",
@@ -2418,11 +2435,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -2432,7 +2455,7 @@
         },
         {
             "action": "update alert",
-            "description": "Updates properties of existing Alert",
+            "description": "Update properties of existing Alert",
             "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/update-alert\" target=\"_blank\">Get Alert Information by ID API Documentation</a>), user can update alerts that available in the API. See List Alerts for more information.; rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
             "type": "investigate",
             "identifier": "update_alert",
@@ -2449,10 +2472,9 @@
                     "order": 0
                 },
                 "status": {
-                    "description": "Specifies the current status of the alert.",
+                    "description": "Specifies the current status of the alert",
                     "data_type": "string",
                     "required": false,
-                    "primary": true,
                     "order": 1,
                     "value_list": [
                         "New",
@@ -2461,7 +2483,7 @@
                     ]
                 },
                 "assigned_to": {
-                    "description": "Owner of the alert.",
+                    "description": "Owner of the alert",
                     "data_type": "string",
                     "required": false,
                     "primary": true,
@@ -2471,10 +2493,9 @@
                     ]
                 },
                 "classification": {
-                    "description": "Specifies the specification of the alert.",
+                    "description": "Specifies the specification of the alert",
                     "data_type": "string",
                     "required": false,
-                    "primary": true,
                     "order": 3,
                     "value_list": [
                         "Unknown",
@@ -2483,10 +2504,9 @@
                     ]
                 },
                 "determination": {
-                    "description": "Specifies the determination of the alert.",
+                    "description": "Specifies the determination of the alert",
                     "data_type": "string",
                     "required": false,
-                    "primary": true,
                     "order": 4,
                     "value_list": [
                         "NotAvailable",
@@ -2499,25 +2519,33 @@
                     ]
                 },
                 "comment": {
-                    "description": "Comment to be added to the alert.",
+                    "description": "Comment to be added to the alert",
                     "data_type": "string",
                     "required": false,
-                    "primary": true,
                     "order": 5
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "defender atp alert id"
+                    ],
+                    "column_name": "Alert ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.title",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Title",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.category",
@@ -2525,7 +2553,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.comments.*.comment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Comment",
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.comments.*.createdBy",
@@ -2676,7 +2706,9 @@
                     "data_type": "string",
                     "contains": [
                         "email"
-                    ]
+                    ],
+                    "column_name": "Assigned To",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.detectorId",
@@ -2718,7 +2750,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.determination",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Determination",
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.lastEventTime",
@@ -2737,7 +2771,9 @@
                 },
                 {
                     "data_path": "action_result.data.*.classification",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_name": "Classification",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.firstEventTime",
@@ -2773,15 +2809,25 @@
                 },
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "failed",
+                        "success"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Action Taken: Updated Alert"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.action_taken",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated Alert"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.status",
@@ -2815,11 +2861,1704 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain prevalence",
+            "description": "Return statistics for the specified domain",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-domain-statistics?view=o365-worldwide\" target=\"_blank\">Get domain statistics API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The maximum value for look_back_hours is 720 hours (30 days).",
+            "type": "investigate",
+            "identifier": "domain_prevalence",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to get the statistics",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                },
+                "look_back_hours": {
+                    "description": "Define the hours you search back to get the statistics (Default: 720 hours (30 days))",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": "720",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "column_name": "Host Name",
+                    "column_order": 0,
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgLastSeen",
+                    "data_type": "string",
+                    "column_name": "Organization Last Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.orgFirstSeen",
+                    "data_type": "string",
+                    "column_name": "Organization First Seen",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.orgPrevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#microsoft.windowsDefenderATP.api.InOrgDomainStats"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organizationPrevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Organization Prevalence",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization prevalence: 0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization_prevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "abc.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.look_back_hours",
+                    "data_type": "numeric",
+                    "example_values": [
+                        720
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "ip prevalence",
+            "description": "Return statistics for the specified IP",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ip-statistics?view=o365-worldwide\" target=\"_blank\">Get IP statistics API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The maximum value for look_back_hours is 720 hours (30 days).",
+            "type": "investigate",
+            "identifier": "ip_prevalence",
+            "read_only": true,
+            "parameters": {
+                "ip": {
+                    "description": "IP to get the statistics",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0
+                },
+                "look_back_hours": {
+                    "description": "Define the hours you search back to get the statistics (Default: 720 hours (30 days))",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": "720",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.217.9.206"
+                    ],
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "IP Address",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.orgLastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T10:18:39.9233319Z"
+                    ],
+                    "column_name": "Organization Last Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.orgFirstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T10:18:39.9233319Z"
+                    ],
+                    "column_name": "Organization First Seen",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.orgPrevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#microsoft.windowsDefenderATP.api.InOrgIPStats"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.organizationPrevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Organization Prevalence",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization prevalence: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization_prevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.217.9.206"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.look_back_hours",
+                    "data_type": "numeric",
+                    "example_values": [
+                        720
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "file prevalence",
+            "description": "Return statistics for the specified file",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-file-statistics?view=o365-worldwide\" target=\"_blank\">Get File statistics API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The maximum value for look_back_hours is 720 hours (30 days).",
+            "type": "investigate",
+            "identifier": "file_prevalence",
+            "read_only": true,
+            "parameters": {
+                "file_hash": {
+                    "description": "File hash to get the statistics (SHA1 or SHA256)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1",
+                        "sha256"
+                    ],
+                    "order": 0
+                },
+                "look_back_hours": {
+                    "description": "Define the hours you search back to get the statistics (Default: 720 hours (30 days))",
+                    "data_type": "numeric",
+                    "required": false,
+                    "default": "720",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "954e0fd64a1242d0fa860b220198118268e35018"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "SHA1",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.orgLastSeen",
+                    "data_type": "string",
+                    "column_name": "Organization Last Seen",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.orgFirstSeen",
+                    "data_type": "string",
+                    "column_name": "Organization First Seen",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.topFileNames",
+                    "data_type": "string",
+                    "example_values": [
+                        "mssense.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgPrevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#microsoft.windowsDefenderATP.api.InOrgFileStats"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.globalPrevalence",
+                    "data_type": "string",
+                    "example_values": [
+                        "64356"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.globalLastObserved",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-20T10:15:33.4741238Z"
+                    ],
+                    "column_name": "Global Last Observed",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.globallyPrevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        64356
+                    ],
+                    "column_name": "Global Prevalence",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.globalFirstObserved",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-07-11T08:50:15.2316886Z"
+                    ],
+                    "column_name": "Global First Observed",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.organizationPrevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Organization Prevalence",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization prevalence: 0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.organization_prevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "954e0fd64a1242d0fa860b220198118268e35018"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.look_back_hours",
+                    "data_type": "string",
+                    "example_values": [
+                        "720"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file info",
+            "description": "Retrieve a File information by identifier SHA1, or SHA256",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-file-information?view=o365-worldwide\" target=\"_blank\">Get File Information API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The valid file identifiers are SHA1 and SHA256.",
+            "type": "investigate",
+            "identifier": "get_file_info",
+            "read_only": true,
+            "parameters": {
+                "file_hash": {
+                    "description": "Identifier of the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1",
+                        "sha256"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "954e0fd64a1242d0fa860b220198118268e35018",
+                        "1a563e59bfcdc9e7b4d8ac81c6b6579e2d215952f6dd98e0ab1ab026ac616896"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "sha256"
+                    ],
+                    "column_name": "File Hash",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "44adb27786eb24e5bbfd06b69e84d252"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "954e0fd64a1242d0fa860b220198118268e35018"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5395384
+                    ],
+                    "column_name": "Size",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.issuer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Windows Production PCA 2011"
+                    ],
+                    "column_name": "Issuer",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "1a563e59bfcdc9e7b4d8ac81c6b6579e2d215952f6dd98e0ab1ab026ac616896"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.signer",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows Publisher"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.isPeFile",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.signerHash",
+                    "data_type": "string",
+                    "example_values": [
+                        "4f95a05d113f1f31b481e92f8f0d2b9889545004"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.filePublisher",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#Files/$entity"
+                    ],
+                    "contains":[
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.fileProductName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows Operating System"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.globalPrevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        64134
+                    ],
+                    "column_name": "Global Prevalence",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.determinationType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unknown"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.determinationValue",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.globalLastObserved",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-19T10:33:39.6552836Z"
+                    ],
+                    "column_name": "Global Last Observed",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.isValidCertificate",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.globalFirstObserved",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-07-11T08:50:15.2316886Z"
+                    ],
+                    "column_name": "Global First Observed",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.summary.global_prevalence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        64355
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved file information"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get file devices",
+            "description": "Retrieve a collection of devices related to a given file hash (SHA1)",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-file-related-machines?view=o365-worldwide\" target=\"_blank\">Get File Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The valid file identifier is SHA1",
+            "type": "investigate",
+            "identifier": "get_file_related_devices",
+            "read_only": true,
+            "parameters": {
+                "file_hash": {
+                    "description": "Identifier of the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "954e0fd64a1242d0fa860b220198118268e35018"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "803c416946e8738b7711903a28362adeae6e1aea"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osBuild",
+                    "data_type": "numeric",
+                    "example_values": [
+                        19042
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "20H2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-04T13:40:25.2473895Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T06:12:16.3736341Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osPlatform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.vmId",
+                    "data_type": "string",
+                    "example_values": [
+                        "238443dc-56ce-487f-aeb6-261a2a00a38c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.resourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/1b922e46-8595-4749-997a-1205e714cd91/resourceGroups/evaluation_3e5d447ba5d6470b9636a8709cd5b26a_4/providers/Microsoft.Compute/virtualMachines/TestMachine4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.cloudProvider",
+                    "data_type": "string",
+                    "example_values": [
+                        "Azure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.subscriptionId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b922e46-8595-4749-997a-1205e714cd91"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aadDeviceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deviceValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "Normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ethernet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.macAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "000D3A7B423C"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.operationalStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Up"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isAadJoined",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osProcessor",
+                    "data_type": "string",
+                    "example_values": [
+                        "x64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agentVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.7740.19041.1110"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.healthStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inactive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exposureLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.osArchitecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "64-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmachine4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.defenderAvStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.onboardingStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Onboarded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastExternalIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "137.116.83.101"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.display_devices",
+                "title": "Get Report"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user devices",
+            "description": "Retrieve a collection of devices related to a given user ID",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-user-related-machines?view=o365-worldwide\" target=\"_blank\">Get User Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The ID is not the full UPN, but only the user name. (for example, to retrieve machines for user1@contoso.com use user1 for user_id parameter).",
+            "type": "investigate",
+            "identifier": "get_user_related_devices",
+            "read_only": true,
+            "parameters": {
+                "user_id": {
+                    "description": "ID of the user",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0,
+                    "contains": [
+                        "user name"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Administrator1"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "803c416946e8738b7711903a28362adeae6e1aea"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osBuild",
+                    "data_type": "numeric",
+                    "example_values": [
+                        19042
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "20H2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-04T13:40:25.2473895Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T06:12:16.3736341Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osPlatform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.vmId",
+                    "data_type": "string",
+                    "example_values": [
+                        "238443dc-56ce-487f-aeb6-261a2a00a38c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.resourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/1b922e46-8595-4749-997a-1205e714cd91/resourceGroups/evaluation_3e5d447ba5d6470b9636a8709cd5b26a_4/providers/Microsoft.Compute/virtualMachines/TestMachine4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.cloudProvider",
+                    "data_type": "string",
+                    "example_values": [
+                        "Azure"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.subscriptionId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b922e46-8595-4749-997a-1205e714cd91"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aadDeviceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deviceValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "Normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ethernet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.macAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "000D3A7B423C"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.operationalStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Up"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isAadJoined",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osProcessor",
+                    "data_type": "string",
+                    "example_values": [
+                        "x64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agentVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.7740.19041.1110"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.healthStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inactive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exposureLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.osArchitecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "64-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmachine4"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.defenderAvStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.onboardingStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Onboarded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastExternalIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "137.116.83.101"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.display_devices",
+                "title": "Get Report"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get installed software",
+            "description": "Retrieve a collection of installed software related to a given device ID",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-installed-software?view=o365-worldwide\" target=\"_blank\">Get Installed Software API Documentation</a>), the user can retrieve a collection of installed software related to a given device ID.",
+            "type": "investigate",
+            "identifier": "get_installed_software",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-_-.net_framework"
+                    ],
+                    "column_name": "Software ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        ".net_framework"
+                    ],
+                    "column_name": "Software Name",
+                    "column_order": 2
+                    
+                },
+                {
+                    "data_path": "action_result.data.*.vendor",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Vendor"
+                    ],
+                    "column_name": "Vendor",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.weaknesses",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Weaknesses",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.activeAlert",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ],
+                    "column_name": "Active Alert",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.impactScore",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Impact Score",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.publicExploit",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ],
+                    "column_name": "Public Exploit",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.exposedMachines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Exposed Machines",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.installedMachines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
+                    ],
+                    "column_name": "Installed Machines",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total software: 9"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_software",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "restrict app execution",
+            "description": "Restrict execution of all applications on the device except a predefined set",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/restrict-code-execution?view=o365-worldwide\" target=\"_blank\">Restrict app execution API Documentation</a>), the user can restrict execution of all applications on the device except a predefined set, rate limitations for this API are 100 calls per minute and 1500 calls per hour.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 minute.",
+            "type": "contain",
+            "identifier": "restrict_app_execution",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "default": 30,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Restrict code execution due to alert 1234"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "testuser@example.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Quarantine Status",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "RestrictCodeExecution"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "PublicApi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.troubleshootInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: cd2ab57e-5b52-43b0-99d8-c370fc620a54, Restriction status: Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.restriction_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pending"
+                    ]
                 }
             ],
             "render": {

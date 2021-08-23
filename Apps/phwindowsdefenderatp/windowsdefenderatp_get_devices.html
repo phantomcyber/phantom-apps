@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: windowsdefenderatp_list_alerts.html
+<!-- File: windowsdefenderatp_get_devices.html
     Copyright (c) 2019-2021 Splunk Inc.
 
     Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -90,32 +90,29 @@
     {% else %}
         <h3 class="wf-h3-style">Action Parameters</h3>
         <table class="wf-table-vertical">
-            {% if result.param.input %}
-                <tr>
-                    <td>Input</td>
+            <tr>
+                {% if result.param.file_hash %}
+                    <td>File Hash</td>
                     <td><a href="javascript:;"
-                        onclick="context_menu(this, [{'contains': ['domain', 'sha1', 'sha256', 'md5', 'ip'], 'value': '{{ result.param.input }}' }], 0, {{ container.id }}, null, false);">
-                        {{ result.param.input }}
+                        onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ result.param.file_hash }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.file_hash }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                     </td>
-                </tr>
-            {%endif%}
-            {% if result.param.input_type %}
-                <tr>
-                    <td>Type of input</td>
-                    <td>{{ result.param.input_type }}</td>
-                </tr>
-            {%endif%}
-            {% if result.param.limit %}
-                <tr>
-                    <td>Limit</td>
-                    <td>{{ result.param.limit }}</td>
-                </tr>
-            {%endif%}
+                {% else %}
+                    <td>User ID</td>
+                    <td><a href="javascript:;"
+                        onclick="context_menu(this, [{'contains': ['user name'], 'value': '{{ result.param.user_id }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.user_id }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                {% endif %}          
+            </tr>
         </table>
-        <h3 class="wf-h3-style">Alert Info</h3>
+        <h3 class="wf-h3-style">Device Info</h3>
         <div class="metadata_div">
             <!--Default View-->
             <div class="panel-group" id="server-information">
@@ -124,51 +121,44 @@
                         <table class="wf-table-horizontal datatable">
                             <thead>
                                 <tr>
-                                    <th>Computer DNS Name</th>
-                                    <th>Alert ID</th>
-                                    <th>Title</th>
-                                    <th>Threat Family</th>
-                                    <th>Status</th>
-                                    <th>Severity</th>
-                                    <th>Category</th>
-                                    <th>Creation Time</th>
-                                    <th>Assigned To</th>
+                                    <th>Device ID</th>
+                                    <th>Health Status</th>
+                                    <th>OS</th>
+                                    <th>Computer Name</th>
+                                    <th>Last External IP address</th>
+                                    <th>Last IP Address</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for alert in result.data %}
+                                {% for device in result.data %}
                                     <tr>
-                                        <td>{{ alert.computerDnsName | default:"None" }}</td>
-                                        {% if alert.id %}
-                                            <td>
-                                                <a href="javascript:;"
-                                                onclick="context_menu(this, [{'contains': ['defender atp alert id'], 'value': '{{ alert.id }}' }], 0, {{ container.id }}, null, false);">
-                                                    {{ alert.id }}
-                                                    &nbsp;
-                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                                </a>
-                                            </td>
-                                        {% else %}
-                                            <td>None</td>
-                                        {% endif %}
-                                        <td>{{ alert.title | default:"None" }}</td>
-                                        <td>{{ alert.threatFamilyName | default:"None" }}</td>
-                                        <td>{{ alert.status | default:"None" }}</td>
-                                        <td>{{ alert.severity | default:"None" }}</td>
-                                        <td>{{ alert.category | default:"None" }}</td>
-                                        <td>{{ alert.alertCreationTime | default:"None" }}</td>
-                                        {% if alert.assignedTo %}
-                                            <td>
-                                                <a href="javascript:;"
-                                                onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ alert.assignedTo }}' }], 0, {{ container.id }}, null, false);">
-                                                    {{ alert.assignedTo }}
-                                                    &nbsp;
-                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                                </a>
-                                            </td>
-                                        {% else %}
-                                            <td>None</td>
-                                        {% endif %}
+                                        <td>
+                                            <a href="javascript:;"
+                                            onclick="context_menu(this, [{'contains': ['sha1'], 'value': '{{ device.id }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ device.id }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                        <td>{{ device.healthStatus | default:"None" }}</td>
+                                        <td>{{ device.osPlatform | default:"None" }}</td>
+                                        <td>{{ device.computerDnsName | default:"None" }}</td>
+                                        <td>
+                                            <a href="javascript:;"
+                                            onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ device.lastExternalIpAddress }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ device.lastExternalIpAddress }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:;"
+                                            onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ device.lastIpAddress }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ device.lastIpAddress }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
