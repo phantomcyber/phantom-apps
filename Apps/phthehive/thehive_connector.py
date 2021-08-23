@@ -592,7 +592,7 @@ class ThehiveConnector(BaseConnector):
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully created Task Log")
-    
+
     def handle_action(self, param):
 
         ret_val = phantom.APP_SUCCESS
