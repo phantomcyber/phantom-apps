@@ -373,12 +373,13 @@ class WindowsDefenderAtpConnector(BaseConnector):
             except:
                 return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
 
-            if parameter <= 0:
-                if not allow_zero and parameter == 0:
-                    return action_result.set_status(phantom.APP_ERROR, POSITIVE_INTEGER_MSG.format(key)), None
-
-                # Return if allow_zero is True
+            # Negative value validation
+            if parameter < 0:
                 return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+            # Zero value validation
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, POSITIVE_INTEGER_MSG.format(key)), None
 
         return phantom.APP_SUCCESS, parameter
 
