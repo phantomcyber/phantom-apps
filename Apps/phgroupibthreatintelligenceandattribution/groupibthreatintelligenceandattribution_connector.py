@@ -278,9 +278,9 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                 err_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
         else:
-            self.debug_print('No configuration has been done for on_poll action. Please select the proper configuration parameter')
-            self.save_progress('No configuration has been done for on_poll action. Please select the proper configuration parameter')
-            return action_result.set_status(phantom.APP_SUCCESS)
+            message = 'No configuration has been done for on_poll action. Please select the proper configuration parameter'
+            self.debug_print(message)
+            return action_result.set_status(phantom.APP_SUCCESS, message)
 
         self.debug_print('Polling process for all collections has finished')
         self.save_progress('Polling process for all collections has finished')
