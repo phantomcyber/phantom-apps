@@ -185,7 +185,8 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                         str(param.get('end_time'))).strftime(GIB_DATE_FORMAT) if param.get('end_time') else None
                     generator, collection_info = self._setup_generator(collection_name, start_time, end_time)
                 else:
-                    generator, collection_info = self._setup_generator(collection_name, date_start, last_fetch=last_fetch)
+                    generator, collection_info = self._setup_generator(collection_name, date_start,
+                                                                       last_fetch=last_fetch)
 
                 for chunk in generator:
                     portion = chunk.parse_portion()
@@ -248,7 +249,7 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                             if artifact.get('end_time'):
                                 artifact['end_time'] = parse(artifact.get('end_time')).strftime(SPLUNK_DATE_FORMAT)
                             artifacts.append({**artifact, **base_artifact,
-                                            "container_id": container_id, "severity": severity})
+                                              "container_id": container_id, "severity": severity})
 
                             if is_manual_poll:
                                 artifacts_count += 1
@@ -278,8 +279,10 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                 err_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
         else:
-            self.debug_print('No configuration has been done for on_poll action. Please select the proper configuration parameter')
-            self.save_progress('No configuration has been done for on_poll action. Please select the proper configuration parameter')
+            self.debug_print('No collections have been configurated for on_poll action.'
+                             'Please set up the proper configuration parameters')
+            self.save_progress('No collections have been configurated for on_poll action.'
+                               'Please set up the proper configuration parameters')
             return action_result.set_status(phantom.APP_SUCCESS)
 
         self.debug_print('Polling process for all collections has finished')
