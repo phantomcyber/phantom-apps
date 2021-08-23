@@ -108,7 +108,7 @@ class FireeyeHxConnector(BaseConnector):
         guid = uuid.uuid4()
 
         if hasattr(Vault, 'get_vault_tmp_dir'):
-            local_dir = Vault.get_vault_tmp_dir() + guid
+            local_dir = ('{}/{}').format(Vault.get_vault_tmp_dir(), guid)
         else:
             local_dir = '/opt/phantom/vault/tmp/{}'.format(guid)
 
