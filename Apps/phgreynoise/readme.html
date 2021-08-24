@@ -1,0 +1,78 @@
+<!-- File: readme.html
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<html>
+  <body>
+  
+    <h2>Playbook Backward Compatibility</h2>
+    <p>
+        <ul>
+            <li>Version 2.0.0 of this application is a complete rewrite and is not backward compatible with version 1.0.0. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks to ensure the correct functioning of the playbooks created on the earlier versions of the app. If the end-user does not want to upgrade their playbooks, they can remain on or downgrade to the old version(v1.0.0).</li>
+        </ul>
+    </p>
+    
+    <h2>Description</h2>
+    <p>The GreyNoise Enrichment plugin for Phantom enriches observables to identify activity associated with
+      mass-internet scanning, creating more time to investigate other higher priority observables.
+      This enrichment provides context into IP behavior: intent, tags, first seen,
+      last seen, geo-data, ports, OS, and JA3. <br><br>The GreyNoise Enrichment plugin for Phantom requires an API key.
+      Set up an account to receive an API key and find GreyNoise documentation here:
+    
+    <a target="_blank" rel="noopener noreferrer" href="https://developer.greynoise.io/">https://developer.greynoise.io/</a></br></br></p>
+  
+    <h2>Actions</h2>
+  
+    <h4>lookup ip</h4>
+    <p>Check to see if a given IP has been seen by GreyNoise engaging in internet scanning behavior.</p>
+
+    <h4>riot lookup ip</h4>
+    <p>Identifies IPs from known benign services and organizations that commonly cause false positives.</p>
+
+    <h4>community lookup ip</h4>
+    <p>An action requiring at least a free community API key to query IPs in the GreyNoise dataset and retrieve a subset of the IP reputation data returned by the lookup ip and lookup reputation actions. A free API key can be obtained at <a target="_blank" rel="noopener noreferrer" href="https://www.greynoise.io/viz/signup">https://www.greynoise.io/viz/signup</a></p>
+  
+    <h4>lookup ips</h4>
+    <p>Check whether IP addresses in a set have been seen engaging in internet scanning behavior.
+      This action is similar to <i>lookup ip</i> except that it processes more than one IP at a time. IPs should be comma-separated.</p>
+  
+    <h4>ip reputation</h4>
+    <p>Delivers full IP context: time ranges, IP metadata
+      (network owner, ASN, reverse DNS pointer, country), associated actors, activity tags,
+      and raw port scan and web request information.</p>
+  
+    <h4>gnql query</h4>
+    <p>GreyNoise Query Language (GNQL) uses Lucene deep under the hood.
+      GNQL enables users to make complex and one-off queries against the GreyNoise dataset. <br>For more information, please visit:
+  <a target="_blank" rel="noopener noreferrer" href="https://developer.greynoise.io/reference#gnqlquery-1">https://developer.greynoise.io/reference#gnqlquery-1</a></p>
+  
+    <h4>on poll</h4>
+    <p>Retrieves GNQL query results on a set interval. The default number of results returned is 25.
+    <br>
+  
+    Notes:
+    <ul>
+      <li>The on poll action will spawn a container for each result returned. Phantom performance may be degraded if an overly large query is used.
+      <li>Potentially useful queries may include ones that limit results to assets owned by your organization, such as:
+      <li>
+        <ul>
+          <li>
+            metadata.organization:your_organization classification:malicious
+          </li>
+          <li>
+            8.8.8.0/30 (replace with your address block) classification:malicious
+          </li>
+        </ul>
+      </li>
+      <li>To test your query or to learn more about GNQL queries, please visit <a target="_blank" rel="noopener noreferrer" href="https://developer.greynoise.io/reference#gnqlquery-1">https://developer.greynoise.io/reference#gnqlquery-1</a></li>
+    </ul>
+    
+    <h4>test connectivity</h4>
+    <p>Test connectivity to GreyNoise. Requires a valid paid or free community API key.</p>
+  
+    <h2>Legal</h2>
+    <p>For terms and legal information, please visit <a target="_blank" rel="noopener noreferrer" href="https://greynoise.io/terms">https://greynoise.io/terms</a></p>
+  
+  </body>
+</html>

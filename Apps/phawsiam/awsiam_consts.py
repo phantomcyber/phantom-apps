@@ -56,6 +56,7 @@ AWSIAM_PARAM_GROUP_PATH = 'group_path'
 AWSIAM_JSON_IS_TRUNCATED = 'IsTruncated'
 AWSIAM_JSON_MARKER = 'Marker'
 AWSIAM_JSON_AMZ_DATE = 'x-amz-date'
+AWSIAM_JSON_STS_TOKEN = 'X-Amz-Security-Token'
 AWSIAM_JSON_AUTHORIZATION = 'Authorization'
 AWSIAM_JSON_PATH = 'Path'
 AWSIAM_JSON_ACTION = 'Action'
@@ -149,7 +150,6 @@ AWSIAM_ROLE_DELETED_MSG = 'Role {role_name} removed successfully along with all 
                           'profiles and policies'
 AWSIAM_USER_LOGIN_PROFILE_ALREADY_DELETED_MSG = 'Login profile for user {username} cannot be found'
 AWSIAM_USER_LOGIN_PROFILE_ALREADY_EXISTS_MSG = 'Login profile for user {username} already exists'
-AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG = 'Error while encoding access key id or secret key'
 AWSIAM_ROLE_DOES_NOT_EXISTS_MSG = 'Name {role_name} cannot be found'
 AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG = 'Profile {instance_profile_name} cannot be found'
 AWSIAM_ROLE_ALREADY_EXISTS_MSG = 'Role {role_name} already exists in AWS IAM account. Please provide a valid and ' \
@@ -163,4 +163,10 @@ AWSIAM_POLICY_DOC_TRIMMING_ERROR_MSG = 'Error occurred while trimming role polic
                                        'spaces. Please provide a valid json string in policy document.'
 AWSIAM_ROLE_DOES_NOT_EXIST_MSG = 'Role {role_name} does not exist. Hence, policy can not be {policy_status}.'
 AWSIAM_ACTION_FAILED_MESSAGE = 'Action {action_name} failed'
-AWSIAM_TIME_OUT = 30
+AWSIAM_TIMEOUT = 30
+AWSIAM_UNKNOWN_ERROR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters"
+AWSIAM_UNKNOWN_ERROR_CODE = "Error code unavailable"
+AWSIAM_TYPE_ERROR_MSG = "Error occurred while connecting to the AWS IAM server. Please check the asset configuration and|or the action parameters"
+AWSIAM_ERR_EC2_ROLE_CREDENTIALS_FAILED = "Failed to get EC2 role credentials"
+AWSIAM_ERR_TEMP_CREDENTIALS_FAILED = "Failed to get temporary credentials: {err}"
+AWSIAM_ERR_BAD_ASSET_CONFIG = 'Please provide access keys or select assume role check box in asset configuration'

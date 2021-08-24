@@ -1,10 +1,10 @@
 # Phantom App for Splunk IT Service Intelligence
 
 Author: Splunk Inc.
-Latest Version Tag: 1.0.0
+Latest Version Tag: 1.0.1
 Date: 2020-06-10
 
-This app integrates with Splunk IT Service Intelligence to provide operations on Splunk IT Service Intelligence episodes, services, entites, and object maintenance.
+This app integrates with Splunk IT Service Intelligence to provide operations on Splunk IT Service Intelligence episodes, services, entities, and object maintenance.
 
 ## Actions
 
@@ -49,7 +49,7 @@ This app integrates with Splunk IT Service Intelligence to provide operations on
 #### Compatibility
 
 * Splunk IT Service Intelligence: 4.4
-* Phantom: 4.6
+* Phantom: 4.8
 
 #### Changes
 

@@ -2,17 +2,21 @@
     "appid": "5e5815d7-bedc-410e-bea2-c7df1b44297e",
     "name": "Nessus",
     "description": "This app integrates with Tenable's Nessus scanner to provide endpoint-based investigative actions",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "package_name": "phantom_nessus",
     "type": "information",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "main_module": "nessusscanner_connector.pyc",
-    "app_version": "1.0.11",
-    "utctime_updated": "2018-12-07T01:33:35.000000Z",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "main_module": "nessusscanner_connector.py",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-01-22T08:33:46.000000Z",
     "product_vendor": "Tenable",
     "product_name": "Nessus",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.284",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "On-prem, Version 6.8.1"
+    ],
     "logo": "logo_nessus.svg",
     "logo_dark": "logo_nessus_dark.svg",
     "configuration": {
@@ -26,7 +30,6 @@
             "description": "Verify server certificate",
             "data_type": "boolean",
             "default": false,
-            "required": false,
             "order": 1
         },
         "listen_port": {
@@ -42,7 +45,7 @@
         },
         "access_key": {
             "description": "Access Key from user's api screen",
-            "data_type": "string",
+            "data_type": "password",
             "order": 4,
             "required": true
         },
@@ -82,7 +85,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -96,10 +100,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -117,7 +118,7 @@
                     "data_path": "action_result.data.*.last_modification_date",
                     "data_type": "numeric",
                     "column_name": "Last Modified",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         1500907264
                     ]
@@ -222,6 +223,7 @@
                 "target_to_scan": {
                     "description": "IP of host to scan",
                     "data_type": "string",
+                    "order": 0,
                     "contains": [
                         "ip",
                         "hostname"
@@ -231,6 +233,7 @@
                 "policy_id": {
                     "description": "ID of the scan policy to use",
                     "data_type": "string",
+                    "order": 1,
                     "contains": [
                         "nessus policy id"
                     ],
@@ -249,7 +252,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {

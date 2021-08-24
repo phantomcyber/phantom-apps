@@ -1,5 +1,5 @@
 # File: okta_consts.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -12,7 +12,8 @@ OKTA_PAGINATED_ACTIONS_LIST = [
 
 OKTA_RESET_PASSWORD_SUCC = "Successfully created one-time token for user to reset password"
 
-OKTA_LIMIT_INVALID_MSG_ERR = "Please provide a valid positive integer value for limit"
+OKTA_LIMIT_INVALID_MSG_ERR = "Please provide a valid positive integer value for 'limit' action parameter"
+OKTA_LIMIT_NON_ZERO_POSITIVE_MSG_ERR = "Please provide a valid non-zero positive integer value for 'limit' action parameter"
 OKTA_PAGINATION_MSG_ERR = "Error occurred while fetching paginated response for action: {action_name}"
 
 OKTA_DISABLE_USER_SUCC = "Successfully disabled the user"
@@ -35,11 +36,28 @@ OKTA_ADDED_GROUP_SUCCESS_MSG = "Group has been added successfully"
 OKTA_GET_GROUP_SUCC = "Successfully retrieved group"
 OKTA_GET_USER_SUCC = "Successfully retrieved user"
 
-OKTA_TEST_CONNECTIVITY_FAILED = "Test Connectivity Failed."
-OKTA_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed."
+OKTA_TEST_CONNECTIVITY_FAILED = "Test Connectivity Failed"
+OKTA_TEST_CONNECTIVITY_PASSED = "Test Connectivity Passed"
 
-OKTA_INVALID_USER_MSG = "Kindly provide valid user_id."
+OKTA_INVALID_USER_MSG = "Please provide a valid user_id"
+
+OKTA_CLEAR_USER_SESSIONS_SUCC = "Successfully cleared user sessions"
+OKTA_SEND_PUSH_NOTIFICATION_ERR_MSG = "Please configure factor_type '{factor_type}' for the user '{user_id}'"
 
 # DO NOT MODIFY!
 # A fixed field used by Okta to the integration
 OKTA_APP_USER_AGENT_BASE = "SplunkPhantom/"
+UNEXPECTED_RESPONSE_MSG = "Unexpected response received"
+
+# Constants relating to '_get_error_message_from_exception'
+ERR_CODE_MSG = "Error code unavailable"
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters"
+PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters"
+TYPE_ERR_MSG = "Error occurred while connecting to the Okta Server. Please check the asset configuration and|or the action parameters"
+
+# Constants relating to value_list check
+FACTOR_TYPE_VALUE_LIST = ["push", "sms (not yet implemented)", "token:software:totp (not yet implemented)"]
+RECEIVE_TYPE_VALUE_LIST = ["Email", "UI"]
+IDENTITY_PROVIDERS_TYPE_VALUE_LIST = ["SAML2", "FACEBOOK", "GOOGLE", "LINKEDIN", "MICROSOFT"]
+ROLE_TYPE_VALUE_LIST = ["SUPER_ADMIN", "ORG_ADMIN", "API_ACCESS_MANAGEMENT_ADMIN", "APP_ADMIN", "USER_ADMIN", "MOBILE_ADMIN", "READ_ONLY_ADMIN"]
+VALUE_LIST_VALIDATION_MSG = "Please provide valid input from {} in '{}' action parameter"

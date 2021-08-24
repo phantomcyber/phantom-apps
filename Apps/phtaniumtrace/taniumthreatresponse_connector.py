@@ -1,5 +1,5 @@
 # File: taniumthreatresponse_connector.py
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2020-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -8,6 +8,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
+from taniumthreatresponse_consts import *
 
 import requests
 import tempfile
@@ -15,6 +16,7 @@ import datetime
 import json
 import uuid
 import os
+import sys
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
 
@@ -32,12 +34,87 @@ class TaniumThreatResponseConnector(BaseConnector):
         super(TaniumThreatResponseConnector, self).__init__()
 
         self._state = dict()
-
+        self._python_version = None
         # Variable to hold a base_url in case the app makes REST calls
         # Do note that the app json defines the asset config, so please
         # modify this as you deem fit.
         self._base_url = None
         self._session_key = None
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+
+                input_str = UnicodeDammit(
+                    input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print(
+                "Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=True):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key)), None
+
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, NON_ZERO_POSITIVE_INTEGER_MSG.format(key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _process_empty_response(self, response, action_result):
 
@@ -74,7 +151,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
             # Remove the script and style from the HTML message
-            for element in soup(["script", "style"]):
+            for element in soup(["script", "style", "footer", "nav", "title"]):
                 element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
@@ -83,7 +160,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         except:
             error_text = 'Cannot parse error details'
 
-        message = 'Status Code: {0}. Data from server:\n{1}\n'.format(status_code, UnicodeDammit(error_text).unicode_markup.encode('utf-8'))
+        message = 'Status Code: {0}. Data from server:\n{1}\n'.format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -95,7 +172,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response. Error: {0}'.format(str(e))), None)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to parse JSON response. Error: {0}'.format(err)), None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -103,13 +181,13 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = 'Error from server. Status Code: {0} Data from server: {1}'.format(
-                r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('UTF-8'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
 
-        # If it is a file download, process before getting getting debug data due tyo
+        # If it is a file download, process before getting debug data
         if 'octet' in r.headers.get('Content-Type', ''):
             return self._process_content_response(r, action_result)
 
@@ -135,11 +213,11 @@ class TaniumThreatResponseConnector(BaseConnector):
             return self._process_empty_response(r, action_result)
 
         if r.status_code == 200:
-            return RetVal(phantom.APP_SUCCESS, r.text)
+            return RetVal(phantom.APP_SUCCESS, self._handle_py_ver_compat_for_input_str(r.text))
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, UnicodeDammit(r.text.replace('{', '{{').replace('}', '}}')).unicode_markup.encode('UTF-8'))
+                r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -151,7 +229,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         config = self.get_config()
-        username = UnicodeDammit(config.get('username')).unicode_markup.encode('utf-8')
+        username = self._handle_py_ver_compat_for_input_str(config.get('username'))
         auth = (username, config.get('password'))
         headers = {
             'Content-Type': 'application/json'
@@ -159,7 +237,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call("{}{}".format(self._base_url, "/auth"), action_result, verify=self._verify, headers=headers, auth=auth, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self._state['session_key'] = None
             self._session_key = None
             self.save_state(self._state)
@@ -189,14 +267,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         try:
             url = "{0}{1}".format(self._base_url, endpoint)
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            else:
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            return action_result.set_status(phantom.APP_ERROR, "Please check the asset configuration and action parameters. Error: {0}".format(error_msg))
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Please check the asset configuration and action parameters. Error: {0}".format(err)), None
 
         if headers is None:
             headers = {}
@@ -206,10 +278,9 @@ class TaniumThreatResponseConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
 
-        headers.update({
-                'session': str(self._session_key),
-                'Content-Type': 'application/json'
-            })
+        headers.update({'session': str(self._session_key)})
+        if 'Content-Type' not in headers.keys():
+            headers.update({'Content-Type': 'application/json'})
 
         ret_val, resp_json = self._make_rest_call(url, action_result, verify=self._verify, headers=headers, params=params, data=data, json=json, method=method)
 
@@ -220,7 +291,9 @@ class TaniumThreatResponseConnector(BaseConnector):
             ret_val = self._get_token(action_result)
             if phantom.is_fail(ret_val):
                 return action_result.get_status(), None
-            headers.update({'session': str(self._session_key), 'Content-Type': 'application/json'})
+            headers.update({'session': str(self._session_key)})
+            if 'Content-Type' not in headers.keys():
+                headers.update({'Content-Type': 'application/json'})
 
             ret_val, resp_json = self._make_rest_call(url, action_result, verify=self._verify, headers=headers, params=params, data=data, json=json, method=method)
 
@@ -252,15 +325,18 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, auth=auth, params=params)
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for %s' % (endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL %s' % (endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = "Error Details: Connection Refused from the Server"
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
-            if e.message:
-                try:
-                    error_msg = UnicodeDammit(e.message).unicode_markup.encode('utf-8')
-                except:
-                    error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            else:
-                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json)
+            err = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(err)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -276,7 +352,7 @@ class TaniumThreatResponseConnector(BaseConnector):
             return RetVal(action_result.get_status(), None)
 
         for f in response:
-            if f.get('id') == int(file_id):
+            if f.get('id') == file_id:
                 filename = f.get('path', '').split('\\')[-1]
                 break
 
@@ -297,7 +373,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         else:
             temp_dir = '/opt/phantom/vault/tmp'
 
-        temp_dir = temp_dir + '/{}'.format(uuid.uuid4())
+        temp_dir = '{}/{}'.format(temp_dir, uuid.uuid4())
         os.makedirs(temp_dir)
 
         file_obj = tempfile.NamedTemporaryFile(prefix='taniumthreatresponse_',
@@ -327,9 +403,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
-            message = action_result.get_message()
-            if message:
-                message = UnicodeDammit(message).unicode_markup.encode('utf-8')
+            message = self._handle_py_ver_compat_for_input_str(action_result.get_message())
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Unable to list connections{}'.format('. Error message: {}'.format(message) if message else "")), None)
 
         return RetVal(phantom.APP_SUCCESS, response)
@@ -406,7 +480,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # name is a required parameter, but it can be blank.
-        params = {'name': param.get('name', '')}
+        params = {'name': self._handle_py_ver_compat_for_input_str(param.get('name', ''))}
         endpoint = '/plugin/products/trace/computers/'
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
@@ -469,15 +543,19 @@ class TaniumThreatResponseConnector(BaseConnector):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
-        summary['total_connections'] = len(response)
-        for state in [x['info']['state'] for x in response if 'state' in x['info']]:
-            summary[state + '_connections'] = len([x for x in response if 'state' in x['info'] and x['info']['state'] == state])
+        try:
+            for state in [x['info']['state'] for x in response if 'state' in x['info']]:
+                summary['{}_connections'.format(state)] = len([x for x in response if 'state' in x['info'] and x['info']['state'] == state])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the response from server. {}".format(err))
 
+        summary['total_connections'] = len(response)
         for r in response:
             action_result.add_data(r)
 
         self.save_progress('List connections successful')
-        message = 'Number of active connections found: {}'.format(summary.get('active_connections'))
+        message = 'Number of active connections found: {}'.format(summary.get('active_connections', 0))
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def _handle_create_connection(self, param):
@@ -492,21 +570,17 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        conntimeout = param.get('conntimeout')
+        ret_val, conntimeout = self._validate_integer(action_result, param.get('conntimeout'), CONNTIMEOUT_KEY, False)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if conntimeout:
-            try:
-                conntimeout = int(conntimeout)
-                if conntimeout <= 0:
-                    raise ValueError
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a non-zero positive integer in conntimeout parameter')
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a non-zero positive integer in conntimeout parameter. Error: {0}'.format(e.message))
+        dsttype = self._handle_py_ver_compat_for_input_str(param.get('dsttype'))
+        if dsttype not in DSTTYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'dsttype' action parameter".format(DSTTYPE_VALUE_LIST))
 
-        data = {'dst': param.get('dst'),
-                'dstType': param.get('dsttype'),
-                'remote': param.get('remote')}
+        data = {'dst': self._handle_py_ver_compat_for_input_str(param.get('dst')),
+                'dstType': dsttype,
+                'remote': param.get('remote', True)}
 
         if conntimeout:
             data.update({'connTimeout': conntimeout})
@@ -534,7 +608,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param.get('connection_id')).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param.get('connection_id'))
 
         endpoint = '/plugin/products/trace/conns/{}'.format(cid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
@@ -561,7 +635,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param.get('connection_id')).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param.get('connection_id'))
 
         endpoint = '/plugin/products/trace/conns/{}'.format(cid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, method='delete')
@@ -619,7 +693,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
@@ -648,8 +722,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        host = UnicodeDammit(param['host']).unicode_markup.encode('utf-8')
-        filename = UnicodeDammit(param['filename']).unicode_markup.encode('utf-8')
+        host = self._handle_py_ver_compat_for_input_str(param['host'])
+        filename = self._handle_py_ver_compat_for_input_str(param['filename'])
 
         endpoint = '/plugin/products/trace/locals/{}/{}'.format(host, filename)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, method='delete')
@@ -728,12 +802,13 @@ class TaniumThreatResponseConnector(BaseConnector):
         file_name = '{}_{}'.format(directory, filename)
 
         # Save file
-        self.send_progress('Saving file to disk.')
+        self.send_progress('Saving file to disk')
         try:
             temp_name = self._save_temp_file(response.content)
         except Exception as e:
-            self.debug_print('Error creating file.')
-            return action_result.set_status(phantom.APP_ERROR, 'Error creating file. {}'.format(e))
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Error creating file')
+            return action_result.set_status(phantom.APP_ERROR, 'Error creating file. {}'.format(err))
 
         vault = Vault.add_attachment(temp_name, self.get_container_id(), file_name=file_name, metadata=metadata)
         if filename:
@@ -786,8 +861,8 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param.get('connection_id')).unicode_markup.encode('utf-8')
-        db = UnicodeDammit(param.get('snapshot')).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param.get('connection_id'))
+        db = self._handle_py_ver_compat_for_input_str(param.get('snapshot'))
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
@@ -816,13 +891,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
+        ret_val, ptid = self._validate_integer(action_result, param.get('process_table_id'), PROCESS_TABLE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/processes/{process_table_id}'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/processes/{1}'.format(cid, ptid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -847,13 +925,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
+        ret_val, ptid = self._validate_integer(action_result, param.get('process_table_id'), PROCESS_TABLE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/eprocesstimelines/{process_table_id}'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/eprocesstimelines/{1}'.format(cid, ptid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -868,7 +949,7 @@ class TaniumThreatResponseConnector(BaseConnector):
                     out.append({
                         'type': event_type.get('name'),
                         'date': date,
-                        'isodate': datetime.datetime.utcfromtimestamp(int(date) / 1000).isoformat() + 'Z',
+                        'isodate': '{}Z'.format(datetime.datetime.utcfromtimestamp(int(date) / 1000).isoformat()),
                         'event': event
                     })
 
@@ -893,13 +974,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
+        ret_val, ptid = self._validate_integer(action_result, param.get('process_table_id'), PROCESS_TABLE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/processtrees/{process_table_id}'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/processtrees/{1}'.format(cid, ptid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -927,13 +1011,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
+        ret_val, ptid = self._validate_integer(action_result, param.get('process_table_id'), PROCESS_TABLE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/parentprocesstrees/{process_table_id}'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/parentprocesstrees/{1}'.format(cid, ptid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -961,13 +1048,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
+        ret_val, ptid = self._validate_integer(action_result, param.get('process_table_id'), PROCESS_TABLE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/processtrees/{process_table_id}/children'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/processtrees/{1}/children'.format(cid, ptid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -996,33 +1086,23 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        limit = param.get('limit')
-        offset = param.get('offset')
-        sort = param.get('sort')
-        fields = param.get('fields')
-        operators = param.get('operators')
-        value = param.get('value')
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        event_type = self._handle_py_ver_compat_for_input_str(param['event_type'])
+        if event_type not in EVENT_TYPE_VALUE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'event_type' action parameter".format(EVENT_TYPE_VALUE_LIST))
 
-        if limit or limit == 0:
-            try:
-                limit = int(limit)
-                if limit <= 0:
-                    raise ValueError
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a positive non-zero integer in limit parameter')
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a positive non-zero integer in limit parameter. Error: {0}'.format(e.message))
+        ret_val, limit = self._validate_integer(action_result, param.get('limit'), LIMIT_KEY, False)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        if offset:
-            try:
-                offset = int(offset)
-                if offset < 0:
-                    raise ValueError
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a positive integer in offset parameter')
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide a positive integer in offset parameter. Error: {0}'.format(e.message))
+        ret_val, offset = self._validate_integer(action_result, param.get('offset'), OFFSET_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        sort = self._handle_py_ver_compat_for_input_str(param.get('sort'))
+        fields = self._handle_py_ver_compat_for_input_str(param.get('fields'))
+        operators = self._handle_py_ver_compat_for_input_str(param.get('operators'))
+        value = self._handle_py_ver_compat_for_input_str(param.get('value'))
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
@@ -1035,7 +1115,9 @@ class TaniumThreatResponseConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, 'fields, operators, and value need to be filled in to query events. Returning all results')
             else:
 
-                filter_type = param.get("filter_type", "all")
+                filter_type = self._handle_py_ver_compat_for_input_str(param.get("filter_type", "all"))
+                if filter_type and filter_type not in FILTER_TYPE_VALUE_LIST:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide valid input from {} in 'filter_type' action parameter".format(FILTER_TYPE_VALUE_LIST))
 
                 fields = [field.strip() for field in fields.split(',')]
                 fields = list(filter(None, fields))
@@ -1060,7 +1142,7 @@ class TaniumThreatResponseConnector(BaseConnector):
                 params["gm1"] = filter_type
                 params["g1"] = ",".join(group_list)
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/{event_type}/eventsCount'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/{1}/eventsCount'.format(cid, event_type)
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
@@ -1077,7 +1159,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         if sort:
             params['sort'] = sort
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/{event_type}/events'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{0}/{1}/events'.format(cid, event_type)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
 
         if phantom.is_fail(ret_val):
@@ -1086,7 +1168,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         for event in response:
             action_result.add_data(event)
-        action_result.update_summary({'type': param.get('event_type')})
+        action_result.update_summary({'type': event_type})
 
         self.save_progress('Get Events Successful')
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1104,13 +1186,13 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
             return action_result.get_status()
 
-        endpoint = '/plugin/products/trace/conns/{connection_id}/eventcounts'.format(**param)
+        endpoint = '/plugin/products/trace/conns/{}/eventcounts'.format(cid)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
@@ -1125,9 +1207,13 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
-        summary['total_categories'] = len(set([r['category'] for r in response]))
-        summary['total_events_operations'] = len(response)
-        summary['total_events_count'] = sum([int(r['count']) for r in response])
+        try:
+            summary['total_categories'] = len(set([r['category'] for r in response]))
+            summary['total_events_operations'] = len(response)
+            summary['total_events_count'] = sum([int(r['count']) for r in response])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the response from server. {}".format(err))
 
         self.save_progress('Events Summary Successful')
         message = 'Number of categories found: {}'.format(summary.get('total_categories'))
@@ -1179,7 +1265,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        cid = UnicodeDammit(param['connection_id']).unicode_markup.encode('utf-8')
+        cid = self._handle_py_ver_compat_for_input_str(param['connection_id'])
 
         if not self._is_connection_active(action_result, cid):
             self.save_progress('Inactive or non-existent connection')
@@ -1187,7 +1273,7 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         data = {
             'connId': cid,
-            'path': UnicodeDammit(param.get('file_path')).unicode_markup.encode('utf-8')
+            'path': self._handle_py_ver_compat_for_input_str(param.get('file_path'))
         }
 
         endpoint = '/plugin/products/trace/filedownloads'
@@ -1213,14 +1299,10 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        file_id = param["file_id"]
-        if file_id is not None:
-            try:
-                file_id = int(file_id)
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide an integer in file_id parameter')
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide an integer in file_id parameter. Error: {0}'.format(e.message))
+        ret_val, file_id = self._validate_integer(action_result, param["file_id"], FILE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         endpoint = '/plugin/products/trace/filedownloads/{file_id}'.format(file_id=file_id)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, method='delete')
 
@@ -1244,14 +1326,10 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        file_id = param["file_id"]
-        if file_id is not None:
-            try:
-                file_id = int(file_id)
-            except ValueError:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide an integer in file_id parameter')
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, 'Please provide an integer in file_id parameter. Error: {0}'.format(e.message))
+        ret_val, file_id = self._validate_integer(action_result, param["file_id"], FILE_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         endpoint = '/plugin/products/trace/filedownloads/{file_id}'.format(file_id=file_id)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result)
 
@@ -1267,15 +1345,16 @@ class TaniumThreatResponseConnector(BaseConnector):
         }
 
         # Get file name from Tanium, if it exists
-        ret_val, filename = self._get_filename_from_tanium(action_result, param['file_id'])
+        ret_val, filename = self._get_filename_from_tanium(action_result, file_id)
 
         # Save file
-        self.send_progress('Saving file to disk.')
+        self.send_progress('Saving file to disk')
         try:
             temp_name = self._save_temp_file(response.content)
         except Exception as e:
-            self.debug_print('Error creating file.')
-            return action_result.set_status(phantom.APP_ERROR, 'Error creating file. {}'.format(e))
+            err = self._get_error_message_from_exception(e)
+            self.debug_print('Error creating file')
+            return action_result.set_status(phantom.APP_ERROR, 'Error creating file. {}'.format(err))
 
         if phantom.is_fail(ret_val) or not filename:
             filename = temp_name.split('/')[-1]
@@ -1288,6 +1367,154 @@ class TaniumThreatResponseConnector(BaseConnector):
 
         self.save_progress('Get File Successful')
         message = 'File downloaded to vault'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_upload_intel_doc(self, param):
+        """ Upload intel document to Tanium Threat Response.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ''' future TODO: file ingestion
+        vault_id = param['vault_id']
+        file_path = Vault.get_file_path(vault_id)
+        data = open(file_path, 'rb').read()
+        '''
+
+        headers = {
+            'Content-Type': 'application/xml'
+        }
+
+        data = self._handle_py_ver_compat_for_input_str(param['intel_doc'])
+
+        endpoint = '/plugin/products/detect3/api/v1/intels'
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, headers=headers, data=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Upload intel document failed')
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        self.save_progress('Upload intel document successful')
+        message = 'Uploaded intel document to Tanium Threat Response'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_start_quick_scan(self, param):
+        """ Scan a computer group for hashes in intel document.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        computer_group_name = self._handle_py_ver_compat_for_input_str(param['computer_group_name'])
+        ret_val, intel_doc_id = self._validate_integer(action_result, param.get('intel_doc_id'), INTEL_DOC_ID_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        endpoint = "{}/{}".format("/api/v2/groups/by-name", computer_group_name)
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        response_data = response.get("data")
+
+        if not response_data:
+            error_message = "No group exists with name {}. Also, please verify that your account has sufficient permissions to access the groups".format(computer_group_name)
+            return action_result.set_status(phantom.APP_ERROR, error_message)
+
+        computer_group_id = response_data.get("id")
+
+        data = {
+            'intelDocId': intel_doc_id,
+            'computerGroupId': computer_group_id
+        }
+
+        endpoint = '/plugin/products/detect3/api/v1/quick-scans'
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, json=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Start quick scan failed')
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        self.save_progress('Start quick scan successful')
+        message = 'Started quick scan successfully'
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
+    def _handle_list_alerts(self, param):
+        """ List alerts with optional filtering.
+
+        Args:
+            param (dict): Parameters sent in by a user or playbook
+
+        Returns:
+            ActionResult status: success/failure
+        """
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = '/plugin/products/detect3/api/v1/alerts'
+        ret_val, limit = self._validate_integer(action_result, param["limit"], LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        params = {
+            'limit': limit
+        }
+        try:
+            for p in self._handle_py_ver_compat_for_input_str(param['query']).split('&'):
+                k = p.split('=')[0]
+                k = self._handle_py_ver_compat_for_input_str(k)
+                v = p.split('=')[1]
+                try:
+                    params[k] = int(v)
+                except ValueError:
+                    params[k] = v
+        except:
+            self.debug_print("Unable to parse provided query")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to parse provided query")
+
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=params)
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('List alerts failed')
+            return action_result.get_status()
+
+        try:
+            for alert in response:
+                details = json.loads(alert['details'])
+                alert['path'] = details['match']['properties']['fullpath']
+                alert['event_type'] = details['match']['type']
+                md5 = details['match']['properties']['md5']
+                if md5:
+                    alert['md5'] = md5
+                sha1 = details['match']['properties'].get('sha1')
+                if sha1:
+                    alert['sha1'] = sha1
+                sha256 = details['match']['properties'].get('sha256')
+                if sha256:
+                    alert['sha256'] = sha256
+                action_result.add_data(alert)
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing the response from server. {}".format(err))
+
+        action_result.update_summary({'total_alerts': len(response)})
+
+        self.save_progress('List alerts successful')
+        message = 'Listed alerts successfully'
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def handle_action(self, param):
@@ -1324,7 +1551,10 @@ class TaniumThreatResponseConnector(BaseConnector):
             'list_files': self._handle_list_files,
             'save_file': self._handle_save_file,
             'delete_file': self._handle_delete_file,
-            'get_file': self._handle_get_file
+            'get_file': self._handle_get_file,
+            'upload_intel_doc': self._handle_upload_intel_doc,
+            'start_quick_scan': self._handle_start_quick_scan,
+            'list_alerts': self._handle_list_alerts
         }
 
         if action_id in supported_actions:
@@ -1335,6 +1565,12 @@ class TaniumThreatResponseConnector(BaseConnector):
 
     def initialize(self):
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
+
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
@@ -1342,7 +1578,7 @@ class TaniumThreatResponseConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
-        self._base_url = UnicodeDammit(config.get('base_url')).unicode_markup.encode('utf-8')
+        self._base_url = self._handle_py_ver_compat_for_input_str(config.get('base_url'))
 
         # removing single occurence of trailing back-slash or forward-slash
         if self._base_url.endswith('/'):
@@ -1357,7 +1593,7 @@ class TaniumThreatResponseConnector(BaseConnector):
             self._base_url = self._base_url.strip('\\').strip('/')
 
         self._session_key = self._state.get('session_key', '')
-        self._verify = config['verify_server_cert']
+        self._verify = config.get('verify_server_cert', False)
 
         return phantom.APP_SUCCESS
 
@@ -1387,16 +1623,16 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass('Password: ')
 
-    if (username and password):
+    if username and password:
         try:
             login_url = '{}/login'.format(BaseConnector.get_phantom_base_url())
-            print ('Accessing the Login page')
+            print('Accessing the Login page')
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1409,11 +1645,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ('Logging into Platform to get the session id')
+            print('Logging into Platform to get the session id')
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ('Unable to get session id from the platform. Error: ' + str(e))
+            print('Unable to get session id from the platform. Error: ' + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1424,11 +1660,11 @@ if __name__ == '__main__':
         connector = TaniumThreatResponseConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

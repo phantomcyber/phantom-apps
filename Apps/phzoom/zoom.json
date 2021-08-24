@@ -1,0 +1,1392 @@
+{
+    "appid": "b64f4942-cb0f-4f15-b8aa-47435a0849db",
+    "name": "Zoom",
+    "description": "The app integrates with Zoom Meetings API to perform investigative and generic actions",
+    "type": "identity management",
+    "product_vendor": "Zoom",
+    "logo": "logo_zoom.svg",
+    "logo_dark": "logo_zoom_dark.svg",
+    "product_name": "Zoom Meetings",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2020-04-03T06:33:59.068584Z",
+    "package_name": "phantom_zoom",
+    "main_module": "zoom_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "Base URL (e.g. https://api.zoom.us/v2)",
+            "data_type": "string",
+            "required": true,
+            "default": "https://api.zoom.us/v2",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify certificate",
+            "data_type": "boolean",
+            "order": 1
+        },
+        "api_key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        },
+        "api_secret": {
+            "description": "API Secret",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "PyJWT",
+                "input_file": "wheel/PyJWT-1.7.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "random-password-generator",
+                "input_file": "wheel/random_password_generator-2.1.0-py3-none-any.whl"
+            }
+        ]
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get meeting invitation",
+            "description": "Gets zoom meeting invitation",
+            "type": "investigate",
+            "identifier": "get_meeting_invitation",
+            "read_only": true,
+            "parameters": {
+                "meeting_id": {
+                    "description": "Zoom meeting ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.meeting_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "column_name": "Meeting ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.invitation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_fields.invitation_link",
+                    "data_type": "string",
+                    "column_name": "Invitation Link",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_fields.meeting_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_fields.passcode",
+                    "data_type": "string",
+                    "column_name": "Passcode",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_fields.time",
+                    "data_type": "string",
+                    "column_name": "Time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_fields.topic",
+                    "data_type": "string",
+                    "column_name": "Topic",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user settings",
+            "description": "Gets zoom user settings",
+            "type": "investigate",
+            "identifier": "get_user_settings",
+            "read_only": true,
+            "parameters": {
+                "user_id": {
+                    "description": "Zoom user ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.email_notification.alternative_host_reminder",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.email_notification.cancel_meeting_reminder",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.email_notification.jbh_reminder",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.email_notification.schedule_for_reminder",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.cn_meeting",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.in_meeting",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.large_meeting",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.large_meeting_capacity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.meeting_capacity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.webinar",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.webinar_capacity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.feature.zoom_phone",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.allow_live_streaming",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.annotation",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.attendee_on_hold",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.auto_saving_chat",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.breakout_room",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.chat",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.closed_caption",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.co_host",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.custom_live_streaming_service",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.custom_service_instructions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.e2e_encryption",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.entry_exit_chime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.far_end_camera_control",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.feedback",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.group_hd",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.non_verbal_feedback",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.polling",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.private_chat",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.record_play_voice",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.remote_control",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.remote_support",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.share_dual_camera",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.show_meeting_control_toolbar",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.virtual_background",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.waiting_room",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.in_meeting.workplace_by_facebook",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.auto_delete_cmr",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.auto_delete_cmr_days",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.auto_recording",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.cloud_recording",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.host_pause_stop_recording",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.local_recording",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.record_audio_file",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.record_gallery_view",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.record_speaker_view",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.recording_audio_transcript",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.save_chat_text",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.recording.show_timestamp",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.audio_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.default_password_for_scheduled_meetings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.force_pmi_jbh_password",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.host_video",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.join_before_host",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.participants_video",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.pmi_password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.pstn_password_protected",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.require_password_for_instant_meetings",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.require_password_for_pmi_meetings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.require_password_for_scheduled_meetings",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.require_password_for_scheduling_new_meetings",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.use_pmi_for_instant_meetings",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.schedule_meeting.use_pmi_for_scheduled_meetings",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.telephony.audio_conference_info",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.telephony.show_international_numbers_link",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.telephony.third_party_audio",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.tsp.call_out",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.tsp.call_out_countries",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tsp.show_international_numbers_link",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user",
+            "description": "Gets zoom user info",
+            "type": "investigate",
+            "identifier": "get_user",
+            "read_only": true,
+            "parameters": {
+                "user_id": {
+                    "description": "Zoom user ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.account_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cms_user_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.company",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.dept",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.group_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host_key",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.im_group_ids",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.jid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.job_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.language",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_client_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_login_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.personal_meeting_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phone_country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phone_number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.pic_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.pmi",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.role_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.use_pmi",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.vanity_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.verified",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get meeting",
+            "description": "Gets zoom meeting details",
+            "type": "investigate",
+            "identifier": "get_meeting",
+            "read_only": true,
+            "parameters": {
+                "meeting_id": {
+                    "description": "Zoom meeting ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.meeting_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "column_name": "Meeting ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.agenda",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.created_at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.duration",
+                    "data_type": "numeric",
+                    "column_name": "Duration",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.encrypted_password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.h323_password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.host_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.join_url",
+                    "data_type": "string",
+                    "column_name": "Join URL",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.occurrences.*.duration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.occurrences.*.occurrence_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.occurrences.*.start_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.occurrences.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.pmi",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.end_date_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.end_times",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.monthly_day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.monthly_week",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.monthly_week_day",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.repeat_interval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.recurrence.weekly_days",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.alternative_hosts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.approval_type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.audio",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.authentication_domains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.authentication_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.authentication_option",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.auto_recording",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.close_registration",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.cn_meeting",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.contact_email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.contact_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.enforce_login",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.enforce_login_domains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_countries",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_numbers.*.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_numbers.*.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_numbers.*.country_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_numbers.*.number",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.global_dial_in_numbers.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.host_video",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.in_meeting",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.join_before_host",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.meeting_authentication",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.mute_upon_entry",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.participant_video",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.registrants_confirmation_email",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.registrants_email_notification",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.registration_type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.use_pmi",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.waiting_room",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.settings.watermark",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.start_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.start_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.timezone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.topic",
+                    "data_type": "string",
+                    "column_name": "Topic",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.tracking_fields.*.field",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tracking_fields.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update meeting",
+            "description": "Updates zoom meeting",
+            "type": "generic",
+            "identifier": "update_meeting",
+            "read_only": false,
+            "parameters": {
+                "meeting_id": {
+                    "description": "Zoom meeting ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "order": 0
+                },
+                "password": {
+                    "description": "Meeting password",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "gen_password": {
+                    "description": "Auto generate meeting password",
+                    "data_type": "boolean",
+                    "order": 2
+                },
+                "waiting_room": {
+                    "description": "Enable waiting room",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "None",
+                        "True",
+                        "False"
+                    ],
+                    "default": "None",
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.gen_password",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.meeting_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "column_name": "Meeting ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.waiting_room",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.meeting_updated",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.password",
+                    "data_type": "string",
+                    "example_values": [
+                        "xFghbsuHndTYGF"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.waiting_room",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete meeting",
+            "description": "Deletes zoom meeting",
+            "verbose": "Deletes previous and future zoom meetings.",
+            "type": "generic",
+            "identifier": "delete_meeting",
+            "read_only": false,
+            "parameters": {
+                "meeting_id": {
+                    "description": "Zoom meeting ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.meeting_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom meeting id"
+                    ],
+                    "column_name": "Meeting ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.meeting_deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update user settings",
+            "description": "Updates zoom user settings",
+            "type": "generic",
+            "identifier": "update_user_settings",
+            "read_only": false,
+            "parameters": {
+                "user_id": {
+                    "description": "Zoom user ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "zoom user id"
+                    ],
+                    "order": 0
+                },
+                "req_password_pmi": {
+                    "description": "Require password for PMI",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "None",
+                        "True",
+                        "False"
+                    ],
+                    "default": "None",
+                    "order": 1
+                },
+                "pmi_password": {
+                    "description": "User pmi password",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "gen_pmi_password": {
+                    "description": "Auto generate pmi password",
+                    "data_type": "boolean",
+                    "order": 3
+                },
+                "waiting_room": {
+                    "description": "Enable waiting room",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "None",
+                        "True",
+                        "False"
+                    ],
+                    "default": "None",
+                    "order": 4
+                },
+                "req_password_sched": {
+                    "description": "Require password for scheduling meetings",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "None",
+                        "True",
+                        "False"
+                    ],
+                    "default": "None",
+                    "order": 5
+                },
+                "req_password_inst": {
+                    "description": "Require password for instant meetings",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "None",
+                        "True",
+                        "False"
+                    ],
+                    "default": "None",
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.gen_pmi_password",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.pmi_password",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.req_password_inst",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.req_password_pmi",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.req_password_sched",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "contains": [
+                        "zoom user id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.waiting_room",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.pmi_password",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.require_password_for_instant_meetings",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.require_password_for_personal_meeting_instance",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.require_password_for_scheduling_new_meetings",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.waiting_room",
+                    "data_type": "string",
+                    "example_values": [
+                        "Not Updated"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

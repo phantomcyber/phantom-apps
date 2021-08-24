@@ -8,23 +8,31 @@
     "logo_dark": "logo_rssorange_dark.svg",
     "product_name": "RSS",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2017-2019 Splunk Inc.",
-    "app_version": "1.0.12",
-    "utctime_updated": "2019-01-04T00:40:55.000000Z",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-04-06T09:56:57.000000Z",
     "package_name": "phantom_rss",
-    "main_module": "rss_connector.pyc",
-    "min_phantom_version": "4.0.1068",
+    "main_module": "rss_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "feedparser-6.0.2"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
+                "module": "sgmllib",
+                "input_file": "wheels/sgmllib/sgmllib3k-1.0.0-py3-none-any.whl"
+            },
+            {
                 "module": "feedparser",
-                "input_file": "wheels/feedparser/feedparser-5.2.1-cp27-none-any.whl"
+                "input_file": "wheels/feedparser/feedparser-6.0.2-py3-none-any.whl"
             },
             {
                 "module": "pdfminer",
-                "input_file": "wheels/phparser-deps/pdfminer-20140328-py2-none-any.whl"
+                "input_file": "wheels/phparser-deps/pdfminer-20191125-py3-none-any.whl"
             }
         ]
     },
@@ -38,28 +46,24 @@
         "save_file": {
             "description": "Save file to vault",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 1
         },
         "container_count": {
             "description": "Maximum entries to parse (0 for all)",
             "data_type": "numeric",
-            "required": false,
             "default": 0,
             "order": 2
         },
         "artifact_count": {
             "description": "Maximum artifacts to create per entry (0 for all)",
             "data_type": "numeric",
-            "required": false,
             "default": 0,
             "order": 3
         },
         "ignore_perrors": {
             "description": "Ignore parsing errors",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 4
         }
@@ -69,7 +73,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},

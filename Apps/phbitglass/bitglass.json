@@ -1,0 +1,883 @@
+{
+    "appid": "8119e222-818e-42f5-a210-1c7c9d337e81",
+    "name": "Bitglass",
+    "description": "The app pulls Bitglass cloudaudit and access log data once configured and parses the specified DLP patterns from the asset configuration page",
+    "type": "siem",
+    "product_vendor": "Bitglass Inc.",
+    "logo": "logo_bitglass.svg",
+    "logo_dark": "logo_bitglass_dark.svg",
+    "product_name": "Bitglass Phantom App",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Bitglass Inc.",
+    "license": "Copyright (c) 2021 Bitglass App Inc.",
+    "app_version": "1.0.9",
+    "utctime_updated": "2020-12-02T14:21:45.475883Z",
+    "package_name": "phantom_bitglass",
+    "main_module": "bitglass_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "auth_token": {
+            "description": "OAuth 2 Authentication Token",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "username": {
+            "description": "Username (Basic Authentication)",
+            "data_type": "string",
+            "order": 1
+        },
+        "api_url": {
+            "description": "Bitglass API URL",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password (Basic Authentication)",
+            "data_type": "password",
+            "order": 3
+        },
+        "proxies": {
+            "description": "Proxy settings for Bitglass API, format: https=https://usr:pswd@1.2.3.4:999",
+            "data_type": "password",
+            "order": 4
+        },
+        "ph": {
+            "data_type": "ph",
+            "order": 5
+        },
+        "enable_access": {
+            "description": "Pull Bitglass Access logs :",
+            "data_type": "boolean",
+            "default": true,
+            "order": 6
+        },
+        "filter_access": {
+            "description": "DLP Pattern for Access",
+            "data_type": "string",
+            "default": "Malware.*|PCI.*",
+            "order": 7
+        },
+        "enable_cloudaudit": {
+            "description": "Pull Bitglass CloudAudit logs :",
+            "data_type": "boolean",
+            "default": true,
+            "order": 8
+        },
+        "filter_cloudaudit": {
+            "description": "DLP Pattern for CloudAudit",
+            "data_type": "string",
+            "default": "^PCI.*",
+            "order": 9
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "identifier": "on_poll",
+            "description": "Polls for new pattern-matched Bitglass events used for other actions to act upon",
+            "verbose": "Use this action to poll for and ingest new pattern-matched Bitglass log events. These events will be used as input for other playbook actions.",
+            "type": "ingest",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "filter by dlp pattern",
+            "identifier": "filter_by_dlp_pattern",
+            "description": "Filter log artifacts by DLP pattern",
+            "verbose": "Use this action to filter log artifacts by DLP patterns with a Python regex.",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "bg_match_expression": {
+                    "description": "Python regex expression to match the patterns",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "Malware.*",
+                    "order": 0
+                },
+                "bg_log_event": {
+                    "description": "Phantom artifact ID",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "default": "artifact:*.id",
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_match_expression",
+                    "data_type": "string",
+                    "column_name": "Bg Match Expression",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_log_event",
+                    "data_type": "string",
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "column_name": "Bg Log Event",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 3,
+                    "example_values": [
+                        "joedoe@whitehat.com"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create update group",
+            "identifier": "create_update_group",
+            "description": "Create or update a group",
+            "verbose": "Use this action to create or update group for risky users.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "bg_group_name": {
+                    "description": "Name of the group to create or update",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "default": "RiskyUsers",
+                    "order": 0,
+                    "primary": true
+                },
+                "bg_new_group_name": {
+                    "description": "New name of the group to rename to",
+                    "data_type": "string",
+                    "default": "RiskyUsers",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "column_name": "Bg Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_new_group_name",
+                    "data_type": "string",
+                    "column_name": "Bg New Group Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete group",
+            "identifier": "delete_group",
+            "description": "Delete a group",
+            "verbose": "Use this action to delete group for risky users.",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "bg_group_name": {
+                    "description": "Name of the group to delete",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "default": "RiskyUsers",
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "column_name": "Bg Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add user to group",
+            "identifier": "add_user_to_group",
+            "undo": "remove user from group",
+            "description": "Add risky user to a group",
+            "verbose": "Use this action to add user determined risky to a special group.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "bg_group_name": {
+                    "description": "Name of the group to add the risky user to",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "default": "RiskyUsers",
+                    "order": 0,
+                    "primary": true
+                },
+                "bg_user_name": {
+                    "description": "User name to add",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "column_name": "Bg Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Bg User Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove user from group",
+            "identifier": "remove_user_from_group",
+            "undo": "add user to group",
+            "description": "Remove risky user from a group",
+            "verbose": "Use this action to remove user previously determined risky from the group.",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "bg_group_name": {
+                    "description": "Name of the group to add the risky user to",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "default": "RiskyUsers",
+                    "order": 0,
+                    "primary": true
+                },
+                "bg_user_name": {
+                    "description": "User name to remove",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_group_name",
+                    "data_type": "string",
+                    "contains": [
+                        "bg group name"
+                    ],
+                    "column_name": "Bg Group Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Bg User Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create update user",
+            "identifier": "create_update_user",
+            "description": "Create or update user",
+            "verbose": "Use this action to create or update user.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "bg_user_name": {
+                    "description": "Email of the user to create or update",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 0,
+                    "primary": true
+                },
+                "bg_first_name": {
+                    "description": "First name",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "bg_last_name": {
+                    "description": "Last name",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "bg_secondary_email": {
+                    "description": "Secondary email",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "bg_netbios_domain": {
+                    "description": "NetBIOS domain",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "bg_sam_account_name": {
+                    "description": "SAM account domain",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "bg_user_principal_name": {
+                    "description": "User principal name",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "bg_object_guid": {
+                    "description": "Object GUID",
+                    "data_type": "string",
+                    "order": 7
+                },
+                "bg_country_code": {
+                    "description": "Country code",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "bg_mobile_number": {
+                    "description": "Mobile number",
+                    "data_type": "string",
+                    "order": 9
+                },
+                "bg_admin_role": {
+                    "description": "Admin role",
+                    "data_type": "string",
+                    "order": 10
+                },
+                "bg_group_membership": {
+                    "description": "Place the user under the group",
+                    "data_type": "string",
+                    "order": 11
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Bg User Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.bg_first_name",
+                    "data_type": "string",
+                    "column_name": "Bg First Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.bg_last_name",
+                    "data_type": "string",
+                    "column_name": "Bg Last Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.bg_secondary_email",
+                    "data_type": "string",
+                    "column_name": "Bg Secondary Email",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.bg_netbios_domain",
+                    "data_type": "string",
+                    "column_name": "Bg Netbios Domain",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.bg_sam_account_name",
+                    "data_type": "string",
+                    "column_name": "Bg Sam Account Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.bg_user_principal_name",
+                    "data_type": "string",
+                    "column_name": "Bg User Principal Name",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.bg_object_guid",
+                    "data_type": "string",
+                    "column_name": "Bg Object Guid",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.parameter.bg_country_code",
+                    "data_type": "string",
+                    "column_name": "Bg Country Code",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.parameter.bg_mobile_number",
+                    "data_type": "string",
+                    "column_name": "Bg Mobile Number",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.parameter.bg_admin_role",
+                    "data_type": "string",
+                    "column_name": "Bg Admin Role",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.parameter.bg_group_membership",
+                    "data_type": "string",
+                    "column_name": "Bg Group Membership",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 12,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deactivate user",
+            "identifier": "deactivate_user",
+            "undo": "reactivate user",
+            "description": "Deactivate user",
+            "verbose": "Use this action to deactivate user.",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "bg_user_name": {
+                    "description": "Email of the user to deactivate",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Bg User Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "reactivate user",
+            "identifier": "reactivate_user",
+            "undo": "deactivate user",
+            "description": "Reactivate user",
+            "verbose": "Use this action to reactivate user.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "bg_user_name": {
+                    "description": "Email of the user to reactivate",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "user name"
+                    ],
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.bg_user_name",
+                    "data_type": "string",
+                    "contains": [
+                        "user name"
+                    ],
+                    "column_name": "Bg User Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

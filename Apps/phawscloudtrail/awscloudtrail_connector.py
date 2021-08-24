@@ -1,5 +1,5 @@
 # File: awscloudtrail_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
@@ -10,12 +10,14 @@ import phantom.app as phantom
 import botocore.response as br
 import botocore.paginate as bp
 
-from boto3 import client
+from boto3 import client, Session
 from awscloudtrail_consts import *
 from botocore.config import Config
 from datetime import datetime
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
+import six
+import ast
 
 
 class RetVal(tuple):
@@ -31,34 +33,55 @@ class AwsCloudtrailConnector(BaseConnector):
         self._state = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._region = None
         self._proxy = None
 
-    def _create_client(self, action_result):
+    def _handle_get_ec2_role(self):
 
-            boto_config = None
-            if self._proxy:
-                boto_config = Config(proxies=self._proxy)
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
 
+    def _create_client(self, action_result, param=None):
+
+        boto_config = None
+        if self._proxy:
+            boto_config = Config(proxies=self._proxy)
+
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
             try:
-                if self._access_key and self._secret_key:
-                    self.debug_print("Creating boto3 client with API keys")
-                    self._client = client(
-                        'cloudtrail',
-                        region_name=self._region,
-                        aws_access_key_id=self._access_key,
-                        aws_secret_access_key=self._secret_key,
-                        config=boto_config)
-                else:
-                    self.debug_print("Creating boto3 client without API keys")
-                    self._client = client(
-                        'cloudtrail',
-                        region_name=self._region,
-                        config=boto_config)
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
 
-            return phantom.APP_SUCCESS
+                self.save_progress("Using temporary assume role ceredentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get temporary credentials:{0}".format(e))
+
+        try:
+            if self._access_key and self._secret_key:
+                self.debug_print("Creating boto3 client with API keys")
+                self._client = client(
+                    'cloudtrail',
+                    region_name=self._region,
+                    aws_access_key_id=self._access_key,
+                    aws_secret_access_key=self._secret_key,
+                    aws_session_token=self._session_token,
+                    config=boto_config)
+            else:
+                self.debug_print("Creating boto3 client without API keys")
+                self._client = client(
+                    'cloudtrail',
+                    region_name=self._region,
+                    config=boto_config)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Could not create boto3 client: {0}".format(e))
+
+        return phantom.APP_SUCCESS
 
     def _extract_cloudtrail_event_object(self, ct_string):
         try:
@@ -89,8 +112,10 @@ class AwsCloudtrailConnector(BaseConnector):
                 for i in resp_json.get(set_name):
                     updated_list.append(i)
         except Exception as e:
-            exception_message = e.args[0].encode('utf-8').strip()
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "boto3 call to CloudTrail failed.", exception_message), None)
+            exception_message = e.args[0].strip()
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, "boto3 call to CloudTrail failed.", exception_message),
+                None)
 
         if can_paginate:
             next_token = None
@@ -98,9 +123,9 @@ class AwsCloudtrailConnector(BaseConnector):
                 next_token = resp_json.get('NextToken')
 
             res_dict = {
-                    "response_list": self._sanitize_data(updated_list),
-                    "next_token": next_token
-                }
+                "response_list": self._sanitize_data(updated_list),
+                "next_token": next_token
+            }
             return phantom.APP_SUCCESS, res_dict
         else:
             return phantom.APP_SUCCESS, self._sanitize_data(updated_list)
@@ -111,7 +136,9 @@ class AwsCloudtrailConnector(BaseConnector):
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))), None)
+            return RetVal(
+                action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(str(e))),
+                None)
 
         # Please specify the status codes here
         if 200 <= r.status_code < 399:
@@ -119,7 +146,7 @@ class AwsCloudtrailConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".format(
-                r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+            r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -163,7 +190,7 @@ class AwsCloudtrailConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("Querying AWS to validate credentials")
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp = self._make_boto_call(action_result, "describe_trails", includeShadowTrails=False)
@@ -172,7 +199,7 @@ class AwsCloudtrailConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
-        self.save_progress("Test Connectivity was Successful")
+        self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_describe_trails(self, param):
@@ -186,7 +213,7 @@ class AwsCloudtrailConnector(BaseConnector):
         if include_shadow_trails == "true":
             include_shadow_trails = True
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp_json = self._make_boto_call(action_result, "describe_trails", includeShadowTrails=include_shadow_trails)
@@ -218,7 +245,7 @@ class AwsCloudtrailConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, AWSCLOUDTRAIL_INVALID_LIMIT)
 
         # fail if we're not able to create a client
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         kwargs = {}           # define the kwargs to send to _make_boto_call
@@ -282,7 +309,7 @@ class AwsCloudtrailConnector(BaseConnector):
 
         if isinstance(cur_obj, dict):
             new_dict = {}
-            for k, v in cur_obj.iteritems():
+            for k, v in six.iteritems(cur_obj):
                 if isinstance(v, br.StreamingBody):
                     content = v.read()
                     new_dict[k] = json.loads(content)
@@ -306,7 +333,7 @@ class AwsCloudtrailConnector(BaseConnector):
                     new_dict.update(page)
                 return new_dict
             except Exception as e:
-                return { 'error': e }
+                return {'error': e}
 
         return cur_obj
 
@@ -321,8 +348,6 @@ class AwsCloudtrailConnector(BaseConnector):
 
         # Load required configs
         self._region = AWS_CLOUDTRAIL_REGIONS.get(config['Region'])
-        self._access_key = config['Access Key']
-        self._secret_key = config['Secret Key']
 
         # handle proxies
         self._proxy = {}
@@ -331,6 +356,22 @@ class AwsCloudtrailConnector(BaseConnector):
             self._proxy['http'] = env_vars['HTTP_PROXY']['value']
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, "Failed to get EC2 role credentials")
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get('Access Key')
+        self._secret_key = config.get('Secret Key')
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSCLOUDTRAIL_BAD_ASSET_CONFIG_MSG)
 
         return phantom.APP_SUCCESS
 
@@ -361,16 +402,16 @@ if __name__ == '__main__':
     password = args.password
 
     if (username is not None and password is None):
-
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if (username and password):
         try:
             login_url = AwsCloudtrailConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -383,11 +424,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -403,6 +444,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

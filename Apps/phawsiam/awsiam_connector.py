@@ -1,5 +1,5 @@
 # File: awsiam_connector.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -8,11 +8,15 @@ import hmac
 import hashlib
 import datetime
 import collections
+import sys
 from collections import OrderedDict
 import requests
 import xmltodict
 from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 from awsiam_consts import *
+import ast
+from boto3 import Session
 
 try:
     from urllib import urlencode, unquote
@@ -40,10 +44,77 @@ class AwsIamConnector(BaseConnector):
         self._state = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._response_metadata_dict = None
+        self._python_version = None
 
-    @staticmethod
-    def _process_empty_response(response, action_result):
+    def _handle_get_ec2_role(self):
+        """
+        This method will retrieve credentials from the EC2 role, if assigned to the instance
+        """
+        session = Session()
+        credentials = session.get_credentials()
+        return credentials
+
+    def _get_temp_credentials(self, action_result, param=None):
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_TEMP_CREDENTIALS_FAILED.format(err=err))
+
+        return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str is not None and (self._python_version == 2 or always_encode):
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This function is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_msg = AWSIAM_UNKNOWN_ERROR_MSG
+        error_code = AWSIAM_UNKNOWN_ERROR_CODE
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = AWSIAM_UNKNOWN_ERROR_CODE
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = AWSIAM_TYPE_ERROR_MSG
+        except:
+            error_msg = AWSIAM_UNKNOWN_ERROR_MSG
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
+    def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
         :param response: Response data
@@ -54,11 +125,10 @@ class AwsIamConnector(BaseConnector):
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
-                      None)
+        error_msg = "Status code: {}. Empty response and no information in the header".format(response.status_code)
+        return RetVal(action_result.set_status(phantom.APP_ERROR, error_msg), None)
 
-    @staticmethod
-    def _process_xml_response(response, action_result):
+    def _process_xml_response(self, response, action_result):
         """ This function is used to process XML response.
 
         :param response: Response data
@@ -68,11 +138,11 @@ class AwsIamConnector(BaseConnector):
 
         # Try a xml parse
         try:
-            text = (xmltodict.parse(response.text.encode('utf-8')))
+            text = (xmltodict.parse(self._handle_py_ver_compat_for_input_str(response.text)))
         except Exception as e:
             return RetVal(
                 action_result.set_status(phantom.APP_ERROR,
-                                         "Unable to parse XML response. Error: {0}".format(str(e))), None)
+                                         "Unable to parse XML response. Error: {0}".format(self._get_error_message_from_exception(e))), None)
 
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, text)
@@ -83,7 +153,7 @@ class AwsIamConnector(BaseConnector):
         error_message = text[AWSIAM_JSON_ERROR_RESPONSE][AWSIAM_JSON_ERROR][AWSIAM_JSON_ERROR_MESSAGE]
 
         error = 'ErrorType: {}\nErrorCode: {}\nErrorMessage: {}'.\
-            format(error_type, error_code, error_message.encode('UTF-8'))
+            format(error_type, error_code, self._handle_py_ver_compat_for_input_str(error_message))
         # Process the error returned in the XML
         try:
             message = "Error from server. Status Code: {0} Data from server: {1}".\
@@ -94,8 +164,7 @@ class AwsIamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), text)
 
-    @staticmethod
-    def _process_html_response(response, action_result):
+    def _process_html_response(self, response, action_result):
         """ This function is used to process html response.
 
         :param response: Response data
@@ -108,14 +177,17 @@ class AwsIamConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8').encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
         except:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, self._handle_py_ver_compat_for_input_str(error_text))
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -124,8 +196,7 @@ class AwsIamConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _process_json_response(response, action_result):
+    def _process_json_response(self, response, action_result):
         """ This function is used to process json response.
 
         :param response: Response data
@@ -138,7 +209,7 @@ class AwsIamConnector(BaseConnector):
             resp_json = response.json()
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(str(e))), None)
+                                                   format(self._get_error_message_from_exception(e))), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
@@ -146,7 +217,7 @@ class AwsIamConnector(BaseConnector):
 
         # You should process the error returned in the json
         message = "Error from server. Status Code: {0} Data from server: {1}".\
-            format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -187,12 +258,11 @@ class AwsIamConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".\
-            format(response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            format(response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    @staticmethod
-    def _aws_sign(key, data):
+    def _aws_sign(self, key, data):
         """ This function is used to generate cryptographic hash of the provided data.
 
         :param key: Secret key shared between two communicating endpoints
@@ -200,7 +270,7 @@ class AwsIamConnector(BaseConnector):
         :return: Cryptographic hash of the actual data combined with the shared secret key
         """
 
-        return hmac.new(key, data.encode('utf-8'), hashlib.sha256).digest()
+        return hmac.new(key, self._handle_py_ver_compat_for_input_str(data, always_encode=True), hashlib.sha256).digest()
 
     def _get_signature_key(self, date_stamp, region_name, service_name):
         """ This function is used to get signature key using AWS Signature Version 4.
@@ -210,7 +280,7 @@ class AwsIamConnector(BaseConnector):
         :param service_name: Service name whose requests are called
         return: Signature key generated using AWS Signature Version 4
         """
-        k_date = self._aws_sign(('{}{}'.format(AWSIAM_SIGNATURE_V4, self._secret_key)).encode('utf-8'), date_stamp)
+        k_date = self._aws_sign(self._handle_py_ver_compat_for_input_str('{}{}'.format(AWSIAM_SIGNATURE_V4, self._secret_key), always_encode=True), date_stamp)
         k_region = self._aws_sign(k_date, region_name)
         k_service = self._aws_sign(k_region, service_name)
         k_signing = self._aws_sign(k_service, AWSIAM_SIGNATURE_V4_REQUEST)
@@ -236,7 +306,7 @@ class AwsIamConnector(BaseConnector):
 
         # b) Create payload hash (hash of the request body content). For GET
         # requests, the payload is an empty string ("").
-        payload_hash = hashlib.sha256(''.encode('utf-8')).hexdigest()
+        payload_hash = hashlib.sha256(self._handle_py_ver_compat_for_input_str("", always_encode=True)).hexdigest()
 
         # c) Combine elements to create canonical request
         canonical_request = '{}\n/\n{}\n{}\n{}\n{}'.\
@@ -246,14 +316,14 @@ class AwsIamConnector(BaseConnector):
         # Match the algorithm to the hashing algorithm, either SHA-1 or SHA-256 (recommended)
         credential_scope = '{}/{}/{}/{}'.format(datestamp, AWSIAM_REGION, AWSIAM_SERVICE, AWSIAM_SIGNATURE_V4_REQUEST)
         string_to_sign = '{}\n{}\n{}\n{}'.format(AWSIAM_REQUESTS_SIGNING_ALGO, amzdate, credential_scope,
-                                                 hashlib.sha256(canonical_request.encode('utf-8')).hexdigest())
+                                                 hashlib.sha256(self._handle_py_ver_compat_for_input_str(canonical_request, always_encode=True)).hexdigest())
 
         # 3. Calculate the signature
         # a) Create the signing key using the function defined above.
         signing_key = self._get_signature_key(datestamp, AWSIAM_REGION, AWSIAM_SERVICE)
 
         # b) Sign the string_to_sign using the signing_key
-        signature = hmac.new(signing_key, string_to_sign.encode('utf-8'), hashlib.sha256).hexdigest()
+        signature = hmac.new(signing_key, self._handle_py_ver_compat_for_input_str(string_to_sign, always_encode=True), hashlib.sha256).hexdigest()
 
         authorization_header = '{} Credential={}/{}, SignedHeaders={}, Signature={}'.\
             format(AWSIAM_REQUESTS_SIGNING_ALGO, self._access_key, credential_scope, AWSIAM_SIGNED_HEADERS, signature)
@@ -261,6 +331,10 @@ class AwsIamConnector(BaseConnector):
         headers = dict()
         headers[AWSIAM_JSON_AMZ_DATE] = amzdate
         headers[AWSIAM_JSON_AUTHORIZATION] = authorization_header
+
+        # If using temporary STS credentials, add additional HTTP header parameter for security token
+        if self._session_token:
+            headers[AWSIAM_JSON_STS_TOKEN] = self._session_token
         return headers
 
     def _make_rest_call(self, action_result, params=None, data=None, method='get', timeout=None):
@@ -276,14 +350,6 @@ class AwsIamConnector(BaseConnector):
         """
 
         resp_json = None
-
-        try:
-            self._access_key = self._access_key
-            self._secret_key = self._secret_key
-        except:
-            self.debug_print(AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, AWSIAM_CONFIG_PARAMS_ENCODING_ERROR_MSG),
-                          resp_json)
 
         if params is None:
             params = OrderedDict()
@@ -303,7 +369,7 @@ class AwsIamConnector(BaseConnector):
                                                                       params=urlencode(params)))
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".
-                                                   format(str(e))), resp_json)
+                                                   format(self._get_error_message_from_exception(e))), resp_json)
 
         return self._process_response(request_response, action_result)
 
@@ -317,12 +383,21 @@ class AwsIamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(AWSIAM_CONNECTING_ENDPOINT_MSG)
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         params = dict()
-        params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
+        config = self.get_config()
+
+        # Need to use different testing endpoint when using non-user credentials (assume role checkbox), since there is no user associated with the credentials
+        if config.get('use_role'):
+            params[AWSIAM_JSON_ACTION] = AWSIAM_LIST_ROLES_ENDPOINT
+        else:
+            params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
 
         # make rest call
-        ret_val, response = self._make_rest_call(action_result=action_result, params=params,
-                                                 timeout=AWSIAM_TIME_OUT)
+        ret_val, response = self._make_rest_call(action_result=action_result, params=params, timeout=AWSIAM_TIMEOUT)
 
         if phantom.is_fail(ret_val):
             self.save_progress(AWSIAM_TEST_CONNECTIVITY_FAILED_MSG)
@@ -341,6 +416,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         response_dict = dict()
         username = param[AWSIAM_PARAM_USERNAME]
         disable_access_keys = param.get(AWSIAM_PARAM_DISABLE_ACCESS_KEYS, True)
@@ -355,7 +434,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile does not exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for disable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_DELETED_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -383,7 +462,7 @@ class AwsIamConnector(BaseConnector):
             for access_key in list_access_keys:
                 # b) Inactivate every access key
                 params = OrderedDict()
-                params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+                params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
                 params[AWSIAM_JSON_ACTION] = AWSIAM_UPDATE_ACCESS_KEYS_ENDPOINT
                 params[AWSIAM_JSON_STATUS] = AWSIAM_JSON_INACTIVE
                 params[AWSIAM_JSON_USERNAME] = username
@@ -410,6 +489,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         password = param[AWSIAM_PARAM_PASSWORD]
         enable_access_keys = param.get(AWSIAM_PARAM_ENABLE_ACCESS_KEYS, True)
@@ -426,7 +509,7 @@ class AwsIamConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             # a) If Login Profile already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # 404 error is thrown and it needs to be handled for enable user action
             if not AWSIAM_USER_LOGIN_PROFILE_ALREADY_EXISTS_MSG.format(username=username).lower() in \
                    action_result.get_message().lower():
                 return action_result.get_status()
@@ -456,7 +539,7 @@ class AwsIamConnector(BaseConnector):
             for access_key in list_access_keys:
                 # b) Activate every access key
                 params = OrderedDict()
-                params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+                params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
                 params[AWSIAM_JSON_ACTION] = AWSIAM_UPDATE_ACCESS_KEYS_ENDPOINT
                 params[AWSIAM_JSON_STATUS] = AWSIAM_JSON_ACTIVE
                 params[AWSIAM_JSON_USERNAME] = username
@@ -482,6 +565,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         username = param[AWSIAM_PARAM_USERNAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
@@ -513,6 +600,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
 
@@ -542,6 +633,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
@@ -583,6 +678,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
 
@@ -622,6 +721,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
 
@@ -692,7 +795,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every policy
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_DETACH_ROLE_POLICY_ENDPOINT
-            params[AWSIAM_JSON_POLICY_ARN] = policy[AWSIAM_JSON_POLICY_ARN].encode('utf-8')
+            params[AWSIAM_JSON_POLICY_ARN] = self._handle_py_ver_compat_for_input_str(policy[AWSIAM_JSON_POLICY_ARN])
             params[AWSIAM_JSON_ROLE_NAME] = role_name
 
             # make rest call
@@ -732,8 +835,8 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If role does not exist, then,
+            # 404 error is thrown and it needs to be handled for the calling action
             if AWSIAM_ROLE_DOES_NOT_EXISTS_MSG.format(role_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
@@ -759,15 +862,15 @@ class AwsIamConnector(BaseConnector):
         ret_val, response = self._make_rest_call(action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            # a) If role already exist, then,
-            # 404 error is thrown and it needs to be handled for delete user action
+            # a) If instance profile does not exist, then,
+            # 404 error is thrown and it needs to be handled for add role action
             if AWSIAM_ROLE_INSTANCE_PROFILE_DOES_NOT_EXISTS_MSG.format(instance_profile_name=role_name).lower() in \
                     action_result.get_message().lower():
                 return False
 
             return None
 
-        # Return True for role already exists if we are successfully able to fetch the given role
+        # Return True for instance profile already exists if we are successfully able to fetch the given role
         return True
 
     def _handle_add_role(self, param):
@@ -779,6 +882,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         role_policy_doc = param[AWSIAM_PARAM_ROLE_POLICY_DOC]
@@ -872,6 +979,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
 
         # 1. Delete login profile of the user
@@ -906,7 +1017,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every policy
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_DETACH_USER_POLICY_ENDPOINT
-            params[AWSIAM_JSON_POLICY_ARN] = policy[AWSIAM_JSON_POLICY_ARN].encode('utf-8')
+            params[AWSIAM_JSON_POLICY_ARN] = self._handle_py_ver_compat_for_input_str(policy[AWSIAM_JSON_POLICY_ARN])
             params[AWSIAM_JSON_USERNAME] = username
 
             # make rest call
@@ -932,7 +1043,7 @@ class AwsIamConnector(BaseConnector):
             # b) Remove user from every group
             params = OrderedDict()
             params[AWSIAM_JSON_ACTION] = AWSIAM_REMOVE_USER_FROM_GROUP_ENDPOINT
-            params[AWSIAM_JSON_GROUP_NAME] = group[AWSIAM_JSON_GROUP_NAME].encode('utf-8')
+            params[AWSIAM_JSON_GROUP_NAME] = self._handle_py_ver_compat_for_input_str(group[AWSIAM_JSON_GROUP_NAME])
             params[AWSIAM_JSON_USERNAME] = username
 
             # make rest call
@@ -957,7 +1068,7 @@ class AwsIamConnector(BaseConnector):
         for access_key in list_access_keys:
             # b) Remove user from every group
             params = OrderedDict()
-            params[AWSIAM_JSON_ACCESS_KEY_ID] = access_key[AWSIAM_JSON_ACCESS_KEY_ID].encode('utf-8')
+            params[AWSIAM_JSON_ACCESS_KEY_ID] = self._handle_py_ver_compat_for_input_str(access_key[AWSIAM_JSON_ACCESS_KEY_ID])
             params[AWSIAM_JSON_ACTION] = AWSIAM_DELETE_ACCESS_KEYS_ENDPOINT
             params[AWSIAM_JSON_USERNAME] = username
 
@@ -992,6 +1103,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         group_name = param[AWSIAM_PARAM_GROUP_NAME]
 
@@ -1022,6 +1137,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         group_name = param[AWSIAM_PARAM_GROUP_NAME]
 
@@ -1051,6 +1170,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         username = param[AWSIAM_PARAM_USERNAME]
         user_details = dict()
@@ -1113,6 +1236,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         if group_path and not group_path == '/' and (not group_path.startswith('/') or not group_path.endswith('/')):
             return action_result.set_status(phantom.APP_ERROR, AWSIAM_INVALID_GROUP_PATH_MSG)
 
@@ -1145,6 +1272,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         params = OrderedDict()
         user_path = param.get(AWSIAM_PARAM_USER_PATH)
         if user_path:
@@ -1175,7 +1306,7 @@ class AwsIamConnector(BaseConnector):
         # Add the roles data in action_result
         if group_name and user_path:
             for user in users_dict[AWSIAM_JSON_LIST_RESPONSE]:
-                if user_path.lower() == user[AWSIAM_JSON_PATH].encode('utf-8').lower():
+                if user_path.lower() == self._handle_py_ver_compat_for_input_str(user[AWSIAM_JSON_PATH]).lower():
                     user[AWSIAM_JSON_REQUEST_ID] = users_dict[AWSIAM_JSON_REQUEST_ID]
                     action_result.add_data(user)
         else:
@@ -1198,6 +1329,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         # 1. Fetch roles of an AWS account
         params = OrderedDict()
@@ -1225,6 +1360,7 @@ class AwsIamConnector(BaseConnector):
 
         :param action_result: Object of ActionResult
         :param params: Dictionary of input parameters
+        :param key: Key parameter to retrieve the key from metadata
         :return: Dictionary of List of items retrieved from paginated response and request ID of request made
         """
 
@@ -1245,7 +1381,7 @@ class AwsIamConnector(BaseConnector):
             json_resp_part_1 = (self._response_metadata_dict[key])[1]
             json_resp_part_2 = (self._response_metadata_dict[key])[2]
 
-            pagination_key = response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_IS_TRUNCATED].encode('utf-8')
+            pagination_key = self._handle_py_ver_compat_for_input_str(response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_IS_TRUNCATED])
             if pagination_key == 'true':
                 is_pagination_required = True
             else:
@@ -1265,8 +1401,7 @@ class AwsIamConnector(BaseConnector):
                     list_items.extend(items)
 
             if is_pagination_required:
-                params[AWSIAM_JSON_MARKER] = response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_MARKER]\
-                    .encode('utf-8')
+                params[AWSIAM_JSON_MARKER] = self._handle_py_ver_compat_for_input_str(response[json_resp_part_0][json_resp_part_1][AWSIAM_JSON_MARKER])
             else:
                 break
 
@@ -1350,9 +1485,27 @@ class AwsIamConnector(BaseConnector):
         self._state = self.load_state()
         config = self.get_config()
 
-        self._access_key = config[AWSIAM_ACCESS_KEY]
-        self._secret_key = config[AWSIAM_SECRET_KEY]
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, AWSIAM_ERR_EC2_ROLE_CREDENTIALS_FAILED)
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+        else:
+            self._access_key = config.get(AWSIAM_ACCESS_KEY)
+            self._secret_key = config.get(AWSIAM_SECRET_KEY)
+
         self._response_metadata_dict = self._get_response_metadata_dict()
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSIAM_ERR_BAD_ASSET_CONFIG)
 
         return phantom.APP_SUCCESS
 

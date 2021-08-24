@@ -1,0 +1,2956 @@
+{
+    "appid": "611b0c66-9ef7-4295-a6cd-a466cf0618c7",
+    "name": "Terraform Cloud",
+    "description": "This app integrates with Terraform Cloud to perform generic and investigative actions to manage runs, plans, and applies",
+    "type": "devops",
+    "product_vendor": "HashiCorp",
+    "logo": "logo_terraform.svg",
+    "logo_dark": "logo_terraform_dark.svg",
+    "product_name": "Terraform Cloud",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2020 Splunk Inc.",
+    "app_version": "1.0.10",
+    "utctime_updated": "2019-12-12T17:12:59.854486Z",
+    "package_name": "phantom_terraformcloud",
+    "main_module": "terraformcloud_connector.py",
+    "min_phantom_version": "4.8.24304",
+    "app_wizard_version": "1.0.0",
+    "python_version": "3",
+    "configuration": {
+        "base_url": {
+            "description": "Terraform URL (e.g. https://app.terraform.io)",
+            "data_type": "string",
+            "default": "https://app.terraform.io",
+            "order": 0
+        },
+        "ph1": {
+            "description": "Placeholder",
+            "data_type": "ph",
+            "order": 1
+        },
+        "token": {
+            "description": "Authentication Token",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list workspaces",
+            "description": "Lists workspaces in the organization",
+            "type": "investigate",
+            "identifier": "list_workspaces",
+            "read_only": true,
+            "parameters": {
+                "organization_name": {
+                    "description": "Name of the organization to list the workspaces of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "order": 0
+                },
+                "page_num": {
+                    "description": "Page number of workspace list",
+                    "data_type": "numeric",
+                    "default": 1,
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "Number of workspaces to return per page (100 is default)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.organization_name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "example_values": [
+                        "Organization"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_num",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.prev-page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.next-page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.current-page",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total-pages",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total-count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.applied",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.discarded",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.none",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.applying",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.cost-estimated",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.plan-queued",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.policy-checked",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.cost-estimating",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.confirmed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.policy-soft-failed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.policy-override",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.canceled",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.apply-queued",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.planning",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.planned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.policy-checking",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.errored",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.pending",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.status-counts.planned-and-finished",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.organization.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "organizations"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.organization.data.id",
+                    "data_type": "string",
+                    "contains": [	
+                        "terraform organization name"	
+                    ],	
+                    "example_values": [	
+                        "Organization"
+                    ],
+                    "column_name": "Organization ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.latest-run.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.current-run.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.current-state-version.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.operations",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.environment",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.source-name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.locked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
+                    ],
+                    "column_name": "Workspace Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.auto-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.terraform-version",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.12.18"
+                    ],
+                    "column_name": "Terraform Version",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test description"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.created-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.vcs-repo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.actions.is-destroyable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.queue-all-runs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "tfe-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.latest-change-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.working-directory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.source-url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.file-triggers-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.speculative-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-lock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-force-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-queue-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-queue-run",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-read-settings",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-update-variable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-queue-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-update",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "workspaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "example_values": [
+                        "ws-X9wL9pBZQdE6gjsp"
+                    ],
+                    "column_name": "Workspace ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/organizations/TestOrg/workspaces/test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.next",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.prev",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.links.last",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.first",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/organizations/TestOrg/workspaces?page%5Bnumber%5D=1&page%5Bsize%5D=100"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list runs",
+            "description": "Lists runs for a workspace",
+            "type": "investigate",
+            "identifier": "list_runs",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "Name of the organization to list the workspaces of",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "order": 0
+                },
+                "page_num": {
+                    "description": "Page number of runs returned",
+                    "data_type": "numeric",
+                    "default": 1,
+                    "order": 1
+                },
+                "page_size": {
+                    "description": "Number of runs to return per page (20 is default)",
+                    "data_type": "numeric",
+                    "default": 20,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "example_values": [
+                        "ws-X9wL9pBZQdE6gjsp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_num",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.page_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.prev-page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.next-page",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.current-page",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total-pages",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total-count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.configuration-version.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "configuration-versions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.configuration-version.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "cv-ybgt5G3jpbW72V1s"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.configuration-version.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/configuration-version"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.run-events.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "run-events"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.run-events.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "re-y9FL2wcGKNsUdG2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.run-events.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/run-events"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.comments.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/comments"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.plan.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "plans"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.plan.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "example_values": [
+                        "plan-iB6dV91zqE5pNCey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.plan.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/plan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.workspace.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "workspaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.workspace.data.id",
+                    "data_type": "string",
+                    "contains":[
+                        "terraform workspace id"
+                    ],
+                    "example_values": [
+                        "ws-X9wL9pBZQdE6gjsp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.apply.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "applies"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.apply.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
+                    "example_values": [
+                        "apply-eK21impkqMUvxZTw"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.apply.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/apply"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.policy-checks.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/policy-checks"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.created-by.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "users"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.created-by.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "user-NU2TLU1zsmvguG3K"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.relationships.created-by.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/created-by"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "errored"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.has-changes",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.canceled-at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.created-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53.076Z"
+                    ],
+                    "column_name": "Created At",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.plan-only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.actions.is-discardable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.actions.is-confirmable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.actions.is-cancelable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.actions.is-force-cancelable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "tfe-ui"
+                    ],
+                    "column_name": "Source",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.trigger-reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "manual"
+                    ],
+                    "column_name": "Trigger Reason",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status-timestamps.planning-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status-timestamps.errored-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:26:00+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status-timestamps.plan-queued-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.status-timestamps.plan-queueable-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Queued from Terraform Cloud UI"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.is-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-force-execute",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-force-cancel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-cancel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-discard",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.attributes.permissions.can-override-policy-check",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "runs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "example_values": [
+                        "run-B45D8uRipKCtvpYd"
+                    ],
+                    "column_name": "Run ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.next",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/workspaces/ws-X9wL9pBZQdE6gjsp/runs?page%5Bnumber%5D=1&page%5Bsize%5D=20"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.prev",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.links.last",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/workspaces/ws-X9wL9pBZQdE6gjsp/runs?page%5Bnumber%5D=1&page%5Bsize%5D=20"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.links.first",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://app.terraform.io/api/v2/workspaces/ws-X9wL9pBZQdE6gjsp/runs?page%5Bnumber%5D=1&page%5Bsize%5D=20"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create run",
+            "description": "Create a run which will perform a plan and apply",
+            "verbose": "NOTE: This endpoint must be accessed using either a <b>user token</b> or a <b>team token</b>. A run performs a plan and applies, using a configuration version and the workspace's current variables. You can specify a configuration version when creating a run; if you don't provide one, the run defaults to the workspace's most recently used version. (A configuration version is 'used' when it is created or used for a run in this workspace.).",
+            "type": "generic",
+            "identifier": "create_run",
+            "read_only": false,
+            "parameters": {
+                "workspace_id": {
+                    "description": "ID of workspace where the run will be executed",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "order": 0
+                },
+                "configuration_version": {
+                    "description": "Configuration version to use for this run. If blank, latest config is used",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "message": {
+                    "description": "Message to be associated with this run",
+                    "data_type": "string",
+                    "default": "Queued manually via the Terraform Enterprise API",
+                    "order": 2
+                },
+                "is_destroy": {
+                    "description": "Specify if this plan is a destroy plan, which will destroy all provisioned resources",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.configuration_version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.is_destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.workspace_id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create workspace",
+            "description": "Create a workspace within Terraform",
+            "verbose": "Workspace creation is restricted to members of the owner's team, the owner's team API token, and the organization API token. The organization must already exist in the system, and the user must have permission to create new workspaces.",
+            "type": "generic",
+            "identifier": "create_workspace",
+            "read_only": false,
+            "parameters": {
+                "organization_name": {
+                    "description": "Name of the organization to create the workspace within Terraform",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "order": 0
+                },
+                "workspace_name": {
+                    "description": "Name of the workspace",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "order": 1
+                },
+                "description": {
+                    "description": "Description for the workspace",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "ph_0": {
+                    "data_type": "ph",
+                    "order": 3
+                },
+                "vcs_repo_id": {
+                    "description": "Reference to your VSC repo in the format :org/:repo",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform vcs repo id"
+                    ],
+                    "order": 4
+                },
+                "vcs_token_id": {
+                    "description": "Token ID of the VSC repo",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform vcs token id"
+                    ],
+                    "order": 5
+                },
+                "file_triggers_enabled": {
+                    "description": "Whether to filter runs based on the changed files in a VCS push",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 6
+                },
+                "auto_apply": {
+                    "description": "Automatically apply changes when plan is successful",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 7
+                },
+                "queue_all_runs": {
+                    "description": "Whether runs should be queued immediately after workspace creation",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.organization_name",
+                    "data_type": "string",
+                    "column_name": "Organization Name",
+                    "column_order": 0,
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "example_values": [
+                        "TestOrg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.workspace_name",
+                    "data_type": "string",
+                    "column_name": "Workspace Name",
+                    "column_order": 1,
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.auto_apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_triggers_enabled",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.queue_all_runs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vcs_repo_id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform vcs repo id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vcs_token_id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform vcs token id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-destroyable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.auto-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.created-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.environment",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.file-triggers-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.latest-change-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.locked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.operations",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-force-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-lock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-run",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-read-settings",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-update",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-update-variable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.queue-all-runs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "tfe-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source-name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source-url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.speculative-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.terraform-version",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.12.18"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.branch",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.identifier",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform vcs repo id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.ingress-submodules",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.oauth-token-id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform vcs token id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.working-directory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "example_values": [
+                        "ws-1jIskLtjsp"
+                    ],
+                    "column_name": "Workspace ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/organizations/TestOrg/workspaces/test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-run.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-state-version.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.latest-run.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.organization.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "TestOrg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.organization.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "organizations"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "workspaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Workspace id: ws-1jIskLtjsp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.workspace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-1jIskLtjsp"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "apply run",
+            "description": "Applies a run that is paused waiting for confirmation after a plan",
+            "verbose": "This includes runs in the 'needs confirmation' and 'policy checked' states. This action is only required for runs that can't be auto-applied. (Plans can be auto-applied if the auto-apply setting is enabled on the workspace, the plan is not a destroy plan, and the plan was not queued by a user without write permissions.)<br>This endpoint queues the request to perform an apply; the apply might not happen immediately.<br>This endpoint represents an action as opposed to a resource. As such, the endpoint does not return any object in the response body.",
+            "type": "generic",
+            "identifier": "apply_run",
+            "read_only": false,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the run to apply",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "An optional comment about the run",
+                    "data_type": "string",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Run ID",
+                    "column_order": 0,
+                    "contains": [
+                        "terraform run id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get apply",
+            "description": "Get details of an apply",
+            "verbose": "There is no endpoint to list applies. You can find the ID for an apply in the 'relationships.apply' property of a run object.",
+            "type": "investigate",
+            "identifier": "get_apply",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the apply to show",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform apply id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
+                    "example_values": [
+                        "apply-Kasd12SWa9AhS6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.relationships.state-versions.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "state-versions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.relationships.state-versions.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "sv-23dawhGdsaoMG"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "finished"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.log-read-url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://terraform.com/v1/object/0dWMmnMUFkQjRu"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-changes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-additions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-destructions",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.queued-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-13T21:53:45+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.started-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-13T21:53:47+00:00"
+                    ],
+                    "column_name": "Started",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.finished-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-11-13T21:54:16+00:00"
+                    ],
+                    "column_name": "Completed",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "applies"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
+                    "example_values": [
+                        "apply-Kasd12SWa9AhS6"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/applies/apply-Kasd12SWa9AhS6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get plan",
+            "description": "Get details and status of the plan of a run in Terraform",
+            "verbose": "There is no endpoint to list plans. You can find the ID for a plan in the 'relationships.plan' property of a run object.",
+            "type": "investigate",
+            "identifier": "get_plan",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the plan to show",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Plan ID",
+                    "column_order": 0,
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "example_values": [
+                        "plan-iB6dV91zqE5pNCey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "errored"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.has-changes",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Has Changes",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.log-read-url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://archivist.terraform.io/v1/object/dmF1bHQ6djE6RFk0YlNjcUg1T1IrN3ptUEpIeXJyM0pZaHpqL09MVlY5bkREWVljeU8xeEJCR2FLVDFwdUpHMU9KT0hRZ2FSMy9uaytGRWRMUHdhemtCVWdwbEtBVXpRYVZyOU1XcVRJcnF3bVlVUUZDbHhPRHEvZEdvR2pZK2kzdWtIaWVNZE1aWmdhY0FTVUppR1ZoaU9FeHR0YjJpdnFKSHN5aUFsM2dvVzJ5YzJVMEhway9lQU13VHFySWlhS0hRRUpHL0ZENUVlRjFWUERVQWpSRXJWYmNKalRZWEhOT0VZeGplbUFJbk5KL2tPcmJZSnNzRHVGaHZPVHZpSjVsMGFnaFBhZXg4ZFN2MzF4R1YwY3JiejZaWGRhU1gyVDlmaXRySStkVS9pNnJUTzBOV1BVbkI4U0FoTUpxYU5sZ0VWQUV3emNHTHdybnNycHJxRkRlcmx5dXlTQkhzWlRhMnF0Q0xhLzlJMnV5M25Xc0EvZ0RrK3ZheU5DVWhnNk9oQT0"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "Log Read URL",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-changes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.actions.is-exportable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-additions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.resource-destructions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.errored-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:26:00+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.started-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:54+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.status-timestamps.managed-queued-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.attributes.permissions.can-export",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "plans"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "example_values": [
+                        "plan-iB6dV91zqE5pNCey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/plans/plan-iB6dV91zqE5pNCey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get run",
+            "description": "This endpoint is used for showing details of a specific run",
+            "type": "investigate",
+            "identifier": "get_run",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the run to retrieve details",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "example_values": [
+                        "run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.configuration-version.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "configuration-versions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.configuration-version.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "cv-ybgt5G3jpbW72V1s"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.configuration-version.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/configuration-version"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.run-events.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "run-events"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.run-events.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "re-y9FL2wcGKNsUdG2a"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.run-events.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/run-events"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.comments.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/comments"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.plan.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "plans"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.plan.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform plan id"
+                    ],
+                    "example_values": [
+                        "plan-iB6dV91zqE5pNCey"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.plan.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/plan"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.workspace.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "workspaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.workspace.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "example_values": [
+                        "ws-X9wL9pBZQdE6gjsp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.apply.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "applies"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.apply.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform apply id"
+                    ],
+                    "example_values": [
+                        "apply-eK21impkqMUvxZTw"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.apply.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/apply"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.policy-checks.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/policy-checks"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.created-by.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "users"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.created-by.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "user-NU2TLU1zsmvguG3K"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.created-by.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd/created-by"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "errored"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.has-changes",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.canceled-at",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.created-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53.076Z"
+                    ],
+                    "column_name": "Created At",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.plan-only",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-discardable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-confirmable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-cancelable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-force-cancelable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "tfe-ui"
+                    ],
+                    "column_name": "Source",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.trigger-reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "manual"
+                    ],
+                    "column_name": "Trigger Reason",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.status-timestamps.planning-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.status-timestamps.errored-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:26:00+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.status-timestamps.plan-queued-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.status-timestamps.plan-queueable-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2020-01-08T21:25:53+00:00"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Queued from Terraform Cloud UI"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.is-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-force-execute",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-force-cancel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-cancel",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-discard",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-override-policy-check",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "runs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "example_values": [
+                        "run-B45D8uRipKCtvpYd"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get workspace",
+            "description": "Get details of a workspace",
+            "verbose": "Details on a workspace can be retrieved from two endpoints, which behave identically. One refers to a workspace by its ID, and the other by its name and organization.",
+            "type": "investigate",
+            "identifier": "get_workspace",
+            "read_only": true,
+            "parameters": {
+                "id": {
+                    "description": "The ID of the workspace to show",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "order": 0
+                },
+                "organization_name": {
+                    "description": "The name of the organization to retrieve workspace details",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "order": 1
+                },
+                "workspace_name": {
+                    "description": "The name of the workspace to retrieve details",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.organization_name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "example_values": [
+                        "Organization"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.workspace_name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.organization.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "organizations"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.organization.data.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Organization"
+                    ],
+                    "contains": [
+                        "terraform organization name"
+                    ],
+                    "column_name": "Organization Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.latest-run.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "runs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.latest-run.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "example_values": [
+                        "run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.latest-run.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-run.data.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "runs"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-run.data.id",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform run id"
+                    ],
+                    "example_values": [
+                        "run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-run.links.related",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/runs/run-B45D8uRipKCtvpYd"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relationships.current-state-version.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.operations",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.environment",
+                    "data_type": "string",
+                    "example_values": [
+                        "default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source-name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.locked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.name",
+                    "data_type": "string",
+                    "contains": [
+                        "terraform workspace name"
+                    ],
+                    "example_values": [
+                        "test_workspace"
+                    ],
+                    "column_name": "Workspace Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.auto-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.terraform-version",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.12.18"
+                    ],
+                    "column_name": "Version",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test description"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.created-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.display-identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "jdoe/TestingAPI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "jdoe/TestingAPI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.github-app-installation-id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ghain-Mrjk7oxpsgekbwqf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.ingress-submodules",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo.branch",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.actions.is-destroyable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.queue-all-runs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "tfe-api"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.latest-change-at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-12-20T19:31:36.463Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.source-url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.working-directory",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.vcs-repo-identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "jdoe/TestingAPI"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.file-triggers-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.speculative-enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-lock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-force-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-apply",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-run",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-read-settings",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-unlock",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-update-variable",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-queue-destroy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes.permissions.can-update",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "workspaces"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ws-X9wL9pBZQdE6gjsp"
+                    ],
+                    "contains": [
+                        "terraform workspace id"
+                    ],
+                    "column_name": "Workspace ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.links.self",
+                    "data_type": "string",
+                    "example_values": [
+                        "/api/v2/organizations/TestOrg/workspaces/test_workspace"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

@@ -1,0 +1,155 @@
+{
+    "id": "id",
+    "attributes": {
+        "title": "title",
+        "state": "state",
+        "created_at": "created_at",
+        "vulnerability_information": "vulnerability_information",
+        "triaged_at": "triaged_at",
+        "closed_at": "closed_at",
+        "last_reporter_activity_at": "last_reporter_activity_at",
+        "first_program_activity_at": "first_program_activity_at",
+        "last_program_activity_at": "last_program_activity_at",
+        "bounty_awarded_at": "bounty_awarded_at",
+        "swag_awarded_at": "swag_awarded_at",
+        "disclosed_at": "disclosed_at",
+        "reporter_agreed_on_going_public_at": "reporter_agreed_on_going_public_at",
+        "issue_tracker_reference_id": "issue_tracker_reference_id",
+        "issue_tracker_reference_url": "issue_tracker_reference_url",
+        "last_public_activity_at": "last_public_activity_at",
+        "last_activity_at": "last_activity_at",
+        "cve_ids": "cve_ids",
+        "source": "source"
+    },
+    "relationships": {
+        "reporter": {
+            "data": {
+                "id": "reporter_id",
+                "attributes": {
+                    "reputation": "reporter_reputation",
+                    "username": "reporter_username",
+                    "name": "reporter_name"
+                }
+            }
+        },
+        "structured_scope": {
+            "data": {
+                "attributes": {
+                    "asset_identifier": "asset_identifier",
+                    "asset_type": "asset_type"
+                }
+            }
+        },
+        "assignee": {
+            "data": {
+                "id": "assignee_id",
+                "type": "assignee_type",
+                "attributes": {
+                    "name": "assignee_name"
+                }
+            }
+        },
+        "program": {
+            "data": {
+                "id": "program_id",
+                "attributes": {
+                    "handle": "program_name"
+                }
+            }
+        },
+        "severity": {
+            "data": {
+                "attributes": {
+                    "rating": "severity_rating",
+                    "author_type": "severity_author_type",
+                    "user_id": "severity_user_id",
+                    "score": "severity_score",
+                    "attack_complexity": "severity_attack_complexity",
+                    "attack_vector": "severity_attack_vector",
+                    "availability": "severity_availability",
+                    "confidentiality": "severity_confidentiality",
+                    "integrity": "severity_integrity",
+                    "privileges_required": "severity_privileges_required",
+                    "user_interaction": "severity_user_interaction",
+                    "scope": "severity_scope"
+                }
+            }
+        },
+        "weakness": {
+            "data": {
+                "id": "weakness_id",
+                "attributes": {
+                    "name": "weakness_name",
+                    "external_id": "weakness_external_id"
+                }
+            }
+        },
+        "activities": {
+            "data": [
+                "comments",
+                {
+                    "id": "id",
+                    "type": "type",
+                    "attributes": {
+                        "message": "comment",
+                        "created_at": "created_at"
+                    },
+                    "relationships": {
+                        "actor": {
+                            "data": {
+                                "id": "actor_id",
+                                "attributes": {
+                                    "username": "actor_username",
+                                    "handle": "actor_username"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "attachments": {
+            "data": [
+                "attachments",
+                {
+                    "id": "id",
+                    "attributes": {
+                        "file_name": "file_name",
+                        "content_type": "content_type",
+                        "file_size": "file_size",
+                        "created_at": "created_at",
+                        "expiring_url": "expiring_url"
+                    }
+                }
+            ]
+        },
+        "custom_field_values": {
+            "data": [
+                "custom_fields",
+                {
+                    "id": "id",
+                    "attributes": {
+                        "value": "value",
+                        "created_at": "created_at",
+                        "updated_at": "updated_at"
+                    },
+                    "relationships": {
+                        "custom_field_attribute": {
+                            "data": {
+                                "attributes": {
+                                    "field_type": "type",
+                                    "label": "label",
+                                    "internal": "is_internal",
+                                    "required": "is_required",
+                                    "regex": "regex",
+                                    "helper_text": "helper_text",
+                                    "checkbox_text": "checkbox_text"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

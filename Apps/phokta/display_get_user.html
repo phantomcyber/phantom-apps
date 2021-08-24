@@ -10,62 +10,67 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_get_user.html
-  Copyright (c) 2018-2020 Splunk Inc.
+  Copyright (c) 2018-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
 <style>
 
-.okta-app a:hover {
-  text-decoration:underline;
-}
-
-.okta-app .wf-table-vertical {
-  width: initial;
-  font-size: 12px;
-}
-
-.okta-app .wf-table-vertical td {
-  padding: 5px;
-  border: 1px solid;
-}
-
-.okta-app .wf-table-horizontal  {
-  margin-right: 10px;
-  width: initial;
-  border: 1px solid;
-  font-size: 12px;
-}
-
-.okta-app .wf-table-horizontal th {
-  text-align: center;
-  border: 1px solid;
-  text-transform: uppercase;
-  font-weight: normal;
-  padding: 5px;
-}
-
-.okta-app .wf-table-horizontal td {
-  border: 1px solid;
-  padding: 5px;
-  padding-left: 4px;
-}
-
-.okta-app .wf-h3-style {
-  font-size : 20px
-}
-
-.okta-app .wf-h4-style {
-  font-size : 16px
-}
-
-.okta-app .wf-h5-style {
-  font-size : 14px
-}
-.okta-app .wf-subheader-style {
-  font-size : 12px
-}
+  .okta-app a:hover {
+    text-decoration:underline;
+  }
+  
+  .okta-app .wf-table-vertical {
+    width: initial;
+    font-size: 12px;
+  }
+  
+  .okta-app .wf-table-vertical td {
+    padding: 5px;
+    border: 1px solid;
+  }
+  
+  .okta-app .wf-table-horizontal  {
+    margin-right: 10px;
+    width: initial;
+    border: 1px solid;
+    font-size: 12px;
+    width: 100%;
+  }
+  
+  .okta-app .wf-table-horizontal th {
+    text-align: center;
+    border: 1px solid;
+    text-transform: uppercase;
+    font-weight: normal;
+    padding: 5px;
+    white-space: nowrap;
+  }
+  
+  .okta-app .wf-table-horizontal td {
+    border: 1px solid;
+    padding: 5px;
+    padding-left: 4px;
+  }
+  
+  .okta-app .wf-h3-style {
+    font-size : 20px
+  }
+  
+  .okta-app .wf-h4-style {
+    font-size : 16px
+  }
+  
+  .okta-app .wf-h5-style {
+    font-size : 14px
+  }
+  .okta-app .wf-subheader-style {
+    font-size : 12px
+  }
+  .okta-app .no-word-wrap {
+    white-space: nowrap;
+  }
 
 </style>
 <div class="okta-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
@@ -75,44 +80,52 @@
 <!------------------- For each Result ---------------------->
 
   {% if result.data %}
-    {% for curr_data in result.data %}
-    <h3 class="wf-h3-style">{{ curr_data.profile.name }}</h3>
-      <table class="wf-table-horizontal">
-        <tr><th>STATUS</th>
-          <td>{{ curr_data.status }}
-          </td>
-        </tr>
-        <tr><th>DISPLAY NAME</th>
-          <td>{{ curr_data.profile.displayName }}
-          </td>
-        </tr>
-        <tr><th>TITLE</th>
-          <td>{{ curr_data.profile.title }}
-          </td>
-        </tr>
-        <tr><th>FIRST NAME</th>
-          <td>{{ curr_data.profile.firstName }}
-          </td>
-        </tr>
-        <tr><th>LAST NAME</th>
-          <td>{{ curr_data.profile.lastName }}
-          </td>
-        </tr>
-        <tr><th>EMAIL</th>
-          <td>{{ curr_data.profile.email }}
-          </td>
-        </tr>
-        <tr><th>ID</th>
-          <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['okta user id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
-              {{ curr_data.id }}
-              &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-          </a></td>
-        </tr>
-      </table>
-      <br>
-    {% endfor %}
+    <table class="phantom-table dataTable">
+      <thead>
+        <th>STATUS</th>
+        <th class="no-word-wrap">DISPLAY NAME</th>
+        <th>TITLE</th>
+        <th>FIRST NAME</th>
+        <th>LAST NAME</th>
+        <th>EMAIL</th>
+        <th>ID</th>
+      </thead>
+      <tbody>
+        {% for curr_data in result.data %}
+          <tr>
+            <td>{{ curr_data.status }}
+            </td>
+            {% if curr_data.profile.displayName %}
+            <td>{{ curr_data.profile.displayName }}
+            </td>
+            {% else %}
+            <td>None
+            </td>
+            {% endif %}
+            {% if curr_data.profile.title %}
+            <td>{{ curr_data.profile.title }}
+            </td>
+            {% else %}
+            <td>None
+            </td>
+            {% endif %}
+            <td>{{ curr_data.profile.firstName }}
+            </td>
+            <td>{{ curr_data.profile.lastName }}
+            </td>
+            <td>{{ curr_data.profile.email }}
+            </td>
+            <td><a href="javascript:;" class="no-word-wrap" onclick="context_menu(this, [{'contains': ['okta user id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
+                {{ curr_data.id }}
+                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+            </a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
   {% else %}
-  <p> Could not retrieve user </p>
+  <p class="wf-h4-style"> Could not retrieve user </p>
   {% endif %}
 
 <br>
@@ -121,6 +134,27 @@
 
 {% endfor %} <!-- loop for each result end -->
 </div> <!-- Main Div -->
+
+<script>
+  $.extend(true, $.fn.dataTable.defaults, {
+      "searching": true,
+      "bLengthChange": false,
+      "language": {
+        "paginate": {
+          "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+          "next": "<i class='fa fa-angle-right fa-lg'></i>"
+        },
+        "emptyTable": "No data available"
+      },
+      "dom": '<"top">rt<"bottom"p><"clear">',
+      drawCallback: function(settings) {
+        var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+        pagination.toggle(this.api().page.info().pages > 1);
+      }
+    });
+    $('.dataTable').DataTable();
+  
+  </script>
 
 {% endblock %} <!-- Main Start Block -->
 

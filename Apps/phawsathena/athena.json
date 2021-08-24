@@ -8,35 +8,35 @@
     "logo_dark": "logo_aws_dark.svg",
     "product_name": "Athena",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) 2017-2019 Splunk Inc.",
-    "app_version": "1.0.10",
-    "utctime_updated": "2018-12-20T03:05:18.000000Z",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "app_version": "2.0.0",
+    "utctime_updated": "2021-02-05T05:17:18.000000Z",
     "package_name": "phantom_athena",
-    "main_module": "athena_connector.pyc",
-    "min_phantom_version": "4.2.7532",
+    "main_module": "athena_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud API, July 28, 2021"
+    ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
         "wheel": [
             {
                 "module": "boto3",
-                "input_file": "wheels/boto3-1.4.7-py2.py3-none-any.whl"
+                "input_file": "wheels/boto3-1.17.30-py2.py3-none-any.whl"
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/s3transfer-0.1.11-py2.py3-none-any.whl"
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
             },
             {
                 "module": "botocore",
-                "input_file": "wheels/botocore-1.7.18-py2.py3-none-any.whl"
-            },
-            {
-                "module": "futures",
-                "input_file": "wheels/futures-3.1.1-py2-none-any.whl"
+                "input_file": "wheels/botocore-1.20.30-py2.py3-none-any.whl"
             },
             {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
@@ -56,7 +56,7 @@
             "order": 1
         },
         "region": {
-            "description": "AWS region",
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -77,8 +77,16 @@
         "kms_key": {
             "description": "KMS key",
             "data_type": "password",
-            "required": false,
             "order": 3
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "default": false,
+            "visibility": [
+                "onprem"
+            ],
+            "order": 4
         }
     },
     "actions": [
@@ -86,7 +94,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -99,35 +106,24 @@
             "description": "List named queries on Athena",
             "type": "investigate",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "",
-                        "Num queries: 7"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -138,22 +134,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.NamedQuery.QueryString",
-                    "data_type": "string",
-                    "column_name": "Query String",
-                    "column_order": 1,
-                    "contains": [
-                        "athena query"
-                    ],
-                    "example_values": [
-                        "SELECT origin, count(*) AS total_departures\nFROM\ntest_table\nWHERE year >= '2000'\nGROUP BY origin\nORDER BY total_departures DESC\nLIMIT 10;"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.NamedQuery.Description",
                     "data_type": "string",
                     "example_values": [
                         "Sample query to get the top 10 airports with the most number of departures since 2000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.NamedQuery.Name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Flights Select Query"
                     ]
                 },
                 {
@@ -169,31 +160,36 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.NamedQuery.Name",
+                    "data_path": "action_result.data.*.NamedQuery.QueryString",
+                    "data_type": "string",
+                    "column_name": "Query String",
+                    "column_order": 1,
+                    "contains": [
+                        "athena query"
+                    ],
+                    "example_values": [
+                        "SELECT origin, count(*) AS total_departures\nFROM\ntest_table\nWHERE year >= '2000'\nGROUP BY origin\nORDER BY total_departures DESC\nLIMIT 10;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
                     "data_type": "string",
                     "example_values": [
-                        "Flights Select Query"
+                        "keep-alive"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
-                    "data_type": "numeric",
-                    "example_values": [
-                        200
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
                     "data_type": "string",
                     "example_values": [
-                        "1234abcd-12ab-ab12-ab12-123456abcdef"
+                        "389"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-amz-json-1.1"
                     ]
                 },
                 {
@@ -212,24 +208,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.connection",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
                     "example_values": [
-                        "keep-alive"
+                        200
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
                     "data_type": "string",
                     "example_values": [
-                        "application/x-amz-json-1.1"
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
                     "example_values": [
-                        "389"
+                        0
                     ]
                 },
                 {
@@ -237,6 +233,37 @@
                     "data_type": "numeric",
                     "example_values": [
                         7
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num queries: 7"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 }
             ],
@@ -267,7 +294,6 @@
                 "database": {
                     "description": "Database to run query on",
                     "data_type": "string",
-                    "required": false,
                     "order": 1
                 },
                 "s3_location": {
@@ -279,7 +305,6 @@
                 "encryption": {
                     "description": "Encyption scheme of S3 location",
                     "data_type": "string",
-                    "required": false,
                     "value_list": [
                         "",
                         "SSE_S3",
@@ -287,16 +312,73 @@
                         "CSE_KMS"
                     ],
                     "order": 3
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 4
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
+                    "column_name": "Status",
+                    "column_order": 0,
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.database",
+                    "data_type": "string",
+                    "example_values": [
+                        "sampledb"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.encryption",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSE_S3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "contains": [
+                        "athena query",
+                        "athena named query"
+                    ],
+                    "example_values": [
+                        "1234abcd-12ab-ab12-ab12-123456abcdef"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.s3_location",
+                    "data_type": "string",
+                    "example_values": [
+                        "s3://test-bucket/test-queries",
+                        "s3://test-bucket/test-queries/kms_encrypt"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.VarCharValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "os"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_rows",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
                     ]
                 },
                 {
@@ -321,49 +403,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.VarCharValue",
+                    "data_path": "action_result.parameter.credentials",
                     "data_type": "string",
                     "example_values": [
-                        "os"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.query",
-                    "data_type": "string",
-                    "contains": [
-                        "athena query",
-                        "athena named query"
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
                     ],
-                    "example_values": [
-                        "1234abcd-12ab-ab12-ab12-123456abcdef"                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.s3_location",
-                    "data_type": "string",
-                    "example_values": [
-                        "s3://test-bucket/test-queries",
-                        "s3://test-bucket/test-queries/kms_encrypt"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.database",
-                    "data_type": "string",
-                    "example_values": [
-                        "sampledb"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.encryption",
-                    "data_type": "string",
-                    "example_values": [
-                        "SSE_S3"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.num_rows",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
+                    "contains": [
+                        "aws credentials"
                     ]
                 }
             ],
