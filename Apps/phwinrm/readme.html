@@ -82,7 +82,7 @@ def custom_parser(action_result, response):
     data = {}
     data['status_code'] = response.status_code
     data['std_out'] = response.std_out
-    data['std_err'] =  response.std_err
+    data['std_err'] = response.std_err
 
     if data['status_code'] != 0:
         # This will be the message displayed
