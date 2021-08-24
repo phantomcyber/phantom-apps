@@ -236,7 +236,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name"
+                        "host name",
+                        "ip"
                     ],
                     "column_name": "IP Host Name",
                     "column_order": 0
@@ -308,7 +309,8 @@
                     "data_path": "action_result.parameter.ip_hostname",
                     "data_type": "string",
                     "contains": [
-                        "host name"
+                        "host name",
+                        "ip"
                     ],
                     "column_name": "IP Host Name",
                     "column_order": 0
@@ -413,6 +415,233 @@
                     "data_type": "string",
                     "column_name": "Status",
                     "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "abort scan",
+            "description": "Abort scan for dormant threats",
+            "type": "generic",
+            "identifier": "abort_scan",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to scan",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "shutdown endpoints",
+            "description": "Shutdown for dormant threats",
+            "type": "generic",
+            "identifier": "shutdown_endpoints",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to shutdown",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "broadcast message",
+            "description": "Broadcast Message",
+            "type": "contain",
+            "identifier": "broadcast_message",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to broadcast message",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                },
+                "message": {
+                    "description": "message",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "Added via Phantom",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
