@@ -3029,7 +3029,8 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "order": 0
                 },
@@ -3046,10 +3047,12 @@
                     "data_path": "action_result.data.*.ipAddress",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.9.206"
+                        "172.217.9.206",
+                        "2001:0db8:0000:0000:0000:ff00:0042:8329"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "column_name": "IP Address",
                     "column_order": 0
@@ -3124,10 +3127,12 @@
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
                     "example_values": [
-                        "172.217.9.206"
+                        "172.217.9.206",
+                        "2001:0db8:0000:0000:0000:ff00:0042:8329"
                     ],
                     "contains": [
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
