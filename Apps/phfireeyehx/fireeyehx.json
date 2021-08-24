@@ -78,7 +78,7 @@
                 "agent_id": {
                     "description": "HX Agent ID to get system info of",
                     "data_type": "string",
-                    "required": false,
+                    "required": true,
                     "primary": true,
                     "contains": [
                         "fireeyehx agentid"
