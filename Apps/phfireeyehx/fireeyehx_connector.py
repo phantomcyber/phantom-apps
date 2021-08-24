@@ -144,10 +144,10 @@ class FireeyeHxConnector(BaseConnector):
                     None)
 
             try:
-                with open(local_dir + '/metadata.json') as f:
+                with open("{}/metadata.json".format(local_dir)) as f:
                     metadata = json.load(f)
                 target_filename = metadata['req_filename']
-                full_target_path = local_dir + '/' + target_filename + '_'
+                full_target_path = "{}/{}_".format(local_dir, target_filename)
 
             except Exception as e:
                 return RetVal(
@@ -241,7 +241,7 @@ class FireeyeHxConnector(BaseConnector):
         # Create a URL to connect to
         hx_url = config.get("hx_hostname")
         hx_port = config.get("hx_port")
-        url = hx_url + ":" + hx_port + endpoint
+        url = "{}:{}{}".format(hx_url, hx_port, endpoint)
 
         if ".zip" in url:
             try:
@@ -288,7 +288,7 @@ class FireeyeHxConnector(BaseConnector):
         # Create a URL to connect to
         hx_url = config.get("hx_hostname")
         hx_port = config.get("hx_port")
-        url = hx_url + ":" + hx_port + endpoint
+        url = "{}:{}{}".format(hx_url, hx_port, endpoint)
         self.save_progress("HX Auth: Execute REST Call")
         try:
             r = request_func(
@@ -411,7 +411,7 @@ class FireeyeHxConnector(BaseConnector):
         file_acq_data = {'req_path': req_path, 'req_filename': req_filename, 'comment': comment,
                 'external_id': external_id, 'req_use_api': req_use_api}
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/files"
+        hx_uri = "/hx/api/v3/hosts/{}/files".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -502,7 +502,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Get File Status API Call
         acquisition_id = param["acquisition_id"]
 
-        hx_uri = "/hx/api/v3/acqs/files/" + acquisition_id
+        hx_uri = "/hx/api/v3/acqs/files/{}".format(acquisition_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -541,7 +541,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Get File Status API Call
         acquisition_id = param["acquisition_id"]
 
-        hx_uri = "/hx/api/v3/acqs/files/" + acquisition_id + ".zip"
+        hx_uri = "/hx/api/v3/acqs/files/{}.zip".format(acquisition_id)
         token_header = {'x-feapi-token': fe_auth_token, 'Accept': 'application/octet-stream'}
 
         # make rest call
@@ -590,7 +590,7 @@ class FireeyeHxConnector(BaseConnector):
 
         triage_acq_data = {}
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/triages"
+        hx_uri = "/hx/api/v3/hosts/{}/triages".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -637,7 +637,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Sys Info API Call
         agent_id = param["agent_id"]
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/sysinfo"
+        hx_uri = "/hx/api/v3/hosts/{}/sysinfo".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -682,7 +682,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Contain API Call
         agent_id = param["agent_id"]
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/containment"
+        hx_uri = "/hx/api/v3/hosts/{}/containment".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -725,7 +725,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Contain API Call
         agent_id = param["agent_id"]
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/containment"
+        hx_uri = "/hx/api/v3/hosts/{}/containment".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -767,7 +767,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Contain API Call
         agent_id = param["agent_id"]
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/containment"
+        hx_uri = "/hx/api/v3/hosts/{}/containment".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
 
         # make rest call
@@ -810,7 +810,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Contain API Call
         agent_id = param["agent_id"]
 
-        hx_uri = "/hx/api/v3/hosts/" + agent_id + "/containment"
+        hx_uri = "/hx/api/v3/hosts/{}/containment".format(agent_id)
         token_header = {'x-feapi-token': fe_auth_token}
         contain_data = {'state': 'contain'}
 
@@ -970,7 +970,7 @@ class FireeyeHxConnector(BaseConnector):
         # Starting Get Alert API Call
         alert_id = param["alert_id"]
 
-        hx_uri = "/hx/api/v3/alerts/" + str(alert_id)
+        hx_uri = "/hx/api/v3/alerts/{}".format(alert_id)
         token_header = {'x-feapi-token': fe_auth_token, 'Accept': 'application/json'}
 
         # make rest call
@@ -1092,7 +1092,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1102,14 +1102,14 @@ if __name__ == '__main__':
             data['csrfmiddlewaretoken'] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: {}".format(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1125,6 +1125,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
