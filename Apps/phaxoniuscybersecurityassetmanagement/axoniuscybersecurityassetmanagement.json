@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Axonius",
     "license": "Copyright (c) Axonius, 2018-2021",
-    "app_version": "2.0.0",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-01-25T11:58:28.000000Z",
     "package_name": "phantom_axoniuscybersecurityassetmanagement",
     "main_module": "axoniuscybersecurityassetmanagement_connector.py",
@@ -198,6 +198,12 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma separated)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "output": [
@@ -318,6 +324,12 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma separated)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "output": [
@@ -438,6 +450,12 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma separated)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "output": [
@@ -657,6 +675,12 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma separated)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "output": [
@@ -759,6 +783,12 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma separated)",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 2
                 }
             },
             "output": [
