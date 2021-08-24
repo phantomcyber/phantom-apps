@@ -86,6 +86,7 @@ def custom_parser(action_result, response):
 
     if data['status_code'] != 0:
         # This will be the message displayed
+        action_result.add_data(data)
         return action_result.set_status(
             phantom.APP_ERROR, "Error: Returned a non-zero status code"
         )
