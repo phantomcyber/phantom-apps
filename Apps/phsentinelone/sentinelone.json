@@ -450,13 +450,13 @@
         },
         {
             "action": "abort scan",
-            "description": "Abort scan for dormant threats",
+            "description": "Abort scan for threats",
             "type": "generic",
             "identifier": "abort_scan",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to scan",
+                    "description": "The hostname of an endpoint to abort scan",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -521,10 +521,10 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "shutdown endpoints",
-            "description": "Shutdown for dormant threats",
+            "action": "shutdown endpoint",
+            "description": "Shutdown endpoint for threats",
             "type": "generic",
-            "identifier": "shutdown_endpoints",
+            "identifier": "shutdown_endpoint",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -733,6 +733,152 @@
                 {
                     "data_path": "action_result.parameter.password",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "fetch firewall rules",
+            "description": "Fetch firewall rules",
+            "type": "correct",
+            "identifier": "fetch_firewall_rules",
+            "undo": "fetch firewall rules",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to fetch firewall rules",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "fetch firewall logs",
+            "description": "Fetch firewall logs",
+            "type": "correct",
+            "identifier": "fetch_firewall_logs",
+            "undo": "fetch firewall logs",
+            "read_only": false,
+            "parameters": {
+                "ip_hostname": {
+                    "description": "The hostname of an endpoint to fetch firewall logs",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
