@@ -456,7 +456,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to abort scan",
+                    "description": "The IP or hostname of an endpoint to abort scan",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -528,7 +528,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to shutdown",
+                    "description": "The IP or hostname of an endpoint to shutdown",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -600,7 +600,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to broadcast message",
+                    "description": "The IP or hostname of an endpoint to broadcast message",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -699,7 +699,7 @@
                     "order": 1
                 },
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to broadcast message",
+                    "description": "The IP or hostname of an endpoint to broadcast message",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -785,7 +785,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to fetch firewall rules",
+                    "description": "The IP or hostname of an endpoint to fetch firewall rules",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -858,7 +858,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to fetch firewall logs",
+                    "description": "The IP or hostname of an endpoint to fetch firewall logs",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
