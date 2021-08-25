@@ -81,13 +81,35 @@ SEC_POL_DEF_ELEMS += "<description>Created by Phantom for Panorama, please don't
 
 ACTION_NODE_DENY = "<action>deny</action>"
 ACTION_NODE_ALLOW = "<action>allow</action>"
-URL_PROF_SEC_POL_ELEM = "<profile-setting><profiles><url-filtering><member>{url_prof_name}</member></url-filtering></profiles></profile-setting>"
+URL_PROF_SEC_POL_ELEM = "<profile-setting>"
+URL_PROF_SEC_POL_ELEM += "<profiles><url-filtering><member>{url_prof_name}</member></url-filtering></profiles>"
+URL_PROF_SEC_POL_ELEM += "</profile-setting>"
+
 IP_GRP_SEC_POL_ELEM = "<destination><member>{ip_group_name}</member></destination>"
 IP_GRP_SEC_POL_ELEM_SRC = "<source><member>{ip_group_name}</member></source>"
 APP_GRP_SEC_POL_ELEM = "<application><member>{app_group_name}</member></application>"
 
 URL_PROF_XPATH = "{config_xpath}/profiles/url-filtering/entry[@name='{url_profile_name}']"
-URL_PROF_ELEM = "<description>Created by Phantom for Panorama</description><action>block</action><block-list><member>{url}</member></block-list>"
+DEL_URL_CATEGORY_XPATH = "/list/member[text()='{url}']"
+
+# URL_PROF_ELEM for version 8 and below. block-list is no longer supported from 9.0 and above.
+URL_PROF_ELEM = "<description>Created by Phantom for Panorama</description>"
+URL_PROF_ELEM += "<action>block</action><block-list><member>{url}</member></block-list>"
+
+# URL_PROF_ELEM for version 9 and above.
+URL_PROF_ELEM_9 = "<credential-enforcement>"
+URL_PROF_ELEM_9 += "<mode><disabled/></mode>"
+URL_PROF_ELEM_9 += "<block><member>{url_category_name}</member></block>"
+URL_PROF_ELEM_9 += "</credential-enforcement>"
+URL_PROF_ELEM_9 += "<block><member>{url_category_name}</member></block>"
+
+URL_CATEGORY_XPATH = "{config_xpath}/profiles/custom-url-category/entry[@name='{url_profile_name}']"
+
+# We can make this work on version 8 and below as well by removing <type>URL List</type>. However, </list><type>URL List</type> is required for version 9 and above.
+URL_CATEGORY_ELEM = "<description>Created by Phantom for Panorama</description>"
+URL_CATEGORY_ELEM += "<list><member>{url}</member></list>"
+URL_CATEGORY_ELEM += "<type>URL List</type>"
+
 DEL_URL_XPATH = "/block-list/member[text()='{url}']"
 
 APP_GRP_XPATH = "{config_xpath}/application-group/entry[@name='{app_group_name}']"
@@ -108,7 +130,10 @@ TAG_ELEM = "<entry name='{tag}'><color>{tag_color}</color><comments>{tag_comment
 
 APP_LIST_XPATH = "/config/predefined/application"
 COMMIT_ALL_DEV_GRP_DEV_CMD = '<commit-all><shared-policy>'
-COMMIT_ALL_DEV_GRP_DEV_CMD += '<device-group><entry name="{device_group}"><devices><entry name="{dev_ser_num}"/></devices></entry></device-group></shared-policy></commit-all>'
+COMMIT_ALL_DEV_GRP_DEV_CMD += '<device-group>'
+COMMIT_ALL_DEV_GRP_DEV_CMD += '<entry name="{device_group}"><devices><entry name="{dev_ser_num}"/></devices></entry>'
+COMMIT_ALL_DEV_GRP_DEV_CMD += '</device-group>'
+COMMIT_ALL_DEV_GRP_DEV_CMD += '</shared-policy></commit-all>'
 
 # Constants relating to value_list check
 POLICY_TYPE_VALUE_LIST = ["pre-rulebase", "post-rulebase"]
