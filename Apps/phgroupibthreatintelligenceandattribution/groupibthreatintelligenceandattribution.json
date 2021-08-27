@@ -16,10 +16,12 @@
         }
     ],
     "license": "Copyright (c) Group-IB, 2021",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "pip_dependencies": {
         "pypi": [
-            {"module": "dateparser"}
+            {
+                "module": "dateparser"
+            }
         ],
         "wheel": [
             {
@@ -28,7 +30,7 @@
             }
         ]
     },
-    "utctime_updated": "2021-05-26T17:12:04.190864Z",
+    "utctime_updated": "2021-08-27T10:30:26.000000Z",
     "package_name": "phantom_groupibthreatintelligenceandattribution",
     "main_module": "groupibthreatintelligenceandattribution_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -204,7 +206,7 @@
                 }
             },
             "output": [],
-            "versions":"EQ(*)"
+            "versions": "EQ(*)"
         }
     ]
 }
