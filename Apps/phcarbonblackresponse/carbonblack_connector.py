@@ -649,7 +649,7 @@ class CarbonblackConnector(BaseConnector):
 
         if (not systems):
             self.add_action_result(sys_info_ar)
-            return sys_info_ar.get_status()
+            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         systems = [x for x in systems if x.get('status', 'Offline') == 'Online']
 
@@ -709,7 +709,7 @@ class CarbonblackConnector(BaseConnector):
 
         if (not systems):
             self.add_action_result(sys_info_ar)
-            return sys_info_ar.get_status()
+            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         for system in systems:
             action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
@@ -1320,13 +1320,17 @@ class CarbonblackConnector(BaseConnector):
 
         ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
 
-        if (phantom.is_fail(ret_val) or not sys_info_ar.get_data()):
+        if (phantom.is_fail(ret_val)):
             self.add_action_result(sys_info_ar)
             return sys_info_ar.get_status()
 
         systems = sys_info_ar.get_data()
 
         self.save_progress("Got {0} systems".format(len(systems)))
+
+        if (not systems):
+            self.add_action_result(sys_info_ar)
+            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         for system in systems:
             action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
@@ -2053,11 +2057,11 @@ class CarbonblackConnector(BaseConnector):
         ret_val = self._validate_version(action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.set_status(ret_val, action_result.get_message())
-            self.append_to_message(CARBONBLACK_ERR_CONNECTIVITY_TEST)
-            return self.get_status()
+            action_result.append_to_message(CARBONBLACK_ERR_CONNECTIVITY_TEST)
+            return action_result.get_status()
 
-        return self.set_status_save_progress(phantom.APP_SUCCESS, CARBONBLACK_SUCC_CONNECTIVITY_TEST)
+        self.save_progress(CARBONBLACK_SUCC_CONNECTIVITY_TEST)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
 
