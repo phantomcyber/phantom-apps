@@ -1354,7 +1354,18 @@ class CarbonblackConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
-        return self._get_system_info_from_cb(ip_hostname, action_result, sensor_id)
+        ret_val = self._get_system_info_from_cb(ip_hostname, action_result, sensor_id)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        systems = action_result.get_data()
+
+        self.save_progress("Got {0} systems".format(len(systems)))
+
+        if not systems:
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _quarantine_device(self, param):
 
@@ -2051,7 +2062,7 @@ class CarbonblackConnector(BaseConnector):
         # Connectivity
         self.save_progress(phantom.APP_PROG_CONNECTING_TO_ELLIPSES, host)
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         # validate the version, this internally makes all the rest calls to validate the config also
         ret_val = self._validate_version(action_result)
