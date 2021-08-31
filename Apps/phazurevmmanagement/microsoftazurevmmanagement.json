@@ -80,6 +80,10 @@
             "parameters": {},
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
@@ -90,19 +94,15 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Token generated"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -153,14 +153,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -499,8 +491,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -508,6 +504,10 @@
                     "example_values": [
                         "The system info was successfully retrieved"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -551,14 +551,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -831,10 +823,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_vms",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -842,6 +835,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num vms: 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_vms",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -949,14 +949,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.create_option",
                     "data_type": "string",
@@ -1102,6 +1094,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Status: Successfully created snapshot, Provisioning state: Updating"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.provisioning_state",
                     "data_type": "string",
                     "example_values": [
@@ -1113,13 +1120,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully created snapshot"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Status: Successfully created snapshot, Provisioning state: Updating"
                     ]
                 },
                 {
@@ -1177,14 +1177,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -1213,13 +1205,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully started VM"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1227,6 +1218,15 @@
                     "example_values": [
                         "Status: Successfully started VM"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully started VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1279,14 +1279,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -1315,13 +1307,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully stopped VM"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1329,6 +1320,15 @@
                     "example_values": [
                         "Status: Successfully stopped VM"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully stopped VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1380,14 +1380,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -1416,13 +1408,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully deleted the vm"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1430,6 +1421,15 @@
                     "example_values": [
                         "Status: Successfully deleted the vm"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1481,14 +1481,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -1517,13 +1509,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully deallocated VM"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1531,6 +1522,15 @@
                     "example_values": [
                         "Status: Successfully deallocated VM"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deallocated VM"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1560,14 +1560,6 @@
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.count.type",
                     "data_type": "string",
@@ -1628,10 +1620,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_tags",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        6
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1639,6 +1632,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num tags: 6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_tags",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6
                     ]
                 },
                 {
@@ -1689,16 +1689,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
                 {
                     "data_path": "action_result.parameter.tag_name",
                     "data_type": "string",
@@ -1753,17 +1743,27 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully created tag"
-                    ]
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully created tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully created tag"
                     ]
                 },
                 {
@@ -1794,14 +1794,6 @@
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
@@ -1856,10 +1848,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_resource_groups",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        4
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1867,6 +1860,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num resource groups: 4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_resource_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
                     ]
                 },
                 {
@@ -1907,14 +1907,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -2041,10 +2033,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_snapshots",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        3
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2052,6 +2045,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num snapshots: 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_snapshots",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
                     ]
                 },
                 {
@@ -2108,14 +2108,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.group_type",
                     "data_type": "string",
@@ -2402,10 +2394,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_security_groups",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2413,6 +2406,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num security groups: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_security_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 },
                 {
@@ -2530,14 +2530,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.default_security_rules",
                     "data_type": "string"
@@ -2750,10 +2742,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added or updated security group"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2761,6 +2754,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -2857,14 +2857,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.group_name",
                     "data_type": "string",
                     "contains": [
@@ -2951,10 +2943,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added or updated security group"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2962,6 +2955,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully added or updated security group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added or updated security group"
                     ]
                 },
                 {
@@ -3006,14 +3006,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3156,10 +3148,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_virtual_networks",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        3
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3167,6 +3160,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num virtual networks: 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_virtual_networks",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
                     ]
                 },
                 {
@@ -3222,14 +3222,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3310,10 +3302,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_subnets",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        2
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3321,6 +3314,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Num subnets: 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_subnets",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -3383,14 +3383,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
                     "example_values": [
@@ -3447,10 +3439,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.num_ips_available",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        5
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -3458,6 +3451,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Available: False, Num ips available: 5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_ips_available",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
                     ]
                 },
                 {
@@ -3510,14 +3510,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -3546,13 +3538,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully generalized the vm"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3560,6 +3551,15 @@
                     "example_values": [
                         "Status: Successfully generalized the vm"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully generalized the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3611,14 +3611,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
                     "contains": [
@@ -3647,13 +3639,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully redeployed the vm"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3661,6 +3652,15 @@
                     "example_values": [
                         "Status: Successfully redeployed the vm"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully redeployed the vm"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3698,9 +3698,6 @@
                     "contains": [
                         "vm management resource group"
                     ],
-                    "example_values": [
-                        "sample_vm_group"
-                    ],
                     "order": 0
                 },
                 "vm_name": {
@@ -3711,18 +3708,12 @@
                     "contains": [
                         "vm management virtual machine"
                     ],
-                    "example_values": [
-                        "sample_vm"
-                    ],
                     "order": 1
                 },
                 "command_id": {
                     "description": "The command to run against the VM",
                     "contains": [
                       "vm management command id"
-                    ],
-                    "example_values": [
-                      "RunShellScript"
                     ],
                     "data_type": "string",
                     "required": true,
@@ -3733,11 +3724,7 @@
                     "contains": [
                       "vm management script"
                     ],
-                    "example_values": [
-                      "echo $arg1 $arg2"
-                    ],
                     "data_type": "string",
-                    "required": false,
                     "order": 3
                 },
                 "script_parameters": {
@@ -3745,23 +3732,11 @@
                   "contains": [
                     "vm management parameters"
                   ],
-                  "example_values": [
-                      "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
-                  ],
                   "data_type": "string",
-                  "required": false,
                   "order": 4
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.resource_group_name",
                     "data_type": "string",
@@ -3862,13 +3837,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully executed command"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3876,6 +3850,15 @@
                     "example_values": [
                         "Status: Successfully executed command"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully executed command"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -3910,9 +3893,6 @@
                     "data_type": "string",
                     "required": true,
                     "primary": true,
-                    "example_values": [
-                        "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
-                    ],
                     "contains": [
                         "vm management results url"
                     ],
@@ -3920,14 +3900,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.results_url",
                     "data_type": "string",
@@ -3978,13 +3950,12 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.status",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully executed command"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -3992,6 +3963,15 @@
                     "example_values": [
                         "Status: Successfully executed command"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully executed command"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
