@@ -19,6 +19,49 @@ def _parse_data(data, param):
                 res['noise'] = item['noise']
                 res['code_meaning'] = item['code_meaning']
                 res['visualization'] = item['visualization']
+        # parsing data for community action
+        elif 'ip' in param.keys() and (("riot" in data[0].keys() and "noise" in data[0].keys()) or "plan" in data[0].keys()):
+            if "plan" in data[0].keys():
+                for item in data:
+                    res['plan'] = item['plan']
+                    res['ratelimit'] = item['rate-limit']
+                    res['plan_url'] = item['plan_url']
+                    res['message'] = item['message']
+            elif "name" in data[0].keys():
+                for item in data:
+                    res['ip'] = item['ip']
+                    res['noise'] = item['noise']
+                    res['riot'] = item['riot']
+                    res['classification'] = item['classification']
+                    res['name'] = item['name']
+                    res['link'] = item['link']
+                    res['last_seen'] = item['last_seen']
+                    res['message'] = item['message']
+            else:
+                for item in data:
+                    res['ip'] = item['ip']
+                    res['noise'] = item['noise']
+                    res['riot'] = item['riot']
+                    res['message'] = item['message']
+                    res['community_not_found'] = item['community_not_found']
+        # parsing data for riot action
+        elif 'ip' in param.keys() and (("riot" in data[0].keys() and "category" in data[0].keys()) or "riot_unseen" in data[0].keys()):
+            if "riot_unseen" in data[0].keys():
+                for item in data:
+                    res['ip'] = item['ip']
+                    res['riot'] = item['riot']
+                    res['riot_unseen'] = item['riot_unseen']
+            else:
+                for item in data:
+                    res['ip'] = item['ip']
+                    res['riot'] = item['riot']
+                    res['category'] = item['category']
+                    res['name'] = item['name']
+                    res['description'] = item['description']
+                    res['explanation'] = item['explanation']
+                    res['last_updated'] = item['last_updated']
+                    res['trust_level'] = item['trust_level']
+                    res['reference'] = item['reference']
         # parsing data for lookup ips action
         elif 'ips' in param.keys():
             ip_return_list = []
@@ -35,6 +78,7 @@ def _parse_data(data, param):
             if data[0]['seen'] is False:
                 res['ip'] = data[0]["ip"]
                 res['seen'] = data[0]['seen']
+                res['unseen_rep'] = data[0]['unseen_rep']
                 res['first_seen'] = "This IP has never been seen scanning the internet"
                 res['last_seen'] = "This IP has never been seen scanning the internet"
             else:

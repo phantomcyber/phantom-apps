@@ -1,20 +1,26 @@
 {
     "appid": "3c681976-e5d1-4ccc-84de-4232fd25acbc",
     "name": "Endace",
-    "description": "App integrates with the Endace Packet Capture device to implement investigative actions",
+    "description": "This app integrates with the Endace Packet Capture device to implement investigative actions",
     "type": "investigative",
     "product_vendor": "Endace",
     "logo": "logo_endace.svg",
     "logo_dark": "logo_endace_dark.svg",
     "product_name": "Endace",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2018",
-    "app_version": "1.1.6",
-    "utctime_updated": "2018-12-07T01:15:23.000000Z",
+    "publisher": "Endace Technology Ltd",
+    "contributors": [
+        {
+            "name": "Soumen Chakraborty"
+        }
+    ],
+    "license": "Copyright (C) Endace Technology Limited, 2018-2021",
+    "app_version": "2.0.0",
+    "python_version": "3",
+    "utctime_updated": "2021-08-09T09:44:39.000000Z",
     "package_name": "phantom_endace",
-    "main_module": "endace_connector.pyc",
-    "min_phantom_version": "3.0.284",
+    "main_module": "endace_connector.py",
+    "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "server": {
@@ -26,7 +32,6 @@
         "verify_cert": {
             "description": "Verify Server Certificate",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 1
         },
@@ -45,8 +50,8 @@
         "max_pcap_size": {
             "description": "Maximum pcap size in bytes (0 = no max)",
             "data_type": "numeric",
+            "default": "0",
             "required": true,
-            "default": 0,
             "order": 4
         }
     },
@@ -84,14 +89,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.pcap_id",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "f411b785-2507-4320-bbf3-83d3ecf69290"
                     ],
-                    "column_name": "status",
-                    "column_order": 1
+                    "contains": [
+                        "pcap id"
+                    ],
+                    "column_name": "PCAP ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.status.datamine.status.bytesTotal",
@@ -286,66 +293,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "PCAP downloaded to Vault: 2fd4e1c67a2d28fced849ee1bb76e7391b93eb12.",
-                        "Error downloading file. State: RUNNING"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.pcap_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "f411b785-2507-4320-bbf3-83d3ecf69290"
-                    ],
-                    "contains": [
-                        "pcap id"
-                    ],
-                    "column_name": "pcap id",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.summary.state",
-                    "data_type": "string",
-                    "example_values": [
-                        "COMPLETED",
-                        "RUNNING"
-                    ],
-                    "column_name": "state",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.summary.vault_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"
-                    ],
-                    "contains": [
-                        "sha1",
-                        "vault id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.file_availability",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
-                },
-                {
                     "data_path": "action_result.data.*.vault.contains",
                     "data_type": "string",
                     "example_values": [
@@ -417,6 +364,67 @@
                     "example_values": [
                         "HTTP"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "PCAP downloaded to Vault: 2fd4e1c67a2d28fced849ee1bb76e7391b93eb12.",
+                        "Error downloading file. State: RUNNING"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPLETED",
+                        "RUNNING"
+                    ],
+                    "column_name": "State",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.file_availability",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -449,56 +457,10 @@
                     "contains": [
                         "pcap id"
                     ],
-                    "column_name": "pcap id",
+                    "column_name": "PCAP ID",
                     "column_order": 0,
                     "example_values": [
                         "1dad7408-1a14-4266-901a-6c07aad2c1a8"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Datamine 1dad7408-1a14-4266-901a-6c07aad2c1a8 deleted"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "datamineDeleted"
-                    ],
-                    "column_name": "name",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.summary.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -521,6 +483,53 @@
                     "example_values": [
                         "Datamine 1dad7408-1a14-4266-901a-6c07aad2c1a8 deleted"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Datamine 1dad7408-1a14-4266-901a-6c07aad2c1a8 deleted"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "datamineDeleted"
+                    ],
+                    "column_name": "Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -532,7 +541,7 @@
             "action": "get status",
             "identifier": "get_status",
             "description": "Get the status of a previously executed query",
-            "verbose": "Request the status of a query and when complete it will include a link for downloading the PCAP",
+            "verbose": "Request the status of a query and when complete it will include a link for downloading the PCAP.",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -549,11 +558,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.pcap_id",
                     "data_type": "string",
                     "example_values": [
-                        "success"
-                    ]
+                        "17147e4b-e73e-4888-9599-f38d43e814f0"
+                    ],
+                    "contains": [
+                        "pcap id"
+                    ],
+                    "column_name": "PCAP ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.datamine.status.bytesTotal",
@@ -720,50 +734,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "COMPLETED",
-                        "RUNNING; 35% complete"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.pcap_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "17147e4b-e73e-4888-9599-f38d43e814f0"
-                    ],
-                    "contains": [
-                        "pcap id"
-                    ],
-                    "column_name": "pcap id",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.summary.state",
-                    "data_type": "string",
-                    "example_values": [
-                        "COMPLETED",
-                        "RUNNING"
-                    ],
-                    "column_name": "state",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.datamine.status.bytesTotalToWriteEstimate",
                     "data_type": "numeric",
                     "example_values": [
@@ -809,10 +779,50 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPLETED",
+                        "RUNNING; 35% complete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.state",
+                    "data_type": "string",
+                    "example_values": [
+                        "COMPLETED",
+                        "RUNNING"
+                    ],
+                    "column_name": "State",
+                    "column_order": 1
+                },
+                {
                     "data_path": "action_result.summary.progress",
                     "data_type": "numeric",
                     "example_values": [
                         0.34555259730702
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
@@ -825,7 +835,7 @@
             "action": "run query",
             "identifier": "run_query",
             "description": "Run a query to create a PCAP",
-            "type": "investigate",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "time": {
@@ -834,7 +844,7 @@
                     "contains": [
                         "rfc3339"
                     ],
-                    "required": false,
+                    "primary": true,
                     "order": 0
                 },
                 "start_time": {
@@ -843,7 +853,7 @@
                     "contains": [
                         "rfc3339"
                     ],
-                    "required": false,
+                    "primary": true,
                     "order": 1
                 },
                 "end_time": {
@@ -852,20 +862,18 @@
                     "contains": [
                         "rfc3339"
                     ],
-                    "required": false,
+                    "primary": true,
                     "order": 2
                 },
                 "span_before": {
                     "description": "The span, in seconds, before the value specified by the 'time' parameter",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 30,
                     "order": 3
                 },
                 "span_after": {
                     "description": "The span, in seconds, after the value specified by the 'time' parameter",
                     "data_type": "numeric",
-                    "required": false,
                     "default": 30,
                     "order": 4
                 },
@@ -874,7 +882,7 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ],
                     "required": true,
                     "primary": true,
@@ -885,9 +893,10 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ],
                     "required": true,
+                    "primary": true,
                     "default": "0.0.0.0/0",
                     "order": 6
                 },
@@ -897,7 +906,7 @@
                     "contains": [
                         "port"
                     ],
-                    "required": false,
+                    "primary": true,
                     "order": 7
                 },
                 "port2": {
@@ -906,7 +915,7 @@
                     "contains": [
                         "port"
                     ],
-                    "required": false,
+                    "primary": true,
                     "order": 8
                 },
                 "protocol": {
@@ -919,10 +928,99 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.span_after",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time",
+                    "data_type": "string",
+                    "contains": [
+                        "rfc3339"
+                    ],
+                    "example_values": [
+                        "2014-06-10T02:43:23.1234Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.span_before",
+                    "data_type": "string",
+                    "example_values": [
+                        "30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.port2",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.port1",
+                    "data_type": "string",
+                    "example_values": [
+                        "80"
+                    ],
+                    "contains": [
+                        "port"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "tcp",
+                        "udp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host1",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.1",
+                        "10.0.0.0/8"
+                    ],
+                    "contains": [
+                        "ip",
+                        "endace ip network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.start_time",
+                    "data_type": "string",
+                    "contains": [
+                        "rfc3339"
+                    ],
+                    "example_values": [
+                        "2014-06-10T02:18:42.1234Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host2",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.0.5",
+                        "0.0.0.0/0"
+                    ],
+                    "contains": [
+                        "ip",
+                        "endace ip network"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.end_time",
+                    "data_type": "string",
+                    "contains": [
+                        "rfc3339"
+                    ],
+                    "example_values": [
+                        "2014-06-10T02:43:23.1234Z"
                     ]
                 },
                 {
@@ -1021,7 +1119,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
@@ -1033,7 +1131,7 @@
                     ],
                     "contains": [
                         "ip",
-                        "ip network"
+                        "endace ip network"
                     ]
                 },
                 {
@@ -1229,62 +1327,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Datamine 983c5fd4-ea17-4e3a-b11f-78bc281644f9 created"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.protocol",
-                    "data_type": "string",
-                    "example_values": [
-                        "tcp",
-                        "udp"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host1",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.0.0.1",
-                        "10.0.0.0/8"
-                    ],
-                    "contains": [
-                        "ip",
-                        "ip network"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.start_time",
-                    "data_type": "string",
-                    "contains": [
-                        "rfc3339"
-                    ],
-                    "example_values": [
-                        "2014-06-10T02:18:42.1234Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.host2",
-                    "data_type": "string",
-                    "example_values": [
-                        "10.0.0.5",
-                        "0.0.0.0/0"
-                    ],
-                    "contains": [
-                        "ip",
-                        "ip network"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.end_time",
-                    "data_type": "string",
-                    "contains": [
-                        "rfc3339"
-                    ],
-                    "example_values": [
-                        "2014-06-10T02:43:23.1234Z"
                     ]
                 },
                 {
@@ -1293,7 +1347,7 @@
                     "example_values": [
                         1977002
                     ],
-                    "column_name": "estimated size",
+                    "column_name": "Estimated Size",
                     "column_order": 2
                 },
                 {
@@ -1302,7 +1356,7 @@
                     "example_values": [
                         "success"
                     ],
-                    "column_name": "status",
+                    "column_name": "Status",
                     "column_order": 1
                 },
                 {
@@ -1314,7 +1368,7 @@
                     "contains": [
                         "pcap id"
                     ],
-                    "column_name": "pcap id",
+                    "column_name": "PCAP ID",
                     "column_order": 0
                 },
                 {
@@ -1329,50 +1383,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.span_after",
-                    "data_type": "string",
-                    "example_values": [
-                        "30"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.time",
-                    "data_type": "string",
-                    "contains": [
-                        "rfc3339"
-                    ],
-                    "example_values": [
-                        "2014-06-10T02:43:23.1234Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.span_before",
-                    "data_type": "string",
-                    "example_values": [
-                        "30"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.port2",
-                    "data_type": "string",
-                    "example_values": [
-                        "80"
-                    ],
-                    "contains": [
-                        "port"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.port1",
-                    "data_type": "string",
-                    "example_values": [
-                        "80"
-                    ],
-                    "contains": [
-                        "port"
                     ]
                 }
             ],

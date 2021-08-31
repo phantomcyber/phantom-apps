@@ -27,6 +27,7 @@ import time
 import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
 from _collections import defaultdict
+import traceback
 
 
 class RetVal(tuple):
@@ -1706,8 +1707,9 @@ class CrowdstrikeConnector(BaseConnector):
 
         event = None
         try:
-            event = json.loads(data.strip('\r\n '))
+            event = json.loads(data)
         except Exception as e:
+            self.debug_print(traceback.format_exc())
             self.debug_print("Exception while parsing data: ", self._get_error_message_from_exception(e))
             return (phantom.APP_ERROR, data)
 
@@ -1863,21 +1865,20 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_ERR_FROM_SERVER, status=r.status_code, message=err_message)
 
         # Parse the events
-        resp_data = ''
         counter = 0   # counter for continuous blank lines
         total_blank_lines_count = 0    # counter for total number of blank lines
 
         try:
-            for chunk in r.iter_content(chunk_size=None):
-                chunk = UnicodeDammit(chunk).unicode_markup
+            for stream_data in r.iter_lines(chunk_size=None):
+                # chunk = UnicodeDammit(chunk).unicode_markup
 
-                if not chunk:
+                if stream_data is None:
                     # Done with all the event data for now
                     self.debug_print(CROWDSTRIKE_NO_DATA_MSG)
                     self.save_progress(CROWDSTRIKE_NO_DATA_MSG)
                     break
 
-                if chunk == '\r\n':
+                if not stream_data.strip():
                     # increment counter for counting of the continuous as well as total blank lines
                     counter += 1
                     total_blank_lines_count += 1
@@ -1891,16 +1892,16 @@ class CrowdstrikeConnector(BaseConnector):
                         self.save_progress(CROWDSTRIKE_RECEIVED_CR_LF_MSG.format(counter))
                         continue
 
-                resp_data += chunk
-                ret_val, resp_data = self._parse_resp_data(resp_data)
+                ret_val, stream_data = self._parse_resp_data(stream_data)
 
                 if phantom.is_fail(ret_val):
-                    self.debug_print("Failed to parse the chunk: {}".format(chunk))
-                    self.debug_print("Waiting to receive the remaining event data to process the entire event")
+                    self.save_progress("Failed to parse the stream_data. Find stream_data details in logs. Error Message: {}".format(action_result.get_status_message()))
+                    self.save_progress("Continuing with next event.")
+                    self.debug_print("Failed to parse the stream_data: {}".format(stream_data))
                     continue
 
-                if resp_data and resp_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
-                    self._events.append(resp_data)
+                if stream_data and stream_data.get('metadata', {}).get('eventType') == 'DetectionSummaryEvent':
+                    self._events.append(stream_data)
                     counter = 0   # reset the continuous blank lines counter as we received a valid data in between
 
                 # Calculate length of DetectionSummaryEvents until now
@@ -1912,8 +1913,7 @@ class CrowdstrikeConnector(BaseConnector):
 
                 self.send_progress(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
                 self.debug_print(CROWDSTRIKE_PULLED_EVENTS_MSG.format(len(self._events)))
-                # convert it to string
-                resp_data = ''
+
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "{}. Error response from server: {}".format(

@@ -10,7 +10,7 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- File: display_get_email.html
-  Copyright (c) 2019-2020 Splunk Inc.
+  Copyright (c) 2019-2021 Splunk Inc.
 
   Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
@@ -79,7 +79,19 @@
     <table class="wf-table-vertical">
         <tr>
             <td>ID</td>
-            <td>{{ result.param.id }}</td>
+            <td>
+              {% if result.param.id %}
+                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['mimecast email id'],
+                'value':'{{ result.param.detector_id }}' }], 0,
+                {{ container.id }}, null, false);">
+                    {{ result.param.id }}
+                    &nbsp;
+                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                </a>
+              {% else %}
+                None
+              {% endif %}
+            </td>
         </tr>
     </table>
     <h3 class="wf-h3-style">Email Details</h3>
@@ -87,23 +99,65 @@
         <tr><th colspan="2"><b>Email</b></th></tr>
         <tr>
           <th><b>Subject</b></th>
-          <td>{{ result.data.queueInfo.subject }}</td>
+          <td>
+            {% if result.data.queueInfo.subject%}
+              {{ result.data.queueInfo.subject }}
+            {% else %}
+              None
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <th><b>Sender</b></th>
-          <td>{{ result.data.queueInfo.fromHeader }}</td>
+          <td>
+            {% if result.data.queueInfo.fromHeader %}
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'],
+              'value':'{{ result.param.detector_id }}' }], 0,
+              {{ container.id }}, null, false);">
+                  {{ result.data.queueInfo.fromHeader }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            {% else %}
+              None
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <th><b>Recipient</b></th>
-          <td>{{ result.data.recipientInfo.messageInfo.to.0 }}</td>
+          <td>
+            {% if result.data.recipientInfo.messageInfo.to.0 %}
+              <a href="javascript:;" onclick="context_menu(this, [{'contains': ['email'],
+              'value':'{{ result.param.detector_id }}' }], 0,
+              {{ container.id }}, null, false);">
+                  {{ result.data.recipientInfo.messageInfo.to.0 }}
+                  &nbsp;
+                  <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+              </a>
+            {% else %}
+              None
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <th><b>Status</b></th>
-          <td>{{ result.data.recipientInfo.txInfo.queueDetailStatus }}</td>
+          <td>
+            {% if result.data.recipientInfo.txInfo.queueDetailStatus %}
+              {{ result.data.recipientInfo.txInfo.queueDetailStatus }}
+            {% else %}
+              None
+            {% endif %}
+          </td>
         </tr>
         <tr>
           <th><b>Route</b></th>
-          <td>{{ result.data.queueInfo.route }}</td>
+          <td>
+            {% if result.data.queueInfo.route %}
+              {{ result.data.queueInfo.route }}
+            {% else %}
+              None
+            {% endif %}
+          </td>
         </tr>
       </table>
 

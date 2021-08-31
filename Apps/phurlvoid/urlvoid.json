@@ -1,0 +1,385 @@
+{
+    "appid": "65a251ed-89ac-4983-b30a-c10565d22d65",
+    "name": "URLVoid",
+    "description": "This app supports executing investigative and reputation actions on the URLVoid cloud based service",
+    "type": "reputation",
+    "main_module": "urlvoid_connector.pyc",
+    "app_version": "1.0.25",
+    "utctime_updated": "2019-03-12T06:29:53.000000Z",
+    "package_name": "phantom_urlvoid",
+    "product_vendor": "URLVoid",
+    "product_name": "URLVoid",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.9.39220",
+    "logo": "logo_urlvoid.svg",
+    "logo_dark": "logo_urlvoid_dark.svg",
+    "python_version": "2.7",
+    "publisher": "Splunk",
+    "consolidate_widgets": true,
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "tldextract",
+                "input_file": "wheels/tldextract-2.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests-file",
+                "input_file": "wheels/requests_file-1.4.2-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "app_config": {
+        "update_days": {
+            "data_type": "numeric",
+            "order": 0,
+            "description": "Update the tld list once every N days",
+            "value": "14",
+            "required": true
+        }
+    },
+    "configuration": {
+        "identifier": {
+            "data_type": "string",
+            "description": "Identifier",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "data_type": "password",
+            "description": "API Key",
+            "required": true,
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action makes a request to the service to verify the connection",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "domain reputation",
+            "description": "Queries URLVoid for domain info",
+            "type": "investigate",
+            "identifier": "domain_reputation",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "domain": {
+                    "description": "Domain to query",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "primary": true,
+                    "required": true
+                }
+            },
+            "verbose": "This action accepts URLs also. It will extract the domain name from the URL before making the action query. It also tries to strip out the subdomain if any.",
+            "render": {
+                "width": 12,
+                "title": "Domain Reputation",
+                "type": "table",
+                "height": 5
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "example_values": [
+                        "www.splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.alexa_rank",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.connect_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.domain_age",
+                    "data_type": "string",
+                    "example_values": [
+                        "1007679600"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.domain_age_date",
+                    "data_type": "string",
+                    "example_values": [
+                        "2001-12-06"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.download_size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.google_page_rank",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.header_size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.host",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.http_response_code",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.addr",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "54.69.58.243"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.asn",
+                    "data_type": "string",
+                    "example_values": [
+                        "16509"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.asname",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon.com, Inc."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.city_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Boardman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.continent_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "NA"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.continent_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "North America"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.country_code",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.country_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "United States"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
+                    "example_values": [
+                        "ec2-54-69-58-243.us-west-2.compute.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.latitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "45.8696"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.longitude",
+                    "data_type": "string",
+                    "example_values": [
+                        "-119.688"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.ip.region_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Oregon"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.speed_download",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.updated",
+                    "data_type": "string",
+                    "example_values": [
+                        "1541579670"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.details.updated_datetime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-11-07 03:34:30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.detections.count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.detections.engines.engine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.response.page_load",
+                    "data_type": "string",
+                    "example_values": [
+                        "0.01"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.asn",
+                    "data_type": "numeric",
+                    "column_name": "ASN",
+                    "column_order": 4,
+                    "example_values": [
+                        "16509"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.city",
+                    "data_type": "string",
+                    "example_values": [
+                        "Boardman"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.country",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.domain",
+                    "data_type": "string",
+                    "column_name": "Domain",
+                    "column_order": 0,
+                    "contains": [
+                        "domain",
+                        "url"
+                    ],
+                    "example_values": [
+                        "splunk.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.hostname",
+                    "data_type": "string",
+                    "column_name": "Hostname",
+                    "column_order": 2,
+                    "contains": [
+                        "host name"
+                    ],
+                    "example_values": [
+                        "ec2-54-69-58-243.us-west-2.compute.amazonaws.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ip",
+                    "data_type": "string",
+                    "column_name": "IP",
+                    "column_order": 1,
+                    "contains": [
+                        "ip"
+                    ],
+                    "example_values": [
+                        "54.69.58.243"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.positives",
+                    "data_type": "numeric",
+                    "column_name": "Positive Detections",
+                    "column_order": 3,
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "City: Boardman, Domain: splunk.com, Positives: 0, Ip: 54.69.58.243, Country: US, Hostname: ec2-54-69-58-243.us-west-2.compute.amazonaws.com, Asn: 16509"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}

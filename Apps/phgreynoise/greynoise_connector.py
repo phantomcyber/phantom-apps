@@ -11,6 +11,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 from greynoise_consts import *
+from datetime import datetime
 import requests
 import json
 from requests.utils import requote_uri
@@ -32,13 +33,8 @@ class GreyNoiseConnector(BaseConnector):
         self._app_version = None
         self._api_key = None
 
-    def validate_parameters(self, param):
-        # Disable BaseConnector's validate functionality, since this App supports unicode domains and the
-        # validation routines don't
-        return phantom.APP_SUCCESS
-
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error messages from the exception.
+        """This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
@@ -62,37 +58,57 @@ class GreyNoiseConnector(BaseConnector):
             if error_code in ERR_CODE_MSG:
                 error_text = "Error Message: {0}".format(error_msg)
             else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+                error_text = "Error Code: {0}. Error Message: {1}".format(
+                    error_code, error_msg
+                )
         except:
             self.debug_print(PARSE_ERR_MSG)
             error_text = PARSE_ERR_MSG
 
         return error_text
 
-    def _validate_integer(self, action_result, parameter, key):
-        if parameter:
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        if parameter is not None:
             try:
                 if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+                    return (
+                        action_result.set_status(
+                            phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)
+                        ),
+                        None,
+                    )
 
                 parameter = int(parameter)
             except:
-                return action_result.set_status(phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)), None
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR, VALID_INTEGER_MSG.format(key=key)
+                    ),
+                    None,
+                )
 
             if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)), None
+                return (
+                    action_result.set_status(
+                        phantom.APP_ERROR, NON_NEGATIVE_INTEGER_MSG.format(key=key)
+                    ),
+                    None,
+                )
+            if not allow_zero and parameter == 0:
+                return (action_result.set_status(phantom.APP_ERROR, NON_NEG_NON_ZERO_INT_MSG.format(key=key)), None)
 
         return phantom.APP_SUCCESS, parameter
 
     def get_session(self):
         if self._session is None:
             self._session = requests.Session()
-            self._session.params.update({
-                "api-key": self._api_key
-            })
+            self._session.params.update({"api-key": self._api_key})
         return self._session
 
-    def _make_rest_call(self, action_result, method, *args, error_on_404=True, **kwargs):
+    def _make_rest_call(
+        self, action_result, method, *args, **kwargs
+    ):
+        error_on_404 = False
         session = self.get_session()
 
         response_json = None
@@ -105,49 +121,87 @@ class GreyNoiseConnector(BaseConnector):
         except requests.exceptions.HTTPError as e:
             err_msg = self._get_error_message_from_exception(e)
             err_msg = urllib.parse.unquote(err_msg)
-            ret_val = action_result.set_status(phantom.APP_ERROR,
-                                               "HTTP error occurred while making REST call: {0}".format(err_msg))
+            if "404" in err_msg:
+                try:
+                    response_json = r.json()
+                    ret_val = phantom.APP_SUCCESS
+                except Exception as e:
+                    err_msg = self._get_error_message_from_exception(e)
+                    ret_val = action_result.set_status(
+                        phantom.APP_ERROR,
+                        "Unable to parse JSON response. Error: {0}".format(err_msg),
+                    )
+            else:
+                ret_val = action_result.set_status(
+                    phantom.APP_ERROR,
+                    "HTTP error occurred while making REST call: {0}".format(err_msg),
+                )
+        except requests.exceptions.ConnectionError:
+            err_msg = 'Error connecting to server. Connection refused from server'
+            ret_val = action_result.set_status(phantom.APP_ERROR, err_msg)
         except Exception as e:
             err_msg = self._get_error_message_from_exception(e)
-            ret_val = action_result.set_status(phantom.APP_ERROR,
-                                               "General error occurred while making REST call: {0}".format(err_msg))
+            ret_val = action_result.set_status(
+                phantom.APP_ERROR,
+                "General error occurred while making REST call: {0}".format(err_msg),
+            )
         else:
             try:
                 response_json = r.json()
                 ret_val = phantom.APP_SUCCESS
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
-                ret_val = action_result.set_status(phantom.APP_ERROR,
-                                                   "Unable to parse JSON response. Error: {0}".format(err_msg))
+                ret_val = action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Unable to parse JSON response. Error: {0}".format(err_msg),
+                )
 
         return (ret_val, response_json, status_code)
 
     def _check_apikey(self, action_result):
         self.save_progress("Testing API key")
         ret_val, response_json, status_code = self._make_rest_call(
-            action_result,
-            "get",
-            API_KEY_CHECK_URL,
-            headers=self._headers
-        )
+            action_result, "get", API_KEY_CHECK_URL, headers=self._headers)
+
         if phantom.is_fail(ret_val):
             self.save_progress("API key check Failed")
             return ret_val
+
+        license_type = response_json.get("offering")
+        expiration = str(response_json.get("expiration"))
+        try:
+            past = datetime.strptime(expiration, "%Y-%m-%d")
+        except Exception as e:
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(self._get_error_message_from_exception(e))
+            )
+        present = datetime.now()
 
         if response_json is None:
             self.save_progress("No response from API")
             return action_result.set_status(phantom.APP_ERROR, "No response from API")
         elif response_json.get("message") == "pong":
-            self.save_progress("Validated API Key")
-            self.debug_print("Validated API Key")
-            return phantom.APP_SUCCESS
+            if past < present:
+                self.save_progress("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.save_progress("Your licence is expired and therefore your API key has community permissions")
+                self.debug_print("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.debug_print("Your licence is expired and therefore your API key has community permissions")
+                return phantom.APP_SUCCESS
+            else:
+                self.save_progress("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                self.debug_print("Validated API Key. License type: {license_type}, Expiration: {expiration}".format(license_type=license_type, expiration=expiration))
+                return phantom.APP_SUCCESS
         else:
             self.save_progress("Invalid response from API")
             try:
                 response_json = json.dumps(response_json)
             except:
-                return action_result.set_status(phantom.APP_ERROR, "Invalid response from API")
-            return action_result.set_status(phantom.APP_ERROR, "Invalid response from API: %s" % response_json)
+                return action_result.set_status(
+                    phantom.APP_ERROR, "Invalid response from API"
+                )
+            return action_result.set_status(
+                phantom.APP_ERROR, "Invalid response from API: %s" % response_json
+            )
 
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -169,7 +223,7 @@ class GreyNoiseConnector(BaseConnector):
             action_result,
             "get",
             LOOKUP_IP_URL.format(ip=param["ip"]),
-            headers=self._headers
+            headers=self._headers,
         )
         if phantom.is_fail(ret_val):
             return ret_val
@@ -180,15 +234,90 @@ class GreyNoiseConnector(BaseConnector):
         result_data.update(response_json)
 
         try:
-            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+            result_data["visualization"] = VISUALIZATION_URL.format(
+                ip=result_data["ip"]
+            )
             if result_data["code"] in CODES:
                 result_data["code_meaning"] = CODES[result_data["code"]]
             else:
                 result_data["code_meaning"] = "This code is unmapped"
         except KeyError:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing API response"
+            )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "IP Lookup action successfully completed")
+
+    def _riot_lookup_ip(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            RIOT_IP_URL.format(ip=param["ip"]),
+            headers=self._headers,
+        )
+
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        result_data = {}
+        action_result.add_data(result_data)
+
+        result_data.update(response_json)
+
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(
+                ip=result_data["ip"]
+            )
+            if result_data["riot"] is False:
+                result_data["riot_unseen"] = True
+            if "trust_level" in result_data.keys():
+                if str(result_data["trust_level"]) in TRUST_LEVELS:
+                    result_data["trust_level"] = TRUST_LEVELS[str(result_data["trust_level"])]
+        except KeyError:
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing API response"
+            )
+
+        return action_result.set_status(phantom.APP_SUCCESS, "RIOT Lookup IP action successfully completed")
+
+    def _community_lookup_ip(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._check_apikey(action_result)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        ret_val, response_json, status_code = self._make_rest_call(
+            action_result,
+            "get",
+            COMMUNITY_IP_URL.format(ip=param["ip"]),
+            headers=self._headers,
+        )
+
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        result_data = {}
+        action_result.add_data(result_data)
+
+        result_data.update(response_json)
+
+        try:
+            result_data["visualization"] = VISUALIZATION_URL.format(
+                ip=result_data["ip"]
+            )
+            if result_data["riot"] is False and result_data['noise'] is False:
+                result_data["community_not_found"] = True
+        except KeyError:
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing API response"
+            )
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Community Lookup IP action successfully completed")
 
     def _ip_reputation(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -200,7 +329,7 @@ class GreyNoiseConnector(BaseConnector):
             action_result,
             "get",
             IP_REPUTATION_URL.format(ip=param["ip"]),
-            headers=self._headers
+            headers=self._headers,
         )
         if phantom.is_fail(ret_val):
             return ret_val
@@ -210,11 +339,17 @@ class GreyNoiseConnector(BaseConnector):
 
         result_data.update(response_json)
         try:
-            result_data["visualization"] = VISUALIZATION_URL.format(ip=result_data["ip"])
+            result_data["visualization"] = VISUALIZATION_URL.format(
+                ip=result_data["ip"]
+            )
+            if result_data["seen"] is False:
+                result_data["unseen_rep"] = True
         except KeyError:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing API response")
+            return action_result.set_status(
+                phantom.APP_ERROR, "Error occurred while processing API response"
+            )
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS, "IP reputation action successfully completed")
 
     def _gnql_query(self, param, is_poll=False, action_result=None):
         if not is_poll:
@@ -244,11 +379,15 @@ class GreyNoiseConnector(BaseConnector):
                 ret_val, response_json, status_code = self._make_rest_call(
                     action_result,
                     "get",
-                    GNQL_QUERY_URl,
+                    GNQL_QUERY_URL,
                     headers=self._headers,
-                    params=(('query', param["query"]),
-                            ('size', size))
+                    params=(("query", param["query"]), ("size", size)),
                 )
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
                 full_response.update(response_json)
 
             if "scroll" in full_response:
@@ -265,13 +404,20 @@ class GreyNoiseConnector(BaseConnector):
                 ret_val, response_json, status_code = self._make_rest_call(
                     action_result,
                     "get",
-                    GNQL_QUERY_URl,
+                    GNQL_QUERY_URL,
                     headers=self._headers,
-                    params=(('query', param["query"]),
-                            ('size', size),
-                            ('scroll', scroll_token))
+                    params=(
+                        ("query", param["query"]),
+                        ("size", size),
+                        ("scroll", scroll_token),
+                    ),
                 )
-                full_response["complete"] = response_json["complete"]
+                if phantom.is_fail(ret_val):
+                    if is_poll:
+                        return ret_val, None
+                    else:
+                        return ret_val
+                full_response["complete"] = response_json.get("complete")
                 if "scroll" in response_json:
                     full_response["scroll"] = response_json["scroll"]
                 for item in response_json["data"]:
@@ -286,12 +432,6 @@ class GreyNoiseConnector(BaseConnector):
                     remaining_results_flag = False
             else:
                 remaining_results_flag = True
-
-        if phantom.is_fail(ret_val):
-            if is_poll:
-                return ret_val, None
-            else:
-                return ret_val
 
         result_data = {}
         action_result.add_data(result_data)
@@ -310,7 +450,7 @@ class GreyNoiseConnector(BaseConnector):
         if is_poll:
             return ret_val, result_data
         else:
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS, "GNQL Query action successfully completed")
 
     def _lookup_ips(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -322,19 +462,26 @@ class GreyNoiseConnector(BaseConnector):
             ips = [x.strip() for x in param["ips"].split(",")]
             ips = list(filter(None, ips))
             if not ips:
-                return action_result.set_status(phantom.APP_ERROR, INVALID_COMMA_SEPARATED_VALUE_ERR_MSG.format(key='ips'))
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    INVALID_COMMA_SEPARATED_VALUE_ERR_MSG.format(key="ips"),
+                )
             ips = ",".join(ips)
             ips_string = requote_uri(ips)
         except Exception as e:
             err = self._get_error_message_from_exception(e)
-            err_msg = "Error occurred while processing 'ips' action parameter. {0}".format(err)
+            err_msg = (
+                "Error occurred while processing 'ips' action parameter. {0}".format(
+                    err
+                )
+            )
             return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         ret_val, response_json, status_code = self._make_rest_call(
             action_result,
             "get",
             LOOKUP_IPS_URL.format(ips=ips_string),
-            headers=self._headers
+            headers=self._headers,
         )
         if phantom.is_fail(ret_val):
             return ret_val
@@ -351,7 +498,7 @@ class GreyNoiseConnector(BaseConnector):
                 result["visualization"] = VISUALIZATION_URL.format(ip=result["ip"])
                 result_data.append(result)
 
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(phantom.APP_SUCCESS, "Lookup IPs action successfully completed")
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             err_msg = "Error occurred while processing results: {0}".format(err)
@@ -359,8 +506,8 @@ class GreyNoiseConnector(BaseConnector):
 
     def _process_query(self, data):
         # spawn container for every item returned
-        if data["count"] > 0:
-            try:
+        try:
+            if data["count"] > 0:
                 for entry in data["data"]:
                     ip = entry["ip"]
                     self.save_progress("Processing IP address {}".format(ip))
@@ -369,7 +516,9 @@ class GreyNoiseConnector(BaseConnector):
                         "data": {},
                         "name": "",
                         "description": "Container added by GreyNoise",
-                        "label": self.get_config().get("ingest", {}).get("container_label"),
+                        "label": self.get_config()
+                        .get("ingest", {})
+                        .get("container_label"),
                         "sensitivity": "amber",
                         "source_data_identifier": "",
                         "tags": entry["tags"],
@@ -379,51 +528,59 @@ class GreyNoiseConnector(BaseConnector):
                     else:
                         container["severity"] = "low"
                     artifact_cef = {
-                        'ip': entry['ip'],
-                        'classification': entry['classification'],
-                        'first_seen': entry['first_seen'],
-                        'last_seen': entry['last_seen'],
-                        'actor': entry['actor'],
-                        'organization': entry['metadata']['organization'],
-                        'asn': entry['metadata']['asn']
+                        "ip": entry["ip"],
+                        "classification": entry["classification"],
+                        "first_seen": entry["first_seen"],
+                        "last_seen": entry["last_seen"],
+                        "actor": entry["actor"],
+                        "organization": entry["metadata"]["organization"],
+                        "asn": entry["metadata"]["asn"],
                     }
-                    if entry['metadata']['country']:
-                        artifact_cef['country'] = entry['metadata']['country']
-                    if entry['metadata']['city']:
-                        artifact_cef['city'] = entry['metadata']['city']
-                    container["artifacts"] = [{
-                        "cef": artifact_cef,
-                        "description": "Artifact added by GreyNoise",
-                        "label": container["label"],
-                        "name": "GreyNoise Query Language Entry",
-                        "source_data_identifier": container["source_data_identifier"],
-                        "severity": container["severity"]
-                    }]
+                    if entry["metadata"]["country"]:
+                        artifact_cef["country"] = entry["metadata"]["country"]
+                    if entry["metadata"]["city"]:
+                        artifact_cef["city"] = entry["metadata"]["city"]
+                    container["artifacts"] = [
+                        {
+                            "cef": artifact_cef,
+                            "description": "Artifact added by GreyNoise",
+                            "label": container["label"],
+                            "name": "GreyNoise Query Language Entry",
+                            "source_data_identifier": container[
+                                "source_data_identifier"
+                            ],
+                            "severity": container["severity"],
+                        }
+                    ]
                     container["name"] = "GreyNoise Query Language Entry"
 
-                    ret_val, container_creation_msg, container_id = self.save_container(container)
+                    ret_val, container_creation_msg, container_id = self.save_container(
+                        container
+                    )
                     if phantom.is_fail(ret_val):
                         self.save_progress("Error occurred while saving the container")
                         self.debug_print(container_creation_msg)
                         continue
-                    self.save_progress("Created %s" % container_id)
-            except Exception as e:
-                err = self._get_error_message_from_exception(e)
-                err_msg = "Error occurred while processing query data. {}".format(err)
-                self.debug_print(err_msg)
-                return phantom.APP_ERROR
-            return phantom.APP_SUCCESS
-        else:
-            self.save_progress("No results matching your GNQL query were found")
-            return phantom.APP_SUCCESS
+                    self.save_progress("Created Container ID: {}".format(container_id))
+                return phantom.APP_SUCCESS
+            else:
+                self.save_progress("No results matching your GNQL query were found")
+                return phantom.APP_SUCCESS
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            err_msg = "Error occurred while processing query data. {}".format(err)
+            self.debug_print(err_msg)
+            return phantom.APP_ERROR
 
     def _on_poll(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
         if self.is_poll_now():
-            self.save_progress('Due to the nature of the API, the '
-                               'artifact limits imposed by POLL NOW are '
-                               'ignored. As a result POLL NOW will simply '
-                               'create a container for each artifact.')
+            self.save_progress(
+                "Due to the nature of the API, the "
+                "artifact limits imposed by POLL NOW are "
+                "ignored. As a result POLL NOW will simply "
+                "create a container for each artifact."
+            )
 
         config = self.get_config()
         param["query"] = config.get("on_poll_query")
@@ -433,16 +590,24 @@ class GreyNoiseConnector(BaseConnector):
         else:
             on_poll_size = config.get("on_poll_size", 25)
             # Validate 'on_poll_size' config parameter
-            ret_val, on_poll_size = self._validate_integer(action_result, on_poll_size, ONPOLL_SIZE_CONFIG_PARAM)
+            ret_val, on_poll_size = self._validate_integer(
+                action_result, on_poll_size, ONPOLL_SIZE_CONFIG_PARAM
+            )
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
             param["size"] = on_poll_size
 
         if param["query"] == "Please refer to the documentation":
-            self.save_progress("Default on poll query unchanged, please enter a valid GNQL query")
-            return action_result.set_status(phantom.APP_ERROR, "Default on poll query unchanged")
+            self.save_progress(
+                "Default on poll query unchanged, please enter a valid GNQL query"
+            )
+            return action_result.set_status(
+                phantom.APP_ERROR, "Default on poll query unchanged"
+            )
 
-        ret_val, data = self._gnql_query(param, is_poll=True, action_result=action_result)
+        ret_val, data = self._gnql_query(
+            param, is_poll=True, action_result=action_result
+        )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -450,7 +615,9 @@ class GreyNoiseConnector(BaseConnector):
         ret_val = self._process_query(data)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to process the query")
+            return action_result.set_status(
+                phantom.APP_ERROR, "Failed to process the query"
+            )
         else:
             return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -471,6 +638,10 @@ class GreyNoiseConnector(BaseConnector):
             ret_val = self._lookup_ips(param)
         elif action == "on_poll":
             ret_val = self._on_poll(param)
+        elif action == "riot_lookup_ip":
+            ret_val = self._riot_lookup_ip(param)
+        elif action == "community_lookup_ip":
+            ret_val = self._community_lookup_ip(param)
 
         return ret_val
 
@@ -479,14 +650,16 @@ class GreyNoiseConnector(BaseConnector):
         self._state = self.load_state()
         config = self.get_config()
 
-        self._api_key = config['api_key']
+        self._api_key = config["api_key"]
         app_json = self.get_app_json()
         self._app_version = app_json["app_version"]
 
         self._headers = {
             "Accept": "application/json",
             "key": self._api_key,
-            "User-Agent": "greynoise-phantom-integration-v{0}".format(self._app_version)
+            "User-Agent": "greynoise-phantom-integration-v{0}".format(
+                self._app_version
+            ),
         }
 
         return phantom.APP_SUCCESS

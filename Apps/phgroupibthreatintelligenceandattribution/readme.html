@@ -1,0 +1,28 @@
+<!--File: readme.html
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+  <head></head>
+  <body>
+  <h2 id="asset-configuration">Asset configuration</h2>
+  <p>1). Find <strong>Group IB Threat Intelligence and Attribution</strong> app, click <strong>CONFIGURE NEW ASSET</strong> button, in <strong>Asset Settings</strong> tab enter your credentials and configure necessary collections.</p>
+  <ul>
+    <li><strong>Group-IB API URL</strong> is https://tap.group-ib.com/api/v2/</li>
+    <li><strong>Username</strong> is the login for the Group-IB TIA portal.</li>
+    <li><strong>Verify server certificate</strong> - Whether to allow connections without verifying SSL certificates validity.</li>
+    <li><strong>API key</strong> can be manually generated in the portal:<br>
+      The old version of the portal: log in to the TIA -> click on your name in the right upper corner -> choose the <strong>Profile</strong> option -> click on the <strong>Go to my setting</strong> button under your name -> under the <strong>Change password</strong> button you will see <strong>API KEY generator</strong>. <strong>Do not forget to save the API key</strong>.<br>
+      The new version of the portal: log in to the TIA -> click on your name in the right upper corner -> choose the <strong>Profile</strong> option -> click on <strong>Security and Access</strong> tab -> click on <strong>Personal token</strong> tab -> click on <strong>Generate new token</strong> button -> enter your password, copy token and click <strong>Save</strong> button.</li>
+    <li>Every collection has a poll starting date and enable checkbox.</li>
+  </ul>
+  <p>2). If you are using a proxy to connect to the Group IB TIA server, you can specify the appropriate settings. You need to expand the <strong>Advanced</strong> section on the bottom, find the <strong>Environment</strong> section and click <strong>+ Variable</strong>. <strong>NAME</strong> must be HTTPS_PROXY, <strong>VALUE</strong> is your proxy server.</p>
+  <p>3). In the <strong>Ingest settings</strong> tab choose the polling interval you need.</p>
+
+  <h2>SDK and SDK Licensing details for the app</h2>
+  <p>
+    <h4>pytia</h4>
+    This app uses the pytia module, which is licensed under the MIT License (MIT), Copyright (c) 2021 Group-IB.
+  </p>
+  </body>
+</html>
