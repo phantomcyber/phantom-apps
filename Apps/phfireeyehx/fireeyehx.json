@@ -18,10 +18,10 @@
         }
     ],
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "1.0.27",
+    "app_version": "2.0.0",
     "utctime_updated": "2020-10-15T20:49:54.000000Z",
     "package_name": "phantom_fireeyehx",
-    "main_module": "fireeyehx_connector.pyc",
+    "main_module": "fireeyehx_connector.py",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
@@ -53,7 +53,6 @@
         "zip_password": {
             "description": "ZIP Archive Password",
             "data_type": "password",
-            "required": false,
             "order": 4
         }
     },
@@ -88,19 +87,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "3805951439869103977B58"
@@ -437,6 +429,22 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Important data: value",
+                        "Primary ip: 10.1.1.1, Hostname: random_565_4"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.Hostname",
                     "data_type": "string",
                     "example_values": [
@@ -461,14 +469,6 @@
                     "data_type": "string",
                     "example_values": [
                         "value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value",
-                        "Primary ip: 10.1.1.1, Hostname: random_565_4"
                     ]
                 },
                 {
@@ -512,19 +512,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "3805951439869103977B58"
@@ -547,10 +540,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -558,6 +552,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -584,8 +585,8 @@
             "action": "get quarantine status",
             "identifier": "get_quarantine_status",
             "description": "Get the containment status for an endpoint",
-            "type": "contain",
-            "read_only": false,
+            "type": "investigate",
+            "read_only": true,
             "parameters": {
                 "agent_id": {
                     "description": "HX Endpoint Agent ID you want to check the status",
@@ -600,20 +601,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "3805951439869103977B58"
@@ -725,10 +718,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -736,6 +732,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -762,7 +765,7 @@
             "action": "set quarantine approved",
             "identifier": "set_quarantine_approved",
             "description": "Approve containment request for host",
-            "type": "contain",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "agent_id": {
@@ -778,20 +781,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "3805951439869103977B58"
@@ -814,10 +809,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -825,6 +823,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -868,22 +873,34 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -905,7 +922,7 @@
             "identifier": "get_acquisition_status",
             "description": "Get status of file acquisition",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "acquisition_id": {
                     "description": "Acquisition ID from (get file) action to query status",
@@ -920,21 +937,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.acquisition_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx acquisition id"
                     ],
-                    "column_name": "acquisition_id",
+                    "column_name": "Acquisition ID",
                     "column_order": 0,
                     "example_values": [
                         "2494"
@@ -1097,11 +1105,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1128,7 +1150,7 @@
             "identifier": "get_triage",
             "description": "Request Endpoint Host Triage Package",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "agent_id": {
                     "description": "HX Agent ID to get Triage Package",
@@ -1143,33 +1165,22 @@
                 "req_timestamp": {
                     "description": "The triage collection time in ISO-8601_DATE format",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 1
                 },
                 "external_id": {
                     "description": "External correlation ID",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 2
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "3805951439869103977B58"
@@ -1178,15 +1189,13 @@
                 {
                     "data_path": "action_result.parameter.external_id",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "external_id",
+                    "column_name": "External ID",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.req_timestamp",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "req_timestamp",
+                    "column_name": "Req Timestamp",
                     "column_order": 1,
                     "example_values": [
                         "null"
@@ -1321,6 +1330,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "State: NEW, Id: 5"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.ID",
                     "data_type": "numeric",
                     "example_values": [
@@ -1332,13 +1356,6 @@
                     "data_type": "string",
                     "example_values": [
                         "NEW"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "State: NEW, Id: 5"
                     ]
                 },
                 {
@@ -1365,14 +1382,12 @@
             "action": "list device groups",
             "identifier": "list_host_sets",
             "description": "Retrieve a list of host sets in HX optionally filtered by name",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "name": {
                     "description": "Host set name for filtering",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 }
             },
@@ -1381,20 +1396,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.name",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*._id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
@@ -1425,11 +1432,21 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -1453,7 +1470,7 @@
             "action": "get device group",
             "identifier": "get_host_set",
             "description": "List endpoints in a host set",
-            "type": "generic",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "host_set_id": {
@@ -1468,14 +1485,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.host_set_id",
                     "contains": [
@@ -1707,10 +1716,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1718,6 +1730,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -1750,36 +1769,27 @@
                 "limit": {
                     "description": "Limit the number of hosts returned. (HX Defaults to 50)",
                     "data_type": "numeric",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 },
                 "search": {
                     "description": "Search all hosts connected to the HX appliance. Search for hostname, IP address or Agent ID",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "host name",
                         "ip",
                         "fireeyehx agentid"
                     ],
-                    "order": 1
+                    "order": 1,
+                    "primary": true
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.limit",
                     "data_type": "numeric",
-                    "contains": []
+                    "example_values": [
+                        50
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.search",
@@ -2042,10 +2052,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 4,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2053,6 +2066,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -2078,48 +2098,37 @@
         {
             "action": "list acquisitions",
             "identifier": "list_acquisitions",
-            "description": "Retireve a list of all acquisitions with optional filters",
-            "type": "generic",
+            "description": "Retrieve a list of all acquisitions with optional filters",
+            "type": "investigate",
             "read_only": true,
             "parameters": {
                 "agent_id": {
                     "description": "HX Agent ID for the host",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "order": 0
+                    "order": 0,
+                    "primary": true
                 },
                 "req_filename": {
                     "description": "Name of the file acquired",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "contains": [
                         "file name"
                     ],
-                    "order": 1
+                    "order": 1,
+                    "primary": true
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "E8kw2d9uRcjgkfDjWKQqnv"
@@ -2131,7 +2140,7 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "req_filename",
+                    "column_name": "Req Filename",
                     "column_order": 2,
                     "example_values": [
                         "NV4HPControllerSetup.exe"
@@ -2289,10 +2298,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2300,6 +2312,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -2326,24 +2345,24 @@
             "action": "start acquisition",
             "identifier": "start_acquisition",
             "description": "Request a file to be acquired into FireEye HX",
-            "type": "investigate",
-            "read_only": true,
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "agent_id": {
                     "description": "HX Agent ID for the host",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "fireeyehx agentid"
                     ],
                     "order": 0
                 },
                 "req_path": {
-                    "description": "Path of the file that you want to acquire.",
+                    "description": "Path of the file that you want to acquire",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "file path"
                     ],
@@ -2353,7 +2372,7 @@
                     "description": "Name of the file you want to acquire",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
+                    "primary": true,
                     "contains": [
                         "file name"
                     ],
@@ -2362,42 +2381,27 @@
                 "req_use_api": {
                     "description": "Whether to use RAW or API mode",
                     "data_type": "boolean",
-                    "required": false,
-                    "primary": false,
                     "order": 3
                 },
                 "comment": {
                     "description": "General Comment",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 4
                 },
                 "external_id": {
-                    "description": "External correlation ID from a SIEM solution.",
+                    "description": "External correlation ID from a SIEM solution",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 5
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 6,
-                    "example_values": [
-                        "success"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.agent_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
                     ],
-                    "column_name": "agent_id",
+                    "column_name": "Agent ID",
                     "column_order": 0,
                     "example_values": [
                         "E8kw2d9uRcjgkfDjWKQqnv"
@@ -2406,7 +2410,7 @@
                 {
                     "data_path": "action_result.parameter.comment",
                     "data_type": "string",
-                    "column_name": "comment",
+                    "column_name": "Comment",
                     "column_order": 4,
                     "example_values": [
                         "null"
@@ -2415,7 +2419,7 @@
                 {
                     "data_path": "action_result.parameter.external_id",
                     "data_type": "string",
-                    "column_name": "external_id",
+                    "column_name": "External ID",
                     "column_order": 5,
                     "example_values": [
                         "null"
@@ -2427,7 +2431,7 @@
                     "contains": [
                         "file name"
                     ],
-                    "column_name": "req_filename",
+                    "column_name": "Req Filename",
                     "column_order": 2,
                     "example_values": [
                         "NV4HPControllerSetup.exe"
@@ -2439,7 +2443,7 @@
                     "contains": [
                         "file path"
                     ],
-                    "column_name": "req_path",
+                    "column_name": "Req Path",
                     "column_order": 1,
                     "example_values": [
                         "C:\\Users\\aeh11\\AppData\\Local\\Temp\\1\\NVFiles_7e7bc015-0db1-4605-a9cf-9d81754054e9\\"
@@ -2448,7 +2452,7 @@
                 {
                     "data_path": "action_result.parameter.req_use_api",
                     "data_type": "boolean",
-                    "column_name": "req_use_api",
+                    "column_name": "Req Use API",
                     "column_order": 3,
                     "example_values": [
                         false,
@@ -2606,10 +2610,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2617,6 +2624,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -2659,21 +2673,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.acquisition_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx acquisition id"
                     ],
-                    "column_name": "acquisition_id",
+                    "column_name": "Acquisition ID",
                     "column_order": 0,
                     "example_values": [
                         "2496"
@@ -2707,7 +2712,8 @@
                     "data_path": "action_result.data.*.message",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2736,10 +2742,13 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2747,6 +2756,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
@@ -2789,21 +2805,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.alert_id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx alert id"
                     ],
-                    "column_name": "alert_id",
+                    "column_name": "Alert ID",
                     "column_order": 0,
                     "example_values": [
                         "1110"
@@ -2863,10 +2870,13 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
+                    "data_path": "action_result.status",
                     "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
-                        "value"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2874,6 +2884,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Important data: value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.important_data",
+                    "data_type": "string",
+                    "example_values": [
+                        "value"
                     ]
                 },
                 {
