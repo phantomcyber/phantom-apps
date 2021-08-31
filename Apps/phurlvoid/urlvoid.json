@@ -4,7 +4,7 @@
     "description": "This app supports executing investigative and reputation actions on the URLVoid cloud based service",
     "type": "reputation",
     "main_module": "urlvoid_connector.pyc",
-    "app_version": "1.0.25",
+    "app_version": "2.0.0",
     "utctime_updated": "2019-03-12T06:29:53.000000Z",
     "package_name": "phantom_urlvoid",
     "product_vendor": "URLVoid",
@@ -14,7 +14,7 @@
     "logo": "logo_urlvoid.svg",
     "logo_dark": "logo_urlvoid_dark.svg",
     "python_version": "2.7",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "consolidate_widgets": true,
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "pip_dependencies": {
