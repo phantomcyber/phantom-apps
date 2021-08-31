@@ -1,11 +1,7 @@
-# --
 # File: urlvoid_connector.py
-#
 # Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-#
-# --
 
 # Phantom App imports
 import phantom.app as phantom
@@ -90,7 +86,6 @@ class URLVoidConnector(BaseConnector):
         should_update = self._should_update_cache()
         try:
             if (should_update):
-                self.debug_print("Will Update tld list on the current call")
                 extract = tldextract.TLDExtract(cache_file=self._cache_file_path)
             else:
                 extract = tldextract.TLDExtract(cache_file=self._cache_file_path, suffix_list_urls=None)

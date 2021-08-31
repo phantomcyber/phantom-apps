@@ -1,11 +1,7 @@
-# --
-# File: urlvoid_connector.py
-#
+# File: urlvoid_consts.py
 # Copyright (c) 2016-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-#
-# --
 
 BASE_URL = "http://api.urlvoid.com"
 
