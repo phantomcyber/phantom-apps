@@ -147,7 +147,8 @@ class SentineloneConnector(BaseConnector):
             r = request_func(
                 url,
                 verify=config.get('verify_server_cert', False),
-                **kwargs
+                **kwargs,
+                timeout=120
             )
         except requests.exceptions.ConnectionError:
             err_msg = 'Error Details: Connection Refused from the Server'
@@ -185,15 +186,26 @@ class SentineloneConnector(BaseConnector):
         hash = param['hash']
         description = param['description']
         os_family = param['os_family']
-        summary = action_result.update_summary({})
-        summary['hash'] = hash
-        summary['description'] = description
-        header = self.HEADER
-        header["Authorization"] = "APIToken %s" % self.token
-        params = {"value": hash, "type": "black_hash"}
-        ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+        try:
+            site_val = self._get_site_id(action_result)
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
+        self.save_progress('Agent query: {}'.format(site_val))
+        if site_val == '0':
+            return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
+        elif site_val == '99':
+            return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
+        else:
+            summary = action_result.update_summary({})
+            summary['hash'] = hash
+            summary['description'] = description
+            summary['site_id'] = site_val
+            header = self.HEADER
+            header["Authorization"] = "APIToken %s" % self.token
+            params = {"value": hash, "type": "black_hash"}
+            ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
         try:
             if response.get('pagination', {}).get('totalItems') != 0:
@@ -208,6 +220,7 @@ class SentineloneConnector(BaseConnector):
                         "source": "phantom"
                     },
                     "filter": {
+                        "siteIds": [site_val],
                         "tenant": "true"
                     }
                 }
@@ -513,6 +526,15 @@ class SentineloneConnector(BaseConnector):
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/{}/actions/fetch-files'.format(ret_val),
                 action_result, headers=header, data=json.dumps(body), method='post')
             self.save_progress("Ret_val: {0}".format(ret_val))
+            activity_val = self._get_activity_id(ip_hostname, action_result)
+            summary['activity_id'] = activity_val
+            activity_val, response = self._make_rest_call('/web/api/v2.1/agents/{}/uploads/{}'.format(ret_val, activity_val),
+                action_result, headers=header, data=json.dumps(body), method='get')
+            # giving time to fetch file and generate download_url
+            time.sleep(30)
+            download_id = self._get_download_id(ip_hostname, action_result)
+            download_url = self._base_url + '/web/api/v2.1{}'.format(download_id)
+            summary['download_url'] = download_url
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to fetch files. Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
@@ -647,6 +669,56 @@ class SentineloneConnector(BaseConnector):
             return '99'
         else:
             return response['data'][0]['id']
+
+    def _get_activity_id(self, search_text, action_result):
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        params = {"query": search_text}
+        activity_val, response = self._make_rest_call('/web/api/v2.1/activities/types', action_result, headers=header, params=params, method='get')
+        if phantom.is_fail(activity_val):
+            return str(-1)
+        endpoints_found = len(response['data'])
+        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
+        action_result.add_data(response)
+        if endpoints_found == 0:
+            return '0'
+        elif endpoints_found > 1:
+            return '99'
+        else:
+            return response['data'][0]['id']
+
+    def _get_site_id(self, action_result):
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        site_val, response = self._make_rest_call('/web/api/v2.1/sites', action_result, headers=header, method='get')
+        if phantom.is_fail(site_val):
+            return str(-1)
+        endpoints_found = len(response['data']['sites'])
+        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
+        action_result.add_data(response)
+        if endpoints_found == 0:
+            return '0'
+        elif endpoints_found > 1:
+            return '99'
+        else:
+            return response['data']['sites'][0]['id']
+
+    def _get_download_id(self, search_text, action_result):
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        download_id, response = self._make_rest_call('/web/api/v2.1/activities?limit=100&sortBy=createdAt&sortOrder=desc&skip=0', action_result,
+            headers=header, method='get')
+        if phantom.is_fail(download_id):
+            return str(-1)
+        endpoints_found = len(response['data'])
+        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
+        action_result.add_data(response)
+        for i in range(100):
+            if response['data'][i]['agentId'] != " " and response['data'][i]['data']['downloadUrl'] != " ":
+                try:
+                    return response['data'][i]['data']['downloadUrl']
+                except KeyError:
+                    pass
 
     def _handle_on_poll(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
