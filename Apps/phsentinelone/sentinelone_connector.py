@@ -526,10 +526,6 @@ class SentineloneConnector(BaseConnector):
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents/{}/actions/fetch-files'.format(ret_val),
                 action_result, headers=header, data=json.dumps(body), method='post')
             self.save_progress("Ret_val: {0}".format(ret_val))
-            activity_val = self._get_activity_id(ip_hostname, action_result)
-            summary['activity_id'] = activity_val
-            activity_val, response = self._make_rest_call('/web/api/v2.1/agents/{}/uploads/{}'.format(ret_val, activity_val),
-                action_result, headers=header, data=json.dumps(body), method='get')
             # giving time to fetch file and generate download_url
             time.sleep(30)
             download_id = self._get_download_id(ip_hostname, action_result)
@@ -659,23 +655,6 @@ class SentineloneConnector(BaseConnector):
         params = {"query": search_text}
         ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params, method='get')
         if phantom.is_fail(ret_val):
-            return str(-1)
-        endpoints_found = len(response['data'])
-        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
-        action_result.add_data(response)
-        if endpoints_found == 0:
-            return '0'
-        elif endpoints_found > 1:
-            return '99'
-        else:
-            return response['data'][0]['id']
-
-    def _get_activity_id(self, search_text, action_result):
-        header = self.HEADER
-        header["Authorization"] = "APIToken %s" % self.token
-        params = {"query": search_text}
-        activity_val, response = self._make_rest_call('/web/api/v2.1/activities/types', action_result, headers=header, params=params, method='get')
-        if phantom.is_fail(activity_val):
             return str(-1)
         endpoints_found = len(response['data'])
         self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
