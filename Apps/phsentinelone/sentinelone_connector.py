@@ -187,49 +187,47 @@ class SentineloneConnector(BaseConnector):
         description = param['description']
         os_family = param['os_family']
         try:
-            site_val = self._get_site_id(action_result)
+            sites = self._get_site_id(action_result)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
-        self.save_progress('Agent query: {}'.format(site_val))
-        if site_val == '0':
-            return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
-        elif site_val == '99':
-            return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
-        else:
-            summary = action_result.update_summary({})
-            summary['hash'] = hash
-            summary['description'] = description
-            summary['site_id'] = site_val
-            header = self.HEADER
-            header["Authorization"] = "APIToken %s" % self.token
-            params = {"value": hash, "type": "black_hash"}
-            ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-
-        try:
-            if response.get('pagination', {}).get('totalItems') != 0:
-                return action_result.set_status(phantom.APP_ERROR, "Hash already exists")
-            else:
-                body = {
-                    "data": {
-                        "description": description,
-                        "osType": os_family,
-                        "type": "black_hash",
-                        "value": hash,
-                        "source": "phantom"
-                    },
-                    "filter": {
-                        "siteIds": [site_val],
-                        "tenant": "true"
-                    }
-                }
-                ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, method='post', data=json.dumps(body))
+        if sites:
+            for site in sites:
+                site_id = site.get('id')
+                self.save_progress('Agent query: {}'.format(site_id))
+                summary = action_result.update_summary({})
+                summary['hash'] = hash
+                summary['description'] = description
+                summary['site_id'] = site_id
+                header = self.HEADER
+                header["Authorization"] = "APIToken %s" % self.token
+                params = {"value": hash, "type": "black_hash"}
+                ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, params=params)
                 if phantom.is_fail(ret_val):
                     return action_result.get_status()
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
-
+                try:
+                    if response.get('pagination', {}).get('totalItems') != 0:
+                        return action_result.set_status(phantom.APP_ERROR, "Hash already exists")
+                    else:
+                        body = {
+                            "data": {
+                                "description": description,
+                                "osType": os_family,
+                                "type": "black_hash",
+                                "value": hash,
+                                "source": "phantom"
+                            },
+                            "filter": {
+                                "siteIds": [site_id],
+                                "tenant": "true"
+                            }
+                        }
+                        ret_val, response = self._make_rest_call('/web/api/v2.1/restrictions', action_result, headers=header, method='post', data=json.dumps(body))
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status()
+                except Exception:
+                    return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
+        else:
+            action_result.set_status(phantom.APP_ERROR, "Site ID not found")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Added Hash to Block List")
 
     def _handle_unblock_hash(self, param):
@@ -669,28 +667,21 @@ class SentineloneConnector(BaseConnector):
     def _get_site_id(self, action_result):
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
-        site_val, response = self._make_rest_call('/web/api/v2.1/sites', action_result, headers=header, method='get')
-        if phantom.is_fail(site_val):
+        site_id, response = self._make_rest_call('/web/api/v2.1/sites', action_result, headers=header, method='get')
+        if phantom.is_fail(site_id):
             return str(-1)
-        endpoints_found = len(response['data']['sites'])
-        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
-        action_result.add_data(response)
-        if endpoints_found == 0:
-            return '0'
-        elif endpoints_found > 1:
-            return '99'
-        else:
-            return response['data']['sites'][0]['id']
+        sites_found = response['data']['sites']
+        return sites_found
 
-    def _get_download_id(self, search_text, action_result):
+    def _get_download_id(self, action_result):
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
         download_id, response = self._make_rest_call('/web/api/v2.1/activities?limit=100&sortBy=createdAt&sortOrder=desc&skip=0', action_result,
             headers=header, method='get')
         if phantom.is_fail(download_id):
             return str(-1)
-        endpoints_found = len(response['data'])
-        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
+        download_id_found = len(response['data'])
+        self.save_progress("Endpoints found: {}".format(str(download_id_found)))
         action_result.add_data(response)
         for i in range(100):
             if response['data'][i]['agentId'] != " " and response['data'][i]['data']['downloadUrl'] != " ":

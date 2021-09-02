@@ -360,7 +360,7 @@
         {
             "action": "mitigate threat",
             "description": "Mitigate an identified threat",
-            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
+            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback-remediation</b>.",
             "type": "correct",
             "identifier": "mitigate_threat",
             "read_only": false,
@@ -376,15 +376,15 @@
                     "order": 0
                 },
                 "action": {
-                    "description": "Allowed values include: kill, quarantine, remediate, rollback, and disconnectFromNetwork",
+                    "description": "Allowed values include: kill, quarantine, remediate, rollback-remediation, and network-quarantine",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
                         "kill",
                         "quarantine",
                         "remediate",
-                        "rollback",
-                        "disconnectFromNetwork"
+                        "rollback-remediation",
+                        "network-quarantine"
                     ],
                     "default": "quarantine",
                     "order": 1
