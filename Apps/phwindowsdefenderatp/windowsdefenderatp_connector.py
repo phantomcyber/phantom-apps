@@ -1519,7 +1519,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         elif action_identifier == "get_domain_related_devices":
             domain = param[DEFENDERATP_DOMAIN_PARAM_CONST]
             endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_DOMAIN_MACHINES_ENDPOINT
-                                   .format(domain=domain))
+                                   .format(input=domain))
 
         elif action_identifier == "get_user_related_devices":
             user_id = param[DEFENDERATP_JSON_USER_ID]

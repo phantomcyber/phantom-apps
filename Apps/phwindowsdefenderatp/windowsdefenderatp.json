@@ -4570,7 +4570,6 @@
             },
             "versions": "EQ(*)"
         },
-
         {
             "action": "list indicators",
             "description": "Retrieve a collection of all active Indicators",
@@ -5447,7 +5446,6 @@
             },
             "versions": "EQ(*)"
         },
-
         {
             "action": "get domain devices",
             "description": "Retrieve a collection of devices that have communicated to or from a given domain address",
@@ -6359,7 +6357,6 @@
             },
             "versions": "EQ(*)"
         },
-
         {
             "action": "get file",
             "description": "Download a file from a device using live response",
