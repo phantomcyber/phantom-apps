@@ -9,6 +9,11 @@ import json
 import os
 import sys
 import time
+from phantom.vault import Vault as Vault
+import phantom.rules as ph_rules
+import gzip
+import shutil
+import uuid
 try:
     from urllib.parse import urlencode, quote
 except:
@@ -19,6 +24,7 @@ import grp
 import requests
 from bs4 import BeautifulSoup, UnicodeDammit
 from django.http import HttpResponse
+from datetime import datetime
 
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
@@ -239,7 +245,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Status Code: {0}. Error: Empty response and no information in the header".format(response.status_code)),
@@ -1495,7 +1501,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully retrieved file information")
 
     def _handle_get_related_devices(self, param):
-        """ This function is used to handle the get file related devices and get user related devices action.
+        """ This function is used to handle the get file related devices, get user related devices and get domain related devices action.
 
         :param param: Dictionary of input parameters
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -1509,10 +1515,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
             file_hash = param[DEFENDERATP_JSON_FILE_HASH]
             endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINE_FILES_ENDPOINT
                                    .format(file_hash=file_hash))
-        else:
+
+        elif action_identifier == "get_domain_related_devices":
+            domain = param[DEFENDERATP_DOMAIN_PARAM_CONST]
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_DOMAIN_MACHINES_ENDPOINT
+                                   .format(domain=domain))
+
+        elif action_identifier == "get_user_related_devices":
             user_id = param[DEFENDERATP_JSON_USER_ID]
             endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_USER_FILES_ENDPOINT
                                    .format(file_hash=user_id))
+
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Action identifier did not match")
 
         # make rest call
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
@@ -1555,15 +1570,15 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(software)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No Software found for the given device")
+            return action_result.set_status(phantom.APP_ERROR, "No software found for the given device")
 
         summary = action_result.update_summary({})
         summary['total_software'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_restrict_app_execution(self, param):
-        """ This function is used to handle the restrict app execution action.
+    def _handle_app_execution(self, param):
+        """ This function is used to handle the restrict app execution and remove app restriction action.
 
         :param param: Dictionary of input parameters
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -1583,8 +1598,19 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if timeout > DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT:
             timeout = DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT
 
-        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_RESTRICT_APP_EXECUTION_ENDPOINT
-                                   .format(device_id=device_id))
+        action_identifier = self.get_action_identifier()
+        if action_identifier == "restrict_app_execution":
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL,
+                                         DEFENDERATP_RESTRICT_APP_EXECUTION_ENDPOINT.format(device_id=device_id))
+            app_restriction_summary = 'restrict_app_execution_status'
+
+        elif action_identifier == "remove_app_restriction":
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL,
+                                         DEFENDERATP_REMOVE_APP_RESTRICTION_ENDPOINT.format(device_id=device_id))
+            app_restriction_summary = 'remove_app_restriction_status'
+
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Action identifier did not match")
 
         data = {
             'Comment': comment
@@ -1611,7 +1637,664 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response_status)
-        summary['restriction_status'] = response_status.get('status')
+        summary[app_restriction_summary] = response_status.get('status')
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_list_indicators(self, param):
+        """ This function is used to handle the list indicators action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
+
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = "{}?$top={}".format(DEFENDERATP_LIST_INDICATORS_ENDPOINT, limit)
+
+        filter = param.get(DEFENDERATP_JSON_FILTER)
+        if filter:
+            endpoint = "{}&$filter={}".format(endpoint, filter)
+
+        url = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint)
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=url, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        for indicator in response.get('value', []):
+            action_result.add_data(indicator)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No indicators found")
+
+        summary = action_result.update_summary({})
+        summary['total_indicators'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_delete_indicator(self, param):
+        """ This function is used to handle the delete indicator action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        indicator_id = param[DEFENDERATP_JSON_INDICATOR_ID]
+        endpoint = "{0}{1}/{2}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIST_INDICATORS_ENDPOINT, indicator_id)
+
+        # make rest call
+        ret_val, _ = self._update_request(endpoint=endpoint, action_result=action_result, method="delete")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully deleted indicator entity")
+
+    def _check_expiration_time_format(self, action_result, date):
+        """Validate the value of expiration time parameter given in the action parameters.
+
+        Parameters:
+            :param date: value of expiration time action parameter
+        Returns:
+            :return: status(True/False), time
+        """
+        # Initialize time for given value of date
+        time = None
+        try:
+            # Check for the time is in valid format or not
+            time = datetime.strptime(date, DEFENDERATP_DATE_FORMAT)
+        except Exception as e:
+            self.debug_print(f"Invalid date string received. Error occurred while checking date format. Error: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_TIME_ERR.format("expiration time")), None
+
+        # Checking for future date
+        today = datetime.utcnow()
+        if time <= today:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_PAST_TIME_ERR.format("expiration time")), None
+
+        time = time.strftime(DEFENDERATP_DATE_FORMAT)
+
+        return phantom.APP_SUCCESS, time
+
+    def _handle_submit_indicator(self, param):
+        """ This function is used to handle the submit indicator action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        title = param[DEFENDERATP_JSON_INDICATOR_TITLE]
+        description = param[DEFENDERATP_JSON_INDICATOR_DESCRIPTION]
+        indicator_value = param[DEFENDERATP_JSON_INDICATOR_VALUE]
+
+        # 'indicator_type' input parameter
+        indicator_type = param[DEFENDERATP_JSON_INDICATOR_TYPE]
+        if indicator_type not in INDICATOR_TYPE_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_INDICATOR_TYPE)
+
+        # 'action' input parameter
+        action = param[DEFENDERATP_JSON_ACTION]
+        if action not in INDICATOR_ACTION_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_ACTION)
+
+        application = param.get(DEFENDERATP_JSON_APPLICATION)
+        recommended_actions = param.get(DEFENDERATP_JSON_RECOMMENDED_ACTIONS)
+
+        expiration_time = param.get(DEFENDERATP_JSON_EXPIRATION_TIME)
+        # Checking date format
+        if expiration_time:
+            ret_val, expiration_time = self._check_expiration_time_format(action_result, expiration_time)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        rbac_group_names_list = None
+        rbac_group_names = param.get(DEFENDERATP_JSON_RBAC_GROUP_NAMES)
+        if rbac_group_names:
+            rbac_group_names_list = [x.strip() for x in rbac_group_names.split(',')]
+            rbac_group_names_list = list(filter(None, rbac_group_names_list))
+            if not rbac_group_names_list:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_RBAC_GROUP_NAMES)
+
+        severity = param.get(DEFENDERATP_JSON_SEVERITY)
+        if severity not in INDICATOR_SEVERITY_LIST:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_SEVERITY)
+
+        # prepare data parameters
+        data = {
+            "indicatorValue": indicator_value,
+            "indicatorType": indicator_type,
+            "title": title,
+            "action": action,
+            "description": description,
+        }
+
+        if application:
+            data.update({"application": application})
+
+        if expiration_time:
+            data.update({"expirationTime": expiration_time})
+
+        if recommended_actions:
+            data.update({"recommendedActions": recommended_actions})
+
+        if rbac_group_names:
+            data.update({"rbacGroupNames": rbac_group_names_list})
+
+        if severity:
+            data.update({"severity": severity})
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIST_INDICATORS_ENDPOINT)
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, data=json.dumps(data), method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_SUBMIT_INDICATOR_PARSE_ERR)
+        else:
+            action_result.add_data(response)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_SUBMIT_INDICATOR_PARSE_ERR)
+
+        summary = action_result.update_summary({})
+        summary['indicator_id'] = response.get('id')
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_run_query(self, param):
+        """ This function is used to handle the run query action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        query = param[DEFENDERATP_JSON_QUERY]
+
+        # prepare data parameters
+        data = {
+            "Query": query
+        }
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_RUN_QUERY_ENDPOINT)
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, data=json.dumps(data), method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        results = list()
+        if not response:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+        else:
+            results = response.get('Results', [])
+            for result in results:
+                action_result.add_data(result)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
+
+        summary = action_result.update_summary({})
+        summary['total_results'] = len(results)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _get_discovered_vulnerabilities(self, param):
+        """ This function is used to handle the get doscovered vulnerabilities action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL,
+                                     DEFENDERATP_VULNERABILITIES_ENDPOINT.format(device_id=device_id))
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        for software in response.get('value', []):
+            action_result.add_data(software)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No vulnerabilities found for the given device")
+
+        summary = action_result.update_summary({})
+        summary['total_vulnerabilities'] = action_result.get_data_size()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_score(self, param):
+        """ This function is used to handle the get exposure score and get secure score action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        action_identifier = self.get_action_identifier()
+        self.save_progress("In action handler for {}".format(action_identifier))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if action_identifier == "get_exposure_score":
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_EXPOSURE_ENDPOINT)
+            action_score_summary_key = 'exposure_score'
+
+        elif action_identifier == "get_secure_score":
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_SECURE_ENDPOINT)
+            action_score_summary_key = 'secure_score'
+
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if response:
+            action_result.add_data(response)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+
+        summary = action_result.update_summary({})
+        summary[action_score_summary_key] = response.get('score')
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _vault_file(self, filename=None, content=None):
+
+        if not filename or not content:
+            return "Error: one or more arguments are null value", None
+
+        gzip_filename = "{}.gz".format(filename)
+        guid = uuid.uuid4()
+
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            temp_dir = Vault.get_vault_tmp_dir()
+        else:
+            temp_dir = '/vault/tmp'
+
+        local_dir = temp_dir + '/{}'.format(guid)
+        self.save_progress("Using temp directory: {0}".format(guid))
+
+        try:
+            os.makedirs(local_dir)
+        except:
+            return "Error while creating directory", None
+
+        gzip_file_path = "{0}/{1}".format(local_dir, gzip_filename)
+        file_path = "{0}/{1}".format(local_dir, filename)
+
+        with open(gzip_file_path, 'wb') as f:
+            f.write(content)
+
+        try:
+            with gzip.open(gzip_file_path, 'rb') as f_in:
+                with open(file_path, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+        except:
+            with open(file_path, 'wb') as f_out:
+                f_out.write(content)
+
+        try:
+            # Adding file to vault
+            success, _, vault_id = ph_rules.vault_add(file_location=file_path, container=self.get_container_id(), file_name=filename)
+        except:
+            return "Error: Unable to add the file to vault", None
+
+        if not success:
+            return "Error: Unable to add the file to vault", None
+
+        try:
+            _, _, fileinfo = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id())
+            fileinfo = list(fileinfo)
+        except:
+            return "Error: Vault file error, newly vaulted file not found; {}".format(vault_id), None
+
+        if len(fileinfo) == 0:
+            return "Error: Vault file error, newly vaulted file not found; {}".format(vault_id), None
+
+        return True, vault_id
+
+    def _get_live_response_result(self, action_id, action_result):
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL,
+                                     DEFENDERATP_LIVE_RESPONSE_RESULT_ENDPOINT.format(action_id=action_id))
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status(), None
+
+        if response.get("value"):
+            response = requests.get(response["value"])
+            if response.status_code == 200:
+                return action_result.set_status(phantom.APP_SUCCESS), response
+
+        return action_result.set_status(phantom.APP_ERROR, "No result found for live response action"), None
+
+    def _handle_get_file_live_response(self, param):
+        """ This function is used to handle the get file action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        file_path = param[DEFENDERATP_JSON_FILE_PATH]
+        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
+        comment = param[DEFENDERATP_JSON_COMMENT]
+
+        timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
+
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
+                                   .format(device_id=device_id))
+
+        data = {
+            'Comment': comment,
+            'Commands': [
+                {
+                    "type": "GetFile",
+                    "params": [
+                        {
+                            "key": "Path",
+                            "value": file_path
+                        }
+                    ]
+                }
+            ]
+        }
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
+                                                 data=json.dumps(data))
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response.get('id'):
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+
+        action_id = response['id']
+        summary = action_result.update_summary({})
+        summary['event_id'] = action_id
+
+        # Wait till the status of the action gets updated
+        status, response = self._status_wait(action_result, action_id, timeout)
+
+        if phantom.is_fail(status):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+        status = response.get("status")
+
+        self.debug_print("Status of live response action: {}".format(status))
+        self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+
+        summary['get_file_status'] = status
+        if status != DEFENDERATP_STATUS_SUCCESS:
+            if status == DEFENDERATP_STATUS_FAILED:
+                return action_result.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        # getting live response result
+        ret_val, result = self._get_live_response_result(action_id, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not result:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+
+        file_name = file_path.split('\\')[-1]
+
+        ret_val, vault_id = self._vault_file(filename=file_name, content=result.content)
+
+        if ret_val is not True:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to vault")
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully added file to vault. vault_id: {}".format(vault_id))
+
+    def _handle_put_file_live_response(self, param):
+        """ This function is used to handle the put file action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        file_name = param[DEFENDERATP_JSON_FILE_NAME]
+        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
+        comment = param[DEFENDERATP_JSON_COMMENT]
+
+        timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
+
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
+                                   .format(device_id=device_id))
+
+        data = {
+            'Comment': comment,
+            'Commands': [
+                {
+                    "type": "PutFile",
+                    "params": [
+                        {
+                            "key": "FileName",
+                            "value": file_name
+                        }
+                    ]
+                }
+            ]
+        }
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
+                                                 data=json.dumps(data))
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response.get('id'):
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+
+        action_id = response['id']
+        summary = action_result.update_summary({})
+        summary['event_id'] = action_id
+
+        # Wait till the status of the action gets updated
+        status, response = self._status_wait(action_result, action_id, timeout)
+
+        status = response.get("status")
+        self.debug_print("Status of live response action: {}".format(status))
+        self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+
+        if phantom.is_fail(status):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        summary = action_result.update_summary({})
+        summary['put_file_status'] = status
+
+        if status == DEFENDERATP_STATUS_FAILED:
+            return action_result.set_status(phantom.APP_ERROR)
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_run_script_live_response(self, param):
+        """ This function is used to handle the run script action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        script_name = param[DEFENDERATP_JSON_SCRIPT_NAME]
+        script_args = param.get(DEFENDERATP_JSON_SCRIPT_ARGS)
+        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
+        comment = param[DEFENDERATP_JSON_COMMENT]
+
+        timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
+
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if timeout > DEFENDERATP_RUN_SCRIPT_MAX_LIMIT:
+            timeout = DEFENDERATP_RUN_SCRIPT_MAX_LIMIT
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
+                                   .format(device_id=device_id))
+
+        if script_args:
+            data = {
+                'Comment': comment,
+                'Commands': [
+                    {
+                        "type": "RunScript",
+                        "params": [
+                            {
+                                "key": "ScriptName",
+                                "value": script_name
+                            },
+                            {
+                                "key": "Args",
+                                "value": script_args
+                            }
+                        ]
+                    }
+                ]
+            }
+        else:
+            data = {
+                'Comment': comment,
+                'Commands': [
+                    {
+                        "type": "RunScript",
+                        "params": [
+                            {
+                                "key": "ScriptName",
+                                "value": script_name
+                            }
+                        ]
+                    }
+                ]
+            }
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
+                                                 data=json.dumps(data))
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not response.get('id'):
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
+
+        action_id = response['id']
+        summary = action_result.update_summary({})
+        summary['event_id'] = action_id
+
+        # Wait till the status of the action gets updated
+        status, response = self._status_wait(action_result, action_id, timeout)
+
+        if phantom.is_fail(status):
+            return action_result.get_status()
+
+        status = response.get("status")
+        self.debug_print("Status of live response action: {}".format(status))
+        self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+
+        summary['run_script_status'] = status
+        if status != DEFENDERATP_STATUS_SUCCESS:
+            if status == DEFENDERATP_STATUS_FAILED:
+                return action_result.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        # getting live response result
+        ret_val, result = self._get_live_response_result(action_id, action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if not result:
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+
+        try:
+            # Process a json response
+            resp_json = result.json()
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
+                                                   .format(self._get_error_message_from_exception(e)))
+        action_result.add_data(resp_json)
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully executed script")
+
+    def _handle_get_missing_kbs(self, param):
+        """ This function is used to handle the get missing kbs action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+        """
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MISSING_KBS_ENDPOINT
+                                   .format(device_id=device_id))
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        for kb in response.get('value', []):
+            action_result.add_data(kb)
+
+        if not action_result.get_data_size():
+            return action_result.set_status(phantom.APP_ERROR, "No missing kbs found for the given device")
+
+        summary = action_result.update_summary({})
+        summary['total_kbs'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1642,7 +2325,20 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'get_file_related_devices': self._handle_get_related_devices,
             'get_user_related_devices': self._handle_get_related_devices,
             'get_installed_software': self._handle_get_installed_software,
-            'restrict_app_execution': self._handle_restrict_app_execution
+            'restrict_app_execution': self._handle_app_execution,
+            'remove_app_restriction': self._handle_app_execution,
+            'list_indicators': self._handle_list_indicators,
+            'delete_indicator': self._handle_delete_indicator,
+            'submit_indicator': self._handle_submit_indicator,
+            'run_query': self._handle_run_query,
+            'get_domain_related_devices': self._handle_get_related_devices,
+            'get_discovered_vulnerabilities': self._get_discovered_vulnerabilities,
+            'get_exposure_score': self._handle_get_score,
+            'get_secure_score': self._handle_get_score,
+            'get_file_live_response': self._handle_get_file_live_response,
+            'put_file_live_response': self._handle_put_file_live_response,
+            'run_script_live_response': self._handle_run_script_live_response,
+            'get_missing_kbs': self._handle_get_missing_kbs
         }
 
         action = self.get_action_identifier()

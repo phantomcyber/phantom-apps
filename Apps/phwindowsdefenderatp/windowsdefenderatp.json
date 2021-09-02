@@ -2417,7 +2417,6 @@
                     "example_values": [
                         "Action taken: Retrieved Alert"
                     ]
-
                 },
                 {
                     "data_path": "action_result.summary.action_taken",
@@ -3472,7 +3471,7 @@
                     "example_values": [
                         "https://api.securitycenter.windows.com/api/$metadata#Files/$entity"
                     ],
-                    "contains":[
+                    "contains": [
                         "url"
                     ]
                 },
@@ -4217,7 +4216,6 @@
                     ],
                     "column_name": "Software Name",
                     "column_order": 2
-                    
                 },
                 {
                     "data_path": "action_result.data.*.vendor",
@@ -4327,10 +4325,11 @@
         {
             "action": "restrict app execution",
             "description": "Restrict execution of all applications on the device except a predefined set",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/restrict-code-execution?view=o365-worldwide\" target=\"_blank\">Restrict app execution API Documentation</a>), the user can restrict execution of all applications on the device except a predefined set, rate limitations for this API are 100 calls per minute and 1500 calls per hour.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 minute.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/restrict-code-execution?view=o365-worldwide\" target=\"_blank\">Restrict app execution API Documentation</a>), rate limitations for this API are 100 calls per minute and 1500 calls per hour.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 minute.",
             "type": "contain",
             "identifier": "restrict_app_execution",
             "read_only": false,
+            "undo": "remove app restriction",
             "parameters": {
                 "device_id": {
                     "description": "ID of the device",
@@ -4476,15 +4475,15 @@
                     "data_path": "action_result.data.*.requestor",
                     "data_type": "string",
                     "example_values": [
-                        "testuser@example.com"
-                    ],
-                    "contains": [
-                        "email"
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.requestorComment",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Restrict code execution due to alert 1234"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.scope",
@@ -4496,7 +4495,7 @@
                     "example_values": [
                         "Succeeded"
                     ],
-                    "column_name": "Quarantine Status",
+                    "column_name": "Status",
                     "column_order": 4
                 },
                 {
@@ -4563,6 +4562,2718 @@
                     "data_type": "string",
                     "example_values": [
                         "Pending"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+
+        {
+            "action": "list indicators",
+            "description": "Retrieve a collection of all active Indicators",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ti-indicators-collection?view=o365-worldwide\" target=\"_blank\">List Indicators API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 indicators by default. The maximum value for the limit parameter is 10000.",
+            "type": "investigate",
+            "identifier": "list_indicators",
+            "read_only": true,
+            "parameters": {
+                "filter": {
+                    "description": "Additional OData V4 filters to apply",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "limit": {
+                    "description": "Maximum number of indicators to return (Maximum: 10,000)",
+                    "data_type": "numeric",
+                    "default": 100,
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13"
+                    ],
+                    "column_name": "Indicator ID",
+                    "column_order": 0,
+                    "contains": [
+                        "defender atp indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
+                    ],
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allowed"
+                    ],
+                    "column_name": "Action",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Informational"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman@phantomengineering.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Created By",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.educateUrl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test-ATP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.generateAlert",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorType",
+                    "data_type": "string",
+                    "example_values": [
+                        "FileSha1"
+                    ],
+                    "column_name": "Indicator Type",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdatedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.additionalInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expirationTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-26T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "63b79504702c9c977e7165ad75d2e6989b2c5962"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "sha256",
+                        "domain",
+                        "ip",
+                        "ipv6",
+                        "url"
+                    ],
+                    "column_name": "Indicator Value",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-25T12:30:51.7457726Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lookBackPeriod",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.notificationId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificateInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdBySource",
+                    "data_type": "string",
+                    "example_values": [
+                        "Portal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notificationBody",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.recommendedActions",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.bypassDurationHours",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.historicalDetection",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdByDisplayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Herman@phantomengineering.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationTimeDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-25T12:30:51.7279453Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total indicators: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_indicators",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "severity+eq+'Informational'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "submit indicator",
+            "description": "Retrieve a collection of all active Indicators",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ti-indicators-collection?view=o365-worldwide\" target=\"_blank\">List Indicators API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 indicators by default. The maximum value for the limit parameter is 10000.",
+            "type": "correct",
+            "identifier": "submit_indicator",
+            "read_only": false,
+            "parameters": {
+                "title": {
+                    "description": "Indicator alert title",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "description": {
+                    "description": "Description of the indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "indicator_type": {
+                    "description": "Type of the indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "FileSha1",
+                        "FileSha256",
+                        "IpAddress",
+                        "DomainName",
+                        "Url"
+                    ],
+                    "order": 2
+                },
+                "indicator_value": {
+                    "description": "Identity of the Indicator entity",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1",
+                        "sha256",
+                        "ip",
+                        "ipv6",
+                        "url",
+                        "domain"
+                    ],
+                    "order": 3
+                },
+                "action": {
+                    "description": "The action that will be taken if the indicator will be discovered in the organization",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Alert",
+                        "AlertAndBlock",
+                        "Allowed"
+                    ],
+                    "order": 4
+                },
+                "application": {
+                    "description": "The application associated with the indicator",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "expiration_time": {
+                    "description": "The expiration time of the indicator",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "severity": {
+                    "description": "The severity of the indicator",
+                    "data_type": "string",
+                    "value_list": [
+                        "",
+                        "Informational",
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "order": 7
+                },
+                "recommended_actions": {
+                    "description": "TI indicator alert recommended actions",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "rbac_group_names": {
+                    "description": "Comma-separated list of RBAC group names the indicator would be applied to",
+                    "data_type": "string",
+                    "order": 9
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "17"
+                    ],
+                    "contains": [
+                        "defender atp indicator id"
+                    ],
+                    "column_name": "Indicator ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test 1"
+                    ],
+                    "column_name": "Title",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allowed"
+                    ],
+                    "column_name": "Action",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.category",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
+                    ],
+                    "column_name": "Created By",
+                    "column_order": 4,
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.educateUrl",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.generateAlert",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorType",
+                    "data_type": "string",
+                    "example_values": [
+                        "DomainName"
+                    ],
+                    "column_name": "Indicator Type",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdatedBy",
+                    "data_type": "string",
+                    "example_values": [
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#Indicators/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.additionalInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.expirationTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-07T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.indicatorValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk.com"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "sha1",
+                        "sha256",
+                        "domain",
+                        "url"
+                    ],
+                    "column_name": "Indicator Value",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-27T12:55:42.0621261Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lookBackPeriod",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.notificationId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificateInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.createdBySource",
+                    "data_type": "string",
+                    "example_values": [
+                        "PublicApi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.notificationBody",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.recommendedActions",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Actions"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bypassDurationHours",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.historicalDetection",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdByDisplayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "WindowsDefenderATPSiemConnector"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationTimeDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-27T12:50:54.882519Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Indicator id: 17"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.indicator_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "17"
+                    ],
+                    "contains": [
+                        "defender atp indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "Allowed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.application",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test App"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "DomainName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.expiration_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-07T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_value",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain.com"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "sha256",
+                        "ip",
+                        "ipv6",
+                        "url",
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.rbac_group_names",
+                    "data_type": "string",
+                    "example_values": [
+                        "Group1, Group2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recommended_actions",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Actions"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete indicator",
+            "description": "Delete an Indicator entity by ID",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ti-indicators-collection?view=o365-worldwide\" target=\"_blank\">List Indicators API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 indicators by default. The maximum value for the limit parameter is 10000.",
+            "type": "contain",
+            "identifier": "delete_indicator",
+            "read_only": false,
+            "parameters": {
+                "indicator_id": {
+                    "description": "Indicator ID to delete",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "defender atp indicator id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted indicator entity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "16"
+                    ],
+                    "contains": [
+                        "defender atp indicator id"
+                    ],
+                    "column_name": "Indicator ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "An advanced search query",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-advanced-query-api?view=o365-worldwide\" target=\"_blank\">Advanced Hunting API Documentation</a>), <li>rate limitations for this action are 45 calls per minute and 1500 calls per hour.</li><li>You can only run a query on data from the last 30 days.</li><li>The execution time is 10 minutes for every hour and 3 hours of running time a day. The maximal execution time of a single request is 10 minutes.</li><li>The maximum query result size of a single request cannot exceed 124 MB. If exceeded, HTTP 400 Bad Request with the message \"Query execution has exceeded the allowed result size. Optimize your query by limiting the amount of results and try again\" will appear.</li><li>The 429 response indicates that you have reached your quota limit, either in terms of requests or CPU usage. To figure out what limit has been reached, read the response body.</li>",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "query": {
+                    "description": "Query to fetch results",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.DeviceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "803c416946e8738b7711903a28362adeae6e1aea"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.FileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "csc.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.Timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T14:26:49.1338079Z"
+                    ],
+                    "column_name": "Timestamp",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.InitiatingProcessFileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "powershell.exe"
+                    ],
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "Initiating Process File Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total results: 2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "DeviceProcessEvents   |where InitiatingProcessFileName =~ 'powershell.exe' |where ProcessCommandLine contains 'appdata' |project Timestamp, FileName, InitiatingProcessFileName, DeviceId |limit 2"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+
+        {
+            "action": "get domain devices",
+            "description": "Retrieve a collection of devices that have communicated to or from a given domain address",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-domain-related-machines?view=o365-worldwide\" target=\"_blank\">Get domain related machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. You can query on devices last updated according to your configured retention period.",
+            "type": "investigate",
+            "identifier": "get_domain_related_devices",
+            "read_only": true,
+            "parameters": {
+                "domain": {
+                    "description": "Domain to get the devices",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "domain"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "abctest.com"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "803c416946e8738b7711903a28362adeae6e1aea"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osBuild",
+                    "data_type": "numeric",
+                    "example_values": [
+                        19042
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "20H2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-04T13:40:25.2473895Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.firstSeen",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-02T06:12:16.3736341Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.riskScore",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osPlatform",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.vmId",
+                    "data_type": "string",
+                    "example_values": [
+                        "238443dc-56ce-487f-aeb6-261a2a00a38c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.resourceId",
+                    "data_type": "string",
+                    "example_values": [
+                        "/subscriptions/1b922e46-8595-4749-997a-1205e714cd91/resourceGroups/evaluation_3e5d447ba5d6470b9636a8709cd5b26a_4/providers/Test.Compute/virtualMachines/TestMachine4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.cloudProvider",
+                    "data_type": "string",
+                    "example_values": [
+                        "TestCloudProvider"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata.subscriptionId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b922e46-8595-4749-997a-1205e714cd91"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.aadDeviceId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deviceValue",
+                    "data_type": "string",
+                    "example_values": [
+                        "Normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Ethernet"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.macAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "000D3A7B423C"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipAddresses.*.operationalStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Up"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isAadJoined",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.osProcessor",
+                    "data_type": "string",
+                    "example_values": [
+                        "x64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agentVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.7740.19041.1110"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.healthStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Inactive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exposureLevel",
+                    "data_type": "string",
+                    "example_values": [
+                        "Medium"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.1.1.4"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.osArchitecture",
+                    "data_type": "string",
+                    "example_values": [
+                        "64-bit"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmachine4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.defenderAvStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Updated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.onboardingStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Onboarded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastExternalIpAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "137.116.83.101"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vmMetadata",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_devices",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total devices: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.display_devices",
+                "title": "Get Report"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get discovered vulnerabilities",
+            "description": "Retrieve a collection of discovered vulnerabilities related to a given device ID",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-discovered-vulnerabilities?view=o365-worldwide\" target=\"_blank\">Get discovered vulnerabilities API Documentation</a>), rate limitations for this API are 50 calls per minute and 1500 calls per hour.",
+            "type": "investigate",
+            "identifier": "get_discovered_vulnerabilities",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-2021-30600"
+                    ],
+                    "column_name": "Vulnerability ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "CVE-2021-30600"
+                    ],
+                    "column_name": "Vulnerability Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.cvssV3",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8.8
+                    ],
+                    "column_name": "CvssV3",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "High"
+                    ],
+                    "column_name": "Severity",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.updatedOn",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-23T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows User Profile Service Elevation of Privilege Vulnerability"
+                    ],
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.publishedOn",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-16T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exploitInKit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.publicExploit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exploitVerified",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exposedMachines",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ],
+                    "column_name": "Exposed Machines",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total vulnerabilities: 7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_vulnerabilities",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exploitUris",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2021-36934"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exploitTypes",
+                    "data_type": "string",
+                    "example_values": [
+                        "Local"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove app restriction",
+            "description": "Enable execution of any application on the device",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/unrestrict-code-execution?view=o365-worldwide\" target=\"_blank\">Remove app restriction API Documentation</a>), rate limitations for this API are 100 calls per minute and 1500 calls per hour.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 1 minute.",
+            "type": "contain",
+            "identifier": "remove_app_restriction",
+            "read_only": false,
+            "undo": "restrict app execution",
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 30)",
+                    "data_type": "numeric",
+                    "default": 30,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unrestrict code execution since machine was cleaned and validated"
+                    ],
+                    "column_name": "Comment",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        30
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10atp2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.error",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-03T08:50:05.8076226Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
+                    ],
+                    "contains": [
+                        "sha1",
+                        "defender atp machine id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Unrestrict code execution since machine was cleaned and validated"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "UnrestrictCodeExecution"
+                    ],
+                    "column_name": "Event Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "PublicApi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.troubleshootInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: cd2ab57e-5b52-43b0-99d8-c370fc620a54, Restriction status: Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.restriction_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pending"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get exposure score",
+            "description": "Retrieve the organizational exposure score",
+            "type": "investigate",
+            "identifier": "get_exposure_score",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-31T10:41:12.6341624Z"
+                    ],
+                    "column_name": "Time",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        46.23333333333333
+                    ],
+                    "column_name": "Exposure Score",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "string",
+                    "column_name": "RbacGroupId",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string",
+                    "column_name": "RbacGroupName",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#ExposureScore/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Exposure score: 46.23333333333333"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.exposure_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        46.23333333333333
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get secure score",
+            "description": "Retrieve your Microsoft Secure Score for devices",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-device-secure-score?view=o365-worldwide\" target=\"_blank\">Get device secure score API Documentation</a>), a higher Microsoft Secure Score for devices means your endpoints are more resilient from cybersecurity threat attacks.",
+            "type": "investigate",
+            "identifier": "get_secure_score",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-08-31T10:55:48.6805335Z"
+                    ],
+                    "column_name": "Time",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        350
+                    ],
+                    "column_name": "Secure Score",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupId",
+                    "data_type": "string",
+                    "column_name": "RbacGroupId",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.rbacGroupName",
+                    "data_type": "string",
+                    "column_name": "RbacGroupName",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#ConfigurationScore/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Secure score: 350.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.secure_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        350
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+
+        {
+            "action": "get file",
+            "description": "Download a file from a device using live response",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can collect file from a device in the vault, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.",
+            "type": "generic",
+            "identifier": "get_file_live_response",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "file_path": {
+                    "description": "Path of the file to download from device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "file path"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 300)",
+                    "data_type": "numeric",
+                    "default": 300,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Testing get file live response"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Users\\administrator1\\Desktop\\Test\\one.txt"
+                    ],
+                    "contains": [
+                        "file path"
+                    ],
+                    "column_name": "File Path",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.get_file_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added file to vault. vault_id: 7553f175dbbfa2f0830bebe8c367fe68fd40a9a4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "81238f5f-f525-4b33-85e1-4460c5465ea4"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "LiveResponse"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.index",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "GetFile"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.params.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "Path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.params.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "C:\\Users\\administrator1\\Desktop\\test\\one.txt"
+                    ],
+                    "contains": [
+                        "file path"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.endTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T09:20:33.353Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.startTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.commandStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Completed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "51e978e9c3cd646dde81162f0517f13b8697cfcb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "PublicApi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmachine7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.troubleshootInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T09:17:58.4219929Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T09:21:19.11422Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "put file",
+            "description": "Put a file from the library to a device using live response",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can put a file from the library to the device, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.",
+            "type": "generic",
+            "identifier": "put_file_live_response",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "file_name": {
+                    "description": "Name of the file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 300)",
+                    "data_type": "numeric",
+                    "default": 300,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Testing put file live response"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Device ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "one.txt"
+                    ],
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "File name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.put_file_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event id: 30f736e4-1538-46ca-b21f-8f315b096077, Put file status: Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "30f736e4-1538-46ca-b21f-8f315b096077"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "LiveResponse"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.index",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "PutFile"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.params.*.key",
+                    "data_type": "string",
+                    "example_values": [
+                        "FileName"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.command.params.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "one.txt"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.endTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T06:43:33.717Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.startTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T06:43:32.42Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.commands.*.commandStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Completed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineId",
+                    "data_type": "string",
+                    "example_values": [
+                        "51e978e9c3cd646dde81162f0517f13b8697cfcb"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestor",
+                    "data_type": "string",
+                    "example_values": [
+                        "65265db5-a7ca-4199-a425-f37ad1dd6d31"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.errorHResult",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requestSource",
+                    "data_type": "string",
+                    "example_values": [
+                        "PublicApi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.@odata.context",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.computerDnsName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testmachine7"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.relatedFileInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requestorComment",
+                    "data_type": "string",
+                    "example_values": [
+                        "putfile"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.troubleshootInfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationComment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.creationDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T06:40:58.9203082Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationRequestor",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.lastUpdateDateTimeUtc",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-01T06:44:17.161248Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cancellationDateTimeUtc",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run script",
+            "description": "Run a script from the library on a device using live response",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can run a script from the library on a device. The script_args parameter is passed to your script, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes",
+            "type": "generic",
+            "identifier": "run_script_live_response",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                },
+                "script_name": {
+                    "description": "Name of the script file to execute on the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "file name"
+                    ],
+                    "order": 1
+                },
+                "script_args": {
+                    "description": "Arguments of the script file",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "comment": {
+                    "description": "Comment",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 3
+                },
+                "timeout": {
+                    "description": "Timeout in seconds (Default: 300)",
+                    "data_type": "numeric",
+                    "default": 300,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string",
+                    "example_values": [
+                        "Testing live response for run script"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.script_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "minidump.ps1"
+                    ],
+                    "contains": [
+                        "file name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.script_args",
+                    "data_type": "string",
+                    "example_values": [
+                        "OfficeClickToRun"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.run_script_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "6925706d-3a7e-4596-b2d7-321fca9cd965"
+                    ],
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully executed script"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exit_code",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ],
+                    "column_name": "Exit Code",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.script_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "script4.ps1"
+                    ],
+                    "column_name": "Script Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.script_errors",
+                    "data_type": "string",
+                    "column_name": "Script Errors",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.script_output",
+                    "data_type": "string",
+                    "example_values": [
+                        "Transcript started, output file is C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Temp\\PSScriptOutputs\\PSScript_Transcript_{66D7B239-34C7-43EF-BB6D-2F6D4C03086E}.txt x is smaller than y"
+                    ],
+                    "column_name": "Script Output",
+                    "column_order": 0
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get missing kbs",
+            "description": "Retrieve missing KBs (security updates) by given device ID",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-missing-kbs-machine?view=o365-worldwide\" target=\"_blank\">Get missing KBs API Documentation</a>), the user can retrieve a collection of missing security updated related to a given device ID.",
+            "type": "investigate",
+            "identifier": "get_missing_kbs",
+            "read_only": true,
+            "parameters": {
+                "device_id": {
+                    "description": "ID of the device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "sha1"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7af22c8a3f92ec0c9c49b80aee3379bf9bfa0768"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total KBs: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_kbs",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "5005033"
+                    ],
+                    "column_name": "KB ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://catalog.update.microsoft.com/v7/site/Search.aspx?q=KB5005033"
+                    ],
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "August 2021 Security Updates"
+                    ],
+                    "column_name": "KB Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.osBuild",
+                    "data_type": "numeric",
+                    "example_values": [
+                        19042
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.cveAddressed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        26
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.productsNames",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows_10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.machineMissedOn",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],

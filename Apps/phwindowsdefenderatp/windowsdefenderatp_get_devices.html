@@ -100,13 +100,28 @@
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                     </td>
-                {% else %}
+                {% elif result.param.user_id %}
                     <td>User ID</td>
                     <td><a href="javascript:;"
                         onclick="context_menu(this, [{'contains': ['user name'], 'value': '{{ result.param.user_id }}' }], 0, {{ container.id }}, null, false);">
                         {{ result.param.user_id }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                {% elif result.param.domain %}
+                    <td>Domain</td>
+                    <td><a href="javascript:;"
+                        onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ result.param.domain }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.domain }}
+                        &nbsp;
+                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                {% else %}
+                    <td>
+                        <a style="font-weight: normal;">
+                        Param in the result did not match with available values
                         </a>
                     </td>
                 {% endif %}          
