@@ -219,7 +219,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to quarantine",
+                    "description": "The IP or hostname of an endpoint to quarantine",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -293,7 +293,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to unquarantine",
+                    "description": "The IP or hostname of an endpoint to unquarantine",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -930,7 +930,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to scan",
+                    "description": "The IP or hostname of an endpoint to scan",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1002,7 +1002,7 @@
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to get information",
+                    "description": "The IP or hostname of an endpoint to get information",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
