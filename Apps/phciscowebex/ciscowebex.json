@@ -173,7 +173,7 @@
             "read_only": false,
             "parameters": {
                 "email_address": {
-                    "description": "user webex e-mail address",
+                    "description": "User webex e-mail address",
                     "data_type": "string",
                     "required": true,
                     "contains": [
@@ -367,7 +367,7 @@
                     "order": 1
                 },
                 "message": {
-                    "description": "message",
+                    "description": "Message"
                     "data_type": "string",
                     "required": true,
                     "order": 2
