@@ -333,9 +333,14 @@ class FireeyeHxConnector(BaseConnector):
                     stream=True)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
+                self.debug_print(self._get_error_message_from_exception(error_msg))
                 return RetVal(
-                    action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)),
-                    resp_json)
+                    action_result.set_status(
+                        phantom.APP_ERROR,
+                        FIREEYEHX_ERR_CONNECTING_TO_SERVER.format(error=error_msg),
+                    ),
+                    resp_json
+                )
 
         else:
             try:
@@ -347,9 +352,14 @@ class FireeyeHxConnector(BaseConnector):
                     params=params)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
+                self.debug_print(self._get_error_message_from_exception(error_msg))
                 return RetVal(
-                    action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)),
-                    resp_json)
+                    action_result.set_status(
+                        phantom.APP_ERROR,
+                        FIREEYEHX_ERR_CONNECTING_TO_SERVER.format(error=error_msg),
+                    ),
+                    resp_json
+                )
 
         return self._process_response(r, action_result)
 
