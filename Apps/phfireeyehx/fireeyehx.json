@@ -445,7 +445,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.Hostname",
+                    "data_path": "action_result.summary.hostname",
                     "data_type": "string",
                     "example_values": [
                         "random_565_4"
@@ -455,7 +455,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.Primary IP",
+                    "data_path": "action_result.summary.primary_ip",
                     "data_type": "string",
                     "example_values": [
                         "10.1.1.1"
@@ -560,6 +560,10 @@
                     "example_values": [
                         "value"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -831,6 +835,10 @@
                     "example_values": [
                         "value"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1345,14 +1353,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.ID",
+                    "data_path": "action_result.summary.id",
                     "data_type": "numeric",
                     "example_values": [
                         5
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.State",
+                    "data_path": "action_result.summary.state",
                     "data_type": "string",
                     "example_values": [
                         "NEW"

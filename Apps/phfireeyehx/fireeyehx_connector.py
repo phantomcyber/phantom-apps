@@ -108,7 +108,7 @@ class FireeyeHxConnector(BaseConnector):
 
         return response
 
-    def _process_empty_reponse(self, response, action_result):
+    def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
@@ -265,7 +265,7 @@ class FireeyeHxConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -274,7 +274,7 @@ class FireeyeHxConnector(BaseConnector):
 
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
-            return self._process_empty_reponse(r, action_result)
+            return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
@@ -312,7 +312,7 @@ class FireeyeHxConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        hx_url = config.get("hx_hostname")
+        hx_url = config.get("hx_hostname").rstrip('/')
 
         hx_port = config.get("hx_port")
         # Integer validation for 'hx_port' configuration parameter
@@ -377,7 +377,7 @@ class FireeyeHxConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        hx_url = config.get("hx_hostname")
+        hx_url = config.get("hx_hostname").rstrip('/')
 
         hx_port = config.get("hx_port")
         # Integer validation for 'hx_port' configuration parameter
@@ -719,8 +719,8 @@ class FireeyeHxConnector(BaseConnector):
         summary = action_result.update_summary({})
         sum_state = response.get('state')
         sum_id = response.get('_id')
-        summary['State'] = sum_state
-        summary['ID'] = sum_id
+        summary['state'] = sum_state
+        summary['id'] = sum_id
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -762,8 +762,8 @@ class FireeyeHxConnector(BaseConnector):
         summary = action_result.update_summary({})
         sum_hostname = response.get('data', {}).get('hostname')
         sum_ip = response.get('data', {}).get('primaryIpAddress')
-        summary['Hostname'] = sum_hostname
-        summary['Primary IP'] = sum_ip
+        summary['hostname'] = sum_hostname
+        summary['primary_ip'] = sum_ip
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -806,7 +806,7 @@ class FireeyeHxConnector(BaseConnector):
         # action_result.add_data({})
         summary = action_result.update_summary({})
         sum_message = response.get('message')
-        summary['Message'] = sum_message
+        summary['message'] = sum_message
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -932,7 +932,7 @@ class FireeyeHxConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         sum_message = response['message']
-        summary['Message'] = sum_message
+        summary['message'] = sum_message
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
