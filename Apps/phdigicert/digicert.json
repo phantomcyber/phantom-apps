@@ -9,8 +9,8 @@
     "logo_dark": "digicert_dark.svg",
     "product_version_regex": ".*",
     "python_version": "3",
-    "publisher": "Splunk",
-    "license": "Copyright 2021 Splunk Inc.",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "2.0.0",
     "utctime_updated": "2021-05-04T21:37:1620164263Z",
     "package_name": "phantom_digicert",
@@ -64,7 +64,7 @@
             "read_only": false,
             "parameters": {
                 "csr": {
-                    "description": "vault_id OR vault_name of the certificate signing request (csr)",
+                    "description": "Vault_id OR vault_name of the certificate signing request (csr)",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -446,7 +446,7 @@
             "read_only": true,
             "parameters": {
                 "order_id": {
-                    "description": "certificate order id",
+                    "description": "Certificate order id",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
