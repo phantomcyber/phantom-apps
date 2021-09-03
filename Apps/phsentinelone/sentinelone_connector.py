@@ -187,12 +187,11 @@ class SentineloneConnector(BaseConnector):
         description = param['description']
         os_family = param['os_family']
         try:
-            sites = self._get_site_id(action_result)
+            site_ids = self._get_site_id(action_result)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
-        if sites:
-            for site in sites:
-                site_id = site.get('id')
+        if site_ids:
+            for site_id in site_ids:
                 self.save_progress('Agent query: {}'.format(site_id))
                 summary = action_result.update_summary({})
                 summary['hash'] = hash
@@ -672,7 +671,11 @@ class SentineloneConnector(BaseConnector):
             return str(-1)
         try:
             sites_found = response['data']['sites']
-            return sites_found
+            site_ids = []
+            for site in sites_found:
+                if site and site.get('id'):
+                    site_ids.append(site.get('id'))
+            return site_ids
         except KeyError:
             return action_result.set_status(phantom.APP_ERROR, "Error fetching sites")
 
