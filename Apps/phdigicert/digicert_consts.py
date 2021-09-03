@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # File: digicert_connector.py
 # Copyright (c) 2021 Splunk Inc.
 #
