@@ -526,7 +526,7 @@ class SentineloneConnector(BaseConnector):
             self.save_progress("Ret_val: {0}".format(ret_val))
             # giving time to fetch file and generate download_url
             time.sleep(30)
-            download_id = self._get_download_id(ip_hostname, action_result)
+            download_id = self._get_download_id(action_result)
             download_url = self._base_url + '/web/api/v2.1{}'.format(download_id)
             summary['download_url'] = download_url
             if phantom.is_fail(ret_val):
@@ -670,8 +670,11 @@ class SentineloneConnector(BaseConnector):
         site_id, response = self._make_rest_call('/web/api/v2.1/sites', action_result, headers=header, method='get')
         if phantom.is_fail(site_id):
             return str(-1)
-        sites_found = response['data']['sites']
-        return sites_found
+        try:
+            sites_found = response['data']['sites']
+            return sites_found
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error fetching sites")
 
     def _get_download_id(self, action_result):
         header = self.HEADER
@@ -680,15 +683,15 @@ class SentineloneConnector(BaseConnector):
             headers=header, method='get')
         if phantom.is_fail(download_id):
             return str(-1)
-        download_id_found = len(response['data'])
-        self.save_progress("Endpoints found: {}".format(str(download_id_found)))
-        action_result.add_data(response)
-        for i in range(100):
-            if response['data'][i]['agentId'] != " " and response['data'][i]['data']['downloadUrl'] != " ":
-                try:
+        try:
+            download_id_found = len(response['data'])
+            self.save_progress("Endpoints found: {}".format(str(download_id_found)))
+            action_result.add_data(response)
+            for i in range(100):
+                if response['data'][i]['agentId'] != " " and response['data'][i]['data']['downloadUrl'] != " ":
                     return response['data'][i]['data']['downloadUrl']
-                except KeyError:
-                    pass
+        except KeyError:
+            return action_result.set_status(phantom.APP_ERROR, "Error fetching download ids")
 
     def _handle_on_poll(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
