@@ -219,7 +219,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to quarantine",
+                    "description": "The IP or hostname of an endpoint to quarantine",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -293,7 +293,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to unquarantine",
+                    "description": "The IP or hostname of an endpoint to unquarantine",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -360,7 +360,7 @@
         {
             "action": "mitigate threat",
             "description": "Mitigate an identified threat",
-            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback</b>.",
+            "verbose": "Mitigate threats such as <b>kill</b>, <b>quarantine</b>, <b>remediate</b>, or <b>rollback-remediation</b>.",
             "type": "correct",
             "identifier": "mitigate_threat",
             "read_only": false,
@@ -376,15 +376,15 @@
                     "order": 0
                 },
                 "action": {
-                    "description": "Allowed values include: kill, quarantine, remediate, rollback, and disconnectFromNetwork",
+                    "description": "Allowed values include: kill, quarantine, remediate, rollback-remediation, and network-quarantine",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
                         "kill",
                         "quarantine",
                         "remediate",
-                        "rollback",
-                        "disconnectFromNetwork"
+                        "rollback-remediation",
+                        "network-quarantine"
                     ],
                     "default": "quarantine",
                     "order": 1
@@ -930,7 +930,7 @@
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to scan",
+                    "description": "The IP or hostname of an endpoint to scan",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1002,7 +1002,7 @@
             "read_only": true,
             "parameters": {
                 "ip_hostname": {
-                    "description": "The hostname of an endpoint to get information",
+                    "description": "The IP or hostname of an endpoint to get information",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
