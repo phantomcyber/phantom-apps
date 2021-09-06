@@ -4170,7 +4170,6 @@
         {
             "action": "get installed software",
             "description": "Retrieve a collection of installed software related to a given device ID",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-installed-software?view=o365-worldwide\" target=\"_blank\">Get Installed Software API Documentation</a>), the user can retrieve a collection of installed software related to a given device ID.",
             "type": "investigate",
             "identifier": "get_installed_software",
             "read_only": true,
@@ -4464,7 +4463,8 @@
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
-                        "sha1"
+                        "sha1",
+                        "defender atp machine id"
                     ]
                 },
                 {
