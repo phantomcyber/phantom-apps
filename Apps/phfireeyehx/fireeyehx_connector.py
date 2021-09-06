@@ -1142,6 +1142,12 @@ class FireeyeHxConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, FIREEYEHX_STATE_FILE_CORRUPT_ERR)
 
         # get the asset config
         config = self.get_config()
