@@ -3564,7 +3564,7 @@
         {
             "action": "get file devices",
             "description": "Retrieve a collection of devices related to a given file hash (SHA1)",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-file-related-machines?view=o365-worldwide\" target=\"_blank\">Get File Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The valid file identifier is SHA1",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-file-related-machines?view=o365-worldwide\" target=\"_blank\">Get File Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The valid file identifier is SHA1.<br>The action retrieves data of the last 30 days.",
             "type": "investigate",
             "identifier": "get_file_related_devices",
             "read_only": true,
@@ -3868,7 +3868,7 @@
         {
             "action": "get user devices",
             "description": "Retrieve a collection of devices related to a given user ID",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-user-related-machines?view=o365-worldwide\" target=\"_blank\">Get User Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The ID is not the full UPN, but only the user name. (for example, to retrieve machines for user1@contoso.com use user1 for user_id parameter).",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-user-related-machines?view=o365-worldwide\" target=\"_blank\">Get User Related Machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. The ID is not the full UPN, but only the user name. (for example, to retrieve machines for user1@contoso.com use user1 for user_id parameter).<br>The action retrieves data of the last 30 days.",
             "type": "investigate",
             "identifier": "get_user_related_devices",
             "read_only": true,
@@ -6979,7 +6979,7 @@
         {
             "action": "run script",
             "description": "Run a script from the library on a device using live response",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can run a script from the library on a device. The script_args parameter is passed to your script, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can run a script from the library on a device. The script_args parameter is passed to your script, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br>The maximum timeout period for a status check is 10 minutes.",
             "type": "generic",
             "identifier": "run_script_live_response",
             "read_only": false,
