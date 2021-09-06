@@ -299,7 +299,6 @@ class CiscoWebexConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _process_response(self, r, action_result):
-
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
@@ -434,7 +433,7 @@ s
             return action_result.set_status(phantom.APP_ERROR, status_message='Error while generating access_token')
 
         self._state[WEBEX_STR_TOKEN] = resp_json
-        self.save_state(self._state)  # TODO
+        self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
         self._state = self.load_state()
 
@@ -665,6 +664,9 @@ s
         else:
             ret_val, response = self._update_request(action_result, WEBEX_GET_ROOMS_ENDPOINT)
 
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         summary = action_result.update_summary({'total_rooms': 0})
         resp_value = response.get('items', [])
         if type(resp_value) != list:
@@ -690,6 +692,9 @@ s
             ret_val, response = self._make_rest_call_using_api_key(uri_endpoint, action_result, params=None)
         else:
             ret_val, response = self._update_request(action_result, uri_endpoint)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         summary = action_result.update_summary({'found_user': False})
         resp_value = response.get('items', [])
@@ -729,6 +734,9 @@ s
             ret_val, response = self._make_rest_call_using_api_key(uri_endpoint, action_result, data=data, method="post")
         else:
             ret_val, response = self._update_request(action_result, uri_endpoint, data=data, method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         action_result.add_data(response)
 
