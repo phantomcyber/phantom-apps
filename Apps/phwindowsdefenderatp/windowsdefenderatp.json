@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.3.0",
+    "app_version": "3.4.0",
     "utctime_updated": "2021-08-08T12:07:47.000000Z",
     "package_name": "phantom_windowsdefenderatp",
     "main_module": "windowsdefenderatp_connector.py",
@@ -4674,9 +4674,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.generateAlert",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -4760,16 +4761,17 @@
                 },
                 {
                     "data_path": "action_result.data.*.historicalDetection",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdByDisplayName",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@phantomengineering.onmicrosoft.com"
+                        "testuser@domain.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -4840,9 +4842,9 @@
         },
         {
             "action": "submit indicator",
-            "description": "Retrieve a collection of all active Indicators",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ti-indicators-collection?view=o365-worldwide\" target=\"_blank\">List Indicators API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 indicators by default. The maximum value for the limit parameter is 10000.",
-            "type": "correct",
+            "description": "Submit or Update new Indicator entity",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/post-ti-indicator?view=o365-worldwide\" target=\"_blank\">Submit or Update Indicator API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. There is a limit of 15,000 active indicators per tenant.",
+            "type": "generic",
             "identifier": "submit_indicator",
             "read_only": false,
             "parameters": {
@@ -4911,7 +4913,6 @@
                     "description": "The severity of the indicator",
                     "data_type": "string",
                     "value_list": [
-                        "",
                         "Informational",
                         "Low",
                         "Medium",
@@ -5014,9 +5015,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.generateAlert",
-                    "data_type": "numeric",
+                    "data_type": "boolean",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -5060,7 +5062,7 @@
                     "data_path": "action_result.data.*.indicatorValue",
                     "data_type": "string",
                     "example_values": [
-                        "splunk.com"
+                        "test.com"
                     ],
                     "contains": [
                         "ip",
@@ -5262,8 +5264,8 @@
         {
             "action": "delete indicator",
             "description": "Delete an Indicator entity by ID",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-ti-indicators-collection?view=o365-worldwide\" target=\"_blank\">List Indicators API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. If the user does not specify the limit value, it will fetch 100 indicators by default. The maximum value for the limit parameter is 10000.",
-            "type": "contain",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/delete-ti-indicator-by-id?view=o365-worldwide\" target=\"_blank\">Delete Indicator API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour.",
+            "type": "generic",
             "identifier": "delete_indicator",
             "read_only": false,
             "parameters": {
@@ -5478,7 +5480,7 @@
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
                     "example_values": [
-                        "abctest.com"
+                        "test.com"
                     ],
                     "contains": [
                         "domain"
@@ -5600,7 +5602,7 @@
                     "data_path": "action_result.data.*.ipAddresses.*.macAddress",
                     "data_type": "string",
                     "example_values": [
-                        "000D3A7B423C"
+                        "000X3X7X423X"
                     ]
                 },
                 {
@@ -6205,13 +6207,13 @@
                 {
                     "data_path": "action_result.data.*.rbacGroupId",
                     "data_type": "string",
-                    "column_name": "RbacGroupId",
+                    "column_name": "RBAC Group ID",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.rbacGroupName",
                     "data_type": "string",
-                    "column_name": "RbacGroupName",
+                    "column_name": "RBAC Group Name",
                     "column_order": 2
                 },
                 {
@@ -6296,13 +6298,13 @@
                 {
                     "data_path": "action_result.data.*.rbacGroupId",
                     "data_type": "string",
-                    "column_name": "RbacGroupId",
+                    "column_name": "RBAC Group ID",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.rbacGroupName",
                     "data_type": "string",
-                    "column_name": "RbacGroupName",
+                    "column_name": "RBAC Group Name",
                     "column_order": 2
                 },
                 {
@@ -6453,6 +6455,16 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "7553f175dbbfa2f0830bebe8c367fe68fd40a9a4"
+                    ],
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.event_id",
                     "data_type": "string",
                     "example_values": [
@@ -6573,7 +6585,8 @@
                         "51e978e9c3cd646dde81162f0517f13b8697cfcb"
                     ],
                     "contains": [
-                        "sha1"
+                        "sha1",
+                        "defender atp machine id"
                     ]
                 },
                 {
@@ -6884,7 +6897,8 @@
                         "51e978e9c3cd646dde81162f0517f13b8697cfcb"
                     ],
                     "contains": [
-                        "sha1"
+                        "sha1",
+                        "defender atp machine id"
                     ]
                 },
                 {

@@ -2086,6 +2086,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if ret_val is not True:
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to vault")
 
+        # Adding vault ID to summary
+        summary['vault_id'] = vault_id
+
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully added file to vault. vault_id: {}".format(vault_id))
 
     def _handle_put_file_live_response(self, param):
@@ -2268,7 +2271,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully executed script")
 
     def _handle_get_missing_kbs(self, param):
-        """ This function is used to handle the get missing kbs action.
+        """ This function is used to handle the get missing KBs action.
 
         :param param: Dictionary of input parameters
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
@@ -2291,7 +2294,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(kb)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No missing kbs found for the given device")
+            return action_result.set_status(phantom.APP_ERROR, "No missing KBs found for the given device")
 
         summary = action_result.update_summary({})
         summary['total_kbs'] = action_result.get_data_size()
