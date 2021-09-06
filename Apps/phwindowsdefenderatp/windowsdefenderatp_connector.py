@@ -1954,14 +1954,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
         gzip_file_path = "{0}/{1}".format(local_dir, gzip_filename)
         file_path = "{0}/{1}".format(local_dir, filename)
 
+        # For image files add the content in .gz file
         with open(gzip_file_path, 'wb') as f:
             f.write(content)
 
         try:
+            # Extracting .gz file
             with gzip.open(gzip_file_path, 'rb') as f_in:
                 with open(file_path, 'wb') as f_out:
                     shutil.copyfileobj(f_in, f_out)
         except:
+            # For other type of files add the content in the actual file
             with open(file_path, 'wb') as f_out:
                 f_out.write(content)
 
