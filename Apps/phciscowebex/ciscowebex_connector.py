@@ -528,7 +528,7 @@ s
                                                   params=params, data=data, method=method)
 
         # If token is expired, generate new token
-        if 'Access token is expired or invalid' in action_result.get_message():  # TODO
+        if 'Access token is expired or invalid' in action_result.get_message():
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
 
             if phantom.is_fail(status):
