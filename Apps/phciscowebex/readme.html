@@ -1,0 +1,90 @@
+  
+<!-- File: readme.html
+  Copyright (c) 2021 Splunk Inc.
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
+-->
+<html>
+<body>
+<h2>Asset Configuration</h2>
+<p>
+<ul>
+<li>Personal access token - By configuring <b>API Key</b> in asset configuration. It will get from the <a href="https://developer.webex.com/docs/api/getting-started">developer site</a>. This access token is valid for 12 hours. If all params are given, API key param is given priority. </li>
+<li>OAuth token - By configuring <b>Client ID</b> and <b>Client secret</b> in asset configuration. To enable OAuth and to retrieve Client ID and Client Secret, we need to follow the steps which are mentioned in the <a href="https://developer.webex.com/docs/integrations">developer document</a>. </li>
+</ul>
+</p>
+
+<h2>Configure Integration on the Cisco Webex Developer portal</h2>
+      <ul>
+        <li>
+          <h3>Integration Configuration Link</h3>
+            <ul>
+              <li><a href="https://developer.webex.com/docs/integrations" target="_blank">Configure Integration</a></li>
+            </ul>
+        </li>
+        <li>
+          <h3>Steps</h3>
+            <ol>
+              <li>Login to the <a href="https://developer.webex.com/my-apps" target="_blank">Cisco Webex app page</a>.</li>
+              <li>Click "Create a New App" then "Create an Integration" to start the wizard.</li>
+              <li>You'll need to provide some basic information like your integration's name, description, and logo.</li>
+              <li>After successful registration, you'll be taken to a different screen containing your integration's newly created Client ID and Client Secret. The Client Secret will only be shown once so please copy and keep it safe!</li>
+			  <li>The <b>Redirect URLs</b> should be filled right here. It should look somehting like: </li>
+				<p>
+					https://&lt;phantom_host&gt;/rest/handler/ciscowebex_34624d1a-f0ae-47d6-a731-8499d5617cf7/&lt;asset_name&gt;/result
+				</p>
+              <li>Give the required scope which defines the level of access that your integration requires. </li>
+            </ol>
+        </li>
+      </ul>
+	  
+<h2>Interactive Method to run Test Connectivity</h2>
+      <p>
+        <ul>
+          <li>After setting up the asset, click the 'TEST CONNECTIVITY' button. A pop-up window will be displayed with appropriate test connectivity logs. It will also display a specific URL on that pop-up window.</li>
+          <li>Open this URL in a separate browser tab. This new tab will redirect to the Cisco Webex login page to complete the login process to grant the permissions to the app.</li>
+          <li>Log in using the same Cisco Webex account that was used to configure the integration and the application on the Cisco Webex page.</li>
+          <li>This will display a successful message of 'Code received. Please close this window, the action will continue to get new token.' on the browser tab.</li>
+          <li>Finally, close the browser tab and come back to the 'Test Connectivity' browser tab. The pop-up window should display a 'Test Connectivity Passed' message.</li>
+        </ul>
+      </p>
+
+<h2>Explanation of Test Connectivity Workflow for Interactive auth and Non-Interactive auth</h2>
+      <p>
+        <ul>
+          <li>This app uses (version 1.0) OAUTH 2.0 authorization code workflow APIs for generating the [access_token] and [refresh_token] pairs if the authentication method is interactive else [Personal access token] if the authentication method is non-interactive is used for all the API calls to the Cisco Webex instance.</li>
+          <li>An interactive authentication mechanism is a user-context-based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated tokens. For more information visit the link mentioned here for the <a href="https://developer.webex.com/docs/integrations" target="_blank">OAUTH 2.0 AUTH CODE</a>.</li>
+          <li>The step-by-step process for the entire authentication mechanism is explained below.</li>
+            <ul>
+              <li>The first step is to get an application created in a specific tenant on the Cisco Webex developer portal. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
+              <li>Run the test connectivity action for the Interactive method.</li>
+              <ul>
+				<li>Configure the Cisco Webex app's asset with appropriate values for [client_id] and [client_secret] configuration parameters.</li>
+                <li>Internally, the connectivity creates a URL for hitting the /v1/authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
+                <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and [refresh_token] pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
+                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the test connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token].</li>
+                <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Cisco Webex instance.</li>
+              </ul>
+            </ul>
+        </ul>
+      </p>
+	  
+	  <h2>State file permissions</h2>
+      <p>
+        Please check the permissions for the state file as mentioned below.
+        <h4>State file path</h4>
+        <ul>
+          <li>For Non-NRI instance: /opt/phantom/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+          <li>For NRI instance: /&lt;PHANTOM_HOME_DIRECTORY&gt;/local_data/app_states/&lt;appid&gt;/&lt;asset_id&gt;_state.json</li>
+        </ul>
+        <h4>State file permissions</h4>
+        <ul>
+          <li>File rights: rw-rw-r-- (664) (The phantom user should have read and write access for the state file)</li>
+          <li>File owner: Appropriate phantom user</li>
+        </ul>
+      </p>
+	  
+	  <h3>The app is configured and ready to be used now.</h3>
+
+</body>
+</html>
