@@ -300,6 +300,9 @@ class CiscoWebexConnector(BaseConnector):
 
     def _process_response(self, r, action_result):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
+        if r.status_code == 401:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Access token is expired or invalid"), None)
+
         if hasattr(action_result, 'add_debug_data'):
             action_result.add_debug_data({'r_status_code': r.status_code})
             action_result.add_debug_data({'r_text': r.text})
@@ -521,16 +524,11 @@ s
         if not headers.get('Content-Type'):
             headers.update({'Content-Type': 'application/json'})
 
-        self.debug_print("##########endpoint: " + str(endpoint))
-        self.debug_print("headers: " + str(headers))
-        self.debug_print("params: " + str(params))
-        self.debug_print("data: " + str(data))
-        self.debug_print("method: " + str(method))
         ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=endpoint, headers=headers,
                                                   params=params, data=data, method=method)
 
         # If token is expired, generate new token
-        if 'Access token has expired' in action_result.get_message():  # TODO
+        if 'Access token is expired or invalid' in action_result.get_message():  # TODO
             status = self._generate_new_access_token(action_result=action_result, data=token_data)
 
             if phantom.is_fail(status):
@@ -754,8 +752,6 @@ s
         ret_val = phantom.APP_SUCCESS
 
         action_id = self.get_action_identifier()
-
-        self.debug_print("action_id", self.get_action_identifier())
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
