@@ -383,10 +383,6 @@ class AwsIamConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(AWSIAM_CONNECTING_ENDPOINT_MSG)
 
-        # Check to see if temporary credentials have been passed as a parameter to the action
-        if not self._get_temp_credentials(action_result, param):
-            return action_result.get_status()
-
         params = dict()
         config = self.get_config()
 
