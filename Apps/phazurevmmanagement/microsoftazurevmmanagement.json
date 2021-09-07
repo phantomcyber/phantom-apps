@@ -2439,7 +2439,7 @@
             "action": "add network group",
             "identifier": "add_network_security_group",
             "description": "Add a network security group in a resource group",
-            "verbose": "Refer to https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate for more information on adding a network security group.",
+            "verbose": "Refer to <a href='https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate' target='_blank'>API Docs</a> for more information on adding a network security group.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -3686,7 +3686,7 @@
             "action": "run command",
             "identifier": "run_command",
             "description": "Run a command on the virtual machine",
-            "verbose": "Run a command or a script in an Azure Windows or Linux VM. Refer to https://docs.microsoft.com/en-us/rest/api/compute/virtual%20machines%20run%20commands/runcommand for more information.",
+            "verbose": "Run a command or a script in an Azure Windows or Linux VM. Refer to <a href='https://docs.microsoft.com/en-us/rest/api/compute/virtual%20machines%20run%20commands/runcommand' target='_blank'>API Docs</a> for more information.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -3721,17 +3721,11 @@
                 },
                 "script": {
                     "description": "The script to be executed. When this value is given, the given script will override the default script of the command",
-                    "contains": [
-                      "vm management script"
-                    ],
                     "data_type": "string",
                     "order": 3
                 },
                 "script_parameters": {
                   "description": "The run command parameters",
-                  "contains": [
-                    "vm management parameters"
-                  ],
                   "data_type": "string",
                   "order": 4
                 }
@@ -3776,9 +3770,6 @@
                 {
                     "data_path": "action_result.parameter.script",
                     "data_type": "string",
-                    "contains": [
-                      "vm management script"
-                    ],
                     "example_values": [
                       "echo $arg1 $arg2"
                     ],
@@ -3788,9 +3779,6 @@
                 {
                     "data_path": "action_result.parameter.script_parameters",
                     "data_type": "string",
-                    "contains": [
-                      "vm management parameters"
-                    ],
                     "example_values": [
                       "[{\"name\": \"arg1\", \"value\": \"hello\"},{\"name\": \"arg2\", \"value\": \"world\" }]"
                     ],
@@ -3802,8 +3790,13 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.results_url",
+                    "data_path": "action_result.data.*.results_url",
                     "data_type": "string",
+                    "column_name": "Results URL",
+                    "column_order": 6,
+                    "contains": [
+                        "vm management results url"
+                    ],
                     "example_values": [
                         "https:\/\/management.azure.com/subscriptions/<subscription_id>/providers/Microsoft.Compute/locations/<location>/operations/<operation_id>monitor=true&api-version=2017-03-30"
                     ]
@@ -3884,7 +3877,7 @@
             "action": "get results",
             "identifier": "get_results",
             "description": "Fetch the results of a previously executed run_command action",
-            "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command for more information.",
+            "verbose": "Commands in Azure can take up to 90 minutes to execute. This allows you to retrieve results of previously executed actions. Refer to <a href='https://docs.microsoft.com/en-us/azure/virtual-machines/windows/run-command' target='_blank'>API Docs</a> for more information.",
             "type": "generic",
             "read_only": true,
             "parameters": {

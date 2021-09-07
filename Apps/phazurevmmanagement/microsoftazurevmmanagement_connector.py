@@ -434,7 +434,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val, None
 
-        phantom_base_url = resp_json.get('base_url')
+        phantom_base_url = resp_json.get('base_url').strip("/")
         if not phantom_base_url:
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_BASE_URL_NOT_FOUND_MSG), None
         return phantom.APP_SUCCESS, phantom_base_url
@@ -572,7 +572,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         resp_json = None
         url = "{0}{1}".format(MS_BASE_URL.format(subscriptionId=self._subscription), endpoint)
-        if (headers is None):
+        if headers is None:
             headers = {}
 
         token = self._state.get('token', {})
@@ -607,7 +607,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
             r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
 
-        # Azure returns a status code 202 for Run Command if there is an Asyncronous Operation running
+        # Azure returns a status code 202 for Run Command if there is an Asynchronous Operation running
         if r.status_code == 202:
             # Headers for the response store the AsyncOperation url which is used to track the operation status.
             # The Location field stores the results of the command when it is finished running
@@ -772,14 +772,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
                 self.send_progress('{0}'.format('.' * (i % 10)))
 
-                if (os.path.isfile(auth_status_file_path)):
+                if os.path.isfile(auth_status_file_path):
                     completed = True
                     os.unlink(auth_status_file_path)
                     break
 
                 time.sleep(MS_TC_STATUS_SLEEP)
 
-            if (not completed):
+            if not completed:
                 self.save_progress("Authentication process does not seem to be completed. Timing out")
                 return self.set_status(phantom.APP_ERROR)
 
@@ -799,7 +799,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self.save_progress(MS_GENERATING_ACCESS_TOKEN_MSG)
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self.save_progress("Getting list of all VMs to verify token")
@@ -1267,16 +1267,19 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
         if default_security_rules:
             body['properties'].update({'defaultSecurityRules': default_security_rules})
         if provisioning_state:
             body['properties'].update({'provisioningState': provisioning_state})
         if resource_guid:
             body['properties'].update({'resourceGuid': resource_guid})
-        if security_rules:
+        try:
+            if security_rules:
+                security_rules = json.loads(security_rules)
+                body['properties'].update({'securityRules': security_rules})
+        except:
             body['properties'].update({'securityRules': security_rules})
-
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
 
@@ -1323,7 +1326,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
