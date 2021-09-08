@@ -1,15 +1,15 @@
   
 <!-- File: readme.html
-  Copyright (c) 2021 Splunk Inc.
-  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
-  without a valid written license from Splunk Inc. is PROHIBITED.
+     Copyright (c) 2021 Splunk Inc.
+
+     Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 <html>
 <body>
 <h2>Asset Configuration</h2>
 <p>
 <ul>
-<li>Personal access token - By configuring <b>API Key</b> in asset configuration. It will get from the <a href="https://developer.webex.com/docs/api/getting-started">developer site</a>. This access token is valid for 12 hours. If all params are given, API key param is given priority. </li>
+<li>Personal access token - By configuring <b>Personal Access Token</b> in asset configuration. It will get from the <a href="https://developer.webex.com/docs/api/getting-started">developer site</a>. This access token is valid for 12 hours. If all params are given, Personal Access Token param is given priority. </li>
 <li>OAuth token - By configuring <b>Client ID</b> and <b>Client secret</b> in asset configuration. To enable OAuth and to retrieve Client ID and Client Secret, we need to follow the steps which are mentioned in the <a href="https://developer.webex.com/docs/integrations">developer document</a>. </li>
 </ul>
 </p>
@@ -49,14 +49,14 @@
         </ul>
       </p>
 
-<h2>Explanation of Test Connectivity Workflow for Interactive auth and Non-Interactive auth</h2>
+<h2>Explanation of Test Connectivity Workflow for Interactive auth</h2>
       <p>
         <ul>
           <li>This app uses (version 1.0) OAUTH 2.0 authorization code workflow APIs for generating the [access_token] and [refresh_token] pairs if the authentication method is interactive else [Personal access token] if the authentication method is non-interactive is used for all the API calls to the Cisco Webex instance.</li>
           <li>An interactive authentication mechanism is a user-context-based workflow and the permissions of the user also matter along with the API permissions set to define the scope and permissions of the generated tokens. For more information visit the link mentioned here for the <a href="https://developer.webex.com/docs/integrations" target="_blank">OAUTH 2.0 AUTH CODE</a>.</li>
           <li>The step-by-step process for the entire authentication mechanism is explained below.</li>
             <ul>
-              <li>The first step is to get an application created in a specific tenant on the Cisco Webex developer portal. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
+              <li>The first step is to get an application created on the Cisco Webex developer portal. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
               <li>Run the test connectivity action for the Interactive method.</li>
               <ul>
 				<li>Configure the Cisco Webex app's asset with appropriate values for [client_id] and [client_secret] configuration parameters.</li>

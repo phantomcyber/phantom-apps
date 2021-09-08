@@ -1,14 +1,14 @@
 {
     "appid": "34624d1a-f0ae-47d6-a731-8499d5617cf7",
     "name": "Cisco Webex",
-    "description": "Integrate with Cisco Webex to implement investigative actions",
+    "description": "This app integrates with Cisco Webex to implement investigative and genric actions",
     "type": "information",
     "product_vendor": "Cisco",
     "logo": "logo_ciscowebex.svg",
     "logo_dark": "logo_ciscowebex_dark.svg",
     "product_name": "Cisco Webex",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "license": "Copyright (c) 2021 Splunk Inc.",
     "app_version": "1.0.0",
     "utctime_updated": "2018-12-07T01:17:36.000000Z",
@@ -23,7 +23,7 @@
     ],
     "configuration": {
         "authorization_key": {
-            "description": "API Key",
+            "description": "Personal Access Token",
             "data_type": "password",
             "order": 0
         },
@@ -54,7 +54,7 @@
             "identifier": "list_rooms",
             "description": "List webex rooms",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {},
             "output": [
                 {
@@ -170,7 +170,7 @@
             "identifier": "get_user",
             "description": "Get user ID from e-mail address",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "email_address": {
                     "description": "User webex e-mail address",
@@ -203,7 +203,8 @@
                     "column_name": "Email Address",
                     "column_order": 1,
                     "example_values": [
-                        "monielynn@theharlanfamily.org"
+                        "monielynn@theharlanfamily.org",
+                        "herman@contoso.com"
                     ]
                 },
                 {
@@ -342,7 +343,7 @@
             "action": "send message",
             "identifier": "send_message",
             "description": "Send message to user or room",
-            "type": "investigate",
+            "type": "generic",
             "read_only": false,
             "parameters": {
                 "endpoint_id": {
