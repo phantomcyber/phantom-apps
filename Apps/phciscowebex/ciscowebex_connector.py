@@ -168,8 +168,7 @@ def _load_app_state(asset_id, app_connector=None):
     state = {}
     try:
         with open(real_state_file_path, 'r') as state_file_obj:
-            state_file_data = state_file_obj.read()
-            state = json.loads(state_file_data)
+            state = json.load(state_file_obj)
     except Exception as e:
         if app_connector:
             error_code, error_msg = _get_error_message_from_exception(e)
@@ -470,13 +469,13 @@ s
         time_out = False
 
         # wait-time while request is being granted
-        for _ in range(0, 35):
+        for _ in range(0, OAUTH_WAIT_INTERVALS):
             self.send_progress('Waiting...')
             if os.path.isfile(auth_status_file_path):
                 time_out = True
                 os.unlink(auth_status_file_path)
                 break
-            time.sleep(3)
+            time.sleep(OAUTH_WAIT_TIME)
 
         if not time_out:
             return action_result.set_status(phantom.APP_ERROR, status_message=WEBEX_ERR_TIMEOUT)

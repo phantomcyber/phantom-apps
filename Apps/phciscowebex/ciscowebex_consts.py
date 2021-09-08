@@ -20,6 +20,8 @@ AUTHORIZATION_URL = '/v1/authorize?client_id={client_id}&response_type={response
 UNKNOWN_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters"
 UNKNOWN_ERR_CODE_MSG = "Error code unavailable"
 
+OAUTH_WAIT_INTERVALS = 35
+OAUTH_WAIT_TIME = 3
 
 WEBEX_STR_CODE = 'code'
 WEBEX_STR_TEXT = "text/plain"

@@ -168,7 +168,7 @@
         {
             "action": "get user",
             "identifier": "get_user",
-            "description": "Get user_ID from e-mail address",
+            "description": "Get user ID from e-mail address",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -341,7 +341,7 @@
         {
             "action": "send message",
             "identifier": "send_message",
-            "description": "Send Message to user or room",
+            "description": "Send message to user or room",
             "type": "investigate",
             "read_only": false,
             "parameters": {
