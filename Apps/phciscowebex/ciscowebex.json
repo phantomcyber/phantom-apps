@@ -27,15 +27,19 @@
             "data_type": "password",
             "order": 0
         },
+        "ph": {
+            "data_type": "ph",
+            "order": 1
+        },
         "client_id": {
             "description": "Client ID",
             "data_type": "string",
-            "order": 1
+            "order": 2
         },
         "client_secret": {
             "description": "Client Secret",
             "data_type": "password",
-            "order": 2
+            "order": 3
         }
     },
     "actions": [
