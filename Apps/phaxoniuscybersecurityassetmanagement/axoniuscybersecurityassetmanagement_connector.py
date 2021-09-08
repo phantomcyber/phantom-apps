@@ -251,9 +251,11 @@ class AxoniusConnector(BaseConnector):
                 key=ADDITIONAL_FIELDS_KEY, param=param
             )
             if len(additional_fields_str) > 0:
-                additional_fields = additional_fields_str.split(",")
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
         except Exception as exc:
-            status = f"Failed to parse additional fields: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         try:
@@ -312,9 +314,11 @@ class AxoniusConnector(BaseConnector):
                 key=ADDITIONAL_FIELDS_KEY, param=param
             )
             if len(additional_fields_str) > 0:
-                additional_fields = additional_fields_str.split(",")
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
         except Exception as exc:
-            status = f"Failed to parse additional fields: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         try:
@@ -373,9 +377,11 @@ class AxoniusConnector(BaseConnector):
                 key=ADDITIONAL_FIELDS_KEY, param=param
             )
             if len(additional_fields_str) > 0:
-                additional_fields = additional_fields_str.split(",")
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
         except Exception as exc:
-            status = f"Failed to parse additional fields: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         try:
@@ -479,9 +485,11 @@ class AxoniusConnector(BaseConnector):
                 key=ADDITIONAL_FIELDS_KEY, param=param
             )
             if len(additional_fields_str) > 0:
-                additional_fields = additional_fields_str.split(",")
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
         except Exception as exc:
-            status = f"Failed to parse additional fields: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         try:
@@ -540,9 +548,11 @@ class AxoniusConnector(BaseConnector):
                 key=ADDITIONAL_FIELDS_KEY, param=param
             )
             if len(additional_fields_str) > 0:
-                additional_fields = additional_fields_str.split(",")
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
         except Exception as exc:
-            status = f"Failed to parse additional fields: {exc}"
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
         try:
