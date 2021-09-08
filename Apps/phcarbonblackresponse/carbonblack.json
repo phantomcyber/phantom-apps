@@ -3935,6 +3935,8 @@
                 {
                     "data_path": "action_result.parameter.sensor_id",
                     "data_type": "numeric",
+                    "column_name": "Sensor ID",
+                    "column_order": 1,
                     "contains": [
                         "carbon black sensor id"
                     ],
@@ -5555,6 +5557,9 @@
                     "example_values": [
                         110
                     ],
+                    "contains": [
+                        "carbon black session id"
+                    ],
                     "column_name": "Session ID",
                     "column_order": 1
                 },
@@ -5817,6 +5822,9 @@
                     "example_values": [
                         115,
                         286
+                    ],
+                    "contains": [
+                        "carbon black session id"
                     ],
                     "column_name": "Session ID",
                     "column_order": 1
@@ -6362,7 +6370,11 @@
                     "data_type": "numeric",
                     "order": 0,
                     "description": "Carbon Black session id",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "carbon black session id"
+                    ]
                 }
             },
             "render": {
@@ -6384,6 +6396,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         104
+                    ],
+                    "contains": [
+                        "carbon black session id"
                     ],
                     "column_name": "Session ID",
                     "column_order": 2
