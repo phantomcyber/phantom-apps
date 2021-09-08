@@ -469,7 +469,7 @@ s
         time_out = False
 
         # wait-time while request is being granted
-        for _ in range(0, OAUTH_WAIT_INTERVALS):
+        for _ in range(OAUTH_WAIT_INTERVALS):
             self.send_progress('Waiting...')
             if os.path.isfile(auth_status_file_path):
                 time_out = True
