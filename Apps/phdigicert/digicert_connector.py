@@ -233,7 +233,7 @@ class DigiCertConnector(BaseConnector):
             # in this case that means we did not find a vault item in the list, so return an error
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Could not find the CSR in the file vault"
+                "Could not find the csr in the file vault"
             )
 
         with open(filename, "r") as fp:
@@ -245,11 +245,11 @@ class DigiCertConnector(BaseConnector):
             parsed_signature_hash = csr_req.signature_hash_algorithm.name
             # https://cryptography.io/en/latest/x509/reference/#cryptography.x509.Name.get_attributes_for_oid
             parsed_cn = csr_req.subject.get_attributes_for_oid(x509.oid.NameOID.COMMON_NAME)[0].value
-            self.save_progress("Parsed CSR values: siganture_hash={0} CN={1}".format(parsed_signature_hash, parsed_cn))
+            self.save_progress("Parsed csr values: siganture_hash={0} CN={1}".format(parsed_signature_hash, parsed_cn))
         except Exception:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Failed to parse the CSR, make sure it is in PEM format"
+                "Failed to parse the csr, make sure it is in PEM format"
             )
 
         payload = {
