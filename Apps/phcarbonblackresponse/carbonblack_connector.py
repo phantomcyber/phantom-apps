@@ -613,20 +613,17 @@ class CarbonblackConnector(BaseConnector):
         ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
 
+        action_result = self.add_action_result(ActionResult(param))
+
         ret_val, pid = self._validate_integer(self, param.get(CARBONBLACK_JSON_PID), CARBONBLACK_JSON_PID, True)
         if phantom.is_fail(ret_val):
-            action_result = self.add_action_result(ActionResult(param))
             return action_result.set_status(phantom.APP_ERROR, self.get_status_message())
 
         if ((not ip_hostname) and (sensor_id is None)):
-            action_result = self.add_action_result(ActionResult(param))
             return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         if (sensor_id is not None):
-
-            # set the param to _only_ contain the sensor_id, since that's the only one we are using
-            action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id, CARBONBLACK_JSON_PID: pid}))
 
             ret_val, sensor_id = self._validate_integer(action_result, sensor_id, CARBONBLACK_JSON_SENSOR_ID, True)
             if phantom.is_fail(ret_val):
@@ -635,27 +632,21 @@ class CarbonblackConnector(BaseConnector):
             self._terminate_process_on_endpoint(sensor_id, action_result, pid)
             return action_result.get_status()
 
-        sys_info_ar = ActionResult(param)
-
-        ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
+        ret_val = self._get_system_info_from_cb(ip_hostname, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.add_action_result(sys_info_ar)
-            return sys_info_ar.get_status()
+            return action_result.get_status()
 
-        systems = sys_info_ar.get_data()
+        systems = action_result.get_data()
 
         self.save_progress("Got {0} systems".format(len(systems)))
 
         if (not systems):
-            self.add_action_result(sys_info_ar)
-            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         systems = [x for x in systems if x.get('status', 'Offline') == 'Online']
 
         if (len(systems) > 1):
-
-            self.add_action_result(sys_info_ar)
 
             systems_error = "<ul>"
 
@@ -663,11 +654,9 @@ class CarbonblackConnector(BaseConnector):
                 systems_error += '<li>{0}</li>'.format(system.get('computer_name'))
 
             systems_error += "</ul>"
-            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_MSG_MORE_THAN_ONE.format(systems_error=systems_error))
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_MSG_MORE_THAN_ONE.format(systems_error=systems_error))
 
         system = systems[0]
-
-        action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: ip_hostname, CARBONBLACK_JSON_PID: pid}))
 
         self._terminate_process_on_endpoint(system.get('id'), action_result, pid)
 
@@ -678,16 +667,16 @@ class CarbonblackConnector(BaseConnector):
         ip_hostname = param.get(phantom.APP_JSON_IP_HOSTNAME)
         sensor_id = param.get(CARBONBLACK_JSON_SENSOR_ID)
 
+        action_result = ActionResult(param)
+
         if ((not ip_hostname) and (sensor_id is None)):
-            action_result = self.add_action_result(ActionResult(param))
+            self.add_action_result(action_result)
             return action_result.set_status(phantom.APP_ERROR, "Neither {0} nor {1} specified. Please specify at-least one of them".format(phantom.APP_JSON_IP_HOSTNAME,
                 CARBONBLACK_JSON_SENSOR_ID))
 
         if (sensor_id is not None):
 
-            # set the param to _only_ contain the sensor_id, since that's the only one we are using
-            action_result = self.add_action_result(ActionResult({CARBONBLACK_JSON_SENSOR_ID: sensor_id}))
-
+            self.add_action_result(action_result)
             ret_val, sensor_id = self._validate_integer(action_result, sensor_id, CARBONBLACK_JSON_SENSOR_ID, True)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
@@ -695,21 +684,19 @@ class CarbonblackConnector(BaseConnector):
             self._get_process_list(sensor_id, action_result)
             return action_result.get_status()
 
-        sys_info_ar = ActionResult(param)
-
-        ret_val = self._get_system_info_from_cb(ip_hostname, sys_info_ar)
+        ret_val = self._get_system_info_from_cb(ip_hostname, action_result)
 
         if (phantom.is_fail(ret_val)):
-            self.add_action_result(sys_info_ar)
-            return sys_info_ar.get_status()
+            self.add_action_result(action_result)
+            return action_result.get_status()
 
-        systems = sys_info_ar.get_data()
+        systems = action_result.get_data()
 
         self.save_progress("Got {0} systems".format(len(systems)))
 
         if (not systems):
-            self.add_action_result(sys_info_ar)
-            return sys_info_ar.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
+            self.add_action_result(action_result)
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_NO_ENDPOINTS.format(ip_hostname))
 
         for system in systems:
             action_result = self.add_action_result(ActionResult({phantom.APP_JSON_IP_HOSTNAME: system.get('computer_name')}))
