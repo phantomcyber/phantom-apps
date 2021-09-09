@@ -845,7 +845,7 @@ if __name__ == '__main__':
         print("No test json specified as input")
         exit(0)
 
-    with open(sys.argv[1]) as f:
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
