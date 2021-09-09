@@ -252,7 +252,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._admin_consent = True
         self._access_token = None
         self._refresh_token = None
-        self._python_version = None
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -486,9 +485,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
-        if self._python_version == 2:
-            endpoint = endpoint.decode('utf-8')
-
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
         except requests.exceptions.InvalidSchema:
@@ -592,20 +588,20 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         except AttributeError:
             return action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json, None
 
-        if self._python_version == 2:
-            url = url.decode('utf-8')
-
         try:
             r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), r.text, None
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
         if r.text and ('token is invalid' in r.text or 'Access token has expired' in r.text or 'ExpiredAuthenticationToken' in r.text or 'AuthenticationFailed' in r.text):
             ret_val = self._get_token(action_result)
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
-
-            r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+            try:
+                r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
         # Azure returns a status code 202 for Run Command if there is an Asynchronous Operation running
         if r.status_code == 202:
@@ -621,10 +617,30 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 # A default count of 60 seconds is provided to check results.
                 while count < 20 or (status and status == "InProgress"):
                     time.sleep(3)
-                    resp_json = request_func(operation_status, headers=headers, verify=verify).json()
+                    try:
+                        res = request_func(operation_status, headers=headers, verify=verify)
+                        resp_json = res.json()
+                    except Exception as e:
+                        error_msg = self._get_error_message_from_exception(e)
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                    if 'token is invalid' in res.text or 'Access token has expired' in res.text or 'ExpiredAuthenticationToken' in res.text or 'AuthenticationFailed' in res.text:
+                        ret_val = self._get_token(action_result)
+                        headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
                     status = resp_json.get('status')
                     count += 1
-                r = request_func(location_url, headers=headers, verify=verify)
+                try:
+                    r = request_func(location_url, headers=headers, verify=verify)
+                except Exception as e:
+                    error_msg = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                if r.text and ('token is invalid' in r.text or 'Access token has expired' in r.text or 'ExpiredAuthenticationToken' in r.text or 'AuthenticationFailed' in r.text):
+                    ret_val = self._get_token(action_result)
+                    headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+                    try:
+                        r = request_func(location_url, headers=headers, verify=verify)
+                    except Exception as e:
+                        error_msg = self._get_error_message_from_exception(e)
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
                 ret_val, response = self._process_response(r, action_result)
                 return ret_val, response, location_url
         elif r.status_code == 200:
@@ -1863,12 +1879,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 "app_version": self.get_app_json().get('app_version')
             }
             return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERROR)
-
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         # get the asset config
         config = self.get_config()
