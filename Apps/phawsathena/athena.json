@@ -10,14 +10,14 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2017-2021 Splunk Inc.",
-    "app_version": "2.1.0",
-    "utctime_updated": "2021-02-05T05:17:18.000000Z",
+    "app_version": "2.2.0",
+    "utctime_updated": "2021-09-08T20:17:21.000000Z",
     "package_name": "phantom_athena",
     "main_module": "athena_connector.py",
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud API, January 28, 2021"
+        "Cloud API, July 28, 2021"
     ],
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
@@ -28,19 +28,15 @@
             },
             {
                 "module": "s3transfer",
-                "input_file": "wheels/s3transfer-0.1.11-py2.py3-none-any.whl"
+                "input_file": "wheels/s3transfer-0.2.0-py2.py3-none-any.whl"
             },
             {
                 "module": "botocore",
                 "input_file": "wheels/botocore-1.20.30-py2.py3-none-any.whl"
             },
             {
-                "module": "futures",
-                "input_file": "wheels/futures-3.1.1-py2-none-any.whl"
-            },
-            {
                 "module": "docutils",
-                "input_file": "wheels/docutils-0.14-py2-none-any.whl"
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
             },
             {
                 "module": "jmespath",
@@ -60,7 +56,7 @@
             "order": 1
         },
         "region": {
-            "description": "AWS region",
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -82,6 +78,15 @@
             "description": "KMS key",
             "data_type": "password",
             "order": 3
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "default": false,
+            "visibility": [
+                "onprem"
+            ],
+            "order": 4
         }
     },
     "actions": [
@@ -101,7 +106,17 @@
             "description": "List named queries on Athena",
             "type": "investigate",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -240,6 +255,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -287,6 +312,15 @@
                         "CSE_KMS"
                     ],
                     "order": 3
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 4
                 }
             },
             "output": [
@@ -294,7 +328,7 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 1,
+                    "column_order": 0,
                     "example_values": [
                         "success",
                         "failed"
@@ -366,6 +400,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 }
             ],
