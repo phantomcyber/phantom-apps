@@ -148,6 +148,7 @@ CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
     'windows 7, 64-bit': 110,
     'windows 7, 32-bit': 100
 }
+CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
 CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Failed to get resource. Resource not found'
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'

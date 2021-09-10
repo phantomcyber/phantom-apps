@@ -2002,6 +2002,13 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_time_string(self, days):
+
+        expiry_date = datetime.now(pytz.utc) + timedelta(days=days)
+        time_str = expiry_date.strftime(CROWDSTRIKE_TIME_FORMAT)
+
+        return "{0}:{1}".format(time_str[:-2], time_str[-2:])
+
     def _handle_upload_iocs(self, param):
 
         # Add an action result to the App Run
@@ -2035,9 +2042,8 @@ class CrowdstrikeConnector(BaseConnector):
             days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
             if days is None:
                 return action_result.get_status()
-            expiry_date = datetime.now(pytz.utc) + timedelta(days=days)
-            expiry_date = expiry_date.strftime("%Y-%m-%dT%H:%M:%S%z")
-            indicator[CROWDSTRIKE_IOCS_EXPIRATION] = "{}:{}".format(expiry_date[:-2], expiry_date[-2:])
+
+            indicator[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
 
         if CROWDSTRIKE_IOCS_SEVERITY in param:
             indicator[CROWDSTRIKE_IOCS_SEVERITY] = param.get(CROWDSTRIKE_IOCS_SEVERITY)
@@ -2097,9 +2103,8 @@ class CrowdstrikeConnector(BaseConnector):
             days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
             if days is None:
                 return action_result.get_status()
-            expiry_date = datetime.now(pytz.utc) + timedelta(days=days)
-            expiry_date = expiry_date.strftime("%Y-%m-%dT%H:%M:%S%z")
-            update_data[CROWDSTRIKE_IOCS_EXPIRATION] = "{}:{}".format(expiry_date[:-2], expiry_date[-2:])
+
+            update_data[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
 
         if CROWDSTRIKE_IOCS_SOURCE in param:
             update_data[CROWDSTRIKE_IOCS_SOURCE] = param.get(CROWDSTRIKE_IOCS_SOURCE)
