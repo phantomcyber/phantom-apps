@@ -2313,7 +2313,7 @@
                     "order": 0
                 },
                 "data_type": {
-                    "description": "Data type of the Observable (select one from list)",
+                    "description": "Data type of the observable (select one from list)",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -2336,8 +2336,8 @@
                     "order": 1
                 },
                 "data": {
-                    "description": "Value of the data for this Observable",
-                    "verbose": "If a file is to be attached to this Observable, the vault_id parameter must be used",
+                    "description": "Value of the data for this observable",
+                    "verbose": "If a file is to be attached to this observable, the 'vault_id' parameter must be used",
                     "data_type": "string",
                     "order": 2
                 },
@@ -2354,13 +2354,13 @@
                     "order": 3
                 },
                 "tags": {
-                    "description": "Tags to associate with this Observable (can be a comma-separated list)",
+                    "description": "Tags to associate with this observable (can be a comma-separated list)",
                     "data_type": "string",
                     "required": true,
                     "order": 4
                 },
                 "description": {
-                    "description": "Describe the Observable in the context of the case",
+                    "description": "Describe the observable in the context of the case",
                     "data_type": "string",
                     "required": true,
                     "order": 5
@@ -2375,7 +2375,7 @@
                     "order": 6
                 },
                 "ioc": {
-                    "description": "Indicates if this Observable is an IOC",
+                    "description": "Indicates if this observable is an IOC",
                     "data_type": "boolean",
                     "order": 7
                 }
