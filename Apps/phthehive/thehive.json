@@ -3113,17 +3113,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.id",
-                    "data_type": "string",
-                    "contains": [
-                        "thehive ticket id"
-                    ],
-                    "example_values": [
-                        "AWG00KRH38eA2eAzW_gI",
-                        "AWQfCcret-_WVPphkhQq"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.message",
                     "data_type": "string",
                     "column_name": "Message",
