@@ -1689,9 +1689,27 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        ioc_type = param['indicator_type']
+        ioc = param['indicator_value']
+
+        api_data = {'filter': "type:'{}'+value:'{}'".format(ioc_type, ioc)}
+
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        resource_id = None
+        if 'resources' in list(response.keys()):
+            if response['resources'] is not None and len(response['resources']) > 0:
+                resource_id = response['resources'][0]
+            else:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)
+
         params = {
-            'type': param['indicator_type'],
-            'value': param['indicator_value']
+            'ids': resource_id
         }
 
         ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
@@ -2067,9 +2085,24 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
+        api_data = {'filter': "type:'{}'+value:'{}'".format(ioc_type, ioc)}
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=api_data, method="delete")
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        resource_id = None
+        if 'resources' in list(response.keys()):
+            if response['resources'] is not None and len(response['resources']) > 0:
+                resource_id = response['resources'][0]
+            else:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND)
+
+        api_data = {'ids': resource_id}
+        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=api_data, method="delete")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()

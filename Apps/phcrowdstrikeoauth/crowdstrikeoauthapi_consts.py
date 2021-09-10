@@ -108,9 +108,9 @@ CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"
-CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/indicators/entities/iocs/v1"
+CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/iocs/entities/indicators/v1"
 CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH = "/indicators/aggregates/devices-count/v1"
-CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT = "/indicators/queries/iocs/v1"
+CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT = "/iocs/queries/indicators/v1"
 CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH = "/indicators/queries/devices/v1"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH = "/indicators/queries/processes/v1"
 CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH = "/processes/entities/processes/v1"
@@ -143,3 +143,6 @@ CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
     'windows 7, 64-bit': 110,
     'windows 7, 32-bit': 100
 }
+
+CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Failed to get resource. Resource not found'
+CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'

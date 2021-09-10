@@ -5448,25 +5448,50 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.name",
+                    "data_path": "action_result.data.*.container",
                     "data_type": "string",
                     "example_values": [
-                        "test.7z"
+                        "test_crowdstrike"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.path",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2840
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.task",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.user",
+                    "data_path": "action_result.data.*.create_time",
                     "data_type": "string",
                     "example_values": [
-                        "admin"
+                        "0 minutes ago"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
+                    "example_values": [
+                        "automation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "30c5e524e975816fbce1d958150e394efc219772"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -5498,17 +5523,32 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.create_time",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "0 minutes ago"
+                        "test.7z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.container_id",
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "example_values": [
-                        2840
+                        5122
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
                     ]
                 },
                 {
@@ -5516,46 +5556,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         556
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.container",
-                    "data_type": "string",
-                    "example_values": [
-                        "test_crowdstrike"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.created_via",
-                    "data_type": "string",
-                    "example_values": [
-                        "automation"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.hash",
-                    "data_type": "string",
-                    "example_values": [
-                        "30c5e524e975816fbce1d958150e394efc219772"
-                    ],
-                    "contains": [
-                        "sha1"
-                    ],
-                    "column_name": "Hash",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        5122
                     ]
                 },
                 {
@@ -7057,10 +7057,32 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resources.*.created_by",
                     "data_type": "string",
                     "example_values": [
                         "C16JJOUVVY125J3O50FF"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-09T08:51:04.131068458Z"
                     ]
                 },
                 {
@@ -7071,10 +7093,25 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resources.*.description",
                     "data_type": "string",
                     "example_values": [
                         "test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-09-09T08:51:03Z"
                     ]
                 },
                 {
@@ -7085,10 +7122,40 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "99cd3772bf570aebea6e58059532ac902798583d6e75e6817364da70a062673a"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resources.*.modified_by",
                     "data_type": "string",
                     "example_values": [
-                        "C16JJOUVVY125J3O50FF"
+                        "ae2000074e144336ea1de4de9dc1bd39"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-09T08:51:04.131068458Z"
                     ]
                 },
                 {
@@ -7106,6 +7173,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.resources.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "medium"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.resources.*.share_level",
                     "data_type": "string",
                     "example_values": [
@@ -7117,6 +7191,13 @@
                     "data_type": "string",
                     "example_values": [
                         "test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag1"
                     ]
                 },
                 {

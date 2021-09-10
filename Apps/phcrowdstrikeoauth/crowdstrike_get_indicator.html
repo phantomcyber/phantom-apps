@@ -113,10 +113,11 @@
                                 <th>Type</th>
                                 <th>Value</th>
                                 <th>Policy</th>
-                                <th>Share Level</th>
                                 <th>Source</th>
                                 <th>Description</th>
                                 <th>Created By</th>
+                                <th>Severity</th>
+                                <th>Platforms</th>
                                 <th>Created Timestamp</th>
                                 <th>Expiration Timestamp</th>
                             </tr>
@@ -127,13 +128,20 @@
                                     <tr>
                                         <td>{{ resource.type }}</td>
                                         <td>{{ resource.value }}</td>
-                                        <td>{{ resource.policy }}</td>
-                                        <td>{{ resource.share_level }}</td>
+                                        <td>{{ resource.action }}</td>
                                         <td>{{ resource.source }}</td>
                                         <td>{{ resource.description }}</td>
                                         <td>{{ resource.created_by }}</td>
-                                        <td>{{ resource.created_timestamp }}</td>
-                                        <td>{{ resource.modified_timestamp }}</td>
+                                        <td>{{ resource.severity }}</td>
+                                        <td>
+                                            <ul>
+                                                {% for platform in resource.platforms %}
+                                                    <li style="list-style-type: none;">{{ platform }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td>{{ resource.created_on }}</td>
+                                        <td>{{ resource.expiration }}</td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}
