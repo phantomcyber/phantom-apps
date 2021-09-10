@@ -25,13 +25,13 @@ def get_str_arg(
 
     if not isinstance(value, str):
         raise ValueError(
-            f"Please provide a valid string value for the parameter {key!r}"
+            f"Please provide a valid string value for the parameter '{key!r}'"
         )
 
     value = value.strip()
 
     if not value and required:
-        raise ValueError(f"No value supplied for parameter {key!r}")
+        raise ValueError(f"No value supplied for parameter '{key!r}'")
 
     return value
 
@@ -111,6 +111,9 @@ class AxoniusConnector(BaseConnector):
         :return: error message
         """
 
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+
         try:
             if e.args:
                 if len(e.args) > 1:
@@ -119,25 +122,10 @@ class AxoniusConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
-            else:
-                error_code = ERR_CODE_MSG
-                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERR_CODE_MSG
-            error_msg = ERR_MSG_UNAVAILABLE
+            pass
 
-        try:
-            if error_code in ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
-            else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(
-                    error_code, error_msg
-                )
-        except:
-            self.debug_print(PARSE_ERR_MSG)
-            error_text = PARSE_ERR_MSG
-
-        return error_text
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _create_client(self, action_result: phantom.ActionResult) -> bool:
         """Create an instance of Axonius API Client."""
@@ -626,6 +614,13 @@ class AxoniusConnector(BaseConnector):
         """Initialize the Phantom integration."""
         self._state: dict = self.load_state()
         config: dict = self.get_config()
+
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, STATE_FILE_CORRUPT_ERR)
 
         self._url: str = config[URL_KEY]
 

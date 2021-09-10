@@ -31,13 +31,14 @@ ERR_MSG_UNAVAILABLE = (
     "Error message unavailable. Please check the asset configuration and|or action"
     " parameters"
 )
-PARSE_ERR_MSG = (
-    "Unable to parse the error message. Please check the asset configuration and|or"
-    " action parameters"
-)
 
 # Integer validation constants
-VALID_INTEGER_MSG = "Please provide a valid integer value for the parameter {key}"
+VALID_INTEGER_MSG = "Please provide a valid integer value for the parameter '{key}'"
 NON_NEGATIVE_INTEGER_MSG = (
-    "Please provide a valid non-negative integer value for the parameter {key}"
+    "Please provide a valid non-negative integer value for the parameter '{key}'"
+)
+
+STATE_FILE_CORRUPT_ERR = (
+    "Error occurred while loading the state file due to its unexpected format."
+    " Resetting the state file with the default format. Please try again"
 )
