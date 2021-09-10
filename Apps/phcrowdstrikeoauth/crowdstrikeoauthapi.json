@@ -15,7 +15,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.3.0",
+    "app_version": "3.4.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, July 19 2021, API version: v1, v2"
     ],
@@ -7873,7 +7873,7 @@
         {
             "action": "upload indicator",
             "description": "Upload one or more indicators that you want CrowdStrike to watch",
-            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>detect<br>Send a notification when the particular indicator has been detected on a host</li><li>none<br>Take no action when the particular indicator has been detected on a host. This is equivalent to turning the indicator off.</li></ul><br>As of this writing, the only valid value for the <b>share_level</b> parameter is <b>red</b>.<br>The <b>expiration</b> parameter is only valid for IP and Domains. As of this writing, if not specified, the Falcon API defaults to 30 days. If the indicator with the same type and value is created again, the action will pass successfully and the indicator will be overwritten.",
+            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platform</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.",
             "type": "contain",
             "identifier": "upload_iocs",
             "read_only": false,
@@ -7885,7 +7885,6 @@
                     "contains": [
                         "hash",
                         "sha256",
-                        "sha1",
                         "md5",
                         "domain",
                         "ip"
@@ -7895,30 +7894,31 @@
                     "order": 0
                 },
                 "policy": {
-                    "description": "Enforcement Policy (in case of detection)",
+                    "description": "Enforcement Policy",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
-                        "detect",
-                        "none"
+                        "no_action",
+                        "allow",
+                        "prevent_no_ui",
+                        "prevent",
+                        "detect"
                     ],
                     "order": 1
                 },
-                "share_level": {
-                    "description": "Indicator share level",
+                "platforms": {
+                    "description": "Comma separated list of platforms",
                     "data_type": "string",
-                    "value_list": [
-                        "red"
-                    ],
+                    "required": true,
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (Valid for domains and ips only)",
+                    "description": "Alert lifetime in days",
                     "data_type": "numeric",
                     "order": 3
                 },
                 "source": {
-                    "description": "Indicator Originating source",
+                    "description": "Indicator originating source",
                     "data_type": "string",
                     "order": 4
                 },
@@ -7926,6 +7926,33 @@
                     "description": "Indicator description",
                     "data_type": "string",
                     "order": 5
+                },
+                "tags": {
+                    "description": "Comma separated list of tags",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "severity": {
+                    "description": "Severity level",
+                    "data_type": "string",
+                    "value_list": [
+                        "informational",
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                    ],
+                    "order": 7
+                },
+                "host_groups": {
+                    "description": "Comma separated list of host group IDs",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "filename": {
+                    "description": "Metadata filename",
+                    "data_type": "string",
+                    "order": 9
                 }
             },
             "render": {
@@ -7957,18 +7984,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f0d05b7b2fd4ddfb34069ab6e99db34"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
                         "hash",
                         "sha256",
-                        "sha1",
                         "md5",
                         "domain",
                         "ip"
                     ],
                     "example_values": [
-                        "test"
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.platforms",
+                    "data_type": "string",
+                    "example_values": [
+                        "linux"
                     ]
                 },
                 {
@@ -7979,10 +8026,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.share_level",
+                    "data_path": "action_result.parameter.severity",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "low"
                     ]
                 },
                 {
@@ -7990,6 +8037,13 @@
                     "data_type": "string",
                     "example_values": [
                         "test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
                     ]
                 },
                 {
@@ -8108,7 +8162,7 @@
         {
             "action": "update indicator",
             "description": "Update an indicator that has been uploaded",
-            "verbose": "If no parameters are provided as input, the action would pass successfully.",
+            "verbose": "Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>The value '<b>all</b>' for all the host groups</li><li>Leave it blank if there is no change</li></ul>If no parameters are provided as input, the action would pass successfully.",
             "type": "generic",
             "identifier": "update_iocs",
             "read_only": false,
@@ -8119,7 +8173,6 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
                         "md5",
                         "sha256",
                         "domain"
@@ -8129,24 +8182,24 @@
                     "order": 0
                 },
                 "policy": {
-                    "description": "Enforcement policy (in case of detection)",
+                    "description": "Enforcement policy",
                     "data_type": "string",
                     "value_list": [
-                        "detect",
-                        "none"
+                        "no_action",
+                        "allow",
+                        "prevent_no_ui",
+                        "prevent",
+                        "detect"
                     ],
                     "order": 1
                 },
-                "share_level": {
-                    "description": "Indicator share level",
+                "platforms": {
+                    "description": "Comma separated list of platforms",
                     "data_type": "string",
-                    "value_list": [
-                        "red"
-                    ],
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (Valid for domains and ips only)",
+                    "description": "Alert lifetime in days",
                     "data_type": "numeric",
                     "order": 3
                 },
@@ -8159,6 +8212,33 @@
                     "description": "Indicator description",
                     "data_type": "string",
                     "order": 5
+                },
+                "tags": {
+                    "description": "Comma separated list of tags",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "severity": {
+                    "description": "Severity level",
+                    "data_type": "string",
+                    "value_list": [
+                        "informational",
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                    ],
+                    "order": 7
+                },
+                "host_groups": {
+                    "description": "Comma separated list of host group IDs",
+                    "data_type": "string",
+                    "order": 8
+                },
+                "filename": {
+                    "description": "Metadata filename",
+                    "data_type": "string",
+                    "order": 9
                 }
             },
             "render": {
@@ -8190,17 +8270,37 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f0d05b7b2fd4ddfb34069ab6e99db34"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
                         "md5",
                         "sha256",
                         "domain"
                     ],
                     "example_values": [
-                        "test"
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.platforms",
+                    "data_type": "string",
+                    "example_values": [
+                        "linux"
                     ]
                 },
                 {
@@ -8211,10 +8311,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.share_level",
+                    "data_path": "action_result.parameter.severity",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "low"
                     ]
                 },
                 {
@@ -8222,6 +8322,13 @@
                     "data_type": "string",
                     "example_values": [
                         "test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
                     ]
                 },
                 {
