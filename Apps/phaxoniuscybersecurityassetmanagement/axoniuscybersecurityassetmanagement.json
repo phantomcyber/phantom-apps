@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Axonius",
     "license": "Copyright (c) Axonius, 2018-2021",
-    "app_version": "2.0.0",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-01-25T11:58:28.000000Z",
     "package_name": "phantom_axoniuscybersecurityassetmanagement",
     "main_module": "axoniuscybersecurityassetmanagement_connector.py",
@@ -198,6 +198,11 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma-separated)",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
             "output": [
@@ -210,7 +215,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.additional_fields",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
@@ -318,6 +330,11 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma-separated)",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
             "output": [
@@ -330,7 +347,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.additional_fields",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
@@ -438,6 +462,11 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma-separated)",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
             "output": [
@@ -450,7 +479,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.additional_fields",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
@@ -563,7 +599,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
@@ -657,6 +696,11 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma-separated)",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
             "output": [
@@ -669,7 +713,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.additional_fields",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
@@ -759,6 +810,11 @@
                     "data_type": "numeric",
                     "default": 25,
                     "order": 1
+                },
+                "additional_fields": {
+                    "description": "Additional fields to include as part of the request (comma-separated)",
+                    "data_type": "string",
+                    "order": 2
                 }
             },
             "output": [
@@ -768,7 +824,14 @@
                 },
                 {
                     "data_path": "action_result.parameter.max_rows",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        25
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.additional_fields",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.adapter_list_length",
