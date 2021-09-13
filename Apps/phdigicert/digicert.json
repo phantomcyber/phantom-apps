@@ -173,7 +173,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.common_name",
                     "data_type": "string"
                 },
                 {
@@ -184,20 +184,55 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.common_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.signature_hash",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.order_validity",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.parameter.server_platform",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.order_validity",
+                    "data_path": "action_result.parameter.signature_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert certificate id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.id",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert request id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.common_name",
+                    "data_type": "string",
+                    "column_name": "Common Name",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.summary.order_id",
@@ -224,49 +259,22 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.summary.common_name",
-                    "data_type": "string",
-                    "column_name": "Common Name",
-                    "column_order": 4
-                },
-                {
                     "data_path": "action_result.summary.signature_hash",
                     "data_type": "string",
                     "column_name": "Signature Hash",
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert order id"
-                    ]
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.domains.*.id",
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.domains.*.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert request id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert certificate id"
-                    ]
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -322,7 +330,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.comment",
                     "data_type": "string"
                 },
                 {
@@ -337,12 +345,14 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.comment",
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.comment",
+                    "data_type": "string",
+                    "column_name": "Request Comment",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary.request_id",
@@ -360,10 +370,16 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.summary.comment",
-                    "data_type": "string",
-                    "column_name": "Request Comment",
-                    "column_order": 3
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -410,10 +426,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.certificate_id",
                     "data_type": "string",
                     "contains": [
@@ -439,6 +451,18 @@
                     ],
                     "column_name": "Vault ID",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
                 }
             ],
             "render": {
@@ -476,15 +500,310 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.order_id",
                     "data_type": "string",
                     "contains": [
                         "digicert order id"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.auto_reissue",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.auto_renew",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.ca_cert.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.ca_cert.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.common_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.csr",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.date_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.dns_names",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert certificate id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.key_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.organization.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.organization_units",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.csr_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.install_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.signature_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.container.is_active",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.container.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.metadata_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.date_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.disable_issuance_email",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.disable_renewal_notifications",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_guest_access_enabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.is_out_of_contract",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.is_renewal",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.assumed_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.display_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.job_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.telephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.telephone_extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payment_method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.csr_required",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.product.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.name_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product_name_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.public_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.purchased_dns_names",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert request id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.job_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.telephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.telephone_extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.user.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.validity_years",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.common_name",
+                    "data_type": "string",
+                    "column_name": "Common Name",
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.summary.order_id",
@@ -502,303 +821,16 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.summary.common_name",
-                    "data_type": "string",
-                    "column_name": "Common Name",
-                    "column_order": 3
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert order id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert certificate id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.common_name",
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.certificate.dns_names",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.date_created",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.csr",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.organization.id",
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.certificate.organization_units",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.server_platform.id",
+                    "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.server_platform.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.server_platform.install_url",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.server_platform.csr_url",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.signature_hash",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.key_size",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.ca_cert.id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.certificate.ca_cert.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_renewal",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.date_created",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.assumed_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.display_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.city",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.state",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.validity_years",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.disable_renewal_notifications",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.auto_renew",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.auto_reissue",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.container.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.container.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.container.is_active",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.product.name_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.validation_type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.validation_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.validation_description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product.csr_required",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.first_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.last_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.email",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.job_title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.telephone",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.organization_contact.telephone_extension",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.first_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.last_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.email",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.job_title",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.telephone",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.technical_contact.telephone_extension",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.user.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.user.first_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.user.last_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.user.email",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.purchased_dns_names",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "digicert request id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.date",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.type",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.requests.*.comments",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.public_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.is_out_of_contract",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.payment_method",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.product_name_id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.custom_fields.*.metadata_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.custom_fields.*.label",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.custom_fields.*.value",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.disable_issuance_email",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.data.*.is_guest_access_enabled",
-                    "data_type": "boolean"
                 }
             ],
             "render": {
