@@ -11,7 +11,7 @@
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "2.2.0",
-    "utctime_updated": "2021-01-29T18:54:49.000000Z",
+    "utctime_updated": "2021-09-14T18:04:14.000000Z",
     "package_name": "phantom_awslambda",
     "main_module": "awslambda_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -115,7 +115,9 @@
             "description": "Use attached role when running Phantom in EC2",
             "data_type": "boolean",
             "default": false,
-            "visibility": ["onprem"],
+            "visibility": [
+                "onprem"
+            ],
             "order": 3
         }
     },
