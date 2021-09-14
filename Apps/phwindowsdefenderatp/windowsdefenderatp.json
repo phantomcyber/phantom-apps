@@ -4646,12 +4646,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Herman@phantomengineering.onmicrosoft.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ],
-                    "column_name": "Created By",
-                    "column_order": 4
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.educateUrl",
@@ -4773,9 +4768,8 @@
                     "example_values": [
                         "testuser@domain.onmicrosoft.com"
                     ],
-                    "contains": [
-                        "email"
-                    ]
+                    "column_name": "Created By",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.creationTimeDateTimeUtc",
@@ -4987,11 +4981,6 @@
                     "data_type": "string",
                     "example_values": [
                         "65265db5-a7ca-4199-a425-f37ad1dd6d31"
-                    ],
-                    "column_name": "Created By",
-                    "column_order": 4,
-                    "contains": [
-                        "email"
                     ]
                 },
                 {
@@ -5129,7 +5118,9 @@
                     "data_type": "string",
                     "example_values": [
                         "WindowsDefenderATPSiemConnector"
-                    ]
+                    ],
+                    "column_name": "Created By",
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.creationTimeDateTimeUtc",
