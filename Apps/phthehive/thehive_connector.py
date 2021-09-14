@@ -296,7 +296,7 @@ class ThehiveConnector(BaseConnector):
         data.update({'tlp': int_tlp})
 
         if 'owner' in param:
-            data.update({'owner': param['owner']})
+            data.update({'owner': param.get('owner')})
 
         # make rest call
         authToken = "Bearer {}".format(self._api_key)
