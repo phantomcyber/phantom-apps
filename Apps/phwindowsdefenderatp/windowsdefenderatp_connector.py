@@ -425,7 +425,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         return error_text
 
-    def _update_request(self, action_result, endpoint, headers=None, params=None, data=None, method='get'):
+    def _update_request(self, action_result, endpoint, headers={}, params=None, data=None, method='get'):
         """ This function is used to update the headers with access_token before making REST call.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -437,9 +437,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message),
         response obtained by making an API call
         """
-
-        if headers is None:
-            headers = {}
 
         if not self._non_interactive:
             token_data = {
@@ -1313,7 +1310,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(response)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No alerts found")
+            return action_result.set_status(phantom.APP_SUCCESS, "No alerts found")
 
         summary = action_result.update_summary({})
         summary['action_taken'] = "Retrieved Alert"
@@ -1370,7 +1367,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(response)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
 
         summary = action_result.update_summary({})
         summary['action_taken'] = "Updated Alert"
@@ -1460,7 +1457,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(response)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
 
         summary = action_result.update_summary({})
         summary['organization_prevalence'] = response.get('organizationPrevalence', 0)
@@ -1493,7 +1490,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(response)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
 
         summary = action_result.update_summary({})
         summary['global_prevalence'] = response.get('globalPrevalence', 0)
@@ -1539,7 +1536,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(device)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No devices found")
+            return action_result.set_status(phantom.APP_SUCCESS, "No devices found")
 
         summary = action_result.update_summary({})
         summary['total_devices'] = action_result.get_data_size()
@@ -1570,7 +1567,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(software)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No software found for the given device")
+            return action_result.set_status(phantom.APP_SUCCESS, "No software found for the given device")
 
         summary = action_result.update_summary({})
         summary['total_software'] = action_result.get_data_size()
@@ -1675,7 +1672,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(indicator)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No indicators found")
+            return action_result.set_status(phantom.APP_SUCCESS, "No indicators found")
 
         summary = action_result.update_summary({})
         summary['total_indicators'] = action_result.get_data_size()
@@ -1885,7 +1882,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(vulnerability)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No vulnerabilities found for the given device")
+            return action_result.set_status(phantom.APP_SUCCESS, "No vulnerabilities found for the given device")
 
         summary = action_result.update_summary({})
         summary['total_vulnerabilities'] = action_result.get_data_size()
@@ -1920,7 +1917,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if response and response.get('score'):
             action_result.add_data(response)
         else:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
 
         summary = action_result.update_summary({})
         summary[action_score_summary_key] = response.get('score')
@@ -1940,7 +1937,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         else:
             temp_dir = '/vault/tmp'
 
-        local_dir = temp_dir + '/{}'.format(guid)
+        local_dir = '{}/{}'.format(temp_dir, guid)
         self.save_progress("Using temp directory: {0}".format(guid))
 
         try:
@@ -1957,9 +1954,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         try:
             # Extracting .gz file
-            with gzip.open(gzip_file_path, 'rb') as f_in:
-                with open(file_path, 'wb') as f_out:
-                    shutil.copyfileobj(f_in, f_out)
+            with gzip.open(gzip_file_path, 'rb') as f_in, open(file_path, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
         except:
             # For other type of files add the content in the actual file
             with open(file_path, 'wb') as f_out:
@@ -1973,15 +1969,6 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if not success:
             return "Error: Unable to add the file to vault", None
-
-        try:
-            _, _, fileinfo = ph_rules.vault_info(vault_id=vault_id, container_id=self.get_container_id())
-            fileinfo = list(fileinfo)
-        except:
-            return "Error: Vault file error, newly vaulted file not found; {}".format(vault_id), None
-
-        if len(fileinfo) == 0:
-            return "Error: Vault file error, newly vaulted file not found; {}".format(vault_id), None
 
         return True, vault_id
 
@@ -2187,40 +2174,22 @@ class WindowsDefenderAtpConnector(BaseConnector):
         endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
                                    .format(device_id=device_id))
 
+        data = {
+                'Comment': comment,
+                'Commands': [
+                    {
+                        "type": "RunScript",
+                        "params": [
+                            {
+                                "key": "ScriptName",
+                                "value": script_name
+                            }
+                        ]
+                    }
+                ]
+            }
         if script_args:
-            data = {
-                'Comment': comment,
-                'Commands': [
-                    {
-                        "type": "RunScript",
-                        "params": [
-                            {
-                                "key": "ScriptName",
-                                "value": script_name
-                            },
-                            {
-                                "key": "Args",
-                                "value": script_args
-                            }
-                        ]
-                    }
-                ]
-            }
-        else:
-            data = {
-                'Comment': comment,
-                'Commands': [
-                    {
-                        "type": "RunScript",
-                        "params": [
-                            {
-                                "key": "ScriptName",
-                                "value": script_name
-                            }
-                        ]
-                    }
-                ]
-            }
+            data['Commands'][0]['params'].append({"key": "Args", "value": script_args})
 
         # make rest call
         ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
@@ -2294,7 +2263,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             action_result.add_data(kb)
 
         if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_ERROR, "No missing KBs found for the given device")
+            return action_result.set_status(phantom.APP_SUCCESS, "No missing KBs found for the given device")
 
         summary = action_result.update_summary({})
         summary['total_kbs'] = action_result.get_data_size()
