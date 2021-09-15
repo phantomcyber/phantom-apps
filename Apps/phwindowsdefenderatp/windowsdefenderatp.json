@@ -2473,7 +2473,6 @@
                 "status": {
                     "description": "Specifies the current status of the alert",
                     "data_type": "string",
-                    "required": false,
                     "order": 1,
                     "value_list": [
                         "New",
@@ -2484,7 +2483,6 @@
                 "assigned_to": {
                     "description": "Owner of the alert",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 2,
                     "contains": [
@@ -2494,7 +2492,6 @@
                 "classification": {
                     "description": "Specifies the specification of the alert",
                     "data_type": "string",
-                    "required": false,
                     "order": 3,
                     "value_list": [
                         "Unknown",
@@ -2505,7 +2502,6 @@
                 "determination": {
                     "description": "Specifies the determination of the alert",
                     "data_type": "string",
-                    "required": false,
                     "order": 4,
                     "value_list": [
                         "NotAvailable",
@@ -2520,7 +2516,6 @@
                 "comment": {
                     "description": "Comment to be added to the alert",
                     "data_type": "string",
-                    "required": false,
                     "order": 5
                 }
             },
@@ -4645,7 +4640,7 @@
                     "data_path": "action_result.data.*.createdBy",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@phantomengineering.onmicrosoft.com"
+                        "test@testdomain.onmicrosoft.com"
                     ]
                 },
                 {
@@ -4899,7 +4894,7 @@
                     "order": 5
                 },
                 "expiration_time": {
-                    "description": "The expiration time of the indicator",
+                    "description": "The expiration time of the indicator (Use this format: %Y-%m-%dT%H:%M:%SZ in UTC timezone)",
                     "data_type": "string",
                     "order": 6
                 },
@@ -4920,7 +4915,7 @@
                     "order": 8
                 },
                 "rbac_group_names": {
-                    "description": "Comma-separated list of RBAC group names the indicator would be applied to",
+                    "description": "RBAC group names the indicator would be applied to (JSON formatted list)",
                     "data_type": "string",
                     "order": 9
                 }
@@ -5222,7 +5217,7 @@
                     "data_path": "action_result.parameter.rbac_group_names",
                     "data_type": "string",
                     "example_values": [
-                        "Group1, Group2"
+                        "[\"Group1\", \"Group2\"]"
                     ]
                 },
                 {

@@ -1305,12 +1305,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         if not response:
-            return action_result.set_status(phantom.APP_ERROR, "No data found")
-        else:
-            action_result.add_data(response)
+            return action_result.set_status(phantom.APP_SUCCESS, "No alert found")
 
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_SUCCESS, "No alerts found")
+        action_result.add_data(response)
 
         summary = action_result.update_summary({})
         summary['action_taken'] = "Retrieved Alert"
@@ -1328,11 +1325,11 @@ class WindowsDefenderAtpConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         alert_id = param[DEFENDERATP_ALERT_ID]
-        status = param.get(DEFENDERATP_JSON_STATUS, None)
-        assigned_to = param.get(DEFENDERATP_JSON_ASSIGNED_TO, None)
-        classification = param.get(DEFENDERATP_JSON_CLASSIFICATION, None)
-        determination = param.get(DEFENDERATP_JSON_DETERMINATION, None)
-        comment = param.get(DEFENDERATP_JSON_COMMENT, None)
+        status = param.get(DEFENDERATP_JSON_STATUS)
+        assigned_to = param.get(DEFENDERATP_JSON_ASSIGNED_TO)
+        classification = param.get(DEFENDERATP_JSON_CLASSIFICATION)
+        determination = param.get(DEFENDERATP_JSON_DETERMINATION)
+        comment = param.get(DEFENDERATP_JSON_COMMENT)
 
         request_body = {}
 
@@ -1362,12 +1359,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         if not response:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
-        else:
-            action_result.add_data(response)
-
-        if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
+
+        action_result.add_data(response)
 
         summary = action_result.update_summary({})
         summary['action_taken'] = "Updated Alert"
@@ -1427,7 +1421,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             endpoint = DEFENDERATP_FILE_PREVALENCE_ENDPOINT.format(id=file_input)
 
         # lookBackHours
-        look_back_hours = param.get(DEFENDERATP_LOOK_BACK_HOURS_PARAM_CONST, 720)
+        look_back_hours = param.get(DEFENDERATP_LOOK_BACK_HOURS_PARAM_CONST, DEFENDERATP_MAX_LOOK_BACK_HOURS)
 
         # Check for integer value
         ret_val, look_back_hours = self._validate_integer(action_result, look_back_hours, LOOK_BACK_HOURS_KEY, allow_zero=False)
@@ -1435,7 +1429,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         # Upper limit validation for look_back_hours
-        if look_back_hours > 720:
+        if look_back_hours > DEFENDERATP_MAX_LOOK_BACK_HOURS:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_LOOK_BACK_HOURS)
 
         # URL
@@ -1453,11 +1447,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         if not response:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
-        else:
-            action_result.add_data(response)
 
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
+        action_result.add_data(response)
 
         summary = action_result.update_summary({})
         summary['organization_prevalence'] = response.get('organizationPrevalence', 0)
@@ -1668,14 +1659,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        for indicator in response.get('value', []):
+        if not response:
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
+
+        indicators = response.get('value', [])
+        len_indicators = len(indicators)
+
+        for indicator in indicators:
             action_result.add_data(indicator)
 
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_SUCCESS, "No indicators found")
-
         summary = action_result.update_summary({})
-        summary['total_indicators'] = action_result.get_data_size()
+        summary['total_indicators'] = len_indicators
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1763,7 +1757,12 @@ class WindowsDefenderAtpConnector(BaseConnector):
         rbac_group_names_list = None
         rbac_group_names = param.get(DEFENDERATP_JSON_RBAC_GROUP_NAMES)
         if rbac_group_names:
-            rbac_group_names_list = [x.strip() for x in rbac_group_names.split(',')]
+            # Load the json value
+            rbac_group_names_list = json.loads(rbac_group_names)
+            # Check for valid JSON formatted list
+            if not isinstance(rbac_group_names_list, list):
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_LIST_JSON_ERR.format("rbac_group_names")), None
+            # Remove empty values from the list
             rbac_group_names_list = list(filter(None, rbac_group_names_list))
             if not rbac_group_names_list:
                 return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_RBAC_GROUP_NAMES)
@@ -1805,15 +1804,16 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return action_result.get_status()
 
         if not response:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_SUBMIT_INDICATOR_PARSE_ERR)
-        else:
-            action_result.add_data(response)
-
-        if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_SUBMIT_INDICATOR_PARSE_ERR)
 
+        indicator_id = response.get('id')
+        if not indicator_id:
+            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_SUBMIT_INDICATOR_ID_PARSE_ERR)
+
+        action_result.add_data(response)
+
         summary = action_result.update_summary({})
-        summary['indicator_id'] = response.get('id')
+        summary['indicator_id'] = indicator_id
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1842,19 +1842,17 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        results = list()
         if not response:
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
-        else:
-            results = response.get('Results', [])
-            for result in results:
-                action_result.add_data(result)
 
-        if not action_result.get_data_size():
-            return action_result.set_status(phantom.APP_SUCCESS, DEFENDERATP_NO_DATA_FOUND)
+        results = response.get('Results', [])
+        len_results = len(results)
+
+        for result in results:
+            action_result.add_data(result)
 
         summary = action_result.update_summary({})
-        summary['total_results'] = len(results)
+        summary['total_results'] = len_results
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

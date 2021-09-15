@@ -115,6 +115,7 @@ DEFENDERATP_QUARANTINE_TIMEOUT_MAX_LIMIT = 60
 DEFENDERATP_SCAN_TIMEOUT_MAX_LIMIT = 3600
 DEFENDERATP_LIVE_RESPONSE_DEFAULT = 300
 DEFENDERATP_RUN_SCRIPT_MAX_LIMIT = 600
+DEFENDERATP_MAX_LOOK_BACK_HOURS = 720
 
 # Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
@@ -160,3 +161,5 @@ DEFENDERATP_INVALID_INDICATOR_TYPE = 'Please provide a valid "indicator type" va
 DEFENDERATP_INVALID_ACTION = 'Please provide a valid "action" value. Possible action values are "Alert", "AlertAndBlock", "Allowed".'
 DEFENDERATP_INVALID_SEVERITY = 'Please provide a valid "severity" value. Possible severity values are "Informational", "Low", "Medium", "High".'
 DEFENDERATP_SUBMIT_INDICATOR_PARSE_ERR = 'Submitted indicator but not able to parse the response'
+DEFENDERATP_SUBMIT_INDICATOR_ID_PARSE_ERR = 'Submitted indicator but not able to parse the Indicator ID'
+DEFENDERATP_INVALID_LIST_JSON_ERR = "Please provide valid JSON formatted list in the '{0}' parameter."
