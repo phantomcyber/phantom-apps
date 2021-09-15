@@ -831,7 +831,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY, allow_zero=False)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -883,7 +883,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY, allow_zero=False)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -1591,7 +1591,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
         comment = param[DEFENDERATP_JSON_COMMENT]
         timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_STATUS_CHECK_DEFAULT)
 
-        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY, allow_zero=False)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -1881,8 +1881,8 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        for software in response.get('value', []):
-            action_result.add_data(software)
+        for vulnerability in response.get('value', []):
+            action_result.add_data(vulnerability)
 
         if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, "No vulnerabilities found for the given device")
@@ -1917,12 +1917,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if response:
+        if response and response.get('score'):
             action_result.add_data(response)
         else:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
-
-        if not action_result.get_data_size():
             return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
 
         summary = action_result.update_summary({})
