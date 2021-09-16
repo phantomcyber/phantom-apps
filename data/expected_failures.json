@@ -72,7 +72,7 @@
       "verbose": [
         "`Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>` does not contain a period",
         "`Action uses the GMail API. Requires authorization with the following scope:<ul><li>https://mail.google.com/</li></ul>` does not contain a period",
-        "`Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>` does not contain a period"
+        "`Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>` does not contain a period"
       ]
     },
     "Optional Parameters": {
