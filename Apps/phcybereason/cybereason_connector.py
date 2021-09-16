@@ -421,6 +421,80 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_isolate_machine_by_id(self, param):
+        """
+        Isolate the machine with specified id. The machine with the id provided as parameter will be
+        disconnected from the network
+        
+        Parameters:
+            param: object containing the machine id
+
+        Returns:
+            Action results
+        """
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        sensor_id = self._get_string_param(param.get('sensor_id'))
+
+        try:
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/monitor/global/commands/isolate".format(self._base_url)
+            self.save_progress(url)
+            query = json.dumps({"pylumIds": [sensor_id]})
+
+            res = cr_session.post(url, data=query, headers=self._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_unisolate_machine_by_id(self, param):
+        """
+        Un-isolate the machine with specified id. The machine with the id provided as parameter will be
+        connected to the network again.
+        
+        Parameters:
+            param: object containing the machine id
+
+        Returns:
+            Action results
+        """
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        sensor_id = self._get_string_param(param.get('sensor_id'))
+
+        try:
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/monitor/global/commands/un-isolate".format(self._base_url)
+            self.save_progress(url)
+            query = json.dumps({"pylumIds": [sensor_id]})
+
+            res = cr_session.post(url, data=query, headers=self._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_kill_process(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
@@ -632,6 +706,12 @@ class CybereasonConnector(BaseConnector):
 
         elif action_id == 'unisolate_machine':
             ret_val = self._handle_unisolate_machine(param)
+
+        elif action_id == 'isolate_machine_by_id':
+            ret_val = self._handle_isolate_machine_by_id(param)
+
+        elif action_id == 'unisolate_machine_by_id':
+            ret_val = self._handle_unisolate_machine_by_id(param)
 
         elif action_id == 'kill_process':
             ret_val = self._handle_kill_process(param)
