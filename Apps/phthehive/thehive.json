@@ -623,7 +623,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully got Ticket"
+                        "Successfully fetched ticket"
                     ]
                 },
                 {
@@ -896,7 +896,7 @@
                     "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
-                        "Successfully updated Ticket"
+                        "Successfully updated ticket"
                     ]
                 },
                 {
@@ -1433,7 +1433,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully created Tasks"
+                        "Successfully created task"
                     ]
                 },
                 {
@@ -1881,7 +1881,7 @@
                     "data_path": "action_result.data.*.createdBy",
                     "data_type": "string",
                     "column_name": "Created By",
-                    "column_order": 2,
+                    "column_order": 1,
                     "example_values": [
                         "testUser"
                     ]
@@ -2273,7 +2273,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully updated Task"
+                        "Successfully updated task"
                     ]
                 },
                 {
@@ -2684,7 +2684,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully created Observable"
+                        "Successfully created observable"
                     ]
                 },
                 {
@@ -3061,8 +3061,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved observables",
-                        "Successfully retrieved observable(s)"
+                        "Num observables found: 8"
                     ]
                 },
                 {
@@ -3131,6 +3130,9 @@
                     "data_type": "string",
                     "contains": [
                         "thehive task id"
+                    ],
+                    "example_values": [
+                        "AZmubWXJkcm5LPGvTUh_"
                     ]
                 },
                 {
@@ -3138,6 +3140,13 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCdsmt-_WVPphkhQv"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*._parent",
+                    "data_type": "string",
+                    "example_values": [
+                        "AZmubWXJkcm5LPGvTUh_"
                     ]
                 },
                 {
@@ -3192,10 +3201,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is expected activity. Closing Task"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.order",
                     "data_type": "numeric",
                     "example_values": [
                         0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.owner",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.startDate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1631792756852
                     ]
                 },
                 {
@@ -3217,7 +3247,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully created Tasks"
+                        "Successfully created task log"
                     ]
                 },
                 {
