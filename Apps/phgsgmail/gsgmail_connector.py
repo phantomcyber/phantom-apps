@@ -441,12 +441,9 @@ class GSuiteConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         scopes = ['https://www.googleapis.com/auth/gmail.readonly']
-
-        # Create a service here
-        self.save_progress("Creating GMail service object")
-
         user_email = param['email']
 
+        self.save_progress("Creating GMail service object")
         ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", user_email)
 
         if (phantom.is_fail(ret_val)):
