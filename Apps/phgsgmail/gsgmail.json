@@ -882,9 +882,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Google Workspace: Your invoice is available for hermancorp.biz"
-                    ],
-                    "column_name": "Subject",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.from",
@@ -894,9 +892,7 @@
                     ],
                     "contains": [
                         "email"
-                    ],
-                    "column_name": "From",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.to",
@@ -906,9 +902,7 @@
                     ],
                     "contains": [
                         "email"
-                    ],
-                    "column_name": "To",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.email_headers.*.x_google_dkim_signature",
@@ -1182,10 +1176,5 @@
                 "view": "gsgmail_view.get_email"
             }
         }
-    ],
-    "directory": "gsuiteforgmail_9c73f233-2c4a-406a-855e-41d8d2497d0e",
-    "version": 1,
-    "appname": "-",
-    "executable": "spawn3",
-    "disabled": false
+    ]
 }

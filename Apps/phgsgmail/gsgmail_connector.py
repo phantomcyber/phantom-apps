@@ -332,9 +332,9 @@ class GSuiteConnector(BaseConnector):
                         'run_automation': False,
                         'source_data_identifier': None
                     }
-                    ret_val, _, _ = self.save_artifact(artifact)
+                    ret_val, msg, _ = self.save_artifact(artifact)
                     if phantom.is_fail(ret_val):
-                        return action_result.get_status()
+                        return action_result.set_status(phantom.APP_ERROR, "Could not save artifact to container: {}".format(msg))
             email_details['email_headers'].append(headers)
         email_details['parsed_plain_body'] = '\n\n'.join(plain_bodies)
         email_details['parsed_html_body'] = '\n\n'.join(html_bodies)
@@ -367,23 +367,23 @@ class GSuiteConnector(BaseConnector):
         query_string = ""
 
         if ('label' in param):
-            query_string += " label:{0}".format(self._handle_py_ver_compat_for_input_str(param['label']))
+            query_string += " label:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('label')))
 
         if ('subject' in param):
-            query_string += " subject:{0}".format(self._handle_py_ver_compat_for_input_str(param['subject']))
+            query_string += " subject:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('subject')))
 
         if ('sender' in param):
-            query_string += " from:{0}".format(param['sender'])
+            query_string += " from:{0}".format(param.get('sender'))
 
         if ('internet_message_id' in param):
-            query_string += " rfc822msgid:{0}".format(self._handle_py_ver_compat_for_input_str(param['internet_message_id']))
+            query_string += " rfc822msgid:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('internet_message_id')))
 
         if ('body' in param):
-            query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param['body']))
+            query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param.get('body')))
 
         # if query is present, then override everything
         if ('query' in param):
-            query_string = self._handle_py_ver_compat_for_input_str(param['query'])
+            query_string = self._handle_py_ver_compat_for_input_str(param.get('query'))
 
         """
         # Check if there is something present in the query string
@@ -436,14 +436,10 @@ class GSuiteConnector(BaseConnector):
 
     def _handle_get_email(self, param):
 
-        # Implement the handler here, some basic code is already in
-
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        # Create the credentials with the required scope
         scopes = ['https://www.googleapis.com/auth/gmail.readonly']
 
         # Create a service here
