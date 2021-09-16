@@ -1649,7 +1649,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         filter = param.get(DEFENDERATP_JSON_FILTER)
         if filter:
-            endpoint = "{}&$filter={}".format(endpoint, filter)
+            endpoint = "{}&$filter={}".format(endpoint, filter.replace("&", "%26"))
 
         url = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, endpoint)
 
