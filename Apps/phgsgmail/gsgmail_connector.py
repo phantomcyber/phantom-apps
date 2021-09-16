@@ -365,18 +365,14 @@ class GSuiteConnector(BaseConnector):
 
         # create the query string
         query_string = ""
+        query_dict = {
+            'label': param.get('label'),
+            'subject': param.get('subject'),
+            'from': param.get('sender'),
+            'rfc822msgid': param.get('internet_message_id')
+        }
 
-        if ('label' in param):
-            query_string += " label:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('label')))
-
-        if ('subject' in param):
-            query_string += " subject:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('subject')))
-
-        if ('sender' in param):
-            query_string += " from:{0}".format(param.get('sender'))
-
-        if ('internet_message_id' in param):
-            query_string += " rfc822msgid:{0}".format(self._handle_py_ver_compat_for_input_str(param.get('internet_message_id')))
+        query_string = ' '.join('{}:{}'.format(key, value) for key, value in query_dict.items() if value is not None)
 
         if ('body' in param):
             query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param.get('body')))
