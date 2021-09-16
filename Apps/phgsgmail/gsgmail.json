@@ -796,7 +796,7 @@
         {
             "action": "get email",
             "description": "Retrieve email details via internet message id",
-            "verbose": "Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>",
+            "verbose": "Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>",
             "type": "investigate",
             "identifier": "get_email",
             "read_only": false,
