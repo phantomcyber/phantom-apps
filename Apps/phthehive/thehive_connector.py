@@ -14,8 +14,8 @@ from thehive_consts import *
 import requests
 import json
 import magic
-import os
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 
 
 class RetVal(tuple):
@@ -38,7 +38,6 @@ class ThehiveConnector(BaseConnector):
         self._base_url = None
 
         self._api_key = None
-        self._proxy = None
 
     def _get_error_message_from_exception(self, e):
         """
@@ -47,7 +46,7 @@ class ThehiveConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_code = ERR_CODE_MSG
+        error_code = None
         error_msg = ERR_MSG_UNAVAILABLE
 
         try:
@@ -56,47 +55,16 @@ class ThehiveConnector(BaseConnector):
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
         except:
             pass
 
-        try:
-            if error_code in ERR_CODE_MSG:
-                error_text = "Error Message: {}".format(error_msg)
-            else:
-                error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
-        except:
-            self.debug_print(PARSE_ERR_MSG)
-            error_text = PARSE_ERR_MSG
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
 
         return error_text
-
-    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
-        """
-        Validate an integer.
-
-        :param action_result: Action result or BaseConnector object
-        :param parameter: input parameter
-        :param key: input parameter message key
-        :allow_zero: whether zero should be considered as valid value or not
-        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS, integer value of the parameter or None in case of failure
-        """
-        if parameter is not None:
-            try:
-                if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, THEHIVE_VALID_INT_MSG.format(param=key)), None
-
-                parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, THEHIVE_VALID_INT_MSG.format(param=key)), None
-
-            if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, THEHIVE_NON_NEG_INT_MSG.format(param=key)), None
-            if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, THEHIVE_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
-
-        return phantom.APP_SUCCESS, parameter
 
     def _process_empty_reponse(self, response, action_result):
 
@@ -149,6 +117,9 @@ class ThehiveConnector(BaseConnector):
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         try:
+            if resp_json.get('type') and resp_json.get('message'):
+                message = "Error from server. Status Code: {0} Data from server: Error Type: {1}. Error Message: {2}".format(
+                    r.status_code, resp_json.get('type'), resp_json.get('message'))
             if resp_json.get('errors', [])[0][0].get('message'):
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(
                     r.status_code, resp_json.get('errors', [])[0][0].get('message'))
@@ -209,8 +180,7 @@ class ThehiveConnector(BaseConnector):
                             headers=headers,
                             verify=config.get('verify_server_cert', False),
                             params=params,
-                            files=files,
-                            proxies=self._proxy)
+                            files=files)
             else:
                 r = request_func(
                             url,
@@ -218,8 +188,7 @@ class ThehiveConnector(BaseConnector):
                             headers=headers,
                             verify=config.get('verify_server_cert', False),
                             params=params,
-                            files=files,
-                            proxies=self._proxy)
+                            files=files)
         except requests.exceptions.InvalidURL as e:
             self.debug_print(self._get_error_message_from_exception(e))
             return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_INVALID_URL.format(url=url)), resp_json)
@@ -317,6 +286,8 @@ class ThehiveConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
 
         # make rest call
         endpoint = "api/case/{}".format(case_id)
@@ -340,6 +311,9 @@ class ThehiveConnector(BaseConnector):
         data = dict()
         fields = dict()
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
+
         ret_val, fields = self._get_fields(param, action_result)
 
         if phantom.is_fail(ret_val):
@@ -387,6 +361,9 @@ class ThehiveConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
+
         title = param['title']
         status = param['status']
         data = dict()
@@ -401,7 +378,7 @@ class ThehiveConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created tasks")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created task")
 
     def _handle_search(self, param, path):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -443,6 +420,9 @@ class ThehiveConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         data = dict()
         task_id = param['task_id']
+        # encoding task_id
+        task_id = quote(task_id, safe='')
+
         title = param.get('task_title')
         owner = param.get('task_owner')
         status = param.get('task_status')
@@ -501,7 +481,8 @@ class ThehiveConnector(BaseConnector):
         authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         data = {"query": { "_parent": { "_type": "case", "_query": { "_id": case_id}}}}
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=data, params=None, method="post", headers=headers)
+        params = {'range': 'all'}
+        ret_val, response = self._make_rest_call(endpoint, action_result, data=data, params=params, method="post", headers=headers)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -519,7 +500,7 @@ class ThehiveConnector(BaseConnector):
                     resp['attachment']['sha1'] = hashes[1]
                     resp['attachment']['md5'] = hashes[2]
 
-        action_result.add_data(response_formatted)
+            action_result.add_data(resp)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Num observables found: {}".format(len(response_formatted)))
 
@@ -615,6 +596,10 @@ class ThehiveConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         task_id = param['task_id']
+
+        # encoding task_id
+        task_id = quote(task_id, safe='')
+
         message = param['message']
         data = dict()
         data.update({'message': message})
@@ -695,18 +680,6 @@ class ThehiveConnector(BaseConnector):
             self._base_url = "{}/".format(self._base_url)
 
         self._api_key = config['api_key']
-
-        self._proxy = {}
-        env_vars = config.get('_reserved_environment_variables', {})
-        if 'HTTP_PROXY' in env_vars:
-            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
-        elif 'HTTP_PROXY' in os.environ:
-            self._proxy['http'] = os.environ.get('HTTP_PROXY')
-
-        if 'HTTPS_PROXY' in env_vars:
-            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
-        elif 'HTTPS_PROXY' in os.environ:
-            self._proxy['https'] = os.environ.get('HTTPS_PROXY')
 
         return phantom.APP_SUCCESS
 

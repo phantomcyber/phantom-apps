@@ -7,14 +7,7 @@ THEHIVE_SEVERITY_DICT = {"Low": 1, "Medium": 2, "High": 3}
 THEHIVE_TLP_DICT = {"White": 0, "Green": 1, "Amber": 2, "Red": 3}
 
 # Constants relating to 'get_error_message_from_exception'
-ERR_CODE_MSG = "Error code unavailable"
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
-PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset configuration and|or action parameters."
-
-# Constants relating to 'validate_integer'
-THEHIVE_VALID_INT_MSG = "Please provide a valid integer value in the {param} parameter"
-THEHIVE_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in {param} parameter"
-THEHIVE_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the {param} parameter"
 
 # Constants relating to error messages
 THEHIVE_ERR_INVALID_URL = "Error connecting to server. Invalid URL: '{url}'"

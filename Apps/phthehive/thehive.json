@@ -114,7 +114,7 @@
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 1,
+                    "column_order": 2,
                     "example_values": [
                         "testTicket",
                         "Today is a beautiful day!",
@@ -125,7 +125,7 @@
                     "data_path": "action_result.parameter.fields",
                     "data_type": "string",
                     "column_name": "Fields",
-                    "column_order": 2,
+                    "column_order": 3,
                     "example_values": [
                         "{\"field_name_1\": \"field_value_1\", \"field_name_2\": \"field_value_2\"}"
                     ]
@@ -151,7 +151,7 @@
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
                     "column_name": "Title",
-                    "column_order": 0,
+                    "column_order": 1,
                     "example_values": [
                         "Test",
                         "QA"
@@ -168,6 +168,11 @@
                 {
                     "data_path": "action_result.data.*._id",
                     "data_type": "string",
+                    "column_name": "Ticket ID",
+                    "column_order": 0,
+                    "contains": [
+                        "thehive ticket id"
+                    ],
                     "example_values": [
                         "AWQfCcret-_WVPphkhQq"
                     ]
@@ -204,7 +209,7 @@
                     "contains": [
                         "thehive case id"
                     ],
-                    "column_order": 6,
+                    "column_order": 7,
                     "example_values": [
                         22,
                         125
@@ -253,7 +258,7 @@
                     "data_path": "action_result.data.*.owner",
                     "data_type": "string",
                     "column_name": "Owner",
-                    "column_order": 5,
+                    "column_order": 6,
                     "contains": [
                         "thehive username"
                     ],
@@ -265,7 +270,7 @@
                     "data_path": "action_result.data.*.severity",
                     "data_type": "numeric",
                     "column_name": "Severity",
-                    "column_order": 4,
+                    "column_order": 5,
                     "example_values": [
                         3
                     ]
@@ -297,7 +302,7 @@
                     "data_path": "action_result.data.*.tlp",
                     "data_type": "numeric",
                     "column_name": "TLP",
-                    "column_order": 3,
+                    "column_order": 4,
                     "example_values": [
                         2
                     ]
@@ -1070,7 +1075,7 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "ID",
+                    "column_name": "Ticket ID",
                     "column_order": 0,
                     "example_values": [
                         "AWLQTgP39H5JF8Rllv1b",
@@ -2768,7 +2773,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*._id",
+                    "data_path": "action_result.data.*._id",
                     "data_type": "string",
                     "example_values": [
                         "1e3ca6553ce39d7e02bd33d810bc146f",
@@ -2781,7 +2786,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*._parent",
+                    "data_path": "action_result.data.*._parent",
                     "data_type": "string",
                     "example_values": [
                         "AWM8DPOUt-_WVPphkhEG",
@@ -2789,7 +2794,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*._routing",
+                    "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
                         "AWM8DPOUt-_WVPphkhEG",
@@ -2797,14 +2802,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*._type",
+                    "data_path": "action_result.data.*._type",
                     "data_type": "string",
                     "example_values": [
                         "case_artifact"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*._version",
+                    "data_path": "action_result.data.*._version",
                     "data_type": "numeric",
                     "example_values": [
                         1,
@@ -2812,14 +2817,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.contentType",
+                    "data_path": "action_result.data.*.attachment.contentType",
                     "data_type": "string",
                     "example_values": [
                         "application/msword"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.hashes",
+                    "data_path": "action_result.data.*.attachment.hashes",
                     "data_type": "string",
                     "example_values": [
                         "0a50c51731e49723e563babc54b6b404"
@@ -2829,7 +2834,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.id",
+                    "data_path": "action_result.data.*.attachment.id",
                     "data_type": "string",
                     "example_values": [
                         "0792bb710556be0218e669b31b94ee01ae639f36b504d4ca01b484918040ffca"
@@ -2839,7 +2844,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.md5",
+                    "data_path": "action_result.data.*.attachment.md5",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -2850,14 +2855,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.name",
+                    "data_path": "action_result.data.*.attachment.name",
                     "data_type": "string",
                     "example_values": [
                         "test.docx"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.sha1",
+                    "data_path": "action_result.data.*.attachment.sha1",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -2868,7 +2873,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.sha256",
+                    "data_path": "action_result.data.*.attachment.sha256",
                     "data_type": "string",
                     "contains": [
                         "hash",
@@ -2879,14 +2884,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.attachment.size",
+                    "data_path": "action_result.data.*.attachment.size",
                     "data_type": "numeric",
                     "example_values": [
                         11745
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.createdAt",
+                    "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
                         1534787641225,
@@ -2896,14 +2901,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.createdBy",
+                    "data_path": "action_result.data.*.createdBy",
                     "data_type": "string",
                     "example_values": [
                         "admin"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.data",
+                    "data_path": "action_result.data.*.data",
                     "data_type": "string",
                     "example_values": [
                         "1.1.1.1",
@@ -2914,7 +2919,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.dataType",
+                    "data_path": "action_result.data.*.dataType",
                     "data_type": "string",
                     "example_values": [
                         "ip",
@@ -2924,7 +2929,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
                         "1e3ca6553ce39d7e02bd33d810bc146f",
@@ -2937,7 +2942,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.ioc",
+                    "data_path": "action_result.data.*.ioc",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -2945,7 +2950,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.message",
+                    "data_path": "action_result.data.*.message",
                     "data_type": "string",
                     "example_values": [
                         "IP",
@@ -2955,28 +2960,28 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.reports.Abuse_Finder_2_0.taxonomies.*.level",
+                    "data_path": "action_result.data.*.reports.Abuse_Finder_2_0.taxonomies.*.level",
                     "data_type": "string",
                     "example_values": [
                         "info"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.reports.Abuse_Finder_2_0.taxonomies.*.namespace",
+                    "data_path": "action_result.data.*.reports.Abuse_Finder_2_0.taxonomies.*.namespace",
                     "data_type": "string",
                     "example_values": [
                         "Abuse_Finder"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.reports.Abuse_Finder_2_0.taxonomies.*.predicate",
+                    "data_path": "action_result.data.*.reports.Abuse_Finder_2_0.taxonomies.*.predicate",
                     "data_type": "string",
                     "example_values": [
                         "Address"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.reports.Abuse_Finder_2_0.taxonomies.*.value",
+                    "data_path": "action_result.data.*.reports.Abuse_Finder_2_0.taxonomies.*.value",
                     "data_type": "string",
                     "example_values": [
                         "xyz@test.com"
@@ -2986,7 +2991,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.sighted",
+                    "data_path": "action_result.data.*.sighted",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -2994,7 +2999,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.startDate",
+                    "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
                         1534787641306,
@@ -3004,7 +3009,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.status",
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
                         "Ok",
@@ -3012,7 +3017,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.tags",
+                    "data_path": "action_result.data.*.tags",
                     "data_type": "string",
                     "example_values": [
                         "malicious",
@@ -3022,7 +3027,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.tlp",
+                    "data_path": "action_result.data.*.tlp",
                     "data_type": "numeric",
                     "example_values": [
                         2,
@@ -3030,7 +3035,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.updatedAt",
+                    "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
                         1542199783148,
@@ -3038,7 +3043,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.updatedBy",
+                    "data_path": "action_result.data.*.updatedBy",
                     "data_type": "string",
                     "example_values": [
                         "admin"
