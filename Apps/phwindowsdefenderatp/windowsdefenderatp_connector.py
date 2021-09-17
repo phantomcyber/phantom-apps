@@ -1641,7 +1641,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         limit = param.get(DEFENDERATP_JSON_LIMIT, DEFENDERATP_ALERT_DEFAULT_LIMIT)
 
-        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY)
+        ret_val, limit = self._validate_integer(action_result, limit, LIMIT_KEY, allow_zero=False)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
