@@ -17,22 +17,31 @@ from phantom.base_connector import BaseConnector
 from axoniuscybersecurityassetmanagement_consts import *
 
 
-def get_str_arg(param: dict, key: str, required: bool = False, default: str = "") -> str:
+def get_str_arg(
+    param: dict, key: str, required: bool = False, default: str = ""
+) -> str:
     """Get a key from a command arg and convert it into an str."""
     value = param.get(key, default)
 
     if not isinstance(value, str):
-        raise ValueError(f"Please provide a valid string value for the parameter {key!r}")
+        raise ValueError(
+            f"Please provide a valid string value for the parameter '{key!r}'"
+        )
 
     value = value.strip()
 
     if not value and required:
-        raise ValueError(f"No value supplied for parameter {key!r}")
+        raise ValueError(f"No value supplied for parameter '{key!r}'")
 
     return value
 
 
-def get_int_arg(param: dict, key: str, required: bool = False, default: Optional[Union[str, int]] = None) -> int:
+def get_int_arg(
+    param: dict,
+    key: str,
+    required: bool = False,
+    default: Optional[Union[str, int]] = None,
+) -> int:
     """Get a key from a command arg and convert it into an int."""
     param_val = param.get(key, default)
 
@@ -97,10 +106,13 @@ class AxoniusConnector(BaseConnector):
         self._client_args: dict = {}
 
     def _get_error_message_from_exception(self, e):
-        """ This method is used to get appropriate error messages from the exception.
+        """This method is used to get appropriate error messages from the exception.
         :param e: Exception object
         :return: error message
         """
+
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
 
         try:
             if e.args:
@@ -110,23 +122,10 @@ class AxoniusConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = ERR_CODE_MSG
                     error_msg = e.args[0]
-            else:
-                error_code = ERR_CODE_MSG
-                error_msg = ERR_MSG_UNAVAILABLE
         except:
-            error_code = ERR_CODE_MSG
-            error_msg = ERR_MSG_UNAVAILABLE
+            pass
 
-        try:
-            if error_code in ERR_CODE_MSG:
-                error_text = "Error Message: {0}".format(error_msg)
-            else:
-                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-        except:
-            self.debug_print(PARSE_ERR_MSG)
-            error_text = PARSE_ERR_MSG
-
-        return error_text
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _create_client(self, action_result: phantom.ActionResult) -> bool:
         """Create an instance of Axonius API Client."""
@@ -234,6 +233,19 @@ class AxoniusConnector(BaseConnector):
             status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
+        additional_fields = []
+        try:
+            additional_fields_str: str = get_str_arg(
+                key=ADDITIONAL_FIELDS_KEY, param=param
+            )
+            if len(additional_fields_str) > 0:
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
         try:
             apiobj: AssetMixin = getattr(self._client, obj_type)
         except AttributeError:
@@ -247,6 +259,7 @@ class AxoniusConnector(BaseConnector):
             assets: List[dict] = apiobj.get_by_value(
                 value=hostname,
                 field="specific_data.data.hostname",
+                fields=additional_fields,
                 max_rows=max_rows,
                 field_null=True,
                 field_null_value=[],
@@ -283,6 +296,19 @@ class AxoniusConnector(BaseConnector):
             status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
+        additional_fields = []
+        try:
+            additional_fields_str: str = get_str_arg(
+                key=ADDITIONAL_FIELDS_KEY, param=param
+            )
+            if len(additional_fields_str) > 0:
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
         try:
             apiobj: AssetMixin = getattr(self._client, obj_type)
         except AttributeError:
@@ -296,6 +322,7 @@ class AxoniusConnector(BaseConnector):
             assets: List[dict] = apiobj.get_by_value(
                 value=ip,
                 field="specific_data.data.network_interfaces.ips",
+                fields=additional_fields,
                 max_rows=max_rows,
                 field_null=True,
                 field_null_value=[],
@@ -332,6 +359,19 @@ class AxoniusConnector(BaseConnector):
             status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
+        additional_fields = []
+        try:
+            additional_fields_str: str = get_str_arg(
+                key=ADDITIONAL_FIELDS_KEY, param=param
+            )
+            if len(additional_fields_str) > 0:
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
         try:
             apiobj: AssetMixin = getattr(self._client, obj_type)
         except AttributeError:
@@ -345,6 +385,7 @@ class AxoniusConnector(BaseConnector):
             assets: List[dict] = apiobj.get_by_value(
                 value=mac,
                 field="specific_data.data.network_interfaces.mac",
+                fields=additional_fields,
                 max_rows=max_rows,
                 field_null=True,
                 field_null_value=[],
@@ -426,6 +467,19 @@ class AxoniusConnector(BaseConnector):
             status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
+        additional_fields = []
+        try:
+            additional_fields_str: str = get_str_arg(
+                key=ADDITIONAL_FIELDS_KEY, param=param
+            )
+            if len(additional_fields_str) > 0:
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
         try:
             apiobj: AssetMixin = getattr(self._client, obj_type)
         except AttributeError:
@@ -439,6 +493,7 @@ class AxoniusConnector(BaseConnector):
             assets: List[dict] = apiobj.get_by_value(
                 value=mail,
                 field="specific_data.data.mail",
+                fields=additional_fields,
                 max_rows=max_rows,
                 field_null=True,
                 field_null_value=[],
@@ -475,6 +530,19 @@ class AxoniusConnector(BaseConnector):
             status = f"Failed to parse parameters: {err_msg}"
             return action_result.set_status(phantom.APP_ERROR, status)
 
+        additional_fields = []
+        try:
+            additional_fields_str: str = get_str_arg(
+                key=ADDITIONAL_FIELDS_KEY, param=param
+            )
+            if len(additional_fields_str) > 0:
+                additional_fields = [x.strip() for x in additional_fields_str.split(',')]
+                additional_fields = list(filter(None, additional_fields))
+        except Exception as exc:
+            err_msg = self._get_error_message_from_exception(exc)
+            status = f"Failed to parse additional fields: {err_msg}"
+            return action_result.set_status(phantom.APP_ERROR, status)
+
         try:
             apiobj: AssetMixin = getattr(self._client, obj_type)
         except AttributeError:
@@ -488,6 +556,7 @@ class AxoniusConnector(BaseConnector):
             assets: List[dict] = apiobj.get_by_value(
                 value=username,
                 field="specific_data.data.username",
+                fields=additional_fields,
                 max_rows=max_rows,
                 field_null=True,
                 field_null_value=[],
@@ -545,6 +614,13 @@ class AxoniusConnector(BaseConnector):
         """Initialize the Phantom integration."""
         self._state: dict = self.load_state()
         config: dict = self.get_config()
+
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, STATE_FILE_CORRUPT_ERR)
 
         self._url: str = config[URL_KEY]
 

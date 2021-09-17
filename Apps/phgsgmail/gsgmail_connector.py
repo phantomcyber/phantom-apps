@@ -8,17 +8,22 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
+from phantom.vault import Vault
 import phantom.utils as ph_utils
 
 from gsgmail_consts import *
 from bs4 import UnicodeDammit
-from google.oauth2 import service_account
+
 
 # Fix to add __init__.py in dependencies folder
 import os
 import requests
 import json
 import sys
+import base64
+import email
+from requests.structures import CaseInsensitiveDict
+from google.oauth2 import service_account
 
 init_path = '{}/dependencies/google/__init__.py'.format(  # noqa
     os.path.dirname(os.path.abspath(__file__))  # noqa
@@ -184,14 +189,14 @@ class GSuiteConnector(BaseConnector):
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
-    def _get_email_details(self, action_result, email_addr, email_id, service):
+    def _get_email_details(self, action_result, email_addr, email_id, service, results_format='metadata'):
 
         """
         import web_pdb
         web_pdb.set_trace()
         """
 
-        kwargs = { 'userId': email_addr, 'id': email_id, 'format': 'metadata' }
+        kwargs = {'userId': email_addr, 'id': email_id, 'format': results_format}
 
         try:
             email_details = service.users().messages().get(**kwargs).execute()
@@ -243,6 +248,99 @@ class GSuiteConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS, input_email)
 
+    def _get_email_headers_from_part(self, part, charset=None):
+
+        email_headers = list(part.items())
+
+        # TODO: the next 2 ifs can be condensed to use 'or'
+        if charset is None:
+            charset = part.get_content_charset()
+
+        if charset is None:
+            charset = 'utf8'
+
+        if not email_headers:
+            return {}
+
+        # Convert the header tuple into a dictionary
+        headers = CaseInsensitiveDict()
+
+        # assume duplicate header names with unique values. ex: received
+        for x in email_headers:
+            try:
+                headers.setdefault(x[0].lower().replace('-', '_').replace(' ', '_'), []).append(x[1])
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                err = "Error occurred while converting the header tuple into a dictionary"
+                self.debug_print("{}. {}".format(err, error_msg))
+        headers = {k.lower(): '\n'.join(v) for k, v in headers.items()}
+
+        return dict(headers)
+
+    def _parse_multipart_msg(self, action_result, msg, email_details, extract_attachments=False):
+        plain_bodies = []
+        html_bodies = []
+        container_id = self.get_container_id()
+
+        email_details['email_headers'] = []
+        for part in msg.walk():
+            type = part.get_content_type()
+            headers = self._get_email_headers_from_part(part)
+            # split out important headers (for output table rendering)
+            if headers.get('to'):
+                email_details['to'] = headers.get('to')
+
+            if headers.get('from'):
+                email_details['from'] = headers.get('from')
+
+            if headers.get('subject'):
+                email_details['subject'] = headers.get('subject')
+
+            disp = str(part.get('Content-Disposition'))
+            file_name = part.get_filename()
+            # look for plain text parts, but skip attachments
+            if type == 'text/plain' and 'attachment' not in disp:
+                charset = part.get_content_charset() or 'utf8'
+                # decode the base64 unicode bytestring into plain text
+                plain_body = part.get_payload(decode=True).decode(encoding=charset, errors="ignore")
+                # Add to list of plan text bodies
+                plain_bodies.append(plain_body)
+            if type == 'text/html' and 'attachment' not in disp:
+                charset = part.get_content_charset() or 'utf8'
+                # decode the base64 unicode bytestring into plain text
+                html_body = part.get_payload(decode=True).decode(encoding=charset, errors="ignore")
+                # Add to list of html bodies
+                html_bodies.append(html_body)
+            elif file_name and extract_attachments:
+                attach_resp = None
+                try:
+                    # Create vault item with attachment payload
+                    attach_resp = Vault.create_attachment(part.get_payload(decode=True), container_id=container_id, file_name=file_name)
+                except Exception as e:
+                    self.debug_print('Unable to add attachment: {} Error: {}').format(str(file_name), str(e))
+                if attach_resp.get('succeeded'):
+                    # Create vault artifact
+                    artifact = {
+                        'name': 'Email Attachment Artifact',
+                        'container_id': container_id,
+                        'cef': {
+                            'vaultId': attach_resp[phantom.APP_JSON_HASH],
+                            'fileHash': attach_resp[phantom.APP_JSON_HASH],
+                            'file_hash': attach_resp[phantom.APP_JSON_HASH],
+                            'fileName': file_name
+                        },
+                        'run_automation': False,
+                        'source_data_identifier': None
+                    }
+                    ret_val, msg, _ = self.save_artifact(artifact)
+                    if phantom.is_fail(ret_val):
+                        return action_result.set_status(phantom.APP_ERROR, "Could not save artifact to container: {}".format(msg))
+            email_details['email_headers'].append(headers)
+        email_details['parsed_plain_body'] = '\n\n'.join(plain_bodies)
+        email_details['parsed_html_body'] = '\n\n'.join(html_bodies)
+
+        return phantom.APP_SUCCESS
+
     def _handle_run_query(self, param):
 
         # Implement the handler here, some basic code is already in
@@ -267,25 +365,21 @@ class GSuiteConnector(BaseConnector):
 
         # create the query string
         query_string = ""
+        query_dict = {
+            'label': param.get('label'),
+            'subject': param.get('subject'),
+            'from': param.get('sender'),
+            'rfc822msgid': param.get('internet_message_id')
+        }
 
-        if ('label' in param):
-            query_string += " label:{0}".format(self._handle_py_ver_compat_for_input_str(param['label']))
-
-        if ('subject' in param):
-            query_string += " subject:{0}".format(self._handle_py_ver_compat_for_input_str(param['subject']))
-
-        if ('sender' in param):
-            query_string += " from:{0}".format(param['sender'])
-
-        if ('internet_message_id' in param):
-            query_string += " rfc822msgid:{0}".format(self._handle_py_ver_compat_for_input_str(param['internet_message_id']))
+        query_string = ' '.join('{}:{}'.format(key, value) for key, value in query_dict.items() if value is not None)
 
         if ('body' in param):
-            query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param['body']))
+            query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param.get('body')))
 
         # if query is present, then override everything
         if ('query' in param):
-            query_string = self._handle_py_ver_compat_for_input_str(param['query'])
+            query_string = self._handle_py_ver_compat_for_input_str(param.get('query'))
 
         """
         # Check if there is something present in the query string
@@ -333,6 +427,68 @@ class GSuiteConnector(BaseConnector):
 
         if (next_page):
             summary['next_page_token'] = next_page
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_email(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+        user_email = param['email']
+
+        self.save_progress("Creating GMail service object")
+        ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", user_email)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        query_string = ""
+        if 'internet_message_id' in param:
+            query_string += " rfc822msgid:{0}".format(self._handle_py_ver_compat_for_input_str(param['internet_message_id']))
+
+        kwargs = {'q': query_string, 'userId': user_email}
+
+        try:
+            messages_resp = service.users().messages().list(**kwargs).execute()
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Failed to get messages", self._get_error_message_from_exception(e))
+
+        messages = messages_resp.get('messages', [])
+        action_result.update_summary({'total_messages_returned': len(messages)})
+
+        for curr_message in messages:
+
+            curr_email_ar = ActionResult()
+
+            ret_val, email_details_resp = self._get_email_details(curr_email_ar, user_email, curr_message['id'], service, 'raw')
+
+            if (phantom.is_fail(ret_val)):
+                continue
+
+            raw_encoded = base64.urlsafe_b64decode(email_details_resp.pop('raw').encode('UTF8'))
+            msg = email.message_from_bytes(raw_encoded)
+
+            if msg.is_multipart():
+                ret_val = self._parse_multipart_msg(action_result, msg, email_details_resp, param.get('extract_attachments', False))
+
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+
+            else:
+                # not multipart
+                email_details_resp['email_headers'] = []
+                charset = msg.get_content_charset()
+                headers = self._get_email_headers_from_part(msg)
+                email_details_resp['email_headers'].append(headers)
+                try:
+                    email_details_resp['parsed_plain_body'] = msg.get_payload(decode=True).decode(encoding=charset, errors="ignore")
+                except Exception as e:
+                    self.debug_print("Unable to add email body: {}").format(e)
+
+            action_result.add_data(email_details_resp)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -517,6 +673,8 @@ class GSuiteConnector(BaseConnector):
             ret_val = self._handle_delete_email(param)
         elif action_id == 'get_users':
             ret_val = self._handle_get_users(param)
+        elif action_id == 'get_email':
+            ret_val = self._handle_get_email(param)
         elif action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
 
