@@ -530,9 +530,9 @@ class CarbonblackConnector(BaseConnector):
             if result_code == 2147942480:
                 msg = "{}{}".format(CARBONBLACK_ERR_FILE_EXISTS, msg)
             elif result_code == 2147942403:
-                msg = "Windows cannot find specified path {}".format(msg)
+                msg = "{} {}".format(CARBONBLACK_ERR_INVALID_PATH, msg)
             elif result_code == 2147942417:
-                msg = "Please check if the destination filename already exists at the specified path {}".format(msg)
+                msg = "{} {}".format(CARBONBLACK_ERR_INVALID_DEST_FILE, msg)
             return (action_result.set_status(phantom.APP_ERROR, msg), resp)
 
         return (phantom.APP_SUCCESS, resp)
@@ -1260,7 +1260,10 @@ class CarbonblackConnector(BaseConnector):
         # the timezone is hard-coded to match what was seen in the web interface
         updated_sensor = dict()
         updated_sensor['event_log_flush_time'] = (datetime.datetime.now() + datetime.timedelta(days=1)).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        updated_sensor['group_id'] = sensor.get("group_id")
+        if sensor.get("group_id"):
+            updated_sensor['group_id'] = sensor["group_id"]
+        else:
+            self.debug_print(CARBONBLACK_GROUP_ID_MSG)
 
         ret_val, body = self._make_rest_call("/v1/sensor/{0}".format(sensor_id), action_result, data=updated_sensor, method="put", additional_succ_codes={204: []})
 
@@ -1429,7 +1432,10 @@ class CarbonblackConnector(BaseConnector):
         # set the isolation status
         updated_data = dict()
         updated_data['network_isolation_enabled'] = state
-        updated_data['group_id'] = data.get('group_id')
+        if data.get('group_id'):
+            updated_data['group_id'] = data['group_id']
+        else:
+            self.debug_print(CARBONBLACK_GROUP_ID_MSG)
 
         # make a rest call to set the endpoint state
         ret_val, response = self._make_rest_call("/v1/sensor/{0}".format(endpoint_id), action_result, method="put",
@@ -1643,7 +1649,7 @@ class CarbonblackConnector(BaseConnector):
 
         if "q=" not in query:
             query_parts = query.split("&")
-            query_parts[1] = "{}{}".format("q=", query_parts[1])
+            query_parts[1] = "q={}".format(query_parts[1])
             query = "&".join(query_parts)
 
         name = param[CARBONBLACK_JSON_NAME]

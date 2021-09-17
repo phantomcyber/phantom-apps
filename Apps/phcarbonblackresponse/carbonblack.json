@@ -14,7 +14,8 @@
     "min_phantom_version": "4.9.39220",
     "python_version": "3",
     "latest_tested_versions": [
-        "On-prem, Version 6.1.0"
+        "On-prem, Version 6.1.0",
+        "On-prem, Version 7.5.0"
     ],
     "logo": "logo_carbonblack.svg",
     "logo_dark": "logo_carbonblack_dark.svg",
@@ -6128,7 +6129,7 @@
             "action": "memory dump",
             "identifier": "memory_dump",
             "description": "Memory dump for a specified path",
-            "verbose": "This actions will work for the windows endpoint.",
+            "verbose": "This action will work for the windows endpoint.",
             "type": "generic",
             "read_only": false,
             "parameters": {
