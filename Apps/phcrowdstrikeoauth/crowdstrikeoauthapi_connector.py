@@ -23,6 +23,7 @@ from bs4 import BeautifulSoup
 import simplejson as json
 from datetime import datetime
 from datetime import timedelta
+import pytz
 import time
 import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
@@ -2001,6 +2002,13 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_time_string(self, days):
+
+        expiry_date = datetime.now(pytz.utc) + timedelta(days=days)
+        time_str = expiry_date.strftime(CROWDSTRIKE_TIME_FORMAT)
+
+        return "{0}:{1}".format(time_str[:-2], time_str[-2:])
+
     def _handle_upload_iocs(self, param):
 
         # Add an action result to the App Run
@@ -2014,25 +2022,55 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
+        platforms = [x.strip() for x in param[CROWDSTRIKE_IOCS_PLATFORMS].split(",")]
+        platforms = list(filter(None, platforms))
+
+        indicator = {
+            "action": policy,
+            "platforms": platforms,
+            "type": ioc_type,
+            "value": ioc
+        }
         api_data = {
-                "value": ioc,
-                "type": ioc_type,
-                "policy": policy}
+            "indicators": [
+                indicator
+            ]
+        }
 
         # optional parameters
-        api_data["share_level"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL, 'red')
         if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
-            if data is None:
+            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
+            if days is None:
                 return action_result.get_status()
-            api_data["expiration_days"] = data
+
+            indicator[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
+
+        if CROWDSTRIKE_IOCS_SEVERITY in param:
+            indicator[CROWDSTRIKE_IOCS_SEVERITY] = param.get(CROWDSTRIKE_IOCS_SEVERITY)
+
         if CROWDSTRIKE_IOCS_SOURCE in param:
-            api_data["source"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+            indicator[CROWDSTRIKE_IOCS_SOURCE] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+
         if CROWDSTRIKE_IOCS_DESCRIPTION in param:
-            api_data["description"] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
+            indicator[CROWDSTRIKE_IOCS_DESCRIPTION] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=[api_data], method="post")
+        if CROWDSTRIKE_IOCS_TAGS in param:
+            tags = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_TAGS, "").split(",")]
+            tags = list(filter(None, tags))
+            indicator[CROWDSTRIKE_IOCS_TAGS] = tags
 
+        if CROWDSTRIKE_IOCS_HOSTS in param:
+            hosts = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_HOSTS, "").split(",")]
+            hosts = list(filter(None, hosts))
+            indicator[CROWDSTRIKE_IOCS_HOSTS] = hosts
+        else:
+            indicator["applied_globally"] = True
+
+        if CROWDSTRIKE_IOCS_FILENAME in param:
+            indicator["metadata"] = dict()
+            indicator["metadata"][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+
+        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=api_data, method="post")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -2049,26 +2087,57 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        api_data = {"ids": "{0}:{1}".format(ioc_type, ioc)}
+        update_data = {
+            "filter": "type:'{}'+value:'{}'".format(ioc_type, ioc)
+        }
 
-        update_data = {}
+        update_body = {
+            "bulk_update": update_data
+        }
 
         # optional parameters
         if CROWDSTRIKE_IOCS_POLICY in param:
-            update_data["policy"] = param.get(CROWDSTRIKE_IOCS_POLICY)
-        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param:
-            update_data["share_level"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL)
-        if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            data = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
-            if data is None:
-                return action_result.get_status()
-            update_data["expiration_days"] = data
-        if CROWDSTRIKE_IOCS_SOURCE in param:
-            update_data["source"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
-        if CROWDSTRIKE_IOCS_DESCRIPTION in param:
-            update_data["description"] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
+            update_data["action"] = param.get(CROWDSTRIKE_IOCS_POLICY)
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_data, method="patch", params=api_data)
+        if CROWDSTRIKE_IOCS_EXPIRATION in param:
+            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
+            if days is None:
+                return action_result.get_status()
+
+            update_data[CROWDSTRIKE_IOCS_EXPIRATION] = self._get_time_string(days)
+
+        if CROWDSTRIKE_IOCS_SOURCE in param:
+            update_data[CROWDSTRIKE_IOCS_SOURCE] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+
+        if CROWDSTRIKE_IOCS_SEVERITY in param:
+            update_data[CROWDSTRIKE_IOCS_SEVERITY] = param.get(CROWDSTRIKE_IOCS_SEVERITY)
+
+        if CROWDSTRIKE_IOCS_PLATFORMS in param:
+            platforms = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_PLATFORMS, "").split(",")]
+            platforms = list(filter(None, platforms))
+            update_data[CROWDSTRIKE_IOCS_PLATFORMS] = platforms
+
+        if CROWDSTRIKE_IOCS_DESCRIPTION in param:
+            update_data[CROWDSTRIKE_IOCS_DESCRIPTION] = param.get(CROWDSTRIKE_IOCS_DESCRIPTION)
+
+        if CROWDSTRIKE_IOCS_TAGS in param:
+            tags = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_TAGS, "").split(",")]
+            tags = list(filter(None, tags))
+            update_data[CROWDSTRIKE_IOCS_TAGS] = tags
+
+        if CROWDSTRIKE_IOCS_HOSTS in param:
+            if param.get(CROWDSTRIKE_IOCS_HOSTS, "") == "all":
+                update_data["applied_globally"] = True
+            else:
+                hosts = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_HOSTS, "").split(",")]
+                hosts = list(filter(None, hosts))
+                update_data[CROWDSTRIKE_IOCS_HOSTS] = hosts
+
+        if CROWDSTRIKE_IOCS_FILENAME in param:
+            update_data["metadata"] = dict()
+            update_data["metadata"][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+
+        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_body, method="patch")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -2695,13 +2764,17 @@ class CrowdstrikeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
                                                    format(err_msg)), None)
 
+        self.debug_print("Response JSON: {}".format(resp_json))
         try:
             if "resources" in list(resp_json.keys()):
                 if "errors" in list(resp_json.keys()):
-                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and len(resp_json["errors"]) != 0:
+                    if (resp_json["resources"] is None or len(resp_json["resources"]) == 0) and resp_json["errors"] and len(resp_json["errors"]) != 0:
                         self.debug_print("Error from server. Error code: {0} Data from server: {1}".format(resp_json["errors"][0]["code"], resp_json["errors"][0]["message"]))
                         return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}".format(
                             resp_json["errors"][0]["code"], resp_json["errors"][0]["message"])), None)
+                    if resp_json["resources"] and len(resp_json["resources"]) != 0 and resp_json["errors"] and len(resp_json["errors"]) != 0:
+                        return RetVal(action_result.set_status(phantom.APP_ERROR, "Error from server. Error code: {0} Data from server: {1}, {2}".format(
+                            resp_json["errors"][0]["code"], resp_json["errors"][0]["message"], resp_json["resources"][0]["message"])), None)
         except:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occured while processing error response from server"), None)
 

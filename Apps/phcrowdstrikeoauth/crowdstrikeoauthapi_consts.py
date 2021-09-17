@@ -21,6 +21,11 @@ CROWDSTRIKE_IOCS_EXPIRATION = "expiration"
 CROWDSTRIKE_IOCS_POLICY = "policy"
 CROWDSTRIKE_IOCS_SHARE_LEVEL = "share_level"
 CROWDSTRIKE_IOCS_SOURCE = "source"
+CROWDSTRIKE_IOCS_PLATFORMS = "platforms"
+CROWDSTRIKE_IOCS_SEVERITY = "severity"
+CROWDSTRIKE_IOCS_HOSTS = "host_groups"
+CROWDSTRIKE_IOCS_TAGS = "tags"
+CROWDSTRIKE_IOCS_FILENAME = "filename"
 CROWDSTRIKE_IOCS_DESCRIPTION = "description"
 CROWDSTRIKE_SEARCH_IOCS_TYPE = "indicator_type"
 CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION = "from_expiration"
@@ -143,6 +148,7 @@ CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
     'windows 7, 64-bit': 110,
     'windows 7, 32-bit': 100
 }
+CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
 CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Failed to get resource. Resource not found'
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
