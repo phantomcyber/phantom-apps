@@ -612,6 +612,33 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def upgradeSensor(self, ActionParams):
+    
+        ActionResult = self.add_action_result(PhantomAction(dict(ActionParams)))
+
+        Headers = {'Content-Type': 'application/json'}
+        sensorid = str(ActionParams['sensorid'])
+        sensorIdArray = []
+        if "," in sensorid:
+            filterArray = sensorid.strip().split(",")
+            sensorIdArray.extend(filterArray)
+        else:
+            sensorIdArray.append(sensorid)
+        query = json.dumps({"sensorsIds": sensorIdArray})
+
+        ReturnValue, Response = self.RequestsWrapper('POST', '/rest/sensors/action/upgrade', ActionResult, data=query, headers=Headers)
+
+        # Return failed status
+        if (phantom.is_fail(ReturnValue)):
+            return Action.set_status(phantom.APP_ERROR, status_message="Error Upgrading Sensor: {0}".format(phantom.is_fail(ReturnValue)))
+            # return ActionResult.get_status()
+
+        ActionResult.update_summary(Response)
+        # Data will typically be the raw JSON if we need to use it in a playbook
+        ActionResult.add_data(Response)
+
+        return ActionResult.set_status(phantom.APP_SUCCESS, status_message="Successfully Requested Upgrade")
+
     def _get_malop_sensor_ids(self, malop_id, action_result):
         sensor_ids = []
         try:
@@ -721,6 +748,9 @@ class CybereasonConnector(BaseConnector):
 
         elif action_id == 'set_reputation':
             ret_val = self._handle_set_reputation(param)
+
+        elif Action == 'upgradeSensor':
+            Results == self.upgradeSensor(Parameters)
 
         elif action_id == 'query_processes':
             query_action = CybereasonQueryActions()

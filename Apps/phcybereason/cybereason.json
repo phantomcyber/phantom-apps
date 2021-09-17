@@ -1129,6 +1129,62 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "upgrade sensor",
+            "description": "Upgrade a sensor",
+            "verbose": "Upgrade a sensor using the pylumID provided as an input",
+            "type": "generic",
+            "identifier": "upgradeSensor",
+            "read_only": false,
+            "parameters": {
+                "sensorid": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The sensor ID targeted for upgrade",
+                    "required": true,
+                    "primary": true,
+                    "default": "5f1b044de4b054cd0e588488:PYLUMCLIENT_GWISP-TEST_PYP0515-7_001A4A3B8D5B",
+                    "value_list": []
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.sensorid",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "pylumid",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 4
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "query processes",
             "description": "Queries a given malop to retrieve all processes",
             "type": "investigate",
