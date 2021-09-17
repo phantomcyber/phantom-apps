@@ -35,15 +35,15 @@ class DossierConnector(BaseConnector):
 
     def _make_rest_call(self, endpoint):
 
-        base_url = "https://api.activetrust.net:8000/api/services/intel/lookup"
+        base_url = "https://csp.infoblox.com/api/services/intel/lookup"
 
         config = self.get_config()
         api_key = config["api_key"].encode('utf-8')
 
-        headers = {"Content-Type": "application/json"}
+        headers = {"Content-Type": "application/json", "Authorization": "Token " + api_key}
 
         url = "{}{}".format(base_url, endpoint)
-        r = requests.get(url, headers=headers, auth=HTTPBasicAuth(api_key, ""))
+        r = requests.get(url, headers=headers)
 
         return r.json(), r.status_code
 
