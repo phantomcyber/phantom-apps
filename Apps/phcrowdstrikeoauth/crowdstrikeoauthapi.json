@@ -7246,7 +7246,7 @@
                 "title": "IOC Details",
                 "type": "custom",
                 "height": 5,
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             }
         },
         {
@@ -7873,7 +7873,7 @@
         {
             "action": "upload indicator",
             "description": "Upload one or more indicators that you want CrowdStrike to watch",
-            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.",
+            "verbose": "Valid values for the <b>action</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.",
             "type": "contain",
             "identifier": "upload_iocs",
             "read_only": false,
@@ -7893,8 +7893,8 @@
                     "required": true,
                     "order": 0
                 },
-                "policy": {
-                    "description": "Enforcement Policy",
+                "action": {
+                    "description": "Action to take when a host observes the custom IOC",
                     "data_type": "string",
                     "required": true,
                     "value_list": [
@@ -7920,7 +7920,8 @@
                 "source": {
                     "description": "Indicator originating source",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "default": "IOC uploaded via Splunk Phantom"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -7958,7 +7959,7 @@
             "render": {
                 "title": "Upload Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -7967,6 +7968,13 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
                     ]
                 },
                 {
@@ -8008,7 +8016,7 @@
                         "ip"
                     ],
                     "example_values": [
-                        "domain"
+                        "8.8.8.8"
                     ]
                 },
                 {
@@ -8016,13 +8024,6 @@
                     "data_type": "string",
                     "example_values": [
                         "linux"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.policy",
-                    "data_type": "string",
-                    "example_values": [
-                        "detect"
                     ]
                 },
                 {
@@ -8047,8 +8048,195 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
+                    "data_path": "action_result.data.*.errors",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.powered_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ioc-manager"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.query_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5.154201499
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "cb5cb5f4-13b5-4623-88e5-a0e3a6ae7768"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.host_groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.platforms",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ipv4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resources.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -8103,7 +8291,7 @@
             "render": {
                 "title": "Delete Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -8181,8 +8369,8 @@
                     "required": true,
                     "order": 0
                 },
-                "policy": {
-                    "description": "Enforcement policy",
+                "action": {
+                    "description": "Action to take when a host observes the custom IOC",
                     "data_type": "string",
                     "value_list": [
                         "no_action",
@@ -8206,7 +8394,8 @@
                 "source": {
                     "description": "Indicator originating source",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "default": "IOC updated via Splunk Phantom"
                 },
                 "description": {
                     "description": "Indicator description",
@@ -8244,7 +8433,7 @@
             "render": {
                 "title": "Update Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -8253,6 +8442,13 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
                     ]
                 },
                 {
@@ -8293,7 +8489,7 @@
                         "domain"
                     ],
                     "example_values": [
-                        "domain"
+                        "8.8.8.8"
                     ]
                 },
                 {
@@ -8301,13 +8497,6 @@
                     "data_type": "string",
                     "example_values": [
                         "linux"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.policy",
-                    "data_type": "string",
-                    "example_values": [
-                        "detect"
                     ]
                 },
                 {

@@ -1693,7 +1693,7 @@ class CrowdstrikeConnector(BaseConnector):
         ioc_type = param['indicator_type']
         ioc = param['indicator_value']
 
-        api_data = {'filter': "type:'{}'+value:'{}'".format(ioc_type, ioc)}
+        api_data = {'filter': CROWDSTRIKE_FILTER_GET_IOC.format(ioc_type, ioc)}
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
 
@@ -2016,7 +2016,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         # required parameters
         ioc = param[CROWDSTRIKE_JSON_IOC]
-        policy = param[CROWDSTRIKE_IOCS_POLICY]
+        action = param[CROWDSTRIKE_IOCS_ACTION]
 
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
         if phantom.is_fail(ret_val):
@@ -2026,10 +2026,10 @@ class CrowdstrikeConnector(BaseConnector):
         platforms = list(filter(None, platforms))
 
         indicator = {
-            "action": policy,
-            "platforms": platforms,
-            "type": ioc_type,
-            "value": ioc
+            CROWDSTRIKE_IOCS_ACTION: action,
+            CROWDSTRIKE_IOCS_PLATFORMS: platforms,
+            CROWDSTRIKE_IOCS_TYPE: ioc_type,
+            CROWDSTRIKE_IOCS_VALUE: ioc
         }
         api_data = {
             "indicators": [
@@ -2039,7 +2039,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         # optional parameters
         if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
+            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), CROWDSTRIKE_IOCS_EXPIRATION)
             if days is None:
                 return action_result.get_status()
 
@@ -2064,15 +2064,17 @@ class CrowdstrikeConnector(BaseConnector):
             hosts = list(filter(None, hosts))
             indicator[CROWDSTRIKE_IOCS_HOSTS] = hosts
         else:
-            indicator["applied_globally"] = True
+            indicator[CROWDSTRIKE_IOCS_ALL_HOSTS] = True
 
         if CROWDSTRIKE_IOCS_FILENAME in param:
-            indicator["metadata"] = dict()
-            indicator["metadata"][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+            indicator[CROWDSTRIKE_IOCS_METADATA] = dict()
+            indicator[CROWDSTRIKE_IOCS_METADATA][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
 
-        ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=api_data, method="post")
+        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=api_data, method="post")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS, "IOC Uploaded to create alert")
 
@@ -2087,20 +2089,18 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        update_data = {
-            "filter": "type:'{}'+value:'{}'".format(ioc_type, ioc)
-        }
+        update_data = {"filter": CROWDSTRIKE_FILTER_GET_IOC.format(ioc_type, ioc)}
 
         update_body = {
             "bulk_update": update_data
         }
 
         # optional parameters
-        if CROWDSTRIKE_IOCS_POLICY in param:
-            update_data["action"] = param.get(CROWDSTRIKE_IOCS_POLICY)
+        if CROWDSTRIKE_IOCS_ACTION in param:
+            update_data[CROWDSTRIKE_IOCS_ACTION] = param.get(CROWDSTRIKE_IOCS_ACTION)
 
         if CROWDSTRIKE_IOCS_EXPIRATION in param:
-            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), 'expiration', allow_zero=True)
+            days = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_EXPIRATION), CROWDSTRIKE_IOCS_EXPIRATION)
             if days is None:
                 return action_result.get_status()
 
@@ -2127,15 +2127,15 @@ class CrowdstrikeConnector(BaseConnector):
 
         if CROWDSTRIKE_IOCS_HOSTS in param:
             if param.get(CROWDSTRIKE_IOCS_HOSTS, "") == "all":
-                update_data["applied_globally"] = True
+                update_data[CROWDSTRIKE_IOCS_ALL_HOSTS] = True
             else:
                 hosts = [x.strip() for x in param.get(CROWDSTRIKE_IOCS_HOSTS, "").split(",")]
                 hosts = list(filter(None, hosts))
                 update_data[CROWDSTRIKE_IOCS_HOSTS] = hosts
 
         if CROWDSTRIKE_IOCS_FILENAME in param:
-            update_data["metadata"] = dict()
-            update_data["metadata"][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
+            update_data[CROWDSTRIKE_IOCS_METADATA] = dict()
+            update_data[CROWDSTRIKE_IOCS_METADATA][CROWDSTRIKE_IOCS_FILENAME] = param.get(CROWDSTRIKE_IOCS_FILENAME)
 
         ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, json=update_body, method="patch")
         if phantom.is_fail(ret_val):
@@ -2154,7 +2154,7 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        api_data = {'filter': "type:'{}'+value:'{}'".format(ioc_type, ioc)}
+        api_data = {'filter': CROWDSTRIKE_FILTER_GET_IOC.format(ioc_type, ioc)}
 
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
 
