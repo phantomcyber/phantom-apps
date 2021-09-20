@@ -317,7 +317,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # Show only error message if available
-        if isinstance(resp_json.get('error', {}), dict):
+        if resp_json.get('error') and isinstance(resp_json.get('error', {}), dict):
             resp_code = resp_json.get('error', {}).get('code')
             resp_msg = resp_json.get('error', {}).get('message')
             if resp_code and resp_msg:
@@ -326,7 +326,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                                                                             resp_code)
             elif resp_msg:
                 message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG, MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg))
-        elif resp_json.get("error"):
+        elif resp_json.get('error'):
             message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG,
                                         MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_json['error']))
         else:
@@ -522,8 +522,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        token = self._state.get('token', {})
-        if not token.get('access_token'):
+        if not self._access_token:
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
@@ -571,8 +570,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if headers is None:
             headers = {}
 
-        token = self._state.get('token', {})
-        if not token.get('access_token'):
+        if not self._access_token:
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
@@ -1111,16 +1109,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='put')
 
             if phantom.is_fail(ret_val):
-                return action_result.get_status()
+                msg = action_result.get_message()
+                if 'PredefinedTagNameNotFound' in msg:
+                    # Need to create the tag name first
+                    ret_val, response = self.create_tag_name(action_result, tag_name)
 
-            # Need to create the tag name first
-            ret_val, response = self.create_tag_name(action_result, tag_name)
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-
-            # Add the response into the data section
-            action_result.add_extra_data(response)
+                    # Add the response into the data section
+                    action_result.add_extra_data(response)
+                else:
+                    return action_result.get_status()
 
             # Now that the tag name has been created, try updating it's value
             ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='put')

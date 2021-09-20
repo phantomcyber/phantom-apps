@@ -871,7 +871,7 @@
         {
             "action": "snapshot vm",
             "identifier": "snapshot_vm",
-            "verbose": "While creating a snapshot using the COPY option, 'source_resource_id' parameter is required and while using the IMPORT option, 'source_uri' parameter is required.",
+            "verbose": "While creating a snapshot using the COPY option, 'source_resource_id' parameter is required and while using the IMPORT option, 'source_uri' parameter is required. For the 'source_uri' parameter, the uri value should be valid page blob uri path. For more information refer to <a href='https://docs.microsoft.com/en-us/rest/api/compute/snapshots/create-or-update' target='_blank'>API Docs</a>.",
             "description": "Take a snapshot of the VM",
             "type": "generic",
             "read_only": false,
@@ -2439,7 +2439,7 @@
             "action": "add network group",
             "identifier": "add_network_security_group",
             "description": "Add a network security group in a resource group",
-            "verbose": "Refer to <a href='https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate' target='_blank'>API Docs</a> for more information on adding a network security group.",
+            "verbose": "The 'security_rules' parameter accept JSON format value. For non-JSON values, the parameter values will be ignored. Refer to <a href='https://docs.microsoft.com/en-us/rest/api/virtualnetwork/networksecuritygroups/createorupdate' target='_blank'>API Docs</a> for more information on adding a network security group.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -2574,7 +2574,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.security_rules",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "[{\"name\": \"rule1\", \"properties\": { \"protocol\": \"*\", \"sourceAddressPrefix\": \"*\", \"destinationAddressPrefix\": \"*\", \"access\": \"Allow\", \"destinationPortRange\": \"80\", \"sourcePortRange\": \"*\", \"priority\": 130, \"direction\": \"Inbound\" } }]"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.tags",
@@ -2850,7 +2853,7 @@
                     "order": 2
                 },
                 "tags": {
-                    "description": "String object of resource tags",
+                    "description": "String object of resource tags. It should be in JSON format",
                     "data_type": "string",
                     "order": 3
                 }
