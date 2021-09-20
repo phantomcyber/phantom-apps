@@ -90,37 +90,6 @@
         <h4 class="wf-h4-style">No data found</h4>
 
     {% else %}
-    <h3 class="wf-h3-style">Info</h3>
-    <table class="wf-table-vertical">
-        {% if result.param.ioc %}
-        <tr>
-            <td>Indicator value</td>
-            <td>
-                <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
-                {{ result.param.ioc }}
-                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-            </td>
-        </tr>
-        {% endif %}
-        {% if result.param.indicator_type %}
-        <tr>
-            <td>Indicator type</td>
-            <td>{{ result.param.indicator_type }}</td>
-        </tr>
-        {% endif %}
-        {% if result.param.indicator_value %}
-        <tr>
-            <td>Indicator value</td>
-            <td>
-                <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.indicator_value }}' }], 0, {{ container.id }}, null, false);">
-                {{ result.param.indicator_value }}
-                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-            </td>
-        </tr>
-        {% endif %}
-    </table>
     <h3 class="wf-h3-style">Indicator Info</h3>
     <div class="metadata_div">
         <!--Default View-->
@@ -130,6 +99,7 @@
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
+                                <th>Resource Id </th>
                                 <th>Type</th>
                                 <th>Value</th>
                                 <th>Action</th>
@@ -146,6 +116,13 @@
                             {% for indicator in result.data %}
                                 {% for resource in indicator.resources %}
                                     <tr>
+                                        <td>
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ resource.id }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                        </td>
                                         <td>{{ resource.type }}</td>
                                         <td>
                                             <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ resource.type }}' ], 'value': '{{ resource.value }}' }], 0, {{ container.id }}, null, false);">
@@ -153,20 +130,38 @@
                                             &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                             </a>
                                         </td>
-                                        <td>{{ resource.action }}</td>
-                                        <td>{{ resource.source }}</td>
-                                        <td>{{ resource.description }}</td>
-                                        <td>{{ resource.created_by }}</td>
-                                        <td>{{ resource.severity }}</td>
                                         <td>
+                                            {{ resource.action | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {{ resource.source | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {{ resource.description | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {{ resource.created_by | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {{ resource.severity | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {% if resource.platforms %}
                                             <ul>
                                                 {% for platform in resource.platforms %}
                                                     <li style="list-style-type: none;">{{ platform }}</li>
                                                 {% endfor %}
                                             </ul>
+                                            {% else %}
+                                                None
+                                            {% endif %}
                                         </td>
-                                        <td>{{ resource.created_on }}</td>
-                                        <td>{{ resource.expiration }}</td>
+                                        <td>
+                                            {{ resource.created_on | default:"None"}}
+                                        </td>
+                                        <td>
+                                            {{ resource.expiration | default:"None"}}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             {% endfor %}

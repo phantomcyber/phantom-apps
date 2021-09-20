@@ -1690,37 +1690,26 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc_type = param['indicator_type']
-        ioc = param['indicator_value']
+        ioc_type = param[CROWDSTRIKE_SEARCH_IOCS_TYPE]
+        ioc = param[CROWDSTRIKE_JSON_LIST_IOC]
+        resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
-        api_data = {'filter': CROWDSTRIKE_FILTER_GET_IOC.format(ioc_type, ioc)}
+        if resource_id:
+            params = {
+                'ids': resource_id
+            }
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
 
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        resource_id = None
-        if 'resources' in list(response.keys()):
-            if response['resources'] is not None and len(response['resources']) > 0:
-                resource_id = response['resources'][0]
-            else:
-                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)
         else:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)
-
-        params = {
-            'ids': resource_id
-        }
-
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
+            params = {'filter': CROWDSTRIKE_FILTER_GET_CUSTOM_IOC.format(ioc_type, ioc)}
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Indicator fetched successfully")
+        return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_GET_ALERT)
 
     def _parse_resp_data(self, data):
 
@@ -2076,7 +2065,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "IOC Uploaded to create alert")
+        return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
 
     def _handle_update_iocs(self, param):
 
@@ -2149,6 +2138,17 @@ class CrowdstrikeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         ioc = param[CROWDSTRIKE_JSON_IOC]
+        resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
+
+        if resource_id:
+            api_data = {'ids': resource_id}
+            ret_val, _ = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=api_data, method="delete")
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_DELETE_ALERT)
+
         ret_val, ioc_type = self._get_ioc_type(ioc, action_result)
 
         if phantom.is_fail(ret_val):

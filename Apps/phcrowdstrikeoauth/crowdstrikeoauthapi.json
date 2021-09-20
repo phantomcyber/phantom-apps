@@ -7011,6 +7011,15 @@
                         "ipv4",
                         "ipv6"
                     ]
+                },
+                "resource_id": {
+                    "data_type": "string",
+                    "description": "The resource id of the indicator",
+                    "order": 2,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
                 }
             },
             "output": [
@@ -7040,6 +7049,16 @@
                         "md5",
                         "sha256",
                         "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
                     ]
                 },
                 {
@@ -8286,6 +8305,15 @@
                     "primary": true,
                     "required": true,
                     "order": 0
+                },
+                "resource_id" : {
+                    "description": "The resource id of the indicator",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
                 }
             },
             "render": {
@@ -8314,6 +8342,16 @@
                     ],
                     "example_values": [
                         "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
                     ]
                 },
                 {

@@ -37,6 +37,7 @@ CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION = "from_expiration"
 CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION = "to_expiration"
 CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
 CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
+CROWDSTRIKE_RESOURCE_ID = "resource_id"
 
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
@@ -75,9 +76,10 @@ CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
 CROWDSTRIKE_ERR_EVENTS_FETCH = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
 CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
 CROWDSTRIKE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
-CROWDSTRIKE_SUCC_GET_ALERT = "Successfully retrieved alert"
-CROWDSTRIKE_SUCC_DELETE_ALERT = "Successfully deleted alert"
-CROWDSTRIKE_SUCC_UPDATE_ALERT = "Successfully updated alert"
+CROWDSTRIKE_SUCC_GET_ALERT = "Indicator fetched successfully"
+CROWDSTRIKE_SUCC_POST_ALERT = "IOC uploaded successfully"
+CROWDSTRIKE_SUCC_DELETE_ALERT = "Successfully deleted indicator"
+CROWDSTRIKE_SUCC_UPDATE_ALERT = "Successfully updated indicator"
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
 CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
@@ -98,7 +100,7 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_name__contains="{2}"'\
                                  '&_filter_start_time__gte="{3}"'
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
-
+CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "type:'{}'+value:'{}',deleted:'true',deleted:'false'"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -122,6 +124,7 @@ CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extr
 CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/iocs/entities/indicators/v1"
 CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH = "/indicators/aggregates/devices-count/v1"
 CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT = "/iocs/queries/indicators/v1"
+CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT = "/iocs/combined/indicator/v1"
 CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH = "/indicators/queries/devices/v1"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH = "/indicators/queries/processes/v1"
 CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH = "/processes/entities/processes/v1"
@@ -156,5 +159,4 @@ CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
 }
 CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
-CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Failed to get resource. Resource not found'
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
