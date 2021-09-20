@@ -1690,9 +1690,18 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc_type = param[CROWDSTRIKE_SEARCH_IOCS_TYPE]
-        ioc = param[CROWDSTRIKE_JSON_LIST_IOC]
+        ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
+        ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
+
+        if not ioc_type and not ioc and not resource_id:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE)
+
+        if ioc_type and not ioc and not resource_id:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE)
+
+        if ioc and not ioc_type and not resource_id:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE)
 
         if resource_id:
             params = {
@@ -2137,8 +2146,11 @@ class CrowdstrikeConnector(BaseConnector):
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc = param[CROWDSTRIKE_JSON_IOC]
+        ioc = param.get(CROWDSTRIKE_JSON_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
+
+        if not ioc and not resource_id:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE)
 
         if resource_id:
             api_data = {'ids': resource_id}

@@ -6989,7 +6989,6 @@
                 "indicator_value": {
                     "data_type": "string",
                     "description": "String representation of the indicator",
-                    "required": true,
                     "primary": true,
                     "order": 0,
                     "contains": [
@@ -7002,7 +7001,6 @@
                 "indicator_type": {
                     "data_type": "string",
                     "description": "The type of the indicator",
-                    "required": true,
                     "order": 1,
                     "value_list": [
                         "sha256",
@@ -8303,7 +8301,6 @@
                         "domain"
                     ],
                     "primary": true,
-                    "required": true,
                     "order": 0
                 },
                 "resource_id" : {

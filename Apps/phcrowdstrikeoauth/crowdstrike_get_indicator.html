@@ -99,7 +99,7 @@
                     <table class="wf-table-horizontal datatable">
                         <thead>
                             <tr>
-                                <th>Resource Id </th>
+                                <th>Resource Id</th>
                                 <th>Type</th>
                                 <th>Value</th>
                                 <th>Action</th>
@@ -118,15 +118,15 @@
                                     <tr>
                                         <td>
                                             <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator id'], 'value': '{{ resource.id }}' }], 0, {{ container.id }}, null, false);">
-                                                {{ resource.id }}
+                                                {{ resource.id | default:"None"}}
                                                 &nbsp;
                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                             </a>
                                         </td>
-                                        <td>{{ resource.type }}</td>
+                                        <td>{{ resource.type | default:"None"}}</td>
                                         <td>
                                             <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ resource.type }}' ], 'value': '{{ resource.value }}' }], 0, {{ container.id }}, null, false);">
-                                            {{ resource.value }}
+                                            {{ resource.value | default:"None"}}
                                             &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                             </a>
                                         </td>

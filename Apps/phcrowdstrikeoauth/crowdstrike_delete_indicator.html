@@ -77,11 +77,13 @@ a:hover {
 <!------------------- For each Result ---------------------->
 {% if result.param.ioc %}
 <table class="ph-table-horizontal">
-  <tr><th>IOC</th></tr>
+  <tr>
+    <th>IOC</th>
+  </tr>
   <tr>
   <td>
     <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
-    {{ result.param.ioc }}
+    {{ result.param.ioc | default:"None"}}
     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
   </td>
