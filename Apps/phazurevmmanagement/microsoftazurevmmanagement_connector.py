@@ -1227,8 +1227,10 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         if group_type == 'network':
             endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='')
-        else:  # group_type == 'application'
+        elif group_type == 'application':
             endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='')
+        else:
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_GROUP_TYPE_ERR_MSG)
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
