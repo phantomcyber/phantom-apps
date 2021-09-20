@@ -10,7 +10,6 @@ from phantom.action_result import ActionResult
 # from dossier_consts import *
 import json
 import requests
-from requests.auth import HTTPBasicAuth
 # from bs4 import BeautifulSoup
 
 
