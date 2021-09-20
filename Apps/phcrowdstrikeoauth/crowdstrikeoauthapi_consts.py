@@ -19,11 +19,16 @@ CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
 CROWDSTRIKE_IOCS_EXPIRATION = "expiration"
 CROWDSTRIKE_IOCS_POLICY = "policy"
+CROWDSTRIKE_IOCS_ACTION = "action"
+CROWDSTRIKE_IOCS_TYPE = "type"
+CROWDSTRIKE_IOCS_VALUE = "value"
+CROWDSTRIKE_IOCS_METADATA = "metadata"
 CROWDSTRIKE_IOCS_SHARE_LEVEL = "share_level"
 CROWDSTRIKE_IOCS_SOURCE = "source"
 CROWDSTRIKE_IOCS_PLATFORMS = "platforms"
 CROWDSTRIKE_IOCS_SEVERITY = "severity"
 CROWDSTRIKE_IOCS_HOSTS = "host_groups"
+CROWDSTRIKE_IOCS_ALL_HOSTS = "applied_globally"
 CROWDSTRIKE_IOCS_TAGS = "tags"
 CROWDSTRIKE_IOCS_FILENAME = "filename"
 CROWDSTRIKE_IOCS_DESCRIPTION = "description"
@@ -92,6 +97,7 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
                                  '&_filter_name__contains="{2}"'\
                                  '&_filter_start_time__gte="{3}"'
+CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
 
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
