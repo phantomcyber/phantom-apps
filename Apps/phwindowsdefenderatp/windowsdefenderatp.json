@@ -5437,7 +5437,7 @@
         {
             "action": "get domain devices",
             "description": "Retrieve a collection of devices that have communicated to or from a given domain address",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-domain-related-machines?view=o365-worldwide\" target=\"_blank\">Get domain related machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. You can query on devices last updated according to your configured retention period.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/get-domain-related-machines?view=o365-worldwide\" target=\"_blank\">Get domain related machines API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. You can query on devices last updated according to your configured retention period.<br>The action retrieves data of the last 30 days.",
             "type": "investigate",
             "identifier": "get_domain_related_devices",
             "read_only": true,
