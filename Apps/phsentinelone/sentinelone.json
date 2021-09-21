@@ -1637,83 +1637,61 @@
             "identifier": "get_cves",
             "undo": "get Cves",
             "read_only": false,
-            "parameters": {
-                "ip_hostname": {
-                    "description": "The IP or hostname of an endpoint to get applications",
-                    "data_type": "string",
-                    "required": false,
-                    "primary": true,
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "order": 0
-                }
-            },
+            "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.parameter.ip_hostname",
-                    "data_type": "string",
-                    "contains": [
-                        "host name",
-                        "ip"
-                    ],
-                    "column_name": "IP Host Name",
-                    "column_order": 1
-                },
                 {
                     "data_path": "action_result.data.*.data.*.description",
                     "data_type": "string",
                     "column_name": "description",
-                    "column_order": 2
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.data.*.publishedAt",
                     "data_type": "string",
                     "column_name": "publishedAt",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.data.*.link",
                     "data_type": "string",
                     "column_name": "link",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.data.*.updatedAt",
                     "data_type": "string",
                     "column_name": "updatedAt",
-                    "column_order": 5
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.data.*.score",
                     "data_type": "numeric",
                     "column_name": "score",
-                    "column_order": 6
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.data.*.createdAt",
                     "data_type": "string",
                     "column_name": "createdAt",
-                    "column_order": 7
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.data.*.riskLevel",
                     "data_type": "string",
                     "column_name": "riskLevel",
-                    "column_order": 8
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.data.*.cveId",
                     "data_type": "string",
                     "column_name": "cveId",
-                    "column_order": 9
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.data.*.data.*.id",
                     "data_type": "string",
                     "column_name": "id",
-                    "column_order": 10
+                    "column_order": 9
                 },
                 {
                     "data_path": "action_result.status",
