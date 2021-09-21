@@ -1098,7 +1098,7 @@ class CarbonblackConnector(BaseConnector):
                 return action_result.get_status()
 
             if response == CARBONBLACK_MSG_FILE_NOT_FOUND:
-                return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
+                return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_MSG_FILE_NOT_FOUND)
 
             return self._save_file_to_vault(action_result, response, sample_hash)
         else:
@@ -1221,7 +1221,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         if file_summary == CARBONBLACK_MSG_FILE_NOT_FOUND:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_MSG_FILE_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_MSG_FILE_NOT_FOUND)
 
         curr_data = action_result.add_data({})
         curr_data[CARBONBLACK_JSON_FILE_DETAILS] = file_summary
@@ -1608,7 +1608,7 @@ class CarbonblackConnector(BaseConnector):
         query_type = param[CARBONBLACK_JSON_QUERY_TYPE]
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
 
         query = param[CARBONBLACK_JSON_QUERY]
 
@@ -1638,7 +1638,7 @@ class CarbonblackConnector(BaseConnector):
         query_type = param[CARBONBLACK_JSON_ALERT_TYPE]
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
 
         query = param[CARBONBLACK_JSON_QUERY]
 
@@ -1776,7 +1776,7 @@ class CarbonblackConnector(BaseConnector):
             return action_result.get_status()
 
         if query_type not in VALID_QUERY_TYPE:
-            return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_INVALID_QUERY_TYPE.format(types=', '.join(VALID_QUERY_TYPE)))
 
         data = action_result.add_data({query_type: None})
 
