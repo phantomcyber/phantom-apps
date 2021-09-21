@@ -646,6 +646,50 @@ class SentineloneConnector(BaseConnector):
         action_result.add_data(response)
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_get_applications(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ip_hostname = param.get('ip_hostname')
+        params = None
+        if ip_hostname:
+            try:
+                ret_val = self._get_computer_name(ip_hostname, action_result)
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
+            self.save_progress('Agent query: {}'.format(ret_val))
+
+            if ret_val == '0':
+                return action_result.set_status(phantom.APP_ERROR, "Endpoint not found")
+            elif ret_val == '99':
+                return action_result.set_status(phantom.APP_ERROR, "More than one endpoint found")
+            else:
+                summary = action_result.update_summary({})
+                summary['ip_hostname'] = ip_hostname
+                summary['computer_name'] = ret_val
+                params = {"agentComputerName__contains": ret_val}
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        ret_val, response = self._make_rest_call('/web/api/v2.1/installed-applications', action_result, headers=header, params=params)
+        action_result.add_data(response)
+        self.save_progress("Ret_val: {0}".format(ret_val))
+        if phantom.is_fail(ret_val):
+            self.save_progress("Failed to get applications.  Error: {0}".format(action_result.get_message()))
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_cves(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        ret_val, response = self._make_rest_call('/web/api/v2.1/installed-applications/cves', action_result, headers=header)
+        action_result.add_data(response)
+        self.save_progress("Ret_val: {0}".format(ret_val))
+        if phantom.is_fail(ret_val):
+            self.save_progress("Failed to get Cves.  Error: {0}".format(action_result.get_message()))
+            return action_result.get_status()
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _get_agent_id(self, search_text, action_result):
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
@@ -662,6 +706,23 @@ class SentineloneConnector(BaseConnector):
             return '99'
         else:
             return response['data'][0]['id']
+
+    def _get_computer_name(self, search_text, action_result):
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        params = {"query": search_text}
+        ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params, method='get')
+        if phantom.is_fail(ret_val):
+            return str(-1)
+        endpoints_found = len(response['data'])
+        self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
+        action_result.add_data(response)
+        if endpoints_found == 0:
+            return '0'
+        elif endpoints_found > 1:
+            return '99'
+        else:
+            return response['data'][0]['computerName']
 
     def _get_site_id(self, action_result):
         header = self.HEADER
@@ -852,6 +913,10 @@ class SentineloneConnector(BaseConnector):
             ret_val = self._handle_get_endpoint_info(param)
         elif action_id == 'get_threat_info':
             ret_val = self._handle_get_threat_info(param)
+        elif action_id == 'get_applications':
+            ret_val = self._handle_get_applications(param)
+        elif action_id == 'get_cves':
+            ret_val = self._handle_get_cves(param)
         return ret_val
 
     def initialize(self):
