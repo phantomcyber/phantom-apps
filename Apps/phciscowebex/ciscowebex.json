@@ -1,0 +1,524 @@
+{
+    "appid": "34624d1a-f0ae-47d6-a731-8499d5617cf7",
+    "name": "Cisco Webex",
+    "description": "This app integrates with Cisco Webex to implement investigative and genric actions",
+    "type": "information",
+    "product_vendor": "Cisco",
+    "logo": "logo_ciscowebex.svg",
+    "logo_dark": "logo_ciscowebex_dark.svg",
+    "product_name": "Cisco Webex",
+    "product_version_regex": ".*",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.1",
+    "utctime_updated": "2021-09-21T09:30:45.000000Z",
+    "package_name": "phantom_ciscowebex",
+    "main_module": "ciscowebex_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "rest_handler": "ciscowebex_connector._handle_rest_request",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cisco webex api v1 tested on 30 Aug, 2021"
+    ],
+    "configuration": {
+        "authorization_key": {
+            "description": "Personal Access Token",
+            "data_type": "password",
+            "order": 0
+        },
+        "ph": {
+            "data_type": "ph",
+            "order": 1
+        },
+        "client_id": {
+            "description": "Client ID",
+            "data_type": "string",
+            "order": 2
+        },
+        "client_secret": {
+            "description": "Client Secret",
+            "data_type": "password",
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list rooms",
+            "identifier": "list_rooms",
+            "description": "List webex rooms",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-05T02:43:33.032Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creatorId",
+                    "data_type": "string",
+                    "contains": [
+                        "creater id"
+                    ],
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9iMmMwZjIwMS03NGQyLTRkYTEtYWM0Yi1mNzc3ZmEwMDg2YmM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "webex room id"
+                    ],
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1JPT00vMzg2NzFhODAtZjFjMi0xMWU3LTg1OWUtNDMzYWY3YWQ5YmJi"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.isLocked",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastActivity",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-08T21:26:38.851Z",
+                        "2018-01-16T18:37:12.037Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ownerId",
+                    "data_type": "string",
+                    "example_value": [
+                        "Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi9hOGY3ZDhlMi04MjY1LTQ4OWEtOWE1My00NzlkZjQ1NTFkNWE"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test Alert Space"
+                    ],
+                    "column_name": "Room Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_rooms",
+                    "data_type": "numeric",
+                    "example_value": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get user",
+            "identifier": "get_user",
+            "description": "Get user ID from e-mail address",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {
+                "email_address": {
+                    "description": "User webex e-mail address",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email_address",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email Address",
+                    "column_order": 1,
+                    "example_values": [
+                        "monielynn@theharlanfamily.org",
+                        "herman@contoso.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_value": [
+                        "2015-04-22T07:16:49.649Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Monika Harlan"
+                    ],
+                    "column_name": "User Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.firstName",
+                    "data_type": "string",
+                    "example_value": [
+                        "abc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "webex user id"
+                    ],
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9hMzllMGQ4Mi01ZWE0LTQ3OTktOWM3Zi00M2E0MTI4MjUzYjU"
+                    ],
+                    "column_name": "ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.lastModified",
+                    "data_type": "string",
+                    "example_value": [
+                        "2021-08-25T11:54:51.623Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastName",
+                    "data_type": "string",
+                    "example_value": [
+                        "abc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-04T20:46:30.734Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails",
+                    "data_type": "string",
+                    "example_values": [
+                        "monielynn@theharlanfamily.org"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastActivity",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-05T21:04:53.424Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nickName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Monika"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgId",
+                    "data_type": "string",
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL09SR0FOSVpBVElPTi9jb25zdW1lcg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "inactive"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "person"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found_user",
+                    "data_type": "boolean",
+                    "example_value": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "send message",
+            "identifier": "send_message",
+            "description": "Send message to user or room",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "endpoint_id": {
+                    "description": "User or Room ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "webex user id",
+                        "webex room id"
+                    ],
+                    "order": 0
+                },
+                "destination_type": {
+                    "description": "Destination Type",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "room",
+                        "user"
+                    ],
+                    "order": 1
+                },
+                "message": {
+                    "description": "Message",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "room"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.endpoint_id",
+                    "data_type": "string",
+                    "column_name": "Endpoint ID",
+                    "contains": [
+                        "webex user id",
+                        "webex room id"
+                    ],
+                    "column_order": 0,
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9hMzllMGQ4Mi01ZWE0LTQ3OTktOWM3Zi00M2E0MTI4MjUzYjU",
+                        "Y2lzY29zcGFyazovL3VzL1JPT00vMzg2NzFhODAtZjFjMi0xMWU3LTg1OWUtNDMzYWY3YWQ5YmJi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Compile Test",
+                        "hello room"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-01-08T21:27:31.755Z",
+                        "2018-03-30T18:36:01.210Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvYmM0MGQ3YjAtZjRiYS0xMWU3LWI5NGEtMzMxMmE4MmI4ZmVl",
+                        "Y2lzY29zcGFyazovL3VzL01FU1NBR0UvMzIxMjA5YTAtMzQ0OS0xMWU4LWJjNmUtMWJkNzlhODNjMTY3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.personEmail",
+                    "data_type": "string",
+                    "example_values": [
+                        "herman@contoso.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.personId",
+                    "data_type": "string",
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9iMmMwZjIwMS03NGQyLTRkYTEtYWM0Yi1mNzc3ZmEwMDg2YmM"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.roomId",
+                    "data_type": "string",
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1JPT00vODliODk1ZWYtYjk2YS0zMTk0LTlhNDQtNDAxZTk4MzBiNGY5",
+                        "Y2lzY29zcGFyazovL3VzL1JPT00vMzg2NzFhODAtZjFjMi0xMWU3LTg1OWUtNDMzYWY3YWQ5YmJi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.roomType",
+                    "data_type": "string",
+                    "example_values": [
+                        "direct",
+                        "group"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.text",
+                    "data_type": "string",
+                    "example_values": [
+                        "Compile Test",
+                        "hello room"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.toPersonId",
+                    "data_type": "string",
+                    "example_values": [
+                        "Y2lzY29zcGFyazovL3VzL1BFT1BMRS9hMzllMGQ4Mi01ZWE0LTQ3OTktOWM3Zi00M2E0MTI4MjUzYjU"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message sent successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Message sent successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ],
+    "render": {
+        "type": "table"
+    },
+    "versions": "EQ(*)"
+}
