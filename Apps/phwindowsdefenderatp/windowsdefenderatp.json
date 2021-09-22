@@ -5347,10 +5347,9 @@
                         "803c416946e8738b7711903a28362adeae6e1aea"
                     ],
                     "contains": [
-                        "sha1"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 0
+                        "sha1",
+                        "defender atp device id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.FileName",
@@ -5360,18 +5359,14 @@
                     ],
                     "contains": [
                         "file name"
-                    ],
-                    "column_name": "File Name",
-                    "column_order": 1
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.Timestamp",
                     "data_type": "string",
                     "example_values": [
-                        "2021-08-02T14:26:49.1338079Z"
-                    ],
-                    "column_name": "Timestamp",
-                    "column_order": 2
+                        "2021-09-15T10:53:13.5858707Z"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.InitiatingProcessFileName",
@@ -5381,9 +5376,7 @@
                     ],
                     "contains": [
                         "file name"
-                    ],
-                    "column_name": "Initiating Process File Name",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.status",
@@ -5397,14 +5390,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total results: 2"
+                        "Total results: 7"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.total_results",
                     "data_type": "numeric",
                     "example_values": [
-                        2
+                        7
                     ]
                 },
                 {
@@ -5427,10 +5420,128 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.UserName",
+                    "data_type": "string",
+                    "example_values": [
+                        "administrator1"
+                    ],
+                    "contains": [
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DeviceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "testserver9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DomainName",
+                    "data_type": "string",
+                    "example_values": [
+                        "TestServer9"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.LastTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T22:53:50.2952649Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.DurationAtLeast",
+                    "data_type": "string",
+                    "example_values": [
+                        "00.12:00:36"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.PUAProtection",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SensorEnabled",
+                    "data_type": "string",
+                    "example_values": [
+                        "BAD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.CloudProtection",
+                    "data_type": "string",
+                    "example_values": [
+                        "BAD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AntivirusEnabled",
+                    "data_type": "string",
+                    "example_values": [
+                        "BAD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.TamperProtection",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AntivirusReporting",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.BehaviorMonitoring",
+                    "data_type": "string",
+                    "example_values": [
+                        "GOOD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.RealtimeProtection",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.SensorDataCollection",
+                    "data_type": "string",
+                    "example_values": [
+                        "BAD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ImpairedCommunications",
+                    "data_type": "string",
+                    "example_values": [
+                        "BAD"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.AntivirusSignatureVersion",
+                    "data_type": "string",
+                    "example_values": [
+                        "N/A"
+                    ]
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "json"
             },
             "versions": "EQ(*)"
         },
