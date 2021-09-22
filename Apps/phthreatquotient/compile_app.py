@@ -87,7 +87,7 @@ def _compile_py_files(py_files, exclude_flake):
                 errored_file = True
                 print(colored(sout, 'red'))
                 if (not args.continue_on_error):
-                    print (colored("Exiting...", 'cyan'))
+                    print(colored("Exiting...", 'cyan'))
                     exit(1)
             if (len(serr) > 0):
                 print(serr)
