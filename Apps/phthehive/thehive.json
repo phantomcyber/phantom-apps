@@ -18,7 +18,7 @@
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
-        "On-prem, Version: 3.0.9, 12/28/2020"
+        "On-prem, Version: 3.0.9, 09/22/2021"
     ],
     "configuration": {
         "base_url": {
@@ -55,7 +55,7 @@
             "action": "create ticket",
             "identifier": "create_ticket",
             "description": "Create a ticket (issue)",
-            "verbose": "If the owner mentioned in the input parameter is an invalid user and it does not exist on The Hive platform, the ticket will get successfully created but, the owner displayed on UI of The Hive will be ***unknown*** as per the API behavior. The user can update the same ticket by running the action Update Ticket with a valid user in the owner field.",
+            "verbose": "If the owner mentioned in the input parameter is an invalid user and it does not exist on The Hive platform, the ticket will get successfully created but, the owner displayed on the UI of The Hive will be ***unknown*** as per the API behavior. The user can update the same ticket by running the action Update Ticket with a valid user in the owner field.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -319,9 +319,9 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Important data: value",
                         "Successfully created a new case",
-                        "Invalid severity entered. Must be an integer between 0 and 3 (inclusive).. Error string: 'invalid literal for int() with base 10: 'invalid severity''"
+                        "Invalid severity entered. Must be one of: Low, Medium, or High.",
+                        "Invalid TLP entered. Must be one of: White, Green, Amber, or Red."
                     ]
                 },
                 {
@@ -1323,7 +1323,7 @@
                     "data_type": "string",
                     "example_values": [
                         "The Waiting is the Hardest Part",
-                        "Sorry folks, park's closed. Moose out front shoulda told ya"
+                        "Sorry folks, the park's closed. Moose out front shoulda told ya"
                     ]
                 },
                 {
