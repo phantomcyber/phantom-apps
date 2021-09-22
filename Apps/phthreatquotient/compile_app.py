@@ -55,7 +55,7 @@ def _get_exclude_cmds(app_dir):
 
 def _create_app_tarball(app_dir, app_version):
 
-    print (colored("  Creating tarball...", 'cyan'))
+    print(colored("  Creating tarball...", 'cyan'))
     if app_version:
         filename = "{0}-{1}.tgz".format(app_dir, app_version)
     else:
@@ -64,10 +64,10 @@ def _create_app_tarball(app_dir, app_version):
     ret_val = os.system('tar {0} -zcf {1} {2}'.format(exclude_cmds, filename, app_dir))
 
     if (ret_val != 0):
-        print (colored("  Failed...", 'red'))
+        print(colored("  Failed...", 'red'))
         exit(1)
 
-    print (colored("  ./{0}".format(filename), 'cyan'))
+    print(colored("  ./{0}".format(filename), 'cyan'))
     return True
 
 
@@ -76,7 +76,7 @@ def _compile_py_files(py_files, exclude_flake):
     error_files = 0
     for py_file in py_files:
         errored_file = False
-        print ("Compiling: {0}".format(py_file))
+        print("Compiling: {0}".format(py_file))
 
         if (exclude_flake is False):
             command = ['flake8', py_file]
@@ -85,7 +85,7 @@ def _compile_py_files(py_files, exclude_flake):
 
             if (len(sout) > 0):
                 errored_file = True
-                print (colored(sout, 'red'))
+                print(colored(sout, 'red'))
                 if (not args.continue_on_error):
                     print (colored("Exiting...", 'cyan'))
                     exit(1)
@@ -115,7 +115,7 @@ def _install_app(app_tarball):
 
 def _validate_json_file(app_dir, args):
 
-    print (colored('Validating App Json', 'cyan'))
+    print(colored('Validating App Json', 'cyan'))
 
     # Create the glob to the json file
     json_file_glob = './*.json'
@@ -124,24 +124,24 @@ def _validate_json_file(app_dir, args):
     files_matched = glob.glob(json_file_glob)
 
     if (not files_matched):
-        print (colored('App Json file not found.', 'red'))
+        print(colored('App Json file not found.', 'red'))
         return False
 
     for json_file in files_matched:
-        print (colored('  Working on: {0}'.format(json_file), 'cyan'))
+        print(colored('  Working on: {0}'.format(json_file), 'cyan'))
 
         with open(json_file) as f:
             try:
                 app_json = json.load(f)
             except Exception as e:
-                print (colored('   Unable to load due to exception: "{0}"'.format(str(e)), 'cyan'))
+                print(colored('   Unable to load due to exception: "{0}"'.format(str(e)), 'cyan'))
                 continue
 
             if (not app_json.get('appid')):
-                print (colored('   Did not find appid in json, ingoring.', 'cyan'))
+                print(colored('   Did not find appid in json, ingoring.', 'cyan'))
                 continue
 
-            print (colored('    Looks good', 'cyan'))
+            print(colored('    Looks good', 'cyan'))
             return True
 
     return False
@@ -160,7 +160,7 @@ def main(args):
     app_dir = "./threatq_app"
     if (args.create_tarball):
         _create_app_tarball(app_dir, args.app_version)
-        print (colored("Done...", 'cyan'))
+        print(colored("Done...", 'cyan'))
         exit(0)
 
     error_files = 0
@@ -181,7 +181,7 @@ def main(args):
                 # clean up the list a bit
                 ignore_fnames = [x.strip() for x in ignore_fnames if len(x.strip()) > 0]
                 if (ignore_fnames):
-                    print (colored('Will be ignoring: {0}'.format(', '.join(ignore_fnames)), 'cyan'))
+                    print(colored('Will be ignoring: {0}'.format(', '.join(ignore_fnames)), 'cyan'))
 
     py_files = glob.glob("./*.py")
     if (ignore_fnames):
@@ -191,7 +191,7 @@ def main(args):
 
     is_valid = _validate_json_file(app_dir, args)
     if (not is_valid):
-        print (colored("Unable to find a valid app json, Exiting...", 'red'))
+        print(colored("Unable to find a valid app json, Exiting...", 'red'))
         exit(1)
 
     if (error_files > 0):
@@ -199,23 +199,23 @@ def main(args):
 
     if (args.install_app is True):
 
-        print (colored("Installing app...", 'cyan'))
+        print(colored("Installing app...", 'cyan'))
         time.sleep(2)
 
         _create_app_tarball(app_dir, args.app_version)
 
         os.chdir('./')
-        print (colored("  Calling installer...", 'cyan'))
+        print(colored("  Calling installer...", 'cyan'))
         ret_val, err_string = _install_app("{0}.tgz".format(app_dir))
 
         if (ret_val is False):
-            print (colored("  Error: {0}".format(err_string), 'red'))
+            print(colored("  Error: {0}".format(err_string), 'red'))
             exit(1)
 
         os.chdir('./{0}'.format(app_dir))
         exit(0)
 
-    print (colored("Done...", 'green'))
+    print(colored("Done...", 'green'))
 
 
 if __name__ == '__main__':
