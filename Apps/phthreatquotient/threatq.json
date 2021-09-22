@@ -8,7 +8,7 @@
         "name": "Emanuel Rodrigues"
       }
     ],
-    "package_name": "threatq",
+    "package_name": "phantom_threatq",
     "type": "information service",
     "license": "Copyright (c) 2021 ThreatQuotient, Inc.",
     "main_module": "threatq_connector.pyc",
@@ -18,7 +18,7 @@
     "product_name": "ThreatQ",
     "product_version_regex": "4.*",
     "min_phantom_version": "4.9.39220",
-    "python_version": "2.*",
+    "python_version": "2.7",
     "logo": "assets/tq-light-bg.png",
     "logo_dark": "assets/tq-dark-bg.png",
     "configuration": {
