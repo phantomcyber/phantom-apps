@@ -538,7 +538,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and 'token is invalid' in msg or 'Access token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
+        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
             ret_val = self._get_token(action_result)
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
@@ -592,7 +592,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             error_msg = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
 
-        if r.text and ('token is invalid' in r.text or 'Access token has expired' in r.text or 'ExpiredAuthenticationToken' in r.text or 'AuthenticationFailed' in r.text):
+        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
             ret_val = self._get_token(action_result)
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
             try:
@@ -621,7 +621,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                     except Exception as e:
                         error_msg = self._get_error_message_from_exception(e)
                         return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
-                    if 'token is invalid' in res.text or 'Access token has expired' in res.text or 'ExpiredAuthenticationToken' in res.text or 'AuthenticationFailed' in res.text:
+                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
                         ret_val = self._get_token(action_result)
                         headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
                     status = resp_json.get('status')
@@ -631,7 +631,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 except Exception as e:
                     error_msg = self._get_error_message_from_exception(e)
                     return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
-                if r.text and ('token is invalid' in r.text or 'Access token has expired' in r.text or 'ExpiredAuthenticationToken' in r.text or 'AuthenticationFailed' in r.text):
+                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
                     ret_val = self._get_token(action_result)
                     headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
                     try:
@@ -1668,12 +1668,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         results_url = param['results_url']
         # Capture information from param results_url and ensure that the subscription id matches the asset
         pattern = re.compile(r'https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)')
-        subscription_id, endpoint = re.search(pattern, results_url).groups()
+        try:
+            subscription_id, endpoint = re.search(pattern, results_url).groups()
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
 
         if subscription_id != self._subscription:
-            return RetVal(action_result.set_status(phantom.APP_ERROR,
-                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset"),
-                None)
+            return action_result.set_status(phantom.APP_ERROR,
+                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset")
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='get')
 
