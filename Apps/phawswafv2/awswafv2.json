@@ -515,6 +515,163 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "delete ip set",
+            "identifier": "delete_ip_set",
+            "description": "Remove the specified IP Set",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for deleting an IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input.",
+            "type": "correct",
+            "read_only": false,
+            "parameters": {
+                "ip_set_id": {
+                    "description": "IP Set ID",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set id"
+                    ],
+                    "order": 0
+                },
+                "ip_set_name": {
+                    "description": "IP Set Name",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "awswaf ip set name"
+                    ],
+                    "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RequestId",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c28d801-b618-49b8-b904-2ff6698bb038"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Wed, 22 Sep 2021 20:04:47 GMT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-amz-json-1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.content-length",
+                    "data_type": "string",
+                    "example_values": [
+                        "2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPHeaders.x-amzn-requestid",
+                    "data_type": "string",
+                    "example_values": [
+                        "0c28d801-b618-49b8-b904-2ff6698bb038"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.RetryAttempts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ResponseMetadata.HTTPStatusCode",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Delete status: IP Set deleted successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.delete_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP Set deleted successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "25b7e872-0645-4229-91d5-28e2369262aa"
+                    ],
+                    "contains": [
+                        "awswaf ip set id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip_set_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "new_ip_set_1383662"
+                    ],
+                    "contains": [
+                        "awswaf ip set name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "list acls",
             "identifier": "list_acls",
             "description": "List all ACLs",
