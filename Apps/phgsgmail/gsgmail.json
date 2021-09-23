@@ -10,15 +10,15 @@
     "package_name": "phantom_gsgmail",
     "product_vendor": "Google",
     "product_name": "GMail",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud, June 7, 2021"
     ],
-    "app_version": "2.1.7",
+    "app_version": "2.2.0",
     "product_version_regex": ".*",
     "license": "Copyright (c) 2017-2021 Splunk Inc.",
-    "utctime_updated": "2021-06-15T01:15:49.000000Z",
+    "utctime_updated": "2021-06-14T14:47:53.000000Z",
     "pip_dependencies": {
         "wheel": [
             {
@@ -792,6 +792,389 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "get email",
+            "description": "Retrieve email details via internet message id",
+            "verbose": "Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>",
+            "type": "investigate",
+            "identifier": "get_email",
+            "read_only": false,
+            "parameters": {
+                "email": {
+                    "description": "User's Email (Mailbox to search)",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "internet_message_id": {
+                    "description": "Internet Message ID",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                "extract_attachments": {
+                    "description": "Add attachments to vault and create vault artifacts",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.internet_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ],
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.extract_attachments",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total messages returned: 1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internalDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "1619925980000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Workspace: Your invoice is available for hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_dkim_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:mime-version:date:reply-to:feedback-id\r\n         :message-id:subject:from:to;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=tJdaiPfRyc4eMG2Yen3mdbA6h41cGBrVQ4yzJakfk1H+apl/RJq7xh1IYQ7+PXM3oH\r\n         IOzDgY6u9CQ2hyEZy6Yu1xuWtHwLYuTZl0iauzV9ve7tvDgXlxPWI7DryZrhge7J8GA/\r\n         dHFVfWU6LS9yBSjhAoiekws3Vhje30lg4kShkKoNXlH7QxkrEOYn5i31s5Gelx9E6m1f\r\n         Q3bs3xF4BbtyF52berodAZsS9tachQGHG2p124Y9mmLzPRsqi1fMCoXbHCXd0BxIFskJ\r\n         twUm+JQnxbX5N/q+MLWifUWYJ6fGkybAZ061JX6JgBp/2RMu0r5E48Q+0lHiUlenj4s6\r\n         TNkg=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_notifications",
+                    "data_type": "string",
+                    "example_values": [
+                        "GAMMA:<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_seal",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; a=rsa-sha256; t=1619925981; cv=none;\r\n        d=google.com; s=arc-20160816;\r\n        b=b1K9fT7s6nA56FOt2CMy22w5fhwxHjx63FzKVzpWlWmeHn4neo4mrtpauZFiiy7tQA\r\n         /VITLzcFg8GMtPaN7pDWQkHUVQ8qyuUi3Kl8xpYre8DoI1KzLfTUz8LqxaBKuYl3Ln00\r\n         rQ/fBj+v16+HuuVOKwd8roet3A5SCmDZBvSOk+pcRfjAtL7GDqF2LVEtDYVDJ0V7eUxx\r\n         V6eZjsFOg9tZTkyHTPq8S+pN7e5KCV7rIgelF25MJcYdt+4OJjs6jfmsn2p1NC14QvRP\r\n         ONhqWc1lMseCp6/GdtoM2tIDHORdLy/upg3mC63jhi5JDIRWiObg1HC2PI8AFxqhkJCW\r\n         rFCQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_authentication_results",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; mx.google.com;\r\n       dkim=pass header.i=@google.com header.s=20161025 header.b=S15AEvGA;\r\n       spf=pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) smtp.mailfrom=33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.authentication_results",
+                    "data_type": "string",
+                    "example_values": [
+                        "mx.google.com;\r\n       dkim=pass header.i=@google.com header.s=20161025 header.b=S15AEvGA;\r\n       spf=pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) smtp.mailfrom=33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Workspace: Your invoice is available for hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_received",
+                    "data_type": "string",
+                    "example_values": [
+                        "by 2002:a05:6e02:102:: with SMTP id t2mr5411682ilm.182.1619925981145;\r\n        Sat, 01 May 2021 20:26:21 -0700 (PDT)\nby 2002:a05:6e02:d53:: with SMTP id h19mr10186694ilj.232.1619925980569;\r\n Sat, 01 May 2021 20:26:20 -0700 (PDT)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "multipart/mixed; boundary=\"000000000000a2607f05c15068be\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sat, 01 May 2021 20:26:20 -0700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13608031"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_message_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;\r\n        h=to:from:subject:message-id:feedback-id:reply-to:date:mime-version\r\n         :dkim-signature;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=K0Q7B+6Dq2695j4C/fRV8QlFGfFo42i3i6TNVIVR3/xvcVZcChH7+XcQ4e43rT4bYz\r\n         /wZZzTVm1BbohPZOLvAsQE07vFMb0T7eggAAesqpoV0aPqahN7ECabqx6JXSPiYIhK/j\r\n         n6BdpvfBdYXhh34tKpNQKgblkkgrpZaiHRYcys+s+e06Xh41W+92j1KahxqKvujgQ50w\r\n         MtD0G492zoocCBJdUl1IGYYCNjbxSZTbO48u7UTqWS4xP1KNLmV9vRpPDp/QwjQDv5Ux\r\n         69G3NeFGJcH0z3REg1AhqHHKtF1/GX2yngvKSUyO4yUajI/tdQdXF0Uxz93w4aOYH5J7\r\n         FV8A=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.delivered_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.received",
+                    "data_type": "string",
+                    "example_values": [
+                        "by 2002:a05:7110:5426:b029:b6:addf:f84f with SMTP id i6csp1772142geg;\r\n        Sat, 1 May 2021 20:26:21 -0700 (PDT)\nfrom mail-il1-x147.google.com (mail-il1-x147.google.com. [2607:f8b0:4864:20::147])\r\n        by mx.google.com with ESMTPS id b3si9189274iot.55.2021.05.01.20.26.20\r\n        for <admin@hermancorp.biz>\r\n        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);\r\n        Sat, 01 May 2021 20:26:21 -0700 (PDT)\nby mail-il1-x147.google.com with SMTP id d3-20020a9287430000b0290181f7671fa1so1924912ilm.9\r\n        for <admin@hermancorp.biz>; Sat, 01 May 2021 20:26:20 -0700 (PDT)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_gm_message_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "AOAM532Nl7MnWYp7qLuC9ClJDlpx6s+kHPwvU7xiPvCBqzdGM36I9tqf\r\n\tLKCzGlzGEDydpiA="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.feedback_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "P-58-0:C10004962:M110105571-en-US:gamma"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.received_spf",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) client-ip=2607:f8b0:4864:20::147;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.return_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "<33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.reply_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.mime_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.dkim_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=google.com; s=20161025;\r\n        h=mime-version:date:reply-to:feedback-id:message-id:subject:from:to;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=S15AEvGAEDpFXZ0KGsbNCqY8YVSzr6At0pUpF7crMh4ik5FmM0vGwomsUR59ONHoNF\r\n         SJ4U+IcxvsItH2mgCsQ7RjJK0dLLC7BkbhkDGHPY/IQ1KSZKcGEU0qfTXAsff5HENC3X\r\n         6LDYi7UqTdnjvSwv2dQdW1/yS96d27anFiPj9Wua4vd8GilRW5QOBJX1rl6yFas6uHD7\r\n         JWQRykXcpcNTKJpj2dvX2JIsT2IKiXy2BCpU69hITTZtvZCrsnl9IQFKM1Ky8H/BjoHv\r\n         jUL+fEuQTQUynp0S6yu/Kj9uvFRIXjhdxgHaGGTRMVtg/SE0tc62b8AxCckxHwrhS94G\r\n         ac9w=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_smtp_source",
+                    "data_type": "string",
+                    "example_values": [
+                        "ABdhPJyqpOGx6rwHwgtf1rUzc0U3BHjsBbH/I0nyqUnNdTHl957rDEZYB4OI7ovt9lbR1X2xjbTp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_transfer_encoding",
+                    "data_type": "string",
+                    "example_values": [
+                        "quoted-printable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_disposition",
+                    "data_type": "string",
+                    "example_values": [
+                        "attachment; filename=\"3902920193.pdf\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.historyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "62313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.snippet",
+                    "data_type": "string",
+                    "example_values": [
+                        "Your Google Workspace monthly invoice is available. Please find the PDF document attached at the bottom of this email. IMPORTANT: The balance will be automatically charged so you don&#39;t need to take"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_plain_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sizeEstimate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        55260
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threadId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1792b1cd66228bf2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.labelIds",
+                    "data_type": "string",
+                    "example_values": [
+                        "INBOX"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_html_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1792b1cd66228bf2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_messages_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 2,
+                "height": 5,
+                "type": "custom",
+                "title": "Get Email",
+                "view": "gsgmail_view.get_email"
+            }
         }
     ]
 }
