@@ -1437,7 +1437,7 @@
                     "contains": [
                         "host name"
                     ],
-                    "column_name": "Agent Computername",
+                    "column_name": "Agent Computer Name",
                     "column_order": 2
                 },
                 {
@@ -1449,7 +1449,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.id",
                     "data_type": "string",
-                    "column_name": "Agent Id",
+                    "column_name": "Agent ID",
                     "column_order": 4
                 },
                 {
@@ -1465,7 +1465,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.isActive",
                     "data_type": "boolean",
-                    "column_name": "Agent IsActive",
+                    "column_name": "Is Agent Active",
                     "column_order": 6,
                     "example_values": [
                         true,
@@ -1475,7 +1475,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.isDecommissioned",
                     "data_type": "boolean",
-                    "column_name": "Agent IsDecommissioned",
+                    "column_name": "Is Decommissioned Agent",
                     "column_order": 7,
                     "example_values": [
                         true,
@@ -1503,13 +1503,13 @@
                 {
                     "data_path": "action_result.data.*.data.*.osType",
                     "data_type": "string",
-                    "column_name": "Agent Os Type",
+                    "column_name": "Agent OS Type",
                     "column_order": 11
                 },
                 {
                     "data_path": "action_result.data.*.data.*.uuid",
                     "data_type": "string",
-                    "column_name": "Agent Uuid",
+                    "column_name": "Agent UUID",
                     "column_order": 12
                 },
                 {
@@ -1527,7 +1527,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.id",
                     "data_type": "string",
-                    "column_name": "Id",
+                    "column_name": "ID",
                     "column_order": 15
                 },
                 {
@@ -1545,7 +1545,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.osType",
                     "data_type": "string",
-                    "column_name": "os Type",
+                    "column_name": "OS Type",
                     "column_order": 18
                 },
                 {
@@ -1684,7 +1684,7 @@
                 {
                     "data_path": "action_result.data.*.data.*.cveId",
                     "data_type": "string",
-                    "column_name": "cve Id",
+                    "column_name": "CVE ID",
                     "column_order": 8
                 },
                 {
