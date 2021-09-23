@@ -500,6 +500,9 @@ class ThehiveConnector(BaseConnector):
                     resp['attachment']['sha1'] = hashes[1]
                     resp['attachment']['md5'] = hashes[2]
 
+            # Django template in the custom view cannot access the keys starting with underscore
+            resp['parent'] = resp.get('_parent')
+
             action_result.add_data(resp)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Num observables found: {}".format(len(response_formatted)))

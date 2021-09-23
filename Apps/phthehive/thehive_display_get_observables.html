@@ -81,15 +81,17 @@
               <th colspan="2">INFO</th>
             </tr>
 
-            <tr>
-              <th>TICKET ID</th>
-              <td>
-                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['thehive ticket id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
-                  {{ curr_data.id }}
-                  &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                </a>
-              </td>
-            </tr>
+            {% if curr_data.parent %}
+              <tr>
+                <th>TICKET ID</th>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['thehive ticket id'], 'value': '{{ curr_data.parent }}' }], 0, {{ container.id }}, null, false);">
+                    {{ curr_data.parent }}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
 
             {% if curr_data.message %}
               <tr>

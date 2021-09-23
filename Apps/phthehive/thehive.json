@@ -14,7 +14,7 @@
     "utctime_updated": "2021-01-22T11:53:23.000000Z",
     "package_name": "phantom_thehive",
     "main_module": "thehive_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
@@ -116,9 +116,7 @@
                     "column_name": "Description",
                     "column_order": 2,
                     "example_values": [
-                        "testTicket",
-                        "Today is a beautiful day!",
-                        "Testing"
+                        "testTicket"
                     ]
                 },
                 {
@@ -153,16 +151,14 @@
                     "column_name": "Title",
                     "column_order": 1,
                     "example_values": [
-                        "Test",
-                        "QA"
+                        "Test"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.tlp",
                     "data_type": "string",
                     "example_values": [
-                        "White",
-                        "Green"
+                        "White"
                     ]
                 },
                 {
@@ -211,16 +207,14 @@
                     ],
                     "column_order": 7,
                     "example_values": [
-                        22,
-                        125
+                        22
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1519079897718,
-                        1529529092329
+                        1519079897718
                     ]
                 },
                 {
@@ -234,8 +228,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "testTicket",
-                        "Today is a beautiful day!"
+                        "testTicket"
                     ]
                 },
                 {
@@ -249,8 +242,10 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
+                    "contains": [
+                        "thehive ticket id"
+                    ],
                     "example_values": [
-                        "AWGwN71W38eA2eAzW_ec",
                         "AWQfCcret-_WVPphkhQq"
                     ]
                 },
@@ -279,8 +274,7 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1519079898453,
-                        1529529092817
+                        1519079898453
                     ]
                 },
                 {
@@ -294,8 +288,7 @@
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "Test",
-                        "QA"
+                        "Test"
                     ]
                 },
                 {
@@ -349,8 +342,7 @@
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
-                        1,
-                        0
+                        1
                     ]
                 }
             ],
@@ -385,17 +377,17 @@
                         "thehive ticket id"
                     ],
                     "example_values": [
-                        "AWGxGFw138eA2eAzW_e6",
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWGxGFw138eA2eAzW_e6"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._id",
                     "data_type": "string",
+                    "contains": [
+                        "thehive ticket id"
+                    ],
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWGxGFw138eA2eAzW_e6"
                     ]
                 },
                 {
@@ -406,8 +398,7 @@
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -431,18 +422,14 @@
                         "thehive case id"
                     ],
                     "example_values": [
-                        31,
-                        125,
-                        219
+                        31
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1519094618881,
-                        1529529092329,
-                        1542260728292
+                        1519094618881
                     ]
                 },
                 {
@@ -481,9 +468,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "testTicket",
-                        "Today is a beautiful day!",
-                        "Go ahead make my day"
+                        "testTicket"
                     ]
                 },
                 {
@@ -510,9 +495,7 @@
                     ],
                     "column_order": 0,
                     "example_values": [
-                        "AWGxGFw138eA2eAzW_e6",
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWGxGFw138eA2eAzW_e6"
                     ]
                 },
                 {
@@ -556,9 +539,7 @@
                     "column_name": "Start Date",
                     "column_order": 2,
                     "example_values": [
-                        1519094619188,
-                        1529529092817,
-                        1542260729127
+                        1519094619188
                     ]
                 },
                 {
@@ -583,8 +564,7 @@
                     "column_name": "Title",
                     "column_order": 5,
                     "example_values": [
-                        "Test",
-                        "QA"
+                        "Test"
                     ]
                 },
                 {
@@ -593,8 +573,7 @@
                     "column_name": "TLP",
                     "column_order": 3,
                     "example_values": [
-                        2,
-                        0
+                        2
                     ]
                 },
                 {
@@ -680,8 +659,7 @@
                     "data_path": "action_result.parameter.fields",
                     "data_type": "string",
                     "example_values": [
-                        "{\"severity\": 1, \"description\": \"Herman, what are you doing\"}",
-                        "{\"severity\": 1, \"description\": \"Clark, what are you doing\"}"
+                        "{\"severity\": 1, \"description\": \"Herman, what are you doing\"}"
                     ]
                 },
                 {
@@ -693,20 +671,17 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*._id",
                     "data_type": "string",
+                    "contains": [
+                        "thehive ticket id"
+                    ],
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -717,8 +692,7 @@
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -739,16 +713,14 @@
                     "data_path": "action_result.data.*.caseId",
                     "data_type": "numeric",
                     "example_values": [
-                        125,
-                        219
+                        125
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1529529092329,
-                        1542260728292
+                        1529529092329
                     ]
                 },
                 {
@@ -801,8 +773,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Herman, what are you doing",
-                        "Clark, what are you doing"
+                        "Herman, what are you doing"
                     ]
                 },
                 {
@@ -817,8 +788,10 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcV5yUoluiuLHdZXLED"
+                        "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -839,8 +812,7 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1529529092817,
-                        1542260729127
+                        1529529092817
                     ]
                 },
                 {
@@ -861,16 +833,14 @@
                     "data_path": "action_result.data.*.tlp",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
-                        0
+                        2
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1529529095327,
-                        1542260731064
+                        1529529095327
                     ]
                 },
                 {
@@ -935,8 +905,10 @@
                     "data_path": "action_result.data.*._id",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcveXB7luiuLHdZXLIh"
+                        "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -947,8 +919,7 @@
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcveXB7luiuLHdZXLIh"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -962,26 +933,21 @@
                     "data_path": "action_result.data.*._version",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
-                        8
+                        2
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.caseId",
                     "data_type": "numeric",
                     "example_values": [
-                        73,
-                        125,
-                        247
+                        73
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913195723,
-                        1529529092329,
-                        1542689745587
+                        1523913195723
                     ]
                 },
                 {
@@ -1052,9 +1018,7 @@
                     "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
-                        "Today is a beautiful day!",
-                        "Herman, what are you doing",
-                        "Test, what are you doing"
+                        "Today is a beautiful day!"
                     ]
                 },
                 {
@@ -1078,9 +1042,10 @@
                     "column_name": "Ticket ID",
                     "column_order": 0,
                     "example_values": [
-                        "AWLQTgP39H5JF8Rllv1b",
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcveXB7luiuLHdZXLIh"
+                        "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -1127,7 +1092,6 @@
                     ],
                     "column_order": 4,
                     "example_values": [
-                        "herman.edwards",
                         "admin"
                     ]
                 },
@@ -1144,7 +1108,6 @@
                     "column_name": "Severity",
                     "column_order": 1,
                     "example_values": [
-                        3,
                         1
                     ]
                 },
@@ -1152,9 +1115,7 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913196534,
-                        1529529092817,
-                        1542689700000
+                        1523913196534
                     ]
                 },
                 {
@@ -1186,9 +1147,7 @@
                     "column_name": "Title",
                     "column_order": 3,
                     "example_values": [
-                        "Test",
-                        "QA",
-                        "Testing for owner field"
+                        "Test"
                     ]
                 },
                 {
@@ -1202,9 +1161,7 @@
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1523912044312,
-                        1529529095327,
-                        1542891939900
+                        1523912044312
                     ]
                 },
                 {
@@ -1237,8 +1194,7 @@
                     "data_path": "action_result.summary.num_tickets",
                     "data_type": "numeric",
                     "example_values": [
-                        21,
-                        239
+                        21
                     ]
                 },
                 {
@@ -1305,7 +1261,6 @@
                         "thehive ticket id"
                     ],
                     "example_values": [
-                        "AWG00KRH38eA2eAzW_gI",
                         "AWQfCcret-_WVPphkhQq"
                     ]
                 },
@@ -1322,8 +1277,7 @@
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
                     "example_values": [
-                        "The Waiting is the Hardest Part",
-                        "Sorry folks, the park's closed. Moose out front shoulda told ya"
+                        "The Waiting is the Hardest Part"
                     ]
                 },
                 {
@@ -1331,6 +1285,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCdsmt-_WVPphkhQv"
+                    ],
+                    "contains": [
+                        "thehive task id"
                     ]
                 },
                 {
@@ -1338,6 +1295,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -1367,8 +1327,7 @@
                     "column_name": "Created At",
                     "column_order": 1,
                     "example_values": [
-                        1519157031533,
-                        1529529096997
+                        1519157031533
                     ]
                 },
                 {
@@ -1395,7 +1354,6 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "AWG00LJx38eA2eAzW_gL",
                         "AWQfCdsmt-_WVPphkhQv"
                     ]
                 },
@@ -1417,8 +1375,7 @@
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "The Waiting is the Hardest Part",
-                        "Sorry folks, park's closed. Moose out front shoulda told ya"
+                        "The Waiting is the Hardest Part"
                     ]
                 },
                 {
@@ -1492,6 +1449,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -1528,16 +1488,14 @@
                     ],
                     "column_order": 0,
                     "example_values": [
-                        73,
-                        125
+                        73
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913195723,
-                        1529529092329
+                        1523913195723
                     ]
                 },
                 {
@@ -1630,8 +1588,10 @@
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
-                        "AWLQTgP39H5JF8Rllv1b",
                         "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -1678,7 +1638,7 @@
                     ],
                     "column_order": 1,
                     "example_values": [
-                        "herman.edwards"
+                        "admin"
                     ]
                 },
                 {
@@ -1701,8 +1661,7 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913196534,
-                        1529529092817
+                        1523913196534
                     ]
                 },
                 {
@@ -1732,8 +1691,7 @@
                     "column_name": "Title",
                     "column_order": 2,
                     "example_values": [
-                        "Test",
-                        "QA"
+                        "Test"
                     ]
                 },
                 {
@@ -1749,8 +1707,7 @@
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913200583,
-                        1529529095327
+                        1523913200583
                     ]
                 },
                 {
@@ -1772,13 +1729,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully Search",
                         "Num results: 10"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.num_results",
@@ -1839,6 +1791,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCdsmt-_WVPphkhQv"
+                    ],
+                    "contains": [
+                        "thehive task id"
                     ]
                 },
                 {
@@ -1846,6 +1801,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -1873,8 +1831,7 @@
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1523913203133,
-                        1529529096997
+                        1523913203133
                     ]
                 },
                 {
@@ -1917,7 +1874,6 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "AWLQTh2-9H5JF8Rllv1e",
                         "AWQfCdsmt-_WVPphkhQv"
                     ]
                 },
@@ -1984,13 +1940,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully Search",
                         "Num results: 10"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.num_results",
@@ -2082,9 +2033,7 @@
                         "thehive task id"
                     ],
                     "example_values": [
-                        "AWHoIVU838eA2eAzW_hw",
-                        "AWQfCdsmt-_WVPphkhQv",
-                        "AWc6uv2UluiuLHdZXLIz"
+                        "AWQfCdsmt-_WVPphkhQv"
                     ]
                 },
                 {
@@ -2116,24 +2065,27 @@
                     "data_path": "action_result.data.*._id",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCdsmt-_WVPphkhQv",
-                        "AWc6uv2UluiuLHdZXLIz"
+                        "AWQfCdsmt-_WVPphkhQv"
+                    ],
+                    "contains": [
+                        "thehive task id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._parent",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcveXB7luiuLHdZXLIh"
+                        "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcveXB7luiuLHdZXLIh"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -2147,17 +2099,14 @@
                     "data_path": "action_result.data.*._version",
                     "data_type": "numeric",
                     "example_values": [
-                        2,
-                        3
+                        2
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017954107,
-                        1529529096997,
-                        1542878592403
+                        1520017954107
                     ]
                 },
                 {
@@ -2182,8 +2131,7 @@
                     "data_path": "action_result.data.*.endDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017956292,
-                        1529529100466
+                        1520017956292
                     ]
                 },
                 {
@@ -2201,9 +2149,7 @@
                         "thehive task id"
                     ],
                     "example_values": [
-                        "AWHoIVU838eA2eAzW_hw",
-                        "AWQfCdsmt-_WVPphkhQv",
-                        "AWc6uv2UluiuLHdZXLIz"
+                        "AWQfCdsmt-_WVPphkhQv"
                     ],
                     "column_order": 0,
                     "column_name": "ID"
@@ -2241,17 +2187,14 @@
                     "data_path": "action_result.data.*.title",
                     "data_type": "string",
                     "example_values": [
-                        "The System updated the Name",
-                        "Hello Task 1"
+                        "The System updated the Name"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017956292,
-                        1529529100466,
-                        1542879276338
+                        1520017956292
                     ]
                 },
                 {
@@ -2414,9 +2357,7 @@
                         "thehive ticket id"
                     ],
                     "example_values": [
-                        "AWHoIVU838eA2eAzW_hw",
-                        "AWQfCdsmt-_WVPphkhQv",
-                        "AWcMUwKIluiuLHdZXK-L"
+                        "AWQfCdsmt-_WVPphkhQv"
                     ]
                 },
                 {
@@ -2459,6 +2400,7 @@
                         "2e441ebe9994d5f6500454fbc10e148c"
                     ],
                     "contains": [
+                        "thehive observable id",
                         "md5"
                     ]
                 },
@@ -2466,16 +2408,17 @@
                     "data_path": "action_result.data.*._parent",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcMUwKIluiuLHdZXK-L"
+                        "AWQfCcret-_WVPphkhQq"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWQfCcret-_WVPphkhQq",
-                        "AWcMUwKIluiuLHdZXK-L"
+                        "AWQfCcret-_WVPphkhQq"
                     ]
                 },
                 {
@@ -2489,8 +2432,7 @@
                     "data_path": "action_result.data.*._version",
                     "data_type": "numeric",
                     "example_values": [
-                        5,
-                        1
+                        5
                     ]
                 },
                 {
@@ -2546,15 +2488,16 @@
                 },
                 {
                     "data_path": "action_result.data.*.attachment.size",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        14367
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017954107,
-                        1529529096997,
-                        1542208435899
+                        1520017954107
                     ]
                 },
                 {
@@ -2568,7 +2511,6 @@
                     "data_path": "action_result.data.*.data",
                     "data_type": "string",
                     "example_values": [
-                        "www.badsite.com",
                         "122.122.122.122"
                     ],
                     "contains": [
@@ -2630,17 +2572,14 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017954107,
-                        1529529096997,
-                        1542208435900
+                        1520017954107
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "OK",
-                        "Ok"
+                        "OK"
                     ]
                 },
                 {
@@ -2661,8 +2600,7 @@
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1520017956292,
-                        1529529100466
+                        1520017956292
                     ]
                 },
                 {
@@ -2765,8 +2703,7 @@
                     "data_path": "action_result.parameter.ticket_id",
                     "data_type": "string",
                     "example_values": [
-                        "AWM8DPOUt-_WVPphkhEG",
-                        "AWcMXCzkluiuLHdZXK-Y"
+                        "AWM8DPOUt-_WVPphkhEG"
                     ],
                     "contains": [
                         "thehive ticket id"
@@ -2777,11 +2714,10 @@
                     "data_type": "string",
                     "example_values": [
                         "1e3ca6553ce39d7e02bd33d810bc146f",
-                        "c898f24d96ecbbce9506f1b5260cf5bb",
-                        "dd6c35ddf86f628247d0d34cb1d9f450",
-                        "612b7f78326d0b105a2814e7c39f7faa"
+                        "c898f24d96ecbbce9506f1b5260cf5bb"
                     ],
                     "contains": [
+                        "thehive observable id",
                         "md5"
                     ]
                 },
@@ -2789,16 +2725,17 @@
                     "data_path": "action_result.data.*._parent",
                     "data_type": "string",
                     "example_values": [
-                        "AWM8DPOUt-_WVPphkhEG",
-                        "AWcMXCzkluiuLHdZXK-Y"
+                        "AWM8DPOUt-_WVPphkhEG"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._routing",
                     "data_type": "string",
                     "example_values": [
-                        "AWM8DPOUt-_WVPphkhEG",
-                        "AWcMXCzkluiuLHdZXK-Y"
+                        "AWM8DPOUt-_WVPphkhEG"
                     ]
                 },
                 {
@@ -2812,8 +2749,7 @@
                     "data_path": "action_result.data.*._version",
                     "data_type": "numeric",
                     "example_values": [
-                        1,
-                        2
+                        1
                     ]
                 },
                 {
@@ -2894,10 +2830,7 @@
                     "data_path": "action_result.data.*.createdAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1534787641225,
-                        1542204972560,
-                        1542198811657,
-                        1542203100058
+                        1534787641225
                     ]
                 },
                 {
@@ -2911,7 +2844,6 @@
                     "data_path": "action_result.data.*.data",
                     "data_type": "string",
                     "example_values": [
-                        "1.1.1.1",
                         "This is for testing purpose"
                     ],
                     "contains": [
@@ -2933,11 +2865,10 @@
                     "data_type": "string",
                     "example_values": [
                         "1e3ca6553ce39d7e02bd33d810bc146f",
-                        "c898f24d96ecbbce9506f1b5260cf5bb",
-                        "dd6c35ddf86f628247d0d34cb1d9f450",
-                        "612b7f78326d0b105a2814e7c39f7faa"
+                        "c898f24d96ecbbce9506f1b5260cf5bb"
                     ],
                     "contains": [
+                        "thehive observable id",
                         "md5"
                     ]
                 },
@@ -2953,10 +2884,18 @@
                     "data_path": "action_result.data.*.message",
                     "data_type": "string",
                     "example_values": [
-                        "IP",
                         "This is for testing purpose",
-                        "Testing - domain",
-                        "Testing - file"
+                        "Testing - domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parent",
+                    "data_type": "string",
+                    "example_values": [
+                        "AWM8DPOUt-_WVPphkhEG"
+                    ],
+                    "contains": [
+                        "thehive ticket id"
                     ]
                 },
                 {
@@ -3002,10 +2941,7 @@
                     "data_path": "action_result.data.*.startDate",
                     "data_type": "numeric",
                     "example_values": [
-                        1534787641306,
-                        1542204972560,
-                        1542198811659,
-                        1542203100064
+                        1534787641306
                     ]
                 },
                 {
@@ -3038,8 +2974,7 @@
                     "data_path": "action_result.data.*.updatedAt",
                     "data_type": "numeric",
                     "example_values": [
-                        1542199783148,
-                        1542206780990
+                        1542199783148
                     ]
                 },
                 {
@@ -3072,16 +3007,14 @@
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        1,
-                        2
+                        1
                     ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric",
                     "example_values": [
-                        1,
-                        2
+                        1
                     ]
                 }
             ],
@@ -3140,6 +3073,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AWQfCdsmt-_WVPphkhQv"
+                    ],
+                    "contains": [
+                        "thehive task log id"
                     ]
                 },
                 {
@@ -3147,6 +3083,9 @@
                     "data_type": "string",
                     "example_values": [
                         "AZmubWXJkcm5LPGvTUh_"
+                    ],
+                    "contains": [
+                        "thehive task id"
                     ]
                 },
                 {
@@ -3176,8 +3115,7 @@
                     "column_name": "Created At",
                     "column_order": 1,
                     "example_values": [
-                        1519157031533,
-                        1529529096997
+                        1519157031533
                     ]
                 },
                 {
@@ -3196,8 +3134,7 @@
                     "column_name": "ID",
                     "column_order": 0,
                     "example_values": [
-                        "AWG00LJx38eA2eAzW_gL",
-                        "AWQfCdsmt-_WVPphkhQv"
+                        "AWG00LJx38eA2eAzW_gL"
                     ]
                 },
                 {
