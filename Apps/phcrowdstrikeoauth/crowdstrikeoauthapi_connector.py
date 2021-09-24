@@ -577,6 +577,22 @@ class CrowdstrikeConnector(BaseConnector):
     def _handle_get_device_scroll(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        submitted_data = {
+            'offset': param.get('offset', ''),
+            'limit': param.get('limit', 1),
+            'sort': param.get('sort', 'status.desc'),
+            'filter': param.get('filter', ''),
+        }
+
+        ret_val, response = self._make_rest_call_helper_oauth2(
+            action_result, CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, params=submitted_data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch device scroll", response)
+
+        action_result.add_data(response)
+
         return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
 
     def _handle_get_process_detail(self, param):

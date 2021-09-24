@@ -92,6 +92,7 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
 CROWDSTRIKE_GET_DEVICE_DETAILS_ENDPOINT = "/devices/entities/devices/v1"
+CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT = "/devices/queries/devices-scroll/v1"
 CROWDSTRIKE_GET_HOST_GROUP_ID_ENDPOINT = "/devices/queries/host-groups/v1"
 CROWDSTRIKE_GET_HOST_GROUP_DETAILS_ENDPOINT = "/devices/entities/host-groups/v1"
 CROWDSTRIKE_DEVICE_ACTION_ENDPOINT = "/devices/entities/devices-actions/v2"
