@@ -13072,20 +13072,12 @@
                 "limit": {
                     "data_type": "numeric",
                     "description": "The maximum records to return. [1-5000]",
-                    "order": 1,
-                    "value_list": [
-                        1,
-                        5000
-                    ]
+                    "order": 1
                 },
                 "sort": {
                     "data_type": "string",
-                    "description": "The property to sort by",
-                    "order": 1,
-                    "value_list": [
-                        "status.desc",
-                        "hostname.asc"
-                    ]
+                    "description": "The property to sort by (e.g. status.desc or hostname.asc)",
+                    "order": 1
                 },
                 "filter": {
                     "data_type": "string",
