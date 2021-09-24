@@ -279,7 +279,10 @@ class AwsWafConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress(AWSWAF_INFO_CHECK_CREDENTIALS)
-        self.save_progress(AWSWAF_INFO_SCOPE)
+
+        if self._scope == AWSWAF_SCOPE_CLOUDFRONT and not self._region == 'us-east-1':
+            self.save_progress(AWSWAF_INFO_SCOPE)
+            return action_result.set_status(phantom.APP_ERROR)
 
         if not self._create_client(action_result, param):
             return action_result.get_status()
@@ -454,6 +457,16 @@ class AwsWafConnector(BaseConnector):
         # get the asset config
         config = self.get_config()
 
+        self._proxy = {}
+        env_vars = config.get('_reserved_environment_variables', {})
+        if 'HTTP_PROXY' in env_vars:
+            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
+        if 'HTTPS_PROXY' in env_vars:
+            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+
+        self._region = AWSWAF_REGION_DICT.get(config[AWSWAF_REGION])
+        self._scope = config.get(AWSWAF_SCOPE)
+
         if config.get('use_role'):
             credentials = self._handle_get_ec2_role()
             if not credentials:
@@ -469,16 +482,6 @@ class AwsWafConnector(BaseConnector):
 
         if not (self._access_key and self._secret_key):
             return self.set_status(phantom.APP_ERROR, AWSWAF_BAD_ASSET_CFG_ERR_MSG)
-
-        self._region = AWSWAF_REGION_DICT.get(config[AWSWAF_REGION])
-        self._scope = config.get(AWSWAF_SCOPE)
-
-        self._proxy = {}
-        env_vars = config.get('_reserved_environment_variables', {})
-        if 'HTTP_PROXY' in env_vars:
-            self._proxy['http'] = env_vars['HTTP_PROXY']['value']
-        if 'HTTPS_PROXY' in env_vars:
-            self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
 
         return phantom.APP_SUCCESS
 

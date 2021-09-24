@@ -1,0 +1,842 @@
+{
+    "appid": "86fd2d88-1b9c-4dbb-b6aa-1fec6f771c0f",
+    "name": "DigiCert",
+    "description": "This app uses the DigiCert automation API to manage ssl certificates",
+    "type": "devops",
+    "product_vendor": "DigiCert",
+    "product_name": "DigiCert Services API",
+    "logo": "digicert.svg",
+    "logo_dark": "digicert_dark.svg",
+    "product_version_regex": ".*",
+    "python_version": "3",
+    "publisher": "Splunk Community",
+    "contributors": [
+        {
+            "name": "Mayur Pipaliya"
+        },
+        {
+            "name": "Alex Baker"
+        }
+    ],
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-05-04T21:37:1620164263Z",
+    "package_name": "phantom_digicert",
+    "main_module": "digicert_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "base_url": {
+            "description": "API Base URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://www.digicert.com/services/v2",
+            "order": 0
+        },
+        "verify_server_cert": {
+            "description": "Verify Sever Certificate",
+            "data_type": "boolean",
+            "default": true,
+            "order": 1
+        },
+        "org_id": {
+            "description": "Organization ID",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "api_key": {
+            "description": "API Key",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "request cert",
+            "identifier": "request_cert",
+            "description": "Order a new SSL certificate",
+            "verbose": "Order a new SSL certificate. By default, some parameters are extracted from the csr, but can be overriden if needed.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "csr": {
+                    "description": "Vault_id OR vault_name of the certificate signing request (csr)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "order": 0
+                },
+                "common_name": {
+                    "description": "Certificate common name (default: extracted from csr)",
+                    "data_type": "string",
+                    "order": 1
+                },
+                "signature_hash": {
+                    "description": "The certificate's signing algorithm hash (default: extracted from csr)",
+                    "data_type": "string",
+                    "value_list": [
+                        "",
+                        "sha256",
+                        "sha384",
+                        "sha512"
+                    ],
+                    "order": 2
+                },
+                "server_platform": {
+                    "description": "Server platform this certificate is for",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Apache",
+                        "Barracuda",
+                        "Bea Weblogic 7 and older",
+                        "BEA Weblogic 8 & 9",
+                        "Cisco",
+                        "Citrix (Other)",
+                        "Citrix Access Essentials",
+                        "Citrix Access Gateway 4.x",
+                        "Citrix Access Gateway 5.x and higher",
+                        "cPanel",
+                        "F5 Big-IP",
+                        "F5 FirePass",
+                        "IBM HTTP Server",
+                        "Java Web Server (Javasoft / Sun)",
+                        "Juniper",
+                        "Lighttpd",
+                        "Lotus Domino",
+                        "Mac OS X Server",
+                        "Microsoft Exchange Server 2003",
+                        "Microsoft Exchange Server 2007",
+                        "Microsoft Exchange Server 2010",
+                        "Microsoft Exchange Server 2013",
+                        "Microsoft Exchange Server 2016",
+                        "Microsoft Forefront Unified Access Gateway",
+                        "Microsoft IIS 1.x to 4.x",
+                        "Microsoft IIS 10",
+                        "Microsoft IIS 5 or 6",
+                        "Microsoft IIS 7",
+                        "Microsoft IIS 8",
+                        "Microsoft Live Communications Server 2005",
+                        "Microsoft Lync Server 2010",
+                        "Microsoft Lync Server 2013",
+                        "Microsoft OCS R2",
+                        "Microsoft Office Communications Server 2007",
+                        "Microsoft Small Business Server 2008 & 2011",
+                        "Netscape Enterprise Server",
+                        "Netscape iPlanet",
+                        "nginx",
+                        "Novell iChain",
+                        "Novell NetWare",
+                        "Oracle",
+                        "Qmail",
+                        "SunOne",
+                        "Tomcat",
+                        "WebStar",
+                        "Zeus Web Server",
+                        "Other"
+                    ],
+                    "default": "Apache",
+                    "order": 3
+                },
+                "order_validity": {
+                    "description": "How long the order should be valid for (in years, max 6)",
+                    "data_type": "numeric",
+                    "required": true,
+                    "default": 1,
+                    "order": 4
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Action Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.common_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.csr",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.order_validity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.server_platform",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.signature_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert certificate id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.domains.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert request id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.common_name",
+                    "data_type": "string",
+                    "column_name": "Common Name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.summary.order_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ],
+                    "column_name": "Order ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.request_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert request id"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary.request_status",
+                    "data_type": "string",
+                    "column_name": "Request Status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.signature_hash",
+                    "data_type": "string",
+                    "column_name": "Signature Hash",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update request status",
+            "identifier": "update_request_status",
+            "description": "Update the status of a request (i.e. approve the request)",
+            "verbose": "Approve or reject a certificate request (requires proper permissions).",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "request_id": {
+                    "description": "The request id of a certificate request to update",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digicert request id"
+                    ],
+                    "order": 0
+                },
+                "status": {
+                    "description": "Status to set for the order",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "approved",
+                        "rejected",
+                        "submitted",
+                        "pending"
+                    ],
+                    "order": 1
+                },
+                "comment": {
+                    "description": "Add comment to the order request that we update (optional)",
+                    "data_type": "string",
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Action Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.comment",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.request_id",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert request id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.comment",
+                    "data_type": "string",
+                    "column_name": "Request Comment",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.request_id",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert request id"
+                    ],
+                    "column_name": "Request ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "column_name": "Request Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download cert",
+            "identifier": "download_cert",
+            "description": "Download a certificate to the vault",
+            "verbose": "Download certificate and save it to the vault.",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "certificate_id": {
+                    "description": "The certificate id to download",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "digicert certificate id"
+                    ],
+                    "order": 0
+                },
+                "order_id": {
+                    "description": "The order id to download the certificate for",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert order id"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Action Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.certificate_id",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert certificate id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.order_id",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get request info",
+            "identifier": "get_request_info",
+            "description": "Get details for a certificate request",
+            "type": "generic",
+            "read_only": true,
+            "parameters": {
+                "order_id": {
+                    "description": "Certificate order id",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "digicert order id"
+                    ],
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Action Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.order_id",
+                    "data_type": "string",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.auto_reissue",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.auto_renew",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.ca_cert.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.ca_cert.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.common_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.csr",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.date_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.dns_names",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert certificate id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.key_size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.organization.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.organization_units",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.csr_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.install_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.server_platform.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.certificate.signature_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.container.is_active",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.container.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.metadata_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.custom_fields.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.date_created",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.disable_issuance_email",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.disable_renewal_notifications",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.is_guest_access_enabled",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.is_out_of_contract",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.is_renewal",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.assumed_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.city",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.display_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization.state",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.job_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.telephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.organization_contact.telephone_extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.payment_method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.csr_required",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.product.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.name_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product.validation_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.product_name_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.public_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.purchased_dns_names",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.comments",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.date",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert request id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.requests.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.job_title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.telephone",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.technical_contact.telephone_extension",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.user.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.validity_years",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.common_name",
+                    "data_type": "string",
+                    "column_name": "Common Name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.summary.order_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "digicert order id"
+                    ],
+                    "column_name": "Order ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.summary.order_status",
+                    "data_type": "string",
+                    "column_name": "Order Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

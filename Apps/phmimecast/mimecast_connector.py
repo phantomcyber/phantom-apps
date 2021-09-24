@@ -43,6 +43,14 @@ class MimecastConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+        self._username = None
+        self._password = None
+        self._app_id = None
+        self._app_key = None
+        self._auth_type = None
+        self._access_key = None
+        self._secret_key = None
+
     def _login(self, action_result):
         uri = '/api/login/login'
         auth_type = 'Basic-AD' if self._auth_type == 'Domain' else 'Basic-Cloud'
@@ -1063,7 +1071,7 @@ class MimecastConnector(BaseConnector):
     def finalize(self):
 
         # Save the state, this data is saved across actions and app upgrades
-        if self._auth_type != "Bypass (Access Key)":
+        if self._auth_type and self._auth_type != "Bypass (Access Key)":
             self._state['access_key'] = self._access_key
             self._state['secret_key'] = self._secret_key
         self.save_state(self._state)
