@@ -585,6 +585,7 @@ class CrowdstrikeConnector(BaseConnector):
             'filter': param.get('filter', ''),
         }
 
+        # More info on the endpoint at https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll
         ret_val, response = self._make_rest_call_helper_oauth2(
             action_result, CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, params=submitted_data)
 
