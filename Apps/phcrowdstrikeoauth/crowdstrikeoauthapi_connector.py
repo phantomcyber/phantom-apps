@@ -1022,86 +1022,106 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_custom_indicators(self, param):
+    def helper_sort_ioc_data(self, indicator_sort_criteria, value):
+        sort_criteria, data_ordering = indicator_sort_criteria.split('.')
+        if data_ordering == 'asc':
+            return sorted(value, key=lambda x: x[CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT[sort_criteria]])
+        return sorted(value, key=lambda x: x[CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT[sort_criteria]], reverse=True)
+
+    def _handle_list_custom_indicators(self, param): # noqa
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        api_data = {
-            "limit": 400  # 500 is the max, don't want to give max, this could be tuned
-        }
+        indicator_limit = self._validate_integers(action_result, param.get(CROWDSTRIKE_IOCS_LIMIT, 100), CROWDSTRIKE_IOCS_LIMIT)
+        if indicator_limit is None:
+            return action_result.get_status()
 
+        indicator_sort_criteria = param.get(CROWDSTRIKE_IOCS_SORT)
+        api_data = {
+            "limit": 2000  # 2000 is the max, this could be tuned
+        }
+        filter_query = ""
         # optional parameters
         if CROWDSTRIKE_JSON_LIST_IOC in param:
-            api_data["values"] = [param.get(CROWDSTRIKE_JSON_LIST_IOC)]
-        if CROWDSTRIKE_IOCS_POLICY in param and param.get(CROWDSTRIKE_IOCS_POLICY) != "all":
-            api_data["policies"] = [param.get(CROWDSTRIKE_IOCS_POLICY)]
-        if CROWDSTRIKE_IOCS_SHARE_LEVEL in param and param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL) != "all":
-            api_data["share_levels"] = param.get(CROWDSTRIKE_IOCS_SHARE_LEVEL)
+            filter_query += "value:'{}'".format(param.get(CROWDSTRIKE_JSON_LIST_IOC))
+        if CROWDSTRIKE_IOCS_ACTION in param:
+            filter_query += "action:'{}'".format(param.get(CROWDSTRIKE_IOCS_ACTION))
         if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
-            api_data["from.expiration_timestamp"] = param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION)
+            filter_query += "expiration:>='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
         if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
-            api_data["to.expiration_timestamp"] = param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION)
+            filter_query += "expiration:<='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
         if CROWDSTRIKE_IOCS_SOURCE in param:
-            api_data["sources"] = param.get(CROWDSTRIKE_IOCS_SOURCE)
+            filter_query += "source:'{}'".format(param.get(CROWDSTRIKE_IOCS_SOURCE))
         if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) != "all":
             if param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) == "hash":
-                api_data["types"] = ["md5", "sha1", "sha256"]
+                source_list = ["md5", "sha256"]
+                filter_query += "type:{}".format(source_list)
             else:
-                api_data["types"] = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
+                filter_query += "type:'{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+
+        if filter_query:
+            api_data['filter'] = filter_query
 
         more = True
 
         self.send_progress("Completed 0 %")
-        data = defaultdict(list)
         ioc_infos = []
         while more:
 
-            ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
+            ret_val, response = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=api_data)
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
-            ioc_infos.extend(response["resources"])
+            if response.get('errors') and len(response.get('errors')) > 0:
+                error = response.get('errors')[0]
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
 
-            offset = response["meta"]["pagination"]["offset"]
-            total = response["meta"]["pagination"]["total"]
+            if response.get("resources"):
+                ioc_infos.extend(response.get("resources"))
+
+            after = response.get('meta', {}).get('pagination', {}).get('after')
+            if after is None:
+                break
+            total = response.get('meta', {}).get('pagination', {}).get('total')
 
             if total:
                 self.send_progress(CROWDSTRIKE_COMPLETED, float(len(ioc_infos)) / float(total))
 
-            if offset >= total:
+            if len(ioc_infos) >= indicator_limit:
+                ioc_infos = ioc_infos[:indicator_limit]
                 more = False
             else:
-                api_data["offset"] = offset
+                api_data["after"] = after
 
         self.save_progress("Processing results")
 
-        # instead of adding the ioc type in each ioc_info put them as the value in the dictionary,
-        # this way the ioc type 'domain' is not repeated for every domain ioc
-        for ioc_info in ioc_infos:
-            ioc_type, ioc = (ioc_info.split(':', 1))
-            data[ioc_type].append(ioc)
+        data = defaultdict(list)
 
-        summary_keys = ['ip', 'domain', 'sha1', 'md5', 'sha256']
+        for ioc_info in ioc_infos:
+            data[ioc_info['type']].append(ioc_info)
+
+        summary_keys = ['ipv4', 'ipv6', 'domain', 'md5', 'sha256']
 
         if data:
             data = dict(data)
-            if 'ipv4' in data:
-                data['ip'] = data.pop('ipv4')
-            if 'ipv6' in data:
-                data['ip'] = data.get('ip', [])
-                data['ip'].extend(data.pop('ipv6'))
+            if indicator_sort_criteria:
+                indicator_sort_criteria = indicator_sort_criteria.lower()
+                for key, value in data.items():
+                    data[key] = self.helper_sort_ioc_data(indicator_sort_criteria, value)
 
             action_result.add_data(data)
 
             for key in summary_keys:
+                summary_data_key = 'total_{}'.format(key)
+
                 if key not in data:
-                    action_result.update_summary({"total_" + key: 0})
+                    action_result.update_summary({summary_data_key: 0})
                     continue
 
-                action_result.update_summary({"total_" + key: len(data[key])})
+                action_result.update_summary({summary_data_key: len(data[key])})
 
         action_result.update_summary({'alerts_found': len(ioc_infos)})
 
