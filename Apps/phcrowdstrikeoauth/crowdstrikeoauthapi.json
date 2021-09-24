@@ -13066,7 +13066,7 @@
                 "offset": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 1,
+                    "order": 0,
                     "value_list": []
                 },
                 "limit": {
@@ -13077,12 +13077,12 @@
                 "sort": {
                     "data_type": "string",
                     "description": "The property to sort by (e.g. status.desc or hostname.asc)",
-                    "order": 1
+                    "order": 2
                 },
                 "filter": {
                     "data_type": "string",
                     "description": "The offset to page from, for the next result set",
-                    "order": 1,
+                    "order": 3,
                     "value_list": []
                 }
             },
