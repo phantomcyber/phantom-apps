@@ -13057,7 +13057,7 @@
         },
         {
             "action": "get device scroll",
-            "description": "Get device scroll",
+            "description": "Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)",
             "type": "investigate",
             "identifier": "get_device_scroll",
             "read_only": true,
