@@ -28,6 +28,7 @@ import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
 from _collections import defaultdict
 import traceback
+from urllib.parse import urlencode
 
 
 class RetVal(tuple):
@@ -574,30 +575,21 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
 
-    def _get_device_scroll_query(self, param):
-        self.debug_print('Get DeviceScroll query from param {0}'.format(param))
-        query = ''
-        offset = param.get('offset', None)
-        limit = param.get('limit', None)
-        sort = param.get('sort', None)
-        filter = param.get('filter', None)
-
-        if offset:
-            query += 'offset={0}&'.format(offset)
-        if limit:
-            query += 'limit={0}&'.format(limit)
-        if sort:
-            query += 'sort={0}&'.format(sort)
-        if filter:
-            query += 'filter={0}&'.format(filter)
-        return query
-
     def _handle_get_device_scroll(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        query = self._get_device_scroll_query(param)
+        data = {
+            'offset': param.get('offset', None),
+            'limit': param.get('limit', None),
+            'sort': param.get('sort', None),
+            'filter': param.get('filter', None),
+        }
+        query_pairs = [(k, v) for k, v in data.items() if v]
+        query = urlencode(query_pairs)
         url = '{0}?{1}'.format(CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, query)
+
+        self.debug_print('Getting device scroll from {0}'.format(url))
 
         # More info on the endpoint at https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll
         ret_val, response = self._make_rest_call_helper_oauth2(action_result, url)
@@ -607,6 +599,7 @@ class CrowdstrikeConnector(BaseConnector):
 
         action_result.add_data(response)
 
+        self.debug_print('Successfully fetched device scroll with response {0}'.format(response))
         return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
 
     def _handle_get_process_detail(self, param):
