@@ -15,7 +15,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.3.0",
+    "app_version": "3.4.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, July 19 2021, API version: v1, v2"
     ],
@@ -13051,6 +13051,87 @@
             "render": {
                 "width": 12,
                 "title": "Check Status",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "get device scroll",
+            "description": "Get device scroll",
+            "type": "investigate",
+            "identifier": "get_device_scroll",
+            "read_only": true,
+            "parameters": {
+                "offset": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 1,
+                    "value_list": []
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "The maximum records to return. [1-5000]",
+                    "order": 1,
+                    "value_list": [
+                        1,
+                        5000
+                    ]
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "The property to sort by",
+                    "order": 1,
+                    "value_list": [
+                        "status.desc",
+                        "hostname.asc"
+                    ]
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 1,
+                    "value_list": []
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Indicator fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Device scrolls",
                 "type": "table",
                 "height": 5
             }

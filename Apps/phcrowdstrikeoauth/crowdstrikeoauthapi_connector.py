@@ -574,6 +574,11 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
 
+    def _handle_get_device_scroll(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
+
     def _handle_get_process_detail(self, param):
 
         # Add an action result to the App Run
@@ -3014,7 +3019,8 @@ class CrowdstrikeConnector(BaseConnector):
             'download_report': self._handle_download_report,
             'detonate_file': self._handle_detonate_file,
             'detonate_url': self._handle_detonate_url,
-            'check_detonate_status': self._handle_check_detonate_status
+            'check_detonate_status': self._handle_check_detonate_status,
+            'get_device_scroll': self._handle_get_device_scroll,
         }
 
         action = self.get_action_identifier()
