@@ -470,6 +470,7 @@ class AwsWafConnector(BaseConnector):
             'test_connectivity': self._handle_test_connectivity,
             'add_ip': self._handle_add_ip,
             'delete_ip': self._handle_delete_ip,
+            'delete_ip_set': self._handle_delete_ip_set,
             'list_acls': self._handle_list_acls,
             'list_ip_sets': self._handle_list_ip_sets
         }
