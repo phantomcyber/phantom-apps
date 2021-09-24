@@ -685,6 +685,8 @@ class SentineloneConnector(BaseConnector):
         ret_val, response = self._make_rest_call('/web/api/v2.1/installed-applications/cves', action_result, headers=header)
         action_result.add_data(response)
         self.save_progress("Ret_val: {0}".format(ret_val))
+        if response.get('pagination', {}).get('totalItems') == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, "No CVEs are found")
         if phantom.is_fail(ret_val):
             self.save_progress("Failed to get Cves.  Error: {0}".format(action_result.get_message()))
             return action_result.get_status()
