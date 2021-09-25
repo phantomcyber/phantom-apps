@@ -24,20 +24,18 @@ import base64
 import email
 from requests.structures import CaseInsensitiveDict
 from google.oauth2 import service_account
+from googleapiclient import errors
+from datetime import datetime
+from gsgmail_process_email import ProcessMail
 
 init_path = '{}/dependencies/google/__init__.py'.format(  # noqa
     os.path.dirname(os.path.abspath(__file__))  # noqa
 )  # noqa
-try:  # noqa
-    open(init_path, 'a+').close()  # noqa
-except:  # noqa
-    pass  # noqa
-
-# the following argv 'work around' is to keep apiclient happy
 # and _also_ debug the connector as a script via pudb
 try:
+    open(init_path, 'a+').close()  # noqa
     argv_temp = list(sys.argv)
-except:
+except Exception:
     pass
 sys.argv = ['']
 
@@ -56,6 +54,7 @@ class GSuiteConnector(BaseConnector):
 
         self._key_dict = None
         self._domain = None
+        self._state = {}
 
         # Call the BaseConnectors init first
         super(GSuiteConnector, self).__init__()
@@ -66,22 +65,21 @@ class GSuiteConnector(BaseConnector):
         try:
             credentials = service_account.Credentials.from_service_account_info(self._key_dict, scopes=scopes)
         except Exception as e:
-            return RetVal2(action_result.set_status(phantom.APP_ERROR, GSGMAIL_SERVICE_KEY_FAILURE,
-                self._get_error_message_from_exception(e)), None)
+            return RetVal2(action_result.set_status(phantom.APP_ERROR, GSGMAIL_SERVICE_KEY_FAILURE, self._get_error_message_from_exception(e)), None)
 
-        if (delegated_user):
+        if delegated_user:
             try:
                 credentials = credentials.with_subject(delegated_user)
             except Exception as e:
-                return RetVal2(action_result.set_status(phantom.APP_ERROR, GSGMAIL_CREDENTIALS_FAILURE,
-                    self._get_error_message_from_exception(e)), None)
+                return RetVal2(action_result.set_status(phantom.APP_ERROR, GSGMAIL_CREDENTIALS_FAILURE, self._get_error_message_from_exception(e)), None)
 
         try:
             service = apiclient.discovery.build(api_name, api_version, credentials=credentials)
         except Exception as e:
             return RetVal2(action_result.set_status(phantom.APP_ERROR,
-                "Failed to create service object for API: {0}-{1}. {2} {3}".format(api_name, api_version, self._get_error_message_from_exception(e),
-                    "Please make sure the user '{0}' is valid and the service account has the proper scopes enabled.".format(delegated_user)), None))
+                                                    FAILED_CREATE_SERVICE.format(api_name, api_version,
+                                                                                 self._get_error_message_from_exception(e),
+                                                                                 GSMAIL_USER_VALID_MESSAGE.format(delegated_user)), None))
 
         return RetVal2(phantom.APP_SUCCESS, service)
 
@@ -90,7 +88,7 @@ class GSuiteConnector(BaseConnector):
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
-        except:
+        except Exception:
             return self.set_status(phantom.APP_ERROR, "Error occurred while fetching the Phantom server's Python major version")
 
         config = self.get_config()
@@ -125,27 +123,27 @@ class GSuiteConnector(BaseConnector):
         try:
             if input_str and (self._python_version == 2 or always_encode):
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
+        except Exception:
             self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
         return input_str
 
     def _validate_integer(self, action_result, parameter, key, allow_zero=False):
-        if parameter is not None:
-            try:
-                if not float(parameter).is_integer():
-                    return action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="", param=key)), None
+        try:
+            parameter = int(parameter)
+        except Exception:
+            action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="", param=key))
+            return None
 
-                parameter = int(parameter)
-            except:
-                return action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="", param=key)), None
+        if parameter < 0:
+            action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="non-negative", param=key))
+            return None
 
-            if parameter < 0:
-                return action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="non-negative", param=key)), None
-            if not allow_zero and parameter == 0:
-                return action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="non-zero positive", param=key)), None
+        if not allow_zero and parameter == 0:
+            action_result.set_status(phantom.APP_ERROR, GSGMAIL_INVALID_INTEGER_ERR_MSG.format(msg="non-zero positive", param=key))
+            return None
 
-        return phantom.APP_SUCCESS, parameter
+        return parameter
 
     def _get_error_message_from_exception(self, e):
         """ This method is used to get appropriate error message from the exception.
@@ -168,7 +166,7 @@ class GSuiteConnector(BaseConnector):
                                 error_msg = error.get('message')
                             if error.get('code'):
                                 error_code = error.get('code')
-                    except:
+                    except Exception:
                         pass
                 elif len(e.args) == 1:
                     error_code = GSGMAIL_ERR_CODE_UNAVAILABLE
@@ -176,7 +174,7 @@ class GSuiteConnector(BaseConnector):
             else:
                 error_code = GSGMAIL_ERR_CODE_UNAVAILABLE
                 error_msg = GSGMAIL_ERR_MESSAGE_UNAVAILABLE
-        except:
+        except Exception:
             error_code = GSGMAIL_ERR_CODE_UNAVAILABLE
             error_msg = GSGMAIL_ERR_MESSAGE_UNAVAILABLE
 
@@ -184,7 +182,7 @@ class GSuiteConnector(BaseConnector):
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
             error_msg = GSGMAIL_UNICODE_DAMMIT_TYPE_ERROR_MESSAGE
-        except:
+        except Exception:
             error_msg = GSGMAIL_ERR_MESSAGE_UNAVAILABLE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -351,7 +349,7 @@ class GSuiteConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Create the credentials with the required scope
-        scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+        scopes = [GSGMAIL_AUTH_GMAIL_READ]
 
         # Create a service here
         self.save_progress("Creating GMail service object")
@@ -387,11 +385,8 @@ class GSuiteConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Please specify at-least one search criteria")
         """
 
-        ret_val, max_results = self._validate_integer(
-            action_result,
-            param.get('max_results', 100),
-            "max_results")
-        if phantom.is_fail(ret_val):
+        max_results = self._validate_integer(action_result, param.get('max_results', 100), "max_results")
+        if max_results is None:
             return action_result.get_status()
 
         kwargs = { 'maxResults': max_results, 'userId': user_email, 'q': query_string }
@@ -436,7 +431,7 @@ class GSuiteConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        scopes = ['https://www.googleapis.com/auth/gmail.readonly']
+        scopes = [GSGMAIL_AUTH_GMAIL_READ]
         user_email = param['email']
 
         self.save_progress("Creating GMail service object")
@@ -502,7 +497,7 @@ class GSuiteConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Create the credentials with the required scope
-        scopes = ['https://mail.google.com/']
+        scopes = [GSGMAIL_DELETE_EMAIL]
 
         # Create a service here
         self.save_progress("Creating GMail service object")
@@ -576,7 +571,7 @@ class GSuiteConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Create the credentials with the required scope
-        scopes = ['https://www.googleapis.com/auth/admin.directory.user']
+        scopes = [GSGMAIL_AUTH_GMAIL_ADMIN_DIR]
 
         # Create a service here
         self.save_progress("Creating AdminSDK service object")
@@ -588,11 +583,8 @@ class GSuiteConnector(BaseConnector):
 
         self.save_progress("Getting list of users for domain: {0}".format(self._domain))
 
-        ret_val, max_users = self._validate_integer(
-            action_result,
-            param.get('max_items', 500),
-            "max_items")
-        if phantom.is_fail(ret_val):
+        max_users = self._validate_integer(action_result, param.get('max_items', 500), "max_items")
+        if max_users is None:
             return action_result.get_status()
 
         kwargs = {'domain': self._domain, 'maxResults': max_users, 'orderBy': 'email', 'sortOrder': 'ASCENDING'}
@@ -629,7 +621,7 @@ class GSuiteConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Create the credentials, with minimal scope info for test connectivity
-        scopes = ['https://www.googleapis.com/auth/admin.directory.user']
+        scopes = [GSGMAIL_AUTH_GMAIL_ADMIN_DIR]
 
         # Test connectivity does not return any data, it's the status that is more important
         # and the progress messages
@@ -653,6 +645,169 @@ class GSuiteConnector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _get_email_ids_to_process(self, service, action_result, max_results, user_id='me', labels=[], include_spam_trash=False, q=None, include_sent=False, use_ingest_limit=False):
+
+        kwargs = {
+            'userId': user_id,
+            'includeSpamTrash': include_spam_trash,
+            'maxResults': GSMAIL_MAX_RESULT
+        }
+
+        label_ids = []
+        if labels:
+            if 'labels' not in self._state:
+                self._state['labels'] = {}
+            for label in labels:
+                if label.lower() not in self._state['labels']:
+                    try:
+                        response = service.users().labels().list(userId=user_id).execute()  # pylint: disable=E1101
+                        gmail_labels = response['labels']
+                        for gmail_label in gmail_labels:
+                            if gmail_label['name'].lower() == label.lower():
+                                self._state['labels'][label.lower()] = gmail_label['id']
+                    except errors.HttpError as error:
+                        return action_result.set_status(phantom.APP_ERROR, error), None
+                if label.lower() not in self._state['labels']:
+                    return action_result.set_status(phantom.APP_ERROR, 'Unable to find label "{}"'.format(label)), None
+                label_ids.append(self._state['labels'][label.lower()])
+
+        if label_ids:
+            kwargs['labelIds'] = label_ids
+
+        query = []
+        if q:
+            query.append(q)
+        if not include_sent:
+            query.append('-in:sent')
+
+        config = self.get_config()
+        using_oldest = config['ingest_manner'] == "oldest first"
+        using_latest = config['ingest_manner'] == "latest first"
+
+        if use_ingest_limit:
+            if 'last_email_epoch' in self._state and using_oldest:
+                query.append('after:{}'.format(self._state['last_email_epoch']))
+            elif 'last_ingested_epoch' in self._state and using_latest:
+                query.append('after:{}'.format(self._state['last_ingested_epoch']))
+
+        kwargs['q'] = ' '.join(query)
+
+        try:
+            response = service.users().messages().list(**kwargs).execute()  # pylint: disable=E1101
+            messages = []
+            if 'messages' in response:
+                messages.extend(response['messages'])
+            while 'nextPageToken' in response:
+                if max_results and using_latest and len(messages) > max_results:
+                    break
+                kwargs['pageToken'] = response['nextPageToken']
+                response = service.users().messages().list(**kwargs).execute()  # pylint: disable=E1101
+                messages.extend(response['messages'])
+
+            message_ids = [x['id'] for x in messages]
+
+            if max_results and len(message_ids) > max_results:
+                if using_oldest:
+                    message_ids = message_ids[-max_results:]
+                else:
+                    message_ids = message_ids[:max_results]
+
+            return action_result.set_status(phantom.APP_SUCCESS), message_ids
+        except errors.HttpError as error:
+            return action_result.set_status(phantom.APP_ERROR, error), None
+
+    def _handle_on_poll(self, param):
+        # Implement the handler here, some basic code is already in
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Create the credentials with the required scope
+        scopes = [GSGMAIL_AUTH_GMAIL_READ]
+
+        # Create a service here
+        self.save_progress("Creating GMail service object")
+
+        # if user_email param is not present use login_email
+        config = self.get_config()
+        self.debug_print("\n PRINTING CONFIG : {0} ".format(config))
+        self.debug_print("\n PRINTING PARAM : {0} ".format(param))
+
+        login_email = config['login_email']
+        first_run_max_emails = self._validate_integer(action_result, config.get('first_run_max_emails', GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL), "first_max_emails", allow_zero=True)
+        max_containers = self._validate_integer(action_result, config.get('max_containers', GSMAIL_DEFAULT_MAX_CONTAINER), "max_containers", allow_zero=False)
+
+        if first_run_max_emails is None or max_containers is None:
+            return action_result.get_status()
+        self.save_progress("login_email is {0}".format(login_email))
+
+        ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", login_email)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        if self.is_poll_now():
+            max_emails = self._validate_integer(action_result, param.get(phantom.APP_JSON_CONTAINER_COUNT), 'container count', allow_zero=False)
+            if max_emails is None:
+                return action_result.get_status()
+            self.save_progress(GSMAIL_POLL_NOW_PROGRESS)
+        else:
+            if self._state.get('first_run', True):
+                self._state['first_run'] = False
+                max_emails = first_run_max_emails
+                self.save_progress(GSMAIL_FIRST_INGES_DELETED)
+            else:
+                max_emails = max_containers
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        email_id = param.get(phantom.APP_JSON_CONTAINER_ID, False)
+        email_ids = [email_id]
+        if not email_id:
+            self.save_progress("Getting {0} '{1}' email ids".format(max_emails, config['ingest_manner']))
+            self.debug_print("Getting {0} '{1}' email ids".format(max_emails, config['ingest_manner']))
+            labels = []
+            if "label" in config:
+                labels = [config['label']]
+            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, labels=labels,
+                                                                use_ingest_limit=True)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if not self.is_poll_now():
+                utc_now = datetime.utcnow()
+                epoch = datetime.utcfromtimestamp(0)
+                self._state['last_ingested_epoch'] = str(int((utc_now - epoch).total_seconds()))
+
+            if not email_ids:
+                return action_result.set_status(phantom.APP_SUCCESS)
+
+        # process email_ids
+        for i, emid in enumerate(email_ids):
+            self.send_progress("Parsing email id: {0}".format(emid))
+            try:
+                message = service.users().messages().get(userId='me', id=emid, format='raw').execute()  # pylint: disable=E1101
+            except errors.HttpError as error:
+                return action_result.set_status(phantom.APP_ERROR, error)
+
+            timestamp = int(message['internalDate']) / 1000
+            if not self.is_poll_now() and i == 0:
+                self._state['last_email_epoch'] = timestamp + 1
+            # the api libraries return the base64 encoded message as a unicode string,
+            # but base64 can be represented in ascii with no possible issues
+            raw_decode = base64.urlsafe_b64decode(message['raw'].encode("utf-8")).decode("utf-8")
+
+            process_email = ProcessMail(self, config)
+            process_email.process_email(raw_decode, emid, timestamp)
+
+        return phantom.APP_SUCCESS
+
+    def finalize(self):
+        # Save the state, this data is saved across actions and app upgrades
+        self.save_state(self._state)
+        return phantom.APP_SUCCESS
+
     def handle_action(self, param):
 
         """
@@ -675,6 +830,8 @@ class GSuiteConnector(BaseConnector):
             ret_val = self._handle_get_users(param)
         elif action_id == 'get_email':
             ret_val = self._handle_get_email(param)
+        elif action_id == 'on_poll':
+            ret_val = self._handle_on_poll(param)
         elif action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
 

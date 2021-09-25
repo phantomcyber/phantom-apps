@@ -111,6 +111,91 @@
             "description": "Contents of Service Account JSON file",
             "data_type": "password",
             "order": 1
+        },
+        "label": {
+            "description": "Mailbox Label (folder) to be polled",
+            "data_type": "string",
+            "required": false,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        },
+        "ph_1": {
+            "description": "Placeholder",
+            "data_type": "ph",
+            "required": false,
+            "value_list": [],
+            "default": "",
+            "order": 3
+        },
+        "ingest_manner": {
+            "description": "How to ingest",
+            "data_type": "string",
+            "required": true,
+            "value_list": [
+                "oldest first",
+                "latest first"
+            ],
+            "default": "oldest first",
+            "order": 4
+        },
+        "first_run_max_emails": {
+            "description": "Maximum emails to poll first time",
+            "data_type": "numeric",
+            "required": true,
+            "value_list": [],
+            "default": "2000",
+            "order": 5
+        },
+        "max_containers": {
+            "description": "Maximum Containers for scheduled polling",
+            "data_type": "numeric",
+            "required": true,
+            "value_list": [],
+            "default": "100",
+            "order": 6
+        },
+        "extract_attachments": {
+            "description": "Extract Attachments",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 10
+        },
+        "extract_urls": {
+            "description": "Extract URLs",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 11
+        },
+        "extract_ips": {
+            "description": "Extract IPs",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 12
+        },
+        "extract_domains": {
+            "description": "Extract Domain Names",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 7
+        },
+        "extract_hashes": {
+            "description": "Extract Hashes",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 8
+        },
+        "extract_email_attachments": {
+            "description": "Extract Email Attachments",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 13
         }
     },
     "actions": [
@@ -791,6 +876,42 @@
                     ]
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "verbose": "Please see sections <a href=\"#poll_now\">POLL NOW</a> and <a href=\"#scheduled_polling\">Scheduled Polling</a> for more info on how this action is implemented by the app.",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of emails to ingest",
+                    "required": true,
+                    "value": 100
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of artifact to ingest",
+                    "required": true,
+                    "value": 1000
+                }
+            },
+            "output": [],
             "versions": "EQ(*)"
         },
         {
