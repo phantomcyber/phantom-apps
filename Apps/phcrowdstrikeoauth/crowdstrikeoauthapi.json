@@ -7281,6 +7281,7 @@
                     "contains": [
                         "hash",
                         "ip",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
@@ -7388,6 +7389,7 @@
                     "contains": [
                         "hash",
                         "ip",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
@@ -7443,10 +7445,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ip",
+                    "data_path": "action_result.data.*.ipv4",
                     "data_type": "string",
                     "contains": [
                         "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6",
+                    "data_type": "string",
+                    "contains": [
+                        "ipv6"
                     ]
                 },
                 {
@@ -7482,15 +7491,15 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.summary.total_ip",
+                    "data_path": "action_result.summary.total_ipv4",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_ipv6",
                     "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary.total_md5",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.total_sha1",
                     "data_type": "numeric"
                 },
                 {

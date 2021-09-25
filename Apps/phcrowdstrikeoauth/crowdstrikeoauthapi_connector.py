@@ -62,6 +62,7 @@ class CrowdstrikeConnector(BaseConnector):
         # The headers, initialize them here once and use them for all other REST calls
         self._headers = {'Content-Type': 'application/json'}
 
+        self.set_validator('ipv6', self._is_ip)
         # Base URL
         self._client_id = config[CROWDSTRIKE_CLIENT_ID]
         self._client_secret = config[CROWDSTRIKE_CLIENT_SECRET]
@@ -91,6 +92,20 @@ class CrowdstrikeConnector(BaseConnector):
     def finalize(self):
         self.save_state(self._state)
         return phantom.APP_SUCCESS
+
+    def _is_ip(self, input_ip_address):
+        """
+        Function that checks given address and return True if address is valid IPv4 or IPV6 address.
+
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+        ip_address_input = input_ip_address
+        try:
+            ipaddress.ip_address(UnicodeDammit(ip_address_input).unicode_markup)
+        except Exception:
+            return False
+        return True
 
     def _handle_preprocess_scripts(self):
 
@@ -1028,9 +1043,49 @@ class CrowdstrikeConnector(BaseConnector):
             return sorted(value, key=lambda x: x[CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT[sort_criteria]])
         return sorted(value, key=lambda x: x[CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT[sort_criteria]], reverse=True)
 
-    def _handle_list_custom_indicators(self, param): # noqa
+    def helper_create_query(self, param, filter_query):
+        if CROWDSTRIKE_JSON_LIST_IOC in param:
+            if filter_query:
+                filter_query = "{}+value:'{}'".format(filter_query, param.get(CROWDSTRIKE_JSON_LIST_IOC))
+            else:
+                filter_query = "value:'{}'".format(param.get(CROWDSTRIKE_JSON_LIST_IOC))
+        if CROWDSTRIKE_IOCS_ACTION in param:
+            if filter_query:
+                filter_query = "{}+action:'{}'".format(filter_query, param.get(CROWDSTRIKE_IOCS_ACTION))
+            else:
+                filter_query = "action:'{}'".format(param.get(CROWDSTRIKE_IOCS_ACTION))
+        if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
+            if filter_query:
+                filter_query = "{}+expiration:>='{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
+            else:
+                filter_query = "expiration:>='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
+        if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
+            if filter_query:
+                filter_query = "{}+expiration:<='{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
+            else:
+                filter_query = "expiration:<='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
+        if CROWDSTRIKE_IOCS_SOURCE in param:
+            if filter_query:
+                filter_query = "{}+source:'{}'".format(filter_query, param.get(CROWDSTRIKE_IOCS_SOURCE))
+            else:
+                filter_query = "source:'{}'".format(param.get(CROWDSTRIKE_IOCS_SOURCE))
+        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) != "all":
+            if param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) == "hash":
+                source_list = ["md5", "sha256"]
+                if filter_query:
+                    filter_query = "{}+type:{}".format(filter_query, source_list)
+                else:
+                    filter_query = "type:{}".format(source_list)
+            else:
+                if filter_query:
+                    filter_query = "{}+type:'{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+                else:
+                    filter_query = "type:'{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+        return filter_query
 
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+    def _handle_list_custom_indicators(self, param):
+
+        self.save_progress('In action handler for: {0}'.format(self.get_action_identifier()))
         # Add an action result to the App Run
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1042,31 +1097,14 @@ class CrowdstrikeConnector(BaseConnector):
         api_data = {
             "limit": 2000  # 2000 is the max, this could be tuned
         }
-        filter_query = ""
-        # optional parameters
-        if CROWDSTRIKE_JSON_LIST_IOC in param:
-            filter_query += "value:'{}'".format(param.get(CROWDSTRIKE_JSON_LIST_IOC))
-        if CROWDSTRIKE_IOCS_ACTION in param:
-            filter_query += "action:'{}'".format(param.get(CROWDSTRIKE_IOCS_ACTION))
-        if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
-            filter_query += "expiration:>='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
-        if CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION in param:
-            filter_query += "expiration:<='{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION))
-        if CROWDSTRIKE_IOCS_SOURCE in param:
-            filter_query += "source:'{}'".format(param.get(CROWDSTRIKE_IOCS_SOURCE))
-        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) != "all":
-            if param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) == "hash":
-                source_list = ["md5", "sha256"]
-                filter_query += "type:{}".format(source_list)
-            else:
-                filter_query += "type:'{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+        filter_query = self.helper_create_query(param, '')
 
         if filter_query:
             api_data['filter'] = filter_query
 
         more = True
 
-        self.send_progress("Completed 0 %")
+        self.send_progress('Completed 0 %')
         ioc_infos = []
         while more:
 
@@ -1079,8 +1117,8 @@ class CrowdstrikeConnector(BaseConnector):
                 error = response.get('errors')[0]
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred in results:\r\nCode: {}\r\nMessage: {}".format(error.get('code'), error.get('message')))
 
-            if response.get("resources"):
-                ioc_infos.extend(response.get("resources"))
+            if response.get('resources'):
+                ioc_infos.extend(response.get('resources'))
 
             after = response.get('meta', {}).get('pagination', {}).get('after')
             if after is None:
@@ -1094,9 +1132,9 @@ class CrowdstrikeConnector(BaseConnector):
                 ioc_infos = ioc_infos[:indicator_limit]
                 more = False
             else:
-                api_data["after"] = after
+                api_data['after'] = after
 
-        self.save_progress("Processing results")
+        self.save_progress('Processing results')
 
         data = defaultdict(list)
 

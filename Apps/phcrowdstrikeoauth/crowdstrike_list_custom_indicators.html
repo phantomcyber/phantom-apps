@@ -107,8 +107,12 @@ a:hover {
     <table class="ph-table-vertical datatable">
       {% if result.summary %}
       <tr>
-        <td><b>Total IPs</b></td>
-        <td>{{ result.summary.total_ip }}</td>
+        <td><b>Total IPV4</b></td>
+        <td>{{ result.summary.total_ipv4 }}</td>
+      </tr>
+      <tr>
+        <td><b>Total IPV6</b></td>
+        <td>{{ result.summary.total_ipv6 }}</td>
       </tr>
       <tr>
         <td><b>Total Domains</b></td>
