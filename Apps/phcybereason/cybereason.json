@@ -712,7 +712,7 @@
         },
         {
             "action": "unisolate specific machine",
-            "description": "Unlocks all communication to and from the machine identified by the give Name or IP. Communication with the Cybereason platform is not affected",
+            "description": "Unblocks all communication to and from the machine identified by the give Name or IP. Communication with the Cybereason platform is not affected",
             "type": "contain",
             "identifier": "unisolate_specific_machine",
             "read_only": false,

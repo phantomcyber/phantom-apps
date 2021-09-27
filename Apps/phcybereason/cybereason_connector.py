@@ -423,10 +423,10 @@ class CybereasonConnector(BaseConnector):
 
     def _handle_isolate_specific_machine(self, param):
         """
-        Isolate the machine with specified id. The machine with the id provided as parameter will be
+        Isolate the machine with specified name or ip. The machine with the id provided as parameter will be
         disconnected from the network
         Parameters:
-            param: object containing the machine id
+            param: object containing either the machine name or ip
 
         Returns:
             Action results
@@ -436,7 +436,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        machine_name_or_ip = self._get_string_param(param.get('machine'))
+        machine_name_or_ip = self._get_string_param(param.get('machine_name_or_ip'))
         ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -462,10 +462,10 @@ class CybereasonConnector(BaseConnector):
 
     def _handle_unisolate_specific_machine(self, param):
         """
-        Un-isolate the machine with specified id. The machine with the id provided as parameter will be
+        Un-isolate the machine with specified Name or IP. The machine with the id provided as parameter will be
         connected to the network again.
         Parameters:
-            param: object containing the machine id
+            param: object containing either the machine name or IP
         Returns:
             Action results
         """
@@ -474,7 +474,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        machine_name_or_ip = self._get_string_param(param.get('machine'))
+        machine_name_or_ip = self._get_string_param(param.get('machine_name_or_ip'))
         ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
