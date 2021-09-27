@@ -263,7 +263,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         try:
             ipaddress.ip_address(input_ip_address)
-        except:
+        except ValueError:
             return False
 
         return True
@@ -1693,7 +1693,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         pattern = re.compile(r'https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)')
         try:
             subscription_id, endpoint = re.search(pattern, results_url).groups()
-        except:
+        except AttributeError:
             return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
 
         if subscription_id != self._subscription:
