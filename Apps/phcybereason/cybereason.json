@@ -640,20 +640,20 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "isolate machine by id",
-            "description": "Blocks all communication to and from the machine. Communication with the Cybereason platform is not affected",
+            "action": "isolate specific machine",
+            "description": "Blocks all communication to and from the machine identified by the give Name or IP. Communication with the Cybereason platform is not affected",
             "type": "contain",
-            "identifier": "isolate_machine_by_id",
+            "identifier": "isolate_specific_machine",
             "read_only": false,
-            "undo": "unisolate machine by id",
+            "undo": "unisolate specific machine",
             "parameters": {
-                "sensor_id": {
-                    "description": "The sensor ID for which we want to isolate the machine",
+                "machine": {
+                    "description": "Name or IP of the machine that needs to be isolated",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason machine name or ip"
                     ],
                     "order": 0
                 }
@@ -711,20 +711,20 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "unisolate machine by id",
-            "description": "Blocks all communication to and from the machine. Communication with the Cybereason platform is not affected",
+            "action": "unisolate specific machine",
+            "description": "Unlocks all communication to and from the machine identified by the give Name or IP. Communication with the Cybereason platform is not affected",
             "type": "contain",
-            "identifier": "unisolate_machine_by_id",
+            "identifier": "unisolate_specific_machine",
             "read_only": false,
-            "undo": "isolate machine by id",
+            "undo": "isolate specific machine",
             "parameters": {
-                "sensor_id": {
-                    "description": "The sensor ID for which we want to isolate the machine",
+                "machine": {
+                    "description": "Name or IP of the machine that needs to be unisolated",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason machine name or ip"
                     ],
                     "order": 0
                 }

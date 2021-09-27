@@ -421,11 +421,10 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_isolate_machine_by_id(self, param):
+    def _handle_isolate_specific_machine(self, param):
         """
         Isolate the machine with specified id. The machine with the id provided as parameter will be
         disconnected from the network
-        
         Parameters:
             param: object containing the machine id
 
@@ -437,14 +436,17 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        sensor_id = self._get_string_param(param.get('sensor_id'))
+        machine_name_or_ip = self._get_string_param(param.get('machine'))
+        ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
             url = "{0}/rest/monitor/global/commands/isolate".format(self._base_url)
             self.save_progress(url)
-            query = json.dumps({"pylumIds": [sensor_id]})
+            query = json.dumps({"pylumIds": sensor_ids})
 
             res = cr_session.post(url, data=query, headers=self._headers)
 
@@ -458,14 +460,12 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_unisolate_machine_by_id(self, param):
+    def _handle_unisolate_specific_machine(self, param):
         """
         Un-isolate the machine with specified id. The machine with the id provided as parameter will be
         connected to the network again.
-        
         Parameters:
             param: object containing the machine id
-
         Returns:
             Action results
         """
@@ -474,14 +474,17 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        sensor_id = self._get_string_param(param.get('sensor_id'))
+        machine_name_or_ip = self._get_string_param(param.get('machine'))
+        ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             cr_session = CybereasonSession(self).get_session()
 
             url = "{0}/rest/monitor/global/commands/un-isolate".format(self._base_url)
             self.save_progress(url)
-            query = json.dumps({"pylumIds": [sensor_id]})
+            query = json.dumps({"pylumIds": sensor_ids})
 
             res = cr_session.post(url, data=query, headers=self._headers)
 
@@ -674,6 +677,100 @@ class CybereasonConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
+    def _get_machine_sensor_ids(self, machine_name_or_ip, action_result):
+        sensor_ids = []
+        try:
+            ret_val, sensors_by_name = self._get_sensor_by_machine_name(machine_name_or_ip, action_result)
+            if not (phantom.is_fail(ret_val) or len(sensors_by_name) == 0):
+                sensor_ids.append(sensors_by_name)
+
+            ret_val, sensors_by_ip = self._get_sensor_by_machine_ip(machine_name_or_ip, action_result)
+            if not (phantom.is_fail(ret_val) or len(sensors_by_ip) == 0):
+                sensor_ids.append(sensors_by_ip)
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.save_progress(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
+
+    def _get_sensor_by_machine_name(self, machine_name, action_result):
+        sensor_ids = []
+        try:
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/sensors/query".format(self._base_url)
+            self.save_progress(url)
+            query_path = {
+                "limit": 1000,
+                "offset": 0,
+                "filters": [
+                            {
+                                "fieldName": "machineName",
+                                "operator": "Equals",
+                                "values": [machine_name]
+                            }
+                        ]
+            }
+            self.save_progress("Calling {} with query {}".format(url, str(query_path)))
+            res = cr_session.post(url, json=query_path, headers=self._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                return self._process_response(res, action_result)
+
+            self.save_progress("Got result from {}".format(url))
+            totalResults = res.json()["totalResults"]
+            if totalResults > 0:
+                machines_dict = res.json()["sensors"]
+                for _, machine_details in machines_dict.items():
+                    sensor_ids.append(str(machine_details['pylumId']))
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.save_progress(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
+
+    def _get_sensor_by_machine_ip(self, machine_ip, action_result):
+        sensor_ids = []
+        try:
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/sensors/query".format(self._base_url)
+            self.save_progress(url)
+            query_path = {
+                "limit": 1000,
+                "offset": 0,
+                "filters": [
+                            {
+                                "fieldName": "externalIpAddress",
+                                "operator": "Equals",
+                                "values": [machine_ip]
+                            }
+                        ]
+            }
+            self.save_progress("Calling {} with query {}".format(url, str(query_path)))
+            res = cr_session.post(url, json=query_path, headers=self._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                return self._process_response(res, action_result)
+
+            self.save_progress("Got result from {}".format(url))
+            totalResults = res.json()["totalResults"]
+            if totalResults > 0:
+                machines_dict = res.json()["sensors"]
+                for _, machine_details in machines_dict.items():
+                    sensor_ids.append(str(machine_details['pylumId']))
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.save_progress(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -707,11 +804,11 @@ class CybereasonConnector(BaseConnector):
         elif action_id == 'unisolate_machine':
             ret_val = self._handle_unisolate_machine(param)
 
-        elif action_id == 'isolate_machine_by_id':
-            ret_val = self._handle_isolate_machine_by_id(param)
+        elif action_id == 'isolate_specific_machine':
+            ret_val = self._handle_isolate_specific_machine(param)
 
-        elif action_id == 'unisolate_machine_by_id':
-            ret_val = self._handle_unisolate_machine_by_id(param)
+        elif action_id == 'unisolate_specific_machine':
+            ret_val = self._handle_unisolate_specific_machine(param)
 
         elif action_id == 'kill_process':
             ret_val = self._handle_kill_process(param)
