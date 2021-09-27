@@ -647,7 +647,7 @@
             "read_only": false,
             "undo": "unisolate specific machine",
             "parameters": {
-                "machine": {
+                "machine_name_or_ip": {
                     "description": "Name or IP of the machine that needs to be isolated",
                     "data_type": "string",
                     "required": true,
@@ -660,12 +660,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.sensor_id",
+                    "data_path": "action_result.parameter.machine_name_or_ip",
                     "data_type": "string",
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason machine name or ip"
                     ],
-                    "column_name": "Sensor ID",
+                    "column_name": "Owner Machine Name",
                     "column_order": 0
                 },
                 {
@@ -718,7 +718,7 @@
             "read_only": false,
             "undo": "isolate specific machine",
             "parameters": {
-                "machine": {
+                "machine_name_or_ip": {
                     "description": "Name or IP of the machine that needs to be unisolated",
                     "data_type": "string",
                     "required": true,
@@ -731,12 +731,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.sensor_id",
+                    "data_path": "action_result.parameter.machine_name_or_ip",
                     "data_type": "string",
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason machine name or ip"
                     ],
-                    "column_name": "Sensor ID",
+                    "column_name": "Owner Machine Name",
                     "column_order": 0
                 },
                 {
