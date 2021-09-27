@@ -68,3 +68,4 @@ MS_AZURE_ERR_MSG = "Status Code: {status_code}. Data from server: {err_msg}"
 MS_AZURE_SERVER_ERR_MSG = "Error from server"
 MS_AZURE_INVALID_JSON = "{err_msg}: Invalid format of body. Please provide valid JSON format in the '{param}' action parameter"
 MS_AZURE_GROUP_TYPE_ERR_MSG = "Please provide a valid value in the 'group_type' action parameter. Expected values are 'application' or 'network'"
+MS_AZURE_INVALID_TOKEN_MESSAGES = ['token is invalid', 'Access token has expired', 'ExpiredAuthenticationToken', 'AuthenticationFailed']
