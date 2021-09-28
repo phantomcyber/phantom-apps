@@ -231,7 +231,7 @@
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -469,7 +469,7 @@
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -679,7 +679,7 @@
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ],
                     "column_name": "Device ID",
                     "column_order": 3
@@ -960,7 +960,7 @@
                         "a3627cbcad1e9ca2dd94eed63e3f9260e2aa7e8e"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -1240,7 +1240,7 @@
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -1497,7 +1497,7 @@
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ],
                     "column_name": "Device ID",
                     "column_order": 0
@@ -1863,7 +1863,7 @@
                         "ae2e5bda4bb22ec9c321680079d03e5e4cdff400"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -2303,10 +2303,9 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ],
-                    "column_name": "Machine ID",
+                    "column_name": "Device ID",
                     "column_order": 6
                 },
                 {
@@ -2691,8 +2690,7 @@
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -3601,7 +3599,7 @@
                         "803c416946e8738b7711903a28362adeae6e1aea"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -3904,7 +3902,7 @@
                         "803c416946e8738b7711903a28362adeae6e1aea"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -4458,8 +4456,7 @@
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -5347,7 +5344,6 @@
                         "803c416946e8738b7711903a28362adeae6e1aea"
                     ],
                     "contains": [
-                        "sha1",
                         "defender atp device id"
                     ]
                 },
@@ -5590,7 +5586,7 @@
                         "803c416946e8738b7711903a28362adeae6e1aea"
                     ],
                     "contains": [
-                        "sha1"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -6168,8 +6164,7 @@
                         "349838747f77ec74e43ab7ca70773a41f7bfb6f2"
                     ],
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -6459,42 +6454,47 @@
         {
             "action": "get file",
             "description": "Download a file from a device using live response",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can collect file from a device in the vault, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br><b>Notes:</b><ul><li>Live response actions cannot be queued up and can only be executed one at a time.</li><li>If the machine that you are trying to run this action is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.</li></ul>",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can collect file from a device in the vault, rate limitations for this API are 10 calls per minute.<br>The action tries to get the file using file_path along with the device_id. This action can take a while to complete the execution. The action retries at an interval of 5 seconds within a specified timeout to check if event execution is completed. If not, the action would return the latest status of the event along with the event ID. The get status action can be used to fetch the latest status of the event with the event ID. If the status is 'Succeeded', the event ID can be used in the same action to get the file. If all the parameters are given, the action gives higher priority to the event ID parameter.<br><br><b>Notes:</b><ul><li>Live response actions cannot be queued up and can only be executed one at a time.</li><li>If the machine that you are trying to run this action is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.</li></ul>",
             "type": "generic",
             "identifier": "get_file_live_response",
             "read_only": false,
             "parameters": {
+                "event_id": {
+                    "description": "ID of the event",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
                 "device_id": {
                     "description": "ID of the device",
                     "data_type": "string",
-                    "required": true,
                     "primary": true,
                     "contains": [
                         "defender atp device id"
                     ],
-                    "order": 0
+                    "order": 1
                 },
                 "file_path": {
                     "description": "Path of the file to download from device",
                     "data_type": "string",
-                    "required": true,
                     "primary": true,
                     "contains": [
                         "file path"
                     ],
-                    "order": 1
+                    "order": 2
                 },
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
-                    "required": true,
-                    "order": 2
+                    "order": 3
                 },
                 "timeout": {
                     "description": "Timeout in seconds (Default: 300)",
                     "data_type": "numeric",
-                    "default": 300,
-                    "order": 3
+                    "order": 4
                 }
             },
             "output": [
@@ -6504,6 +6504,16 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
+                    ],
+                    "contains": [
+                        "defender atp event id"
                     ]
                 },
                 {
@@ -6523,7 +6533,7 @@
                         "defender atp device id"
                     ],
                     "column_name": "Device ID",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.file_path",
@@ -6535,7 +6545,7 @@
                         "file path"
                     ],
                     "column_name": "File Path",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
@@ -6545,11 +6555,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.get_file_status",
+                    "data_path": "action_result.summary.file_status",
                     "data_type": "string",
                     "example_values": [
                         "Succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.live_response_result",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.vault_id",
@@ -6569,6 +6583,15 @@
                     ],
                     "contains": [
                         "defender atp event id"
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.summary.event_id_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Succeeded"
                     ]
                 },
                 {
@@ -6622,9 +6645,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Succeeded"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.commands.*.index",
@@ -6682,8 +6703,7 @@
                         "51e978e9c3cd646dde81162f0517f13b8697cfcb"
                     ],
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -6842,7 +6862,7 @@
                         "defender atp device id"
                     ],
                     "column_name": "Device ID",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.file_name",
@@ -6854,7 +6874,7 @@
                         "file name"
                     ],
                     "column_name": "File name",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.timeout",
@@ -6909,7 +6929,9 @@
                     ],
                     "contains": [
                         "defender atp event id"
-                    ]
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.type",
@@ -6933,7 +6955,7 @@
                         "Succeeded"
                     ],
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.commands.*.index",
@@ -6994,8 +7016,7 @@
                         "51e978e9c3cd646dde81162f0517f13b8697cfcb"
                     ],
                     "contains": [
-                        "sha1",
-                        "defender atp machine id"
+                        "defender atp device id"
                     ]
                 },
                 {
@@ -7090,47 +7111,52 @@
         {
             "action": "run script",
             "description": "Run a script from the library on a device using live response",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can run a script from the library on a device. The script_args parameter is passed to your script, rate limitations for this API are 10 calls per minute.<br>This action can take a while to complete execution. The action retries at an interval of 5 seconds within a specified <b>timeout</b> to check if event execution is complete. If not, the action would return the latest status of the event along with the event ID.<br>The <b>get status</b> action can be used to fetch the latest status of the event with the event ID.<br><b>Notes:</b><ul><li>The maximum timeout period for the script execution is 10 minutes.</li><li>Live response actions cannot be queued up and can only be executed one at a time.</li><li>If the machine that you are trying to run this action is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.</li></ul>",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide\" target=\"_blank\">Run live response commands on a device API Documentation</a>), the user can run a script from the library on a device. The script_args parameter is passed to your script, rate limitations for this API are 10 calls per minute.<br>The action tries to execute the script using script_name along with the device_id. This action can take a while to complete the execution. The action retries at an interval of 5 seconds within a specified timeout to check if event execution is completed. If not, the action would return the latest status of the event along with the event ID. The get status action can be used to fetch the latest status of the event with the event ID. If the status is 'Succeded', the event ID can be used in the same action to get the script output. If all the parameters are given, the action gives higher priority to the event ID parameter.<br><br><b>Notes:</b><ul><li>The maximum timeout period for the script execution is 10 minutes.</li><li>Live response actions cannot be queued up and can only be executed one at a time.</li><li>If the machine that you are trying to run this action is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.</li></ul>",
             "type": "generic",
             "identifier": "run_script_live_response",
             "read_only": false,
             "parameters": {
+                "event_id": {
+                    "description": "ID of the event",
+                    "data_type": "string",
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "defender atp event id"
+                    ]
+                },
                 "device_id": {
                     "description": "ID of the device",
                     "data_type": "string",
-                    "required": true,
                     "primary": true,
                     "contains": [
                         "defender atp device id"
                     ],
-                    "order": 0
+                    "order": 1
                 },
                 "script_name": {
                     "description": "Name of the script file to execute on the device",
                     "data_type": "string",
-                    "required": true,
                     "primary": true,
                     "contains": [
                         "file name"
                     ],
-                    "order": 1
+                    "order": 2
                 },
                 "script_args": {
                     "description": "Arguments of the script file",
                     "data_type": "string",
-                    "order": 2
+                    "order": 3
                 },
                 "comment": {
                     "description": "Comment",
                     "data_type": "string",
-                    "required": true,
-                    "order": 3
+                    "order": 4
                 },
                 "timeout": {
                     "description": "Timeout in seconds (Default: 300)",
                     "data_type": "numeric",
-                    "default": 300,
-                    "order": 4
+                    "order": 5
                 }
             },
             "output": [
@@ -7140,6 +7166,16 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.event_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "f4ddc97a-6f4e-471c-9be5-45e0d6d64ab8"
+                    ],
+                    "contains": [
+                        "defender atp event id"
                     ]
                 },
                 {
@@ -7184,11 +7220,15 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.run_script_status",
+                    "data_path": "action_result.summary.script_status",
                     "data_type": "string",
                     "example_values": [
                         "Succeeded"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.live_response_result",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.event_id",
@@ -7198,7 +7238,9 @@
                     ],
                     "contains": [
                         "defender atp event id"
-                    ]
+                    ],
+                    "column_name": "Event ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -7241,9 +7283,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.script_errors",
-                    "data_type": "string",
-                    "column_name": "Script Errors",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.script_output",
@@ -7252,7 +7292,7 @@
                         "Transcript started, output file is C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Temp\\PSScriptOutputs\\PSScript_Transcript_{66D7B239-34C7-43EF-BB6D-2F6D4C03086E}.txt x is smaller than y"
                     ],
                     "column_name": "Script Output",
-                    "column_order": 0
+                    "column_order": 1
                 }
             ],
             "render": {

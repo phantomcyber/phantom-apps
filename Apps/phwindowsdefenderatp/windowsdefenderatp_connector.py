@@ -14,10 +14,11 @@ import phantom.rules as ph_rules
 import gzip
 import shutil
 import uuid
+import re
 try:
-    from urllib.parse import urlencode, quote
+    from urllib.parse import urlencode, quote, unquote
 except:
-    from urllib import urlencode, quote
+    from urllib import urlencode, quote, unquote
 import ipaddress
 import pwd
 import grp
@@ -424,6 +425,25 @@ class WindowsDefenderAtpConnector(BaseConnector):
             error_text = PARSE_ERR_MSG
 
         return error_text
+
+    def _is_ipv6(self, input_ip_address):
+        """ Function that checks given address and returns True if the address is a valid IPV6 address.
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        ip_address_input = input_ip_address
+
+        # If interface is present in the IP, it will be separated by the %
+        if '%' in input_ip_address:
+            ip_address_input = input_ip_address.split('%')[0]
+
+        try:
+            ipaddress.ip_address(ip_address_input)
+        except:
+            return False
+
+        return True
 
     def _update_request(self, action_result, endpoint, headers={}, params=None, data=None, method='get'):
         """ This function is used to update the headers with access_token before making REST call.
@@ -1986,6 +2006,37 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_ERROR, "No result found for live response action"), None
 
+    def _validate_event_id(self, event_id, command, action_result, summary):
+
+        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_MACHINEACTIONS_ENDPOINT
+                                .format(action_id=event_id))
+
+        # make rest call
+        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result)
+
+        if phantom.is_fail(ret_val):
+            summary['event_id_status'] = action_result.get_message()
+            summary['event_id'] = event_id
+            event_id = None
+            return phantom.APP_SUCCESS, event_id, None
+        else:
+            status = response.get('status')
+            commands = response.get('commands')
+            summary['event_id_status'] = status
+            summary['event_id'] = event_id
+            try:
+                command_type = commands[0].get('command', {}).get('type')
+                if not command_type or command_type != command:
+                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_COMMAND_ERR.format(command)), event_id, None
+            except:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_COMMAND_ERR.format(command)), event_id, None
+            if status == DEFENDERATP_STATUS_FAILED:
+                event_id = None
+                return phantom.APP_SUCCESS, event_id, None
+            if status != DEFENDERATP_STATUS_SUCCESS:
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_EVENT_ID_ERR.format(status)), event_id, None
+            return action_result.set_status(phantom.APP_SUCCESS), event_id, response
+
     def _handle_get_file_live_response(self, param):
         """ This function is used to handle the get file action.
 
@@ -1995,86 +2046,115 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        file_path = param[DEFENDERATP_JSON_FILE_PATH]
-        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
-        comment = param[DEFENDERATP_JSON_COMMENT]
-
-        timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
-
-        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
-                                   .format(device_id=device_id))
-
-        data = {
-            'Comment': comment,
-            'Commands': [
-                {
-                    "type": "GetFile",
-                    "params": [
-                        {
-                            "key": "Path",
-                            "value": file_path
-                        }
-                    ]
-                }
-            ]
-        }
-
-        # make rest call
-        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
-                                                 data=json.dumps(data))
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        if not response.get('id'):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
-
-        action_id = response['id']
         summary = action_result.update_summary({})
-        summary['event_id'] = action_id
 
-        # Wait till the status of the action gets updated
-        status, response = self._status_wait(action_result, action_id, timeout)
+        event_id = param.get(DEFENDERATP_EVENT_ID)
+        file_path = param.get(DEFENDERATP_JSON_FILE_PATH)
+        device_id = param.get(DEFENDERATP_JSON_DEVICE_ID)
+        comment = param.get(DEFENDERATP_JSON_COMMENT)
 
-        if phantom.is_fail(status):
-            return action_result.get_status()
+        required_params = file_path and device_id and comment
+        if not (event_id or required_params):
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_REQUIRED_PARAMETER_ERR.format(DEFENDERATP_JSON_FILE_PATH))
 
-        action_result.add_data(response)
-        status = response.get("status")
+        if event_id:
+            ret_val, event_id, response = self._validate_event_id(event_id, DEFENDERATP_GET_FILE_COMMAND, action_result, summary)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            if response:
+                action_result.add_data(response)
 
-        self.debug_print("Status of live response action: {}".format(status))
-        self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
-
-        summary['get_file_status'] = status
-        if status != DEFENDERATP_STATUS_SUCCESS:
-            if status == DEFENDERATP_STATUS_FAILED:
+        # the event_id is updated hence checking it
+        if not event_id:
+            if not required_params:
                 return action_result.set_status(phantom.APP_ERROR)
-            return action_result.set_status(phantom.APP_SUCCESS)
+            timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
+
+            ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+            if phantom.is_fail(ret_val):
+                summary['file_status'] = action_result.get_message()
+                return action_result.set_status(phantom.APP_ERROR)
+
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
+                                        .format(device_id=device_id))
+
+            data = {
+                'Comment': comment,
+                'Commands': [
+                    {
+                        "type": DEFENDERATP_GET_FILE_COMMAND,
+                        "params": [
+                            {
+                                "key": "Path",
+                                "value": file_path
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            # make rest call
+            ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
+                                                    data=json.dumps(data))
+
+            if phantom.is_fail(ret_val):
+                summary['file_status'] = action_result.get_message()
+                return action_result.set_status(phantom.APP_ERROR)
+
+            if not response.get('id'):
+                summary['file_status'] = DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG
+                return action_result.set_status(phantom.APP_ERROR)
+
+            event_id = response['id']
+
+            # Wait till the status of the action gets updated
+            status, response = self._status_wait(action_result, event_id, timeout)
+
+            if phantom.is_fail(status):
+                summary['file_status'] = action_result.get_message()
+                return action_result.set_status(phantom.APP_ERROR)
+
+            action_result.add_data(response)
+            status = response.get("status")
+
+            self.debug_print("Status of live response action: {}".format(status))
+            self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+
+            summary['file_status'] = status
+            summary['event_id'] = event_id
+            if status != DEFENDERATP_STATUS_SUCCESS:
+                if status == DEFENDERATP_STATUS_FAILED:
+                    return action_result.set_status(phantom.APP_ERROR)
+                return action_result.set_status(phantom.APP_SUCCESS)
 
         # getting live response result
-        ret_val, result = self._get_live_response_result(action_id, action_result)
+        ret_val, result = self._get_live_response_result(event_id, action_result)
 
         if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            summary['live_response_result'] = action_result.get_message()
+            return action_result.set_status(phantom.APP_ERROR)
 
         if not result:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            summary['live_response_result'] = DEFENDERATP_NO_DATA_FOUND
+            return action_result.set_status(phantom.APP_ERROR)
 
-        file_name = file_path.split('\\')[-1]
+        try:
+            file_name = result.headers.get("Content-Disposition")
+            file_name = unquote(str(re.findall("filename=(.+)", file_name)[0]).strip('"'))
+        except:
+            summary['live_response_result'] = "Error occured while getting the file name"
+            return action_result.set_status(phantom.APP_ERROR)
 
         ret_val, vault_id = self._vault_file(filename=file_name, content=result.content)
 
         if ret_val is not True:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to vault")
+            summary['live_response_result'] = "Error occurred while adding file to vault"
+            return action_result.set_status(phantom.APP_ERROR)
 
         # Adding vault ID to summary
         summary['vault_id'] = vault_id
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully added file to vault. vault_id: {}".format(vault_id))
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_put_file_live_response(self, param):
         """ This function is used to handle the put file action.
@@ -2102,7 +2182,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             'Comment': comment,
             'Commands': [
                 {
-                    "type": "PutFile",
+                    "type": DEFENDERATP_PUT_FILE_COMMAND,
                     "params": [
                         {
                             "key": "FileName",
@@ -2155,87 +2235,108 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        script_name = param[DEFENDERATP_JSON_SCRIPT_NAME]
-        script_args = param.get(DEFENDERATP_JSON_SCRIPT_ARGS)
-        device_id = param[DEFENDERATP_JSON_DEVICE_ID]
-        comment = param[DEFENDERATP_JSON_COMMENT]
-
-        timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
-
-        ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        if timeout > DEFENDERATP_RUN_SCRIPT_MAX_LIMIT:
-            timeout = DEFENDERATP_RUN_SCRIPT_MAX_LIMIT
-
-        endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
-                                   .format(device_id=device_id))
-
-        data = {
-                'Comment': comment,
-                'Commands': [
-                    {
-                        "type": "RunScript",
-                        "params": [
-                            {
-                                "key": "ScriptName",
-                                "value": script_name
-                            }
-                        ]
-                    }
-                ]
-            }
-        if script_args:
-            data['Commands'][0]['params'].append({"key": "Args", "value": script_args})
-
-        # make rest call
-        ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
-                                                 data=json.dumps(data))
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        if not response.get('id'):
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG)
-
-        action_id = response['id']
         summary = action_result.update_summary({})
-        summary['event_id'] = action_id
 
-        # Wait till the status of the action gets updated
-        status, response = self._status_wait(action_result, action_id, timeout)
+        event_id = param.get(DEFENDERATP_EVENT_ID)
+        script_name = param.get(DEFENDERATP_JSON_SCRIPT_NAME)
+        device_id = param.get(DEFENDERATP_JSON_DEVICE_ID)
+        comment = param.get(DEFENDERATP_JSON_COMMENT)
 
-        if phantom.is_fail(status):
-            return action_result.get_status()
+        required_params = script_name and device_id and comment
+        if not (event_id or required_params):
+            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_REQUIRED_PARAMETER_ERR.format(DEFENDERATP_JSON_SCRIPT_NAME))
 
-        status = response.get("status")
-        self.debug_print("Status of live response action: {}".format(status))
-        self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+        if event_id:
+            ret_val, event_id, response = self._validate_event_id(event_id, DEFENDERATP_RUN_SCRIPT_COMMAND, action_result, summary)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-        summary['run_script_status'] = status
-        if status != DEFENDERATP_STATUS_SUCCESS:
-            if status == DEFENDERATP_STATUS_FAILED:
+        if not event_id:
+            if not required_params:
                 return action_result.set_status(phantom.APP_ERROR)
-            return action_result.set_status(phantom.APP_SUCCESS)
+            timeout = param.get(DEFENDERATP_JSON_TIMEOUT, DEFENDERATP_LIVE_RESPONSE_DEFAULT)
+            script_args = param.get(DEFENDERATP_JSON_SCRIPT_ARGS)
+
+            ret_val, timeout = self._validate_integer(action_result, timeout, TIMEOUT_KEY)
+            if phantom.is_fail(ret_val):
+                summary['script_status'] = action_result.get_message()
+                return action_result.set_status(phantom.APP_ERROR)
+
+            if timeout > DEFENDERATP_RUN_SCRIPT_MAX_LIMIT:
+                timeout = DEFENDERATP_RUN_SCRIPT_MAX_LIMIT
+
+            endpoint = "{0}{1}".format(DEFENDERATP_MSGRAPH_API_BASE_URL, DEFENDERATP_LIVE_RESPONSE_ENDPOINT
+                                    .format(device_id=device_id))
+
+            data = {
+                    'Comment': comment,
+                    'Commands': [
+                        {
+                            "type": DEFENDERATP_RUN_SCRIPT_COMMAND,
+                            "params": [
+                                {
+                                    "key": "ScriptName",
+                                    "value": script_name
+                                }
+                            ]
+                        }
+                    ]
+                }
+            if script_args:
+                data['Commands'][0]['params'].append({"key": "Args", "value": script_args})
+
+            # make rest call
+            ret_val, response = self._update_request(endpoint=endpoint, action_result=action_result, method='post',
+                                                    data=json.dumps(data))
+
+            if phantom.is_fail(ret_val):
+                summary['script_status'] = action_result.get_message()
+                return action_result.set_status(phantom.APP_ERROR)
+
+            if not response.get('id'):
+                summary['script_status'] = DEFENDERATP_ACTION_ID_UNAVAILABLE_MSG
+                return action_result.set_status(phantom.APP_ERROR)
+
+            event_id = response['id']
+            # Wait till the status of the action gets updated
+            status, response = self._status_wait(action_result, event_id, timeout)
+
+            if phantom.is_fail(status):
+                summary['script_status'] = action_result.get_message()
+                summary['event_id'] = event_id
+                return action_result.set_status(phantom.APP_ERROR)
+
+            status = response.get("status")
+            self.debug_print("Status of live response action: {}".format(status))
+            self.debug_print("Command Status of live response action: {}".format(response.get("commands")))
+
+            summary['script_status'] = status
+            summary['event_id'] = event_id
+            if status != DEFENDERATP_STATUS_SUCCESS:
+                if status == DEFENDERATP_STATUS_FAILED:
+                    return action_result.set_status(phantom.APP_ERROR)
+                return action_result.set_status(phantom.APP_SUCCESS)
 
         # getting live response result
-        ret_val, result = self._get_live_response_result(action_id, action_result)
+        ret_val, result = self._get_live_response_result(event_id, action_result)
 
         if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            summary['live_response_result'] = action_result.get_message()
+            return action_result.set_status(phantom.APP_ERROR)
 
         if not result:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_NO_DATA_FOUND)
+            summary['live_response_result'] = DEFENDERATP_NO_DATA_FOUND
+            return action_result.set_status(phantom.APP_ERROR)
 
         try:
             # Process a json response
             resp_json = result.json()
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}"
-                                                   .format(self._get_error_message_from_exception(e)))
+            summary['live_response_result'] = "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))
+            return action_result.set_status(phantom.APP_ERROR)
+
         action_result.add_data(resp_json)
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully executed script")
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_missing_kbs(self, param):
         """ This function is used to handle the get missing KBs action.
@@ -2335,6 +2436,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
         self._state = self.load_state()
+        self.set_validator('ipv6', self._is_ipv6)
 
         # get the asset config
         config = self.get_config()
