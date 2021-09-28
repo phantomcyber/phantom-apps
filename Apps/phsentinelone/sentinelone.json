@@ -781,7 +781,6 @@
             "description": "Fetch firewall rules",
             "type": "correct",
             "identifier": "fetch_firewall_rules",
-            "undo": "fetch firewall rules",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -854,7 +853,6 @@
             "description": "Fetch firewall logs",
             "type": "correct",
             "identifier": "fetch_firewall_logs",
-            "undo": "fetch firewall logs",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -1405,7 +1403,6 @@
             "description": "Get the applications, and their data, installed on endpoints",
             "type": "correct",
             "identifier": "get_applications",
-            "undo": "get applications",
             "read_only": false,
             "parameters": {
                 "ip_hostname": {
@@ -1635,7 +1632,6 @@
             "description": "Get known CVEs for applications that are installed on endpoints with Application Risk-enabled Agents.",
             "type": "correct",
             "identifier": "get_cves",
-            "undo": "get Cves",
             "read_only": false,
             "parameters": {},
             "output": [
