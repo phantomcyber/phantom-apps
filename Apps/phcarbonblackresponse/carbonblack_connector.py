@@ -40,6 +40,7 @@ class CarbonblackConnector(BaseConnector):
     ACTION_ID_HUNT_FILE = "hunt_file"
     ACTION_ID_CREATE_ALERT = "create_alert"
     ACTION_ID_LIST_ALERTS = "list_alerts"
+    ACTION_ID_UPDATE_ALERTS = "update_alerts"
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_QUARANTINE_DEVICE = "quarantine_device"
@@ -323,7 +324,7 @@ class CarbonblackConnector(BaseConnector):
         printed_message = ""
         for i, process in enumerate(process_list):
 
-            curr_message = CARBONBLACK_FINISHED_PROCESSESING.format(float(i) / float(total_processes_to_process))
+            curr_message = CARBONBLACK_FINISHED_PROCESSING.format(float(i) / float(total_processes_to_process))
 
             if (curr_message != printed_message):
                 self.send_progress(curr_message)
@@ -1610,6 +1611,41 @@ class CarbonblackConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_DISPLAYING_RESULTS_TOTAL.format(
                 displaying=len(search_results.get('results', [])), query_type=query_type, total=search_results.get('total_results', 'Unknown')))
 
+    def _update_alerts(self, param):
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        data = {}
+
+        query = param.get('query')
+        alert_ids = param.get('alert_ids').split()
+        requested_status = param.get('requested_status')
+        set_ignored = param.get('set_ignored')
+        assigned_to = param.get('assigned_to')
+
+        # query or alert_ids are required, but not both
+        if (not query and not alert_ids) or (query and alert_ids):
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_IDS)
+
+        # If assigned_to is set, then requested_status is required
+        if assigned_to and not requested_status:
+            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_ASSIGNED_TO)
+
+        data = {
+                'query': query,
+                'alert_ids': alert_ids,
+                'requested_status': requested_status,
+                'set_ignored': set_ignored,
+                'assigned_to': assigned_to
+        }
+
+        ret_val, alert = self._make_rest_call("/v1/alerts", action_result, method="post", data=data)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _create_alert(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
@@ -2065,6 +2101,8 @@ class CarbonblackConnector(BaseConnector):
             result = self._list_endpoints(param)
         elif (action == self.ACTION_ID_CREATE_ALERT):
             result = self._create_alert(param)
+        elif (action == self.ACTION_ID_UPDATE_ALERTS):
+            result = self._update_alerts(param)
         elif (action == self.ACTION_ID_RUN_QUERY):
             result = self._run_query(param)
         elif (action == self.ACTION_ID_QUARANTINE_DEVICE):

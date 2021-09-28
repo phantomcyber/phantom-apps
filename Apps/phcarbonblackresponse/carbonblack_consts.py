@@ -31,7 +31,7 @@ CARBONBLACK_JSON_CB_ID = "carbonblack_process_id"
 CARBONBLACK_JSON_VAULT_ID = "vault_id"
 CARBONBLACK_JSON_DESTINATION_PATH = "destination"
 
-CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the endpint ip/name."
+CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the endpoint ip/name."
 CARBONBLACK_MSG_MORE_THAN_ONE += "<br>Please specify input params that matches a single ONLINE endpoint.<br>Systems Found:<br>{systems_error}"
 
 CARBONBLACK_ERR_CONNECTIVITY_TEST = "Test Connectivity Failed"
@@ -71,9 +71,12 @@ CARBONBLACK_ERR_FILE_EXISTS = "File id for sensor already exists. "
 CARBONBLACK_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value in the "{param}"'
 MAX_POLL_TRIES = 10
 
-CARBONBLACK_FINISHED_PROCESSESING = "Finished Processing {0:.0%}"
+CARBONBLACK_FINISHED_PROCESSING = "Finished Processing {0:.0%}"
 
 CARBONBLACK_ERR_CODE_MSG = "Error code unavailable"
 CARBONBLACK_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Carbon Black Response server."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG += " Please check the asset configuration and|or the action parameters."
+
+CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_IDS = "Either 'query' or 'alert_ids' parameters are required for this action."
+CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_ASSIGNED_TO = "If 'assigned_to' parameter is set, then 'requested status' is required."

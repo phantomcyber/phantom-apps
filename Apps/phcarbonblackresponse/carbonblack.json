@@ -5,13 +5,13 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "carbonblack_connector.py",
-    "app_version": "2.1.0",
+    "app_version": "2.2.0",
     "utctime_updated": "2021-03-03T07:15:17.000000Z",
     "package_name": "phantom_carbonblack",
     "product_vendor": "Bit9",
     "product_name": "Carbon Black",
     "product_version_regex": "[5-6]\\.[0-4]\\.*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "On-prem, Version 6.1.0"
@@ -1735,6 +1735,65 @@
                     ]
                 }
             ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update alerts",
+            "description": "Alert update and resolution",
+            "verbose": "Allows for update of one or more alerts by alert id(s) or by query.",
+            "type": "generic",
+            "identifier": "update_alerts",
+            "read_only": false,
+            "parameters": {
+                "query": {
+                    "description": "Query to run (Carbon Black Response search language)",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "carbon black query"
+                    ]
+                },
+                "alert_ids": {
+                    "description": "Unique ID of alert or comma-separated list of unique alert IDs to update",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "carbon black alert id"
+                    ]
+                },
+                "requested_status": {
+                    "description": "Status of the alert",
+                    "data_type": "string",
+                    "value_list": [
+                        "Resolved",
+                        "Unresolved",
+                        "In Progress",
+                        "False Positive"
+                    ],
+                    "order": 2,
+                    "required": true
+                },
+                "set_ignored": {
+                    "description": "If set to true, modifies threat report so that any further hits on IOCs contained within that report will no longer trigger an Alert",
+                    "data_type": "boolean",
+                    "order": 3,
+                    "default": false
+                },
+                "assign_to": {
+                    "description": "Assign owner of Alert",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Update Alert(s)"
+            },
+            "output": [],
             "versions": "EQ(*)"
         },
         {
