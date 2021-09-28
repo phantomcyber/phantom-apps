@@ -110,7 +110,7 @@ class FireeyeHxConnector(BaseConnector):
 
     def _process_empty_response(self, response, action_result):
 
-        if response.status_code == 200:
+        if response.ok:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
@@ -667,8 +667,8 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
+        # summary = action_result.update_summary({})
+        # summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -845,8 +845,8 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response.get('data'))
 
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
+        # summary = action_result.update_summary({})
+        # summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -886,8 +886,8 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
+        # summary = action_result.update_summary({})
+        # summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
