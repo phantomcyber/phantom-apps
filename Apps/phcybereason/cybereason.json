@@ -1323,6 +1323,98 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "query machine ip",
+            "description": "Queries a given machine ip to retrieve all that machine's information",
+            "type": "investigate",
+            "identifier": "query_machine_ip",
+            "read_only": true,
+            "parameters": {
+                "machine_ip": {
+                    "description": "The IP of a machine",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.machine_ip",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.machine_id",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason machine id"
+                    ],
+                    "column_name": "Machine ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.machine_name",
+                    "data_type": "string",
+                    "column_name": "Machine Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.os_version",
+                    "data_type": "string",
+                    "column_name": "OS Version",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.platform_architecture",
+                    "data_type": "string",
+                    "column_name": "Platform Architecture",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.is_connected_to_cybereason",
+                    "data_type": "string",
+                    "column_name": "Is Connected To Cybereason",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "query users",
             "description": "Queries a given user to retrieve all user-related details",
             "type": "investigate",

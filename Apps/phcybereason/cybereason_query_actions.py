@@ -87,64 +87,31 @@ class CybereasonQueryActions:
         action_result = connector.add_action_result(ActionResult(dict(param)))
 
         name = connector._get_string_param(param.get('name'))
-        malops_dict = {}
         try:
-            cr_session = CybereasonSession(connector).get_session()
+            self._query_machine_details(connector, action_result, name)
 
-            query = {
-                "queryPath": [
-                    {
-                        "requestedType": "Machine",
-                        "filters": [
-                            {
-                                "facetName": "elementDisplayName",
-                                "values": [name],
-                                "filterType": "MatchesWildcard"
-                            }
-                        ],
-                        "isResult": True
-                    }
-                ],
-                "totalResultLimit": 1000,
-                "perGroupLimit": 100,
-                "perFeatureLimit": 100,
-                "templateContext": "SPECIFIC",
-                "queryTimeout": 120000,
-                "customFields": [
-                    "osVersionType",
-                    "platformArchitecture",
-                    "uptime",
-                    "isActiveProbeConnected",
-                    "lastSeenTimeStamp",
-                    "timeStampSinceLastConnectionTime",
-                    "activeUsers",
-                    "mountPoints",
-                    "processes",
-                    "services",
-                    "elementDisplayName"
-                ]
-            }
-            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
+            connector.debug_print(traceback.format_exc())
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
-            res = cr_session.post(url, json=query, headers=connector._headers)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
-            if res.status_code < 200 or res.status_code >= 399:
-                connector._process_response(res, action_result)
-                return action_result.get_status()
+    def _handle_query_machine_ip(self, connector, param):
+        connector.save_progress("In action handler for: {0}".format(connector.get_action_identifier()))
 
-            malops_dict = res.json()["data"]["resultIdToElementDataMap"]
-            for machine_id, machine_data in malops_dict.items():
-                data = {
-                    "machine_id": machine_id,
-                    "machine_name": machine_data["simpleValues"]["elementDisplayName"]["values"][0]
-                }
-                self._add_simple_value_if_exists(data, "os_version", machine_data, "osVersionType")
-                self._add_simple_value_if_exists(data, "platform_architecture", machine_data, "platformArchitecture")
-                self._add_simple_value_if_exists(data, "is_connected_to_cybereason", machine_data, "isActiveProbeConnected")
-                action_result.add_data(data)
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = connector.add_action_result(ActionResult(dict(param)))
 
-            summary = action_result.update_summary({})
-            summary['total_machines'] = len(malops_dict)
+        machine_ip = connector._get_string_param(param.get('machine_ip'))
+
+        ret_val, machine_names = connector._get_machine_name_by_machine_ip(machine_ip, action_result)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        try:
+            self._query_machine_details(connector, action_result, machine_names[0])
 
         except Exception as e:
             err = connector._get_error_message_from_exception(e)
@@ -467,3 +434,69 @@ class CybereasonQueryActions:
     def _add_element_value_if_exists(self, target, target_key, obj, element_value_key1, element_value_key2):
         if obj["elementValues"].get(element_value_key1):
             target[target_key] = obj["elementValues"][element_value_key1]["elementValues"][0][element_value_key2]
+
+    def _query_machine_details(self, connector, action_result, machine_name):
+        malops_dict = {}
+        try:
+            cr_session = CybereasonSession(connector).get_session()
+
+            query = {
+                "queryPath": [
+                    {
+                        "requestedType": "Machine",
+                        "filters": [
+                            {
+                                "facetName": "elementDisplayName",
+                                "values": [machine_name],
+                                "filterType": "MatchesWildcard"
+                            }
+                        ],
+                        "isResult": True
+                    }
+                ],
+                "totalResultLimit": 1000,
+                "perGroupLimit": 100,
+                "perFeatureLimit": 100,
+                "templateContext": "SPECIFIC",
+                "queryTimeout": 120000,
+                "customFields": [
+                    "osVersionType",
+                    "platformArchitecture",
+                    "uptime",
+                    "isActiveProbeConnected",
+                    "lastSeenTimeStamp",
+                    "timeStampSinceLastConnectionTime",
+                    "activeUsers",
+                    "mountPoints",
+                    "processes",
+                    "services",
+                    "elementDisplayName"
+                ]
+            }
+            url = "{0}/rest/visualsearch/query/simple".format(connector._base_url)
+
+            res = cr_session.post(url, json=query, headers=connector._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                connector._process_response(res, action_result)
+                return action_result.get_status()
+
+            malops_dict = res.json()["data"]["resultIdToElementDataMap"]
+            for machine_id, machine_data in malops_dict.items():
+                data = {
+                    "machine_id": machine_id,
+                    "machine_name": machine_data["simpleValues"]["elementDisplayName"]["values"][0]
+                }
+                self._add_simple_value_if_exists(data, "os_version", machine_data, "osVersionType")
+                self._add_simple_value_if_exists(data, "platform_architecture", machine_data, "platformArchitecture")
+                self._add_simple_value_if_exists(data, "is_connected_to_cybereason", machine_data, "isActiveProbeConnected")
+                action_result.add_data(data)
+
+            summary = action_result.update_summary({})
+            summary['total_machines'] = len(malops_dict)
+
+        except Exception as e:
+            err = connector._get_error_message_from_exception(e)
+            connector.debug_print(err)
+            connector.debug_print(traceback.format_exc())
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
