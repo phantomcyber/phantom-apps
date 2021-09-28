@@ -15,6 +15,9 @@
         },
         {
             "name": "Daniel Federschmidt"
+        },
+        {
+            "name": "Brandan Neises"
         }
     ],
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
@@ -1809,7 +1812,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*._id",
+                    "data_path": "action_result.data.*.data.entries.*._id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
@@ -1821,14 +1824,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.agent_version",
+                    "data_path": "action_result.data.*.data.entries.*.agent_version",
                     "data_type": "string",
                     "example_values": [
                         "1.0.1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_missing_software",
+                    "data_path": "action_result.data.*.data.entries.*.containment_missing_software",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1836,7 +1839,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_queued",
+                    "data_path": "action_result.data.*.data.entries.*.containment_queued",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1844,14 +1847,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_state",
+                    "data_path": "action_result.data.*.data.entries.*.containment_state",
                     "data_type": "string",
                     "example_values": [
                         "normal"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.domain",
+                    "data_path": "action_result.data.*.data.entries.*.domain",
                     "data_type": "string",
                     "column_name": "Domain",
                     "column_order": 3,
@@ -1863,7 +1866,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.excluded_from_containment",
+                    "data_path": "action_result.data.*.data.entries.*.excluded_from_containment",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1871,14 +1874,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.gmt_offset_seconds",
+                    "data_path": "action_result.data.*.data.entries.*.gmt_offset_seconds",
                     "data_type": "numeric",
                     "example_values": [
                         -28800
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.hostname",
+                    "data_path": "action_result.data.*.data.entries.*.hostname",
                     "data_type": "string",
                     "column_name": "Hostname",
                     "column_order": 1,
@@ -1890,59 +1893,59 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last _exploit_block",
+                    "data_path": "action_result.data.*.data.entries.*.last _exploit_block",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_alert",
+                    "data_path": "action_result.data.*.data.entries.*.last_alert",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_alert_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_alert_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_audit_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_audit_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2015-07-30T04:12:23.000Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_exploit_block_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_exploit_block_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_poll_ip",
+                    "data_path": "action_result.data.*.data.entries.*.last_poll_ip",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_poll_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_poll_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.bitness",
+                    "data_path": "action_result.data.*.data.entries.*.os.bitness",
                     "data_type": "string",
                     "example_values": [
                         "32-bit"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.patch_level",
+                    "data_path": "action_result.data.*.data.entries.*.os.patch_level",
                     "data_type": "string",
                     "example_values": [
                         "Service Pack 3"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.product_name",
+                    "data_path": "action_result.data.*.data.entries.*.os.product_name",
                     "data_type": "string",
                     "example_values": [
                         "Windows XP SP1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.primary_ip_address",
+                    "data_path": "action_result.data.*.data.entries.*.primary_ip_address",
                     "data_type": "string",
                     "column_name": "Primary IP",
                     "column_order": 2,
@@ -1954,14 +1957,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.primary_mac",
+                    "data_path": "action_result.data.*.data.entries.*.primary_mac",
                     "data_type": "string",
                     "example_values": [
                         "a2-ac-75-70-ec-ae"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.reported_clone",
+                    "data_path": "action_result.data.*.data.entries.*.reported_clone",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1969,21 +1972,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.acqs",
+                    "data_path": "action_result.data.*.data.entries.*.stats.acqs",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.alerting_conditions",
+                    "data_path": "action_result.data.*.data.entries.*.stats.alerting_conditions",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.alerts",
+                    "data_path": "action_result.data.*.data.entries.*.stats.alerts",
                     "data_type": "numeric",
                     "example_values": [
                         0
@@ -1997,63 +2000,63 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.exploit_blocks",
+                    "data_path": "action_result.data.*.data.entries.*.stats.exploit_blocks",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.sysinfo.url",
+                    "data_path": "action_result.data.*.data.entries.*.sysinfo.url",
                     "data_type": "string",
                     "example_values": [
                         "/hx/api/v3/hosts/3805951439869103977B58/sysinfo"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.timezone",
+                    "data_path": "action_result.data.*.data.entries.*.timezone",
                     "data_type": "string",
                     "example_values": [
                         "Pacific Standard Time"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.url",
+                    "data_path": "action_result.data.*.data.entries.*.url",
                     "data_type": "string",
                     "example_values": [
                         "/hx/api/v3/hosts/3805951439869103977B58"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.limit",
+                    "data_path": "action_result.data.*.data.limit",
                     "data_type": "numeric",
                     "example_values": [
                         50
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.message",
+                    "data_path": "action_result.data.*.data.message",
                     "data_type": "string",
                     "example_values": [
                         "OK"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.offset",
+                    "data_path": "action_result.data.*.data.offset",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.route",
+                    "data_path": "action_result.data.*.data.route",
                     "data_type": "string",
                     "example_values": [
                         "/hx/api/v3/hosts"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.total",
+                    "data_path": "action_result.data.*.data.total",
                     "data_type": "numeric",
                     "example_values": [
                         5
