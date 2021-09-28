@@ -295,6 +295,8 @@ class SentineloneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.save_progress("Quarantine Device Failed.  Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
+            if response.get('data', {}).get('affected') == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not quarantine Device.")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Quarantined device")
 
     def _handle_unquarantine_device(self, param):
@@ -327,6 +329,8 @@ class SentineloneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.save_progress("Unquarantine Device Failed.  Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
+            if response.get('data', {}).get('affected') == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not unquarantine Device.")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully Unquarantined device")
 
     def _handle_mitigate_threat(self, param):
@@ -388,6 +392,8 @@ class SentineloneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to abort scan. Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
+            if response.get('data', {}).get('affected') == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not abort scanning.")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_scan_endpoint(self, param):
@@ -420,6 +426,8 @@ class SentineloneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to scan endpoint. Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
+            if response.get('data', {}).get('affected') == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not start scanning.")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_shutdown_endpoint(self, param):
@@ -452,6 +460,8 @@ class SentineloneConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to shutdown endpoint. Error: {0}".format(action_result.get_message()))
                 return action_result.get_status()
+            if response.get('data', {}).get('affected') == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not shutdown endpoint.")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_broadcast_message(self, param):
