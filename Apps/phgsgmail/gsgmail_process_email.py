@@ -700,7 +700,7 @@ class ProcessMail:
             files = result.get('files')
             vault_artifacts_added = 0
             for curr_file in files:
-                ret_val, added_to_vault = self._handle_file(curr_file, container_id, container)
+                ret_val, added_to_vault = self._handle_file(curr_file, container_id)
 
                 if added_to_vault:
                     vault_artifacts_added += 1
@@ -767,7 +767,7 @@ class ProcessMail:
 
         return phantom.APP_SUCCESS, PROC_EMAIL_MAPPED_HASH_VAL
 
-    def _handle_file(self, curr_file, container_id, container):
+    def _handle_file(self, curr_file, container_id):
 
         file_name = curr_file.get('file_name')
 
@@ -788,7 +788,7 @@ class ProcessMail:
 
         file_name = self._decode_uni_string(file_name, file_name)
 
-        success, message, vault_id = phantom_rules.vault_add(container, local_file_path, file_name, vault_attach_dict)
+        success, message, vault_id = phantom_rules.vault_add(container_id, local_file_path, file_name)
 
         if not success:
             self._base_connector.debug_print(PROC_EMAIL_FAILED_VAULT_ADD_FILE.format(message))
