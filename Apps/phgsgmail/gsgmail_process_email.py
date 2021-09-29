@@ -21,7 +21,6 @@ import magic
 import phantom.rules as phantom_rules
 from gsgmail_consts import *
 
-# todo -> confirm this with ravindra once.
 _container_common = {
     "run_automation": False  # Don't run any playbooks, when this artifact is added
 }
@@ -52,7 +51,6 @@ EWS_DEFAULT_ARTIFACT_COUNT = 100
 EWS_DEFAULT_CONTAINER_COUNT = 100
 HASH_FIXED_PHANTOM_VERSION = "2.0.201"
 
-# todo confirm these id as well
 OFFICE365_APP_ID = "a73f6d32-c9d5-4fec-b024-43876700daa6"
 EXCHANGE_ONPREM_APP_ID = "badc5252-4a82-4a6d-bc53-d1e503857124"
 IMAP_APP_ID = "9f2e9f72-b0e5-45d6-92a7-09ef820476c1"
@@ -196,7 +194,7 @@ class ProcessMail:
         urls = parsed_mail[PROC_EMAIL_JSON_URLS]
         domains = parsed_mail[PROC_EMAIL_JSON_DOMAINS]
 
-        with open(local_file_path, 'r') as f:
+        with open(local_file_path, 'r') as f:  # noqa
             file_data = f.read()
 
         if file_data is None or len(file_data) == 0:
@@ -377,7 +375,7 @@ class ProcessMail:
         if not part_payload:
             return phantom.APP_SUCCESS, False
 
-        with open(file_path, 'wb') as f:
+        with open(file_path, 'wb') as f:  # noqa
             f.write(part_payload)
 
         bodies.append({'file_path': file_path, 'charset': part.get_content_charset()})
@@ -433,7 +431,7 @@ class ProcessMail:
             part_payload = part.get_payload(decode=True)
             if not part_payload:
                 return phantom.APP_SUCCESS
-            with open(file_path, 'wb') as f:
+            with open(file_path, 'wb') as f:  # noqa
                 f.write(part_payload)
             files.append({'file_name': file_name, 'file_path': file_path})
 
@@ -552,7 +550,7 @@ class ProcessMail:
             self._parse_email_headers(parsed_mail, mail, add_email_id=email_id)
             # parsed_mail[PROC_EMAIL_JSON_EMAIL_HEADERS].append(mail.items())
             file_path = "{0}/part_1.text".format(tmp_dir)
-            with open(file_path, 'wb') as f:
+            with open(file_path, 'wb') as f:  # noqa
                 f.write(mail.get_payload(decode=True))
             bodies.append({'file_path': file_path, 'charset': charset})
 
@@ -634,7 +632,7 @@ class ProcessMail:
                     file_path = os.path.join(tmp_dir, msg.get_filename())
                     if ".eml" not in file_path:
                         continue
-                    with open(file_path, 'wb') as f:
+                    with open(file_path, 'wb') as f:  # noqa
                         f.write(msg.as_bytes())
                     self._attachments.append({'file_name': msg.get_filename(), 'file_path': file_path})
             except Exception as err:
