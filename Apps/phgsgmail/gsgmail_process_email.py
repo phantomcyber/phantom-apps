@@ -607,13 +607,13 @@ class ProcessMail:
         email_id = str(email_id)
 
         if self._base_connector.get_app_id() == EXCHANGE_ONPREM_APP_ID and email_id.endswith('='):
-            _email_id_contains = ["exchange email id"]
+            self._email_id_contains = ["exchange email id"]
         elif self._base_connector.get_app_id() == OFFICE365_APP_ID and email_id.endswith('='):
-            _email_id_contains = ["office 365 email id"]
+            self._email_id_contains = ["office 365 email id"]
         elif self._base_connector.get_app_id() == IMAP_APP_ID and email_id.isdigit():
-            _email_id_contains = ["imap email id"]
+            self._email_id_contains = ["imap email id"]
         elif ph_utils.is_sha1(email_id):
-            _email_id_contains = ["vault id"]
+            self._email_id_contains = ["vault id"]
 
         return
 
