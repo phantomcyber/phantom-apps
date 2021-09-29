@@ -18,5 +18,19 @@
     <li>In the <b>One or More API Scopes</b> field enter the list of scopes that you wish to grant access to the App. For example, to enable all the scopes required by this app enter: https://mail.google.com/, https://www.googleapis.com/auth/admin.directory.user, https://www.googleapis.com/auth/gmail.readonly</li>
     <li>Click <b>Authorize</b>.</li>
     </ul>
+  <h3>On-Poll</h3>
+    <b>Configuration:</b><br>
+    <ul>
+    <li>label - To fetch the emails from the given folder name.</li>
+    <li>ingest_manner - To ingest the emails from old first or the new first.</li>
+    <li>first_run_max_emails - Maximum containers to poll for the first scheduled polling.</li>
+    <li>max_containers - Maximum containers to poll after the first scheduled poll completes.</li>
+    <li>extract_attachments - Extract all the attachments included in emails.</li>
+    <li>extract_email_attachments - Extract the another emails which has been sent as an attachment with the fetched emails.</li>
+    <li>extract_urls - Extracts the URLs present in the emails.</li>
+    <li>extract_ips - Extracts the IP addresses present in the emails.</li>
+    <li>extract_domains - Extract the domain names present in the emails.</li>
+    <li>extract_hashes - Extract the hashes present in the emails (MD5).</li>
+    </ul>
   </body>
 </html>

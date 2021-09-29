@@ -132,7 +132,7 @@
             "order": 3
         },
         "first_run_max_emails": {
-            "description": "Maximum emails to poll first time",
+            "description": "Maximum Containers for scheduled polling first time",
             "data_type": "numeric",
             "required": true,
             "value_list": [],
@@ -194,7 +194,7 @@
         {
             "action": "test connectivity",
             "description": "Validate the asset configuration for connectivity",
-            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>.",
             "type": "test",
             "identifier": "test_connectivity",
             "read_only": true,
@@ -205,17 +205,10 @@
         {
             "action": "list users",
             "description": "Get the list of users",
-            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul><br>The action will limit the number of users returned to <b>max_items</b> or (if not specified) 500. If the system has any more users, a next page token will be returned in <b>action_result.summary.next_page_token</b>. Use this value as input to <b>page_token</b> in subsequent calls to <b>list users</b>.",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/admin.directory.user</li></ul>.<br>The action will limit the number of users returned to <b>max_items</b> or (if not specified) 500. If the system has any more users, a next page token will be returned in <b>action_result.summary.next_page_token</b>. Use this value as input to <b>page_token</b> in subsequent calls to <b>list users</b>.",
             "type": "investigate",
             "identifier": "get_users",
             "read_only": true,
-            "render": {
-                "width": 2,
-                "height": 5,
-                "type": "custom",
-                "title": "List Users",
-                "view": "gsgmail_view.list_users"
-            },
             "parameters": {
                 "max_items": {
                     "description": "Max users to get (max 500)",
@@ -480,12 +473,19 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 2,
+                "height": 5,
+                "type": "custom",
+                "title": "List Users",
+                "view": "gsgmail_view.list_users"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "run query",
             "description": "Search emails with query/filtering options",
-            "verbose": "Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter).<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul><br>If none of the filtering parameters are specified the action will return all emails in the mailbox. If the <b>query</b> parameter is specified, all other filtering parameters are ignored.<br>The query parameter uses the same filtering options (operators) as the GMail search box. A brief description of these can be found <a href=\"https://support.google.com/mail/answer/7190?hl=en\">at this link</a>.<br>To page through results, execute the action without a <b>page_token</b> parameter and a valid <b>max_results</b> value. If the query matches more than <b>max_results</b>, the action will return a value in the <b>action_result.summary.next_page_token</b> data path. This value should be used as the input value to the <b>page_token</b> parameter in the next call to <b>run query</b> to get the next set of results.",
+            "verbose": "Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter).<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>.<br>If none of the filtering parameters are specified the action will return all emails in the mailbox. If the <b>query</b> parameter is specified, all other filtering parameters are ignored.<br>The query parameter uses the same filtering options (operators) as the GMail search box. A brief description of these can be found <a href=\"https://support.google.com/mail/answer/7190?hl=en\">at this link</a>.<br>To page through results, execute the action without a <b>page_token</b> parameter and a valid <b>max_results</b> value. If the query matches more than <b>max_results</b>, the action will return a value in the <b>action_result.summary.next_page_token</b> data path. This value should be used as the input value to the <b>page_token</b> parameter in the next call to <b>run query</b> to get the next set of results.",
             "type": "investigate",
             "identifier": "run_query",
             "read_only": true,
@@ -554,12 +554,6 @@
                     "data_type": "string",
                     "order": 8
                 }
-            },
-            "render": {
-                "width": 12,
-                "title": "Run Query",
-                "type": "table",
-                "height": 5
             },
             "output": [
                 {
@@ -751,25 +745,25 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Run Query",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "delete email",
             "description": "Delete emails",
             "type": "contain",
-            "verbose": "Action uses the GMail API. Requires authorization with the following scope:<ul><li>https://mail.google.com/</li></ul>",
+            "verbose": "Action uses the GMail API. Requires authorization with the following scope:<ul><li>https://mail.google.com/</li></ul>.",
             "read_only": false,
             "identifier": "delete_email",
-            "render": {
-                "width": 12,
-                "title": "Delete Email",
-                "type": "table",
-                "height": 5
-            },
             "parameters": {
                 "id": {
                     "required": true,
-                    "description": "Message IDs to delete(Comma seperated IDs allowed)",
+                    "description": "Message IDs to delete(Comma separated IDs allowed)",
                     "data_type": "string",
                     "contains": [
                         "gmail email id"
@@ -868,6 +862,12 @@
                     ]
                 }
             ],
+            "render": {
+                "width": 12,
+                "title": "Delete Email",
+                "type": "table",
+                "height": 5
+            },
             "versions": "EQ(*)"
         },
         {
@@ -909,7 +909,7 @@
         {
             "action": "get email",
             "description": "Retrieve email details via internet message id",
-            "verbose": "Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>",
+            "verbose": "Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope:<ul><li>https://www.googleapis.com/auth/gmail.readonly</li></ul>.",
             "type": "investigate",
             "identifier": "get_email",
             "read_only": false,
