@@ -1942,7 +1942,7 @@
                 "width": 10,
                 "height": 5,
                 "view": "windowsdefenderatp_view.display_alerts",
-                "title": "Get Report"
+                "title": "List Alerts"
             },
             "versions": "EQ(*)"
         },
@@ -2147,17 +2147,13 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
-                    "column_name": "Alert ID",
-                    "column_order": 0,
                     "contains": [
                         "defender atp alert id"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.title",
-                    "data_type": "string",
-                    "column_name": "Title",
-                    "column_order": 1
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.status",
@@ -2165,9 +2161,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.category",
-                    "data_type": "string",
-                    "column_name": "Category",
-                    "column_order": 2
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.evidence.*.url",
@@ -2295,18 +2289,14 @@
                 },
                 {
                     "data_path": "action_result.data.*.severity",
-                    "data_type": "string",
-                    "column_name": "Severity",
-                    "column_order": 3
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.machineId",
                     "data_type": "string",
                     "contains": [
                         "defender atp device id"
-                    ],
-                    "column_name": "Device ID",
-                    "column_order": 6
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.assignedTo",
@@ -2322,9 +2312,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.threatName",
-                    "data_type": "string",
-                    "column_name": "Threat Name",
-                    "column_order": 4
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.aadTenantId",
@@ -2378,9 +2366,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.computerDnsName",
-                    "data_type": "string",
-                    "column_name": "Computer Name",
-                    "column_order": 5
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.detectionSource",
@@ -2447,7 +2433,11 @@
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.get_alert",
+                "title": "Get Alert"
             },
             "versions": "EQ(*)"
         },
@@ -3854,7 +3844,7 @@
                 "width": 10,
                 "height": 5,
                 "view": "windowsdefenderatp_view.display_devices",
-                "title": "Get Report"
+                "title": "Get File Devices"
             },
             "versions": "EQ(*)"
         },
@@ -4156,7 +4146,7 @@
                 "width": 10,
                 "height": 5,
                 "view": "windowsdefenderatp_view.display_devices",
-                "title": "Get Report"
+                "title": "Get User Devices"
             },
             "versions": "EQ(*)"
         },
@@ -5838,7 +5828,7 @@
                 "width": 10,
                 "height": 5,
                 "view": "windowsdefenderatp_view.display_devices",
-                "title": "Get Report"
+                "title": "Get Domain Devices"
             },
             "versions": "EQ(*)"
         },
