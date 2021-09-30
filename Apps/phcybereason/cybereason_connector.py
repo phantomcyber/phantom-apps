@@ -438,9 +438,6 @@ class CybereasonConnector(BaseConnector):
 
         machine_name_or_ip = self._get_string_param(param.get('machine_name_or_ip'))
         ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
-        action_result.add_data({
-                    "sensor_ids": sensor_ids
-                })
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -456,7 +453,10 @@ class CybereasonConnector(BaseConnector):
             if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
-
+            action_result.add_data({
+                    "response_code_from_server": res.status_code,
+                    "response_from_server": res.json()
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
@@ -490,11 +490,13 @@ class CybereasonConnector(BaseConnector):
             query = json.dumps({"pylumIds": sensor_ids})
 
             res = cr_session.post(url, data=query, headers=self._headers)
-
             if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
-
+            action_result.add_data({
+                    "response_code_from_server": res.status_code,
+                    "response_from_server": res.json()
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
@@ -721,10 +723,6 @@ class CybereasonConnector(BaseConnector):
             }
             self.save_progress("Calling {} with query {}".format(url, str(query_path)))
             res = cr_session.post(url, json=query_path, headers=self._headers)
-
-            action_result.add_data({
-                "debug_response": res.json()
-            })
             if res.status_code < 200 or res.status_code >= 399:
                 return self._process_response(res, action_result)
 
@@ -734,9 +732,6 @@ class CybereasonConnector(BaseConnector):
                 sensors = res.json()["sensors"]
                 for sensor in sensors:
                     sensor_ids.append(sensor['pylumId'])
-                action_result.add_data({
-                    "debug_sensors": sensors
-                })
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
