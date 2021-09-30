@@ -12,7 +12,6 @@ from phantom.action_result import ActionResult
 from django.http import HttpResponse
 from microsoftazurevmmanagement_consts import *
 from bs4 import BeautifulSoup
-from bs4 import UnicodeDammit
 
 import requests
 import json
@@ -21,6 +20,8 @@ import pwd
 import grp
 import os
 import sys
+import re
+import ipaddress
 
 
 def _handle_login_redirect(request, key):
@@ -252,7 +253,20 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._admin_consent = True
         self._access_token = None
         self._refresh_token = None
-        self._python_version = None
+
+    def _is_ip(self, input_ip_address):
+        """ Function that checks given address and returns True if address is valid IPv4 or IPV6 address.
+
+        :param input_ip_address: IP address
+        :return: status (success/failure)
+        """
+
+        try:
+            ipaddress.ip_address(input_ip_address)
+        except ValueError:
+            return False
+
+        return True
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -288,7 +302,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         except:
             error_text = "Cannot parse error details"
 
-        message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=self._handle_py_ver_compat_for_input_str(error_text))
+        message = MS_AZURE_ERR_MSG.format(status_code=status_code, err_msg=error_text)
 
         message = message.replace('{', '{{').replace('}', '}}')
 
@@ -318,22 +332,22 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
         # Show only error message if available
-        if isinstance(resp_json.get('error', {}), dict):
-            resp_code = self._handle_py_ver_compat_for_input_str(resp_json.get('error', {}).get('code'))
-            resp_msg = self._handle_py_ver_compat_for_input_str(resp_json.get('error', {}).get('message'))
+        if resp_json.get('error') and isinstance(resp_json.get('error', {}), dict):
+            resp_code = resp_json.get('error', {}).get('code')
+            resp_msg = resp_json.get('error', {}).get('message')
             if resp_code and resp_msg:
                 message = "{0}. {1}. Response code from server: {2}".format(MS_AZURE_SERVER_ERR_MSG,
                                                                             MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg),
                                                                             resp_code)
             elif resp_msg:
                 message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG, MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_msg))
-        elif resp_json.get("error"):
+        elif resp_json.get('error'):
             message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG,
-                                        MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=self._handle_py_ver_compat_for_input_str(resp_json['error'])))
+                                        MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=resp_json['error']))
         else:
             message = "{0}. {1}".format(MS_AZURE_SERVER_ERR_MSG,
                                         MS_AZURE_ERR_MSG.format(status_code=response.status_code,
-                                                                err_msg=self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))))
+                                                                err_msg=response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -373,7 +387,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. {0}".format(
-            MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))))
+            MS_AZURE_ERR_MSG.format(status_code=response.status_code, err_msg=response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -399,29 +413,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             error_code = MS_AZURE_ERR_CODE_UNAVAILABLE
             error_msg = MS_AZURE_UNKNOWN_ERR_MSG
 
-        try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = MS_AZURE_UNICODE_DAMMIT_TYPE_ERR_MSG
-        except:
-            error_msg = MS_AZURE_UNKNOWN_ERR_MSG
-
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _get_asset_name(self, action_result):
         """ Get name of the asset using Phantom URL.
@@ -456,7 +448,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val, None
 
-        phantom_base_url = resp_json.get('base_url')
+        phantom_base_url = resp_json.get('base_url').strip("/")
         if not phantom_base_url:
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_BASE_URL_NOT_FOUND_MSG), None
         return phantom.APP_SUCCESS, phantom_base_url
@@ -508,11 +500,17 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
-        if self._python_version == 2:
-            endpoint = endpoint.decode('utf-8')
-
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
+        except requests.exceptions.InvalidSchema:
+            error_message = 'Error connecting to server. No connection adapters were found for {}'.format(endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.InvalidURL:
+            error_message = 'Error connecting to server. Invalid URL {}'.format(endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
+        except requests.exceptions.ConnectionError:
+            error_message = 'Error Details: Connection Refused from the Server {}'.format(endpoint)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), resp_json)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
@@ -536,11 +534,10 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         url = "{0}{1}".format(MS_BASE_URL.format(subscriptionId=self._subscription), endpoint)
-        if (headers is None):
+        if headers is None:
             headers = {}
 
-        token = self._state.get('token', {})
-        if not token.get('access_token'):
+        if not self._access_token:
             ret_val = self._get_token(action_result)
 
             if phantom.is_fail(ret_val):
@@ -556,8 +553,10 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # If token is expired, generate a new token
         msg = action_result.get_message()
 
-        if msg and 'token is invalid' in msg or 'Access token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
+        if msg and any(message in msg for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
             ret_val = self._get_token(action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
 
@@ -567,6 +566,113 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, resp_json
+
+    def _make_redirect_call(self, endpoint, action_result, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+        """ Function that handles instances where a redirect may be required.
+        Default timeout for following the redirect location is 60 seconds.
+
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param action_result: object of ActionResult class
+        :param headers: request headers
+        :param params: request parameters
+        :param data: request body
+        :param json: JSON object
+        :param method: GET/POST/PUT/DELETE/PATCH (Default will be GET)
+        :param verify: verify server certificate (Default True)
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message), response, result_location
+        """
+
+        resp_json = None
+        url = "{0}{1}".format(MS_BASE_URL.format(subscriptionId=self._subscription), endpoint)
+        if headers is None:
+            headers = {}
+
+        if not self._access_token:
+            ret_val = self._get_token(action_result)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+        headers.update({
+                'Authorization': 'Bearer {0}'.format(self._access_token),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'})
+
+        try:
+            request_func = getattr(requests, method)
+        except AttributeError:
+            return action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json, None
+
+        try:
+            r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+
+        if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+            ret_val = self._get_token(action_result)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), resp_json, None
+            headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+            try:
+                r = request_func(url, json=json, data=data, headers=headers, verify=verify, params=params)
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+
+        # Azure returns a status code 202 for Run Command if there is an Asynchronous Operation running
+        if r.status_code == 202:
+            # Headers for the response store the AsyncOperation url which is used to track the operation status.
+            # The Location field stores the results of the command when it is finished running
+            request_func = getattr(requests, "get")
+            operation_status = r.headers.get('Azure-AsyncOperation')
+            location_url = r.headers.get('Location')
+            if operation_status:
+                status = "InProgress"
+                count = 0
+                # It can take some time for the results to be ready.
+                # A default count of 60 seconds is provided to check results.
+                while count < 20 or (status and status == "InProgress"):
+                    time.sleep(3)
+                    try:
+                        res = request_func(operation_status, headers=headers, verify=verify)
+                        resp_json = res.json()
+                    except Exception as e:
+                        error_msg = self._get_error_message_from_exception(e)
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                    if any(message in res.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                        ret_val = self._get_token(action_result)
+                        if phantom.is_fail(ret_val):
+                            return action_result.get_status(), resp_json, None
+                        headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+                    status = resp_json.get('status')
+                    count += 1
+                try:
+                    r = request_func(location_url, headers=headers, verify=verify)
+                except Exception as e:
+                    error_msg = self._get_error_message_from_exception(e)
+                    return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                if r.text and any(message in r.text for message in MS_AZURE_INVALID_TOKEN_MESSAGES):
+                    ret_val = self._get_token(action_result)
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status(), resp_json, None
+                    headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+                    try:
+                        r = request_func(location_url, headers=headers, verify=verify)
+                    except Exception as e:
+                        error_msg = self._get_error_message_from_exception(e)
+                        return action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(error_msg)), resp_json, None
+                ret_val, response = self._process_response(r, action_result)
+                return ret_val, response, location_url
+        elif r.status_code == 200:
+            ret_val, response = self._process_response(r, action_result)
+            return ret_val, response, None
+        else:
+            message = "Can't process response from server. {0}".format(
+                MS_AZURE_ERR_MSG.format(status_code=r.status_code,
+                err_msg=r.text.replace('{', '{{').replace('}', '}}')))
+
+        return action_result.set_status(phantom.APP_ERROR, message), resp_json, None
 
     def _get_admin_access(self, action_result, app_rest_url, app_state):
         """ This function is used to get admin access for given credentials.
@@ -607,14 +713,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
             self.send_progress('{0}'.format('.' * (i % 10)))
 
-            if (os.path.isfile(auth_status_file_path)):
+            if os.path.isfile(auth_status_file_path):
                 completed = True
                 os.unlink(auth_status_file_path)
                 break
 
             time.sleep(MS_TC_STATUS_SLEEP)
 
-        if (not completed):
+        if not completed:
             self.save_progress("Authentication process does not seem to be completed. Timing out")
             return self.set_status(phantom.APP_ERROR)
 
@@ -643,7 +749,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Progress
-        # self.save_progress("Generating Authentication URL")
         app_state = {}
         action_result = self.add_action_result(ActionResult(param))
 
@@ -654,7 +759,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             # box will ask the user to connect to
             ret_val, app_rest_url = self._get_app_rest_url(action_result)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 self.save_progress(MS_REST_URL_NOT_AVAILABLE_MSG.format(error=self.get_status()))
                 return self.set_status(phantom.APP_ERROR)
 
@@ -669,7 +774,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
             if self._admin_access:
                 result = self._get_admin_access(action_result, app_rest_url, app_state)
-                if (phantom.is_fail(result)):
+                if phantom.is_fail(result):
                     return self.get_status()
 
             admin_consent_url = "https://login.microsoftonline.com/{0}/oauth2/v2.0/authorize".format(self._tenant)
@@ -704,14 +809,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
                 self.send_progress('{0}'.format('.' * (i % 10)))
 
-                if (os.path.isfile(auth_status_file_path)):
+                if os.path.isfile(auth_status_file_path):
                     completed = True
                     os.unlink(auth_status_file_path)
                     break
 
                 time.sleep(MS_TC_STATUS_SLEEP)
 
-            if (not completed):
+            if not completed:
                 self.save_progress("Authentication process does not seem to be completed. Timing out")
                 return self.set_status(phantom.APP_ERROR)
 
@@ -731,14 +836,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self.save_progress(MS_GENERATING_ACCESS_TOKEN_MSG)
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self.save_progress("Getting list of all VMs to verify token")
 
         ret_val, response = self._make_rest_call_helper(VM_LIST_VMS_ALL_ENDPOINT, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("API to get VMs failed")
             self.save_progress("Test Connectivity Failed")
             return action_result.set_status(phantom.APP_ERROR)
@@ -756,20 +861,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_GET_SYSTEM_INFO_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -787,7 +890,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
+        resource_group_name = param.get('resource_group_name')
 
         if resource_group_name:
             endpoint = VM_LIST_VMS_RESOURCE_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name)
@@ -797,7 +900,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -820,14 +923,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        snapshot_name = self._handle_py_ver_compat_for_input_str(param.get('snapshot_name'))
+        resource_group_name = param.get('resource_group_name')
+        snapshot_name = param.get('snapshot_name')
         location = param['location']
 
         create_option = param['create_option']
@@ -854,7 +955,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, json=body, method='put')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -876,20 +977,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_ACTION_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name, action="/start")
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -908,20 +1007,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_ACTION_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name, action="/powerOff")
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -940,20 +1037,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_ACTION_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name, action="/deallocate")
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -972,7 +1067,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
@@ -981,7 +1075,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call_helper(VM_LIST_TAGS_ENDPOINT, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into thetag
@@ -1014,20 +1108,19 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        tag_name = self._handle_py_ver_compat_for_input_str(param.get('tag_name'))
-        tag_value = self._handle_py_ver_compat_for_input_str(param.get('tag_value'))
+        tag_name = param.get('tag_name')
+        tag_value = param.get('tag_value')
 
         # If not tag_value, then create tag_name
         if not tag_value:
             ret_val, response = self.create_tag_name(action_result, tag_name)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
             # Add the response into the data section
@@ -1038,22 +1131,24 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             endpoint = VM_CREATE_TAG_ENDPOINT.format(tagName=tag_name, tagValue=value)
             ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='put')
 
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                msg = action_result.get_message()
+                if 'PredefinedTagNameNotFound' in msg:
+                    # Need to create the tag name first
+                    ret_val, response = self.create_tag_name(action_result, tag_name)
 
-            # Need to create the tag name first
-            ret_val, response = self.create_tag_name(action_result, tag_name)
+                    if phantom.is_fail(ret_val):
+                        return action_result.get_status()
 
-            if (phantom.is_fail(ret_val)):
-                return action_result.get_status()
-
-            # Add the response into the data section
-            action_result.add_extra_data(response)
+                    # Add the response into the data section
+                    action_result.add_extra_data(response)
+                else:
+                    return action_result.get_status()
 
             # Now that the tag name has been created, try updating it's value
             ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='put')
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
             # Add the response into the data section
@@ -1075,16 +1170,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(VM_RESOURCE_GROUP_ENDPOINT, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1108,13 +1201,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
+        resource_group_name = param.get('resource_group_name')
 
         if resource_group_name:
             resource_part = VM_RESOURCE_GROUP_VALUE_PART.format(resourceGroupName=resource_group_name)
@@ -1125,7 +1217,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1149,24 +1241,24 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
+        resource_group_name = param.get('resource_group_name')
         group_type = param.get('group_type')
 
         if group_type == 'network':
             endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='networkSecurityGroups', groupName='')
-        else:  # group_type == 'application'
+        elif group_type == 'application':
             endpoint = VM_SECURITY_GROUP_ENDPOINT.format(resourceGroupName=resource_group_name, groupType='applicationSecurityGroups', groupName='')
+        else:
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_GROUP_TYPE_ERR_MSG)
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1190,14 +1282,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        group_name = self._handle_py_ver_compat_for_input_str(param.get('group_name'))
+        resource_group_name = param.get('resource_group_name')
+        group_name = param.get('group_name')
         location = param.get('location')
         tags = param.get('tags')
         default_security_rules = param.get('default_security_rules')
@@ -1218,20 +1308,23 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
         if default_security_rules:
             body['properties'].update({'defaultSecurityRules': default_security_rules})
         if provisioning_state:
             body['properties'].update({'provisioningState': provisioning_state})
         if resource_guid:
             body['properties'].update({'resourceGuid': resource_guid})
-        if security_rules:
+        try:
+            if security_rules:
+                security_rules = json.loads(security_rules)
+                body['properties'].update({'securityRules': security_rules})
+        except:
             body['properties'].update({'securityRules': security_rules})
-
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1253,14 +1346,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        group_name = self._handle_py_ver_compat_for_input_str(param.get('group_name'))
+        resource_group_name = param.get('resource_group_name')
+        group_name = param.get('group_name')
         location = param.get('location')
         tags = param.get('tags')
 
@@ -1276,12 +1367,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
                 body['tags'].update(sg_tags)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg, param='tags'))
 
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='put')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1303,13 +1394,11 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
+        resource_group_name = param.get('resource_group_name')
 
         if resource_group_name:
             endpoint = VM_LIST_VIRTUAL_NETWORKS_ENDPOINT.format(resourceGroup='/resourceGroups/{}'.format(resource_group_name))
@@ -1319,7 +1408,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1343,20 +1432,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        virtual_network_name = self._handle_py_ver_compat_for_input_str(param.get('virtual_network_name'))
+        resource_group_name = param.get('resource_group_name')
+        virtual_network_name = param.get('virtual_network_name')
 
         # make rest call
         endpoint = VM_LIST_SUBNETS_ENDPOINT.format(resourceGroupName=resource_group_name, virtualNetworkName=virtual_network_name)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1380,20 +1467,18 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_GET_SYSTEM_INFO_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='delete')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -1412,21 +1497,19 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        virtual_network_name = self._handle_py_ver_compat_for_input_str(param.get('virtual_network_name'))
+        resource_group_name = param.get('resource_group_name')
+        virtual_network_name = param.get('virtual_network_name')
         ip_address = param.get('ip_address')
 
         # make rest call
         endpoint = VM_CHECK_IP_AVAIL.format(resourceGroup=resource_group_name, virtualNetwork=virtual_network_name, ip=ip_address)
         ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1450,14 +1533,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_ACTION_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name, action='generalize')
@@ -1469,7 +1550,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if 'OperationNotAllowed' in action_result.get_message() and 'Please power off' in action_result.get_message():
             summary['status'] = "Virtual machine must be powered off. Please power off the vm before generalizing it."
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1489,14 +1570,12 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
 
         # make rest call
         endpoint = VM_ACTION_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name, action='redeploy')
@@ -1511,7 +1590,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         if 'could not be found' in action_result.get_message():
             summary['status'] = "Resource group could not be found"
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1531,34 +1610,120 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         """
 
         # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        resource_group_name = self._handle_py_ver_compat_for_input_str(param.get('resource_group_name'))
-        vm_name = self._handle_py_ver_compat_for_input_str(param.get('vm_name'))
+        resource_group_name = param.get('resource_group_name')
+        vm_name = param.get('vm_name')
+        script = param.get('script')
+        script_parameters = param.get('script_parameters')
 
-        try:
-            body = json.loads(param.get('body', {}))
-        except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_INVALID_JSON.format(err_msg=error_msg))
+        # If script or parameters were provided, ensure they are both wrapped inside a list to be accepted by Azure
+        if script:
+            try:
+                script_json = json.loads(script)
+            except ValueError:
+                # If param['script'] is not JSON then treat it as a regular string
+                script = [script]
+            else:
+                if not isinstance(script_json, list):
+                    script = [script_json]
+                else:
+                    script = script_json
+        if script_parameters:
+            try:
+                script_param_json = json.loads(script_parameters)
+            except ValueError:
+                return action_result.set_status(phantom.APP_ERROR, "'script_parameters' input is not a JSON dictionary")
+            else:
+                if not isinstance(script_param_json, list):
+                    script_parameters = [script_param_json]
+                else:
+                    script_parameters = script_param_json
+
+        data = {"commandId": param['command_id'], "script": script, "parameters": script_parameters}
 
         # make rest call
         endpoint = VM_RUN_COMMAND_ENDPOINT.format(resourceGroupName=resource_group_name, vmName=vm_name)
-        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, json=body, method='post')
+        ret_val, response, results_url = self._make_redirect_call(endpoint, action_result, params=None, headers=None, json=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Add the response into the data section
-        action_result.add_data(response)
+        # Add a cleaner response into the data section
+        if isinstance(response, list):
+            data = {'results_url': results_url, 'results': [item for item in response]}
+            for index, result in enumerate(data['results']):
+                if result.get('message'):
+                    try:
+                        message_json = json.loads(result.get('message'))
+                    except Exception as e:
+                        err_msg = self._get_error_message_from_exception(e)
+                        self.debug_print("No json data in results message: {}".format(err_msg))
+                    else:
+                        data['results'][index]['message'] = message_json
+            action_result.add_data(data)
+        else:
+            data = {'results_url': results_url, 'results': response}
+            action_result.add_data(data)
 
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['status'] = "Successfully executed command"
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_get_results(self, param):
+        """ This function is used to handle the get run command results action.
+
+        :param param: Dictionary of input parameters
+        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
+
+        """
+        # Implement the handler here
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        results_url = param['results_url']
+        # Capture information from param results_url and ensure that the subscription id matches the asset
+        pattern = re.compile(r'https:\/\/[^\/]+\/subscriptions\/([^\/]+)(.+)')
+        try:
+            subscription_id, endpoint = re.search(pattern, results_url).groups()
+        except AttributeError:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid value in the 'results_url' action parameter")
+
+        if subscription_id != self._subscription:
+            return action_result.set_status(phantom.APP_ERROR,
+                "Cannot retrieve 'run command' results from a different Azure Subscription than the configured Subscription on this asset")
+
+        ret_val, response = self._make_rest_call_helper(endpoint, action_result, params=None, headers=None, method='get')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        # Add a cleaner response into the data section
+        if isinstance(response, list):
+            data = {'results_url': results_url, 'results': [item for item in response]}
+            for index, result in enumerate(data['results']):
+                if result.get('message'):
+                    try:
+                        message_json = json.loads(result.get('message'))
+                    except Exception as e:
+                        err_msg = self._get_error_message_from_exception(e)
+                        self.debug_print("No json data in results message: {}".format(err_msg))
+                    else:
+                        data['results'][index]['message'] = message_json
+            action_result.add_data(data)
+        else:
+            data = {'results_url': results_url, 'results': response}
+            action_result.add_data(data)
+
+        summary = action_result.update_summary({})
+        summary['status'] = "Successfully fetched result"
 
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
@@ -1599,14 +1764,14 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
         self._access_token = resp_json.get(MS_AZURE_ACCESS_TOKEN_STRING)
 
         if not self._admin_consent:
-            # referesh token is only  received of interactive OAuth
+            # refresh token is only received of interactive OAuth
             self._refresh_token = resp_json.get(MS_AZURE_REFRESH_TOKEN_STRING)
 
         self.save_state(self._state)
@@ -1634,7 +1799,7 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._get_token(action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state['admin_consent'] = True
@@ -1718,6 +1883,9 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         elif action_id == 'run_command':
             ret_val = self._handle_run_command(param)
 
+        elif action_id == 'get_results':
+            ret_val = self._handle_get_results(param)
+
         elif action_id == 'generate_token':
             ret_val = self._handle_generate_token(param)
 
@@ -1739,12 +1907,6 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
             }
             return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERROR)
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
-
         # get the asset config
         config = self.get_config()
 
@@ -1756,6 +1918,8 @@ class MicrosoftAzureVmManagementConnector(BaseConnector):
         self._admin_consent = config.get(MS_AZURE_CONFIG_ADMIN_CONSENT)
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
+
+        self.set_validator('ipv6', self._is_ip)
 
         return phantom.APP_SUCCESS
 

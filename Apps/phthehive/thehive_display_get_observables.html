@@ -75,36 +75,155 @@
 <!------------------- For each Result ---------------------->
 
   {% if result.data %}
-    {% for curr_datas in result.data %}
-        {% for curr_data in curr_datas %}
+    {% for curr_data in result.data %}
         <table class="wf-table-horizontal">
-            <tr><th colspan="2">INFO</th></tr>
-            <tr><th>TICKET ID</th>
-            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['thehive ticket id'], 'value': '{{ curr_data.id }}' }], 0, {{ container.id }}, null, false);">
-                {{ curr_data.id }}
-                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a></td>
+            <tr>
+              <th colspan="2">INFO</th>
             </tr>
-            <tr><th>DATA</th>
-            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
-                {{ curr_data.data }}
-                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a></td>
+
+            {% if curr_data.parent %}
+              <tr>
+                <th>TICKET ID</th>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['thehive ticket id'], 'value': '{{ curr_data.parent }}' }], 0, {{ container.id }}, null, false);">
+                    {{ curr_data.parent }}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% if curr_data.message %}
+              <tr>
+                  <th>DESCRIPTION</th>
+                  <td>
+                      {{ curr_data.message }}
+                  </td>
+              </tr>
+            {% endif %}
+
+            {% if curr_data.tlp is not None %}
+              <tr>
+                <th>TLP</th>
+                {% if curr_data.tlp == 0 %}
+                  <td>White</td>
+                {% elif curr_data.tlp == 1 %}
+                  <td>Green</td>
+                {% elif curr_data.tlp == 2 %}
+                  <td>Amber</td>
+                {% elif curr_data.tlp == 3 %}
+                  <td>Red</td>
+                {% else %}
+                  <td>{{ curr_data.tlp }}</td>
+                {% endif %}
+              </tr>
+            {% endif %}
+
+            <tr>
+              <th>DATA TYPE</th>
+              <td>
+                  {{ curr_data.dataType }}
+              </td>
             </tr>
-            <tr><th>DATA TYPE</th>
-            <td>
-                {{ curr_data.dataType }}    
-            </td>
+
+            <tr>
+              <th>DATA</th>
+              {% if curr_data.data %}
+                {% if curr_data.dataType == 'url' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'ip' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'domain' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'mail' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'hash' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['hash'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'filename' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% else %}
+                  <td>
+                    {{ curr_data.data }}
+                  </td>
+                {% endif %}
+              {% else %}
+                  <td>
+                    None
+                  </td>
+              {% endif %}
             </tr>
-            <tr><th>SHA256</th>
-            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['hash, sha256'], 'value': '{{ curr_data.attachment.sha256 }}' }], 0, {{ container.attachment.sha256 }}, null, false);">
-                {{ curr_data.attachment.sha256 }}
-                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-            </a></td>
+
+            {% if curr_data.attachment.sha256 %}
+              <tr>
+                <th>SHA256</th>
+                <td>
+                  <a href="javascript:;"
+                    onclick="context_menu(this, [{'contains': ['hash, sha256'], 'value': '{{ curr_data.attachment.sha256 }}' }], 0, {{ container.attachment.sha256 }}, null, false);">
+                    {{ curr_data.attachment.sha256 }}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <th>IS IOC</th>
+              <td>
+                {{ curr_data.ioc }}
+              </td>
             </tr>
+
+            {% if curr_data.tags %}
+              <tr>
+                <th>Tags</th>
+                <td>
+                  {% for tag in curr_data.tags %}
+                    <li>
+                      {{ tag }}
+                    </li>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endif %}
+
         </table>
         <br>
-       {% endfor %} 
     {% endfor %}
   {% else %}
   <p> No data found </p>
