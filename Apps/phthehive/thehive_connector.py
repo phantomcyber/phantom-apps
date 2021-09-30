@@ -15,6 +15,7 @@ import requests
 import json
 import magic
 from bs4 import BeautifulSoup
+from urllib.parse import quote
 
 
 class RetVal(tuple):
@@ -36,12 +37,44 @@ class ThehiveConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+        self._api_key = None
+
+    def _get_error_message_from_exception(self, e):
+        """
+        Get appropriate error message from the exception.
+
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = None
+        error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+
+        return error_text
+
     def _process_empty_reponse(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(action_result.set_status(
+            phantom.APP_ERROR,
+            "Status Code: {}. Empty response and no information in the header.".format(response.status_code)
+        ), None)
 
     def _process_html_response(self, response, action_result):
 
@@ -50,6 +83,9 @@ class ThehiveConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -81,6 +117,9 @@ class ThehiveConnector(BaseConnector):
                 r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         try:
+            if resp_json.get('type') and resp_json.get('message'):
+                message = "Error from server. Status Code: {0} Data from server: Error Type: {1}. Error Message: {2}".format(
+                    r.status_code, resp_json.get('type'), resp_json.get('message'))
             if resp_json.get('errors', [])[0][0].get('message'):
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(
                     r.status_code, resp_json.get('errors', [])[0][0].get('message'))
@@ -131,7 +170,7 @@ class ThehiveConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
         # Create a URL to connect to
-        url = self._base_url + endpoint
+        url = "{}{}".format(self._base_url, endpoint)
 
         try:
             if not files:
@@ -150,26 +189,40 @@ class ThehiveConnector(BaseConnector):
                             verify=config.get('verify_server_cert', False),
                             params=params,
                             files=files)
+        except requests.exceptions.InvalidURL as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_INVALID_URL.format(url=url)), resp_json)
+        except requests.exceptions.ConnectionError as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_CONNECTION_REFUSED.format(url=url)), resp_json)
+        except requests.exceptions.InvalidSchema as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_INVALID_SCHEMA.format(url=url)), resp_json)
         except Exception as e:
-            return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(self._get_error_message_from_exception(error_msg))
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR,
+                    THEHIVE_ERR_CONNECTING_TO_SERVER.format(error=error_msg),
+                ),
+                resp_json
+            )
 
         return self._process_response(r, action_result)
 
     def _handle_test_connectivity(self, param):
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
 
         self.save_progress("Connecting to endpoint")
         # make rest call
         headers = {'Authorization': authToken}
-        ret_val, response = self._make_rest_call('api/case', action_result, params=None, headers=headers)
+        ret_val, _ = self._make_rest_call('api/case', action_result, params=None, headers=headers)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Return success
@@ -178,11 +231,8 @@ class ThehiveConnector(BaseConnector):
 
     def _handle_create_ticket(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         data = dict()
@@ -190,17 +240,15 @@ class ThehiveConnector(BaseConnector):
 
         ret_val, fields = self._get_fields(param, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if (fields):
+        if fields:
             data.update(fields)
 
         title = param['title']
         description = param['description']
         data.update({'title': title, 'description': description})
-
-        # Optional values should use the .get() function
 
         severity = param.get('severity', 'Medium')
         try:
@@ -217,125 +265,95 @@ class ThehiveConnector(BaseConnector):
         data.update({'tlp': int_tlp})
 
         if 'owner' in param:
-            data.update({'owner': param['owner']})
+            data.update({'owner': param.get('owner')})
 
         # make rest call
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call('api/case', action_result, params=None, data=data, headers=headers, method="post")
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
-        action_result.update_summary({'new_case_id': response['caseId']})
+        action_result.update_summary({'new_case_id': response.get('caseId')})
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully created a new case")
 
     def _handle_get_ticket(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
 
         # make rest call
-        endpoint = "api/case/" + case_id
-        authToken = "Bearer " + self._api_key
+        endpoint = "api/case/{}".format(case_id)
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=headers)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # summary = action_result.update_summary(response)
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully got Ticket")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully fetched ticket")
 
     def _handle_update_ticket(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
         data = dict()
         fields = dict()
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
+
         ret_val, fields = self._get_fields(param, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        if (fields):
+        if fields:
             data.update(fields)
 
-        endpoint = "api/case/" + case_id
-        authToken = "Bearer " + self._api_key
+        endpoint = "api/case/{}".format(case_id)
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call(endpoint, action_result, data=data, params=None, headers=headers, method="patch")
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated Ticket")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated ticket")
 
     def _handle_list_tickets(self, param):
 
-        # Implement the handler here
-        # use self.save_progress(...) to send progress messages back to the platform
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Authorization': authToken}
         params = {'range': 'all'}
         ret_val, response = self._make_rest_call('api/case', action_result, params=params, headers=headers)
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        # Now post process the data,  uncomment code as you deem fit
-
-        # Add the response into the data section
-        # action_result.add_data(response)
         for ticket in response:
             action_result.add_data(ticket)
 
         summary = action_result.set_summary({})
         summary['num_tickets'] = len(response)
-        # Add a dictionary that is made up of the most important values from data into the summary
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -343,23 +361,24 @@ class ThehiveConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         case_id = param['id']
+        # encoding case_id
+        case_id = quote(case_id, safe='')
+
         title = param['title']
         status = param['status']
         data = dict()
         data.update({'title': title, 'status': status})
-        endpoint = 'api/case/' + case_id + '/task'
-        authToken = "Bearer " + self._api_key
+        endpoint = 'api/case/{}/task'.format(case_id)
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, data=data, headers=headers,
                                                  method="post")
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created Tasks")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created task")
 
     def _handle_search(self, param, path):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -378,14 +397,15 @@ class ThehiveConnector(BaseConnector):
         try:
             search = json.loads(search)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_FIELDS_JSON_PARSE, e)
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_FIELDS_JSON_PARSE.format(error=error_msg))
         data.update(search)
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call(endpoint, action_result, params=params, data=data, headers=headers,
                                                     method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         for ticket in response:
@@ -395,59 +415,55 @@ class ThehiveConnector(BaseConnector):
         summary['num_results'] = len(response)
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_update_task(self, param, path):
+    def _handle_update_task(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         data = dict()
         task_id = param['task_id']
+        # encoding task_id
+        task_id = quote(task_id, safe='')
+
         title = param.get('task_title')
         owner = param.get('task_owner')
         status = param.get('task_status')
         description = param.get('task_description')
 
-        if (title):
+        if title:
             data.update({'title': title})
-        if (owner):
+        if owner:
             data.update({'owner': owner})
-        if (status):
+        if status:
             data.update({'status': status})
-        if (description):
+        if description:
             data.update({'description': description})
 
-        endpoint = "api/case/task/" + task_id
-        authToken = "Bearer " + self._api_key
+        endpoint = "api/case/task/{}".format(task_id)
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=headers, data=data, method="patch")
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
-
-        # Now post process the data,  uncomment code as you deem fit
 
         # Add the response into the data section
         action_result.add_data(response)
 
-        # summary = action_result.update_summary(response)
-
-        # Return success, no need to set the message, only the status
-        # BaseConnector will create a textual message based off of the summary dictionary
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated Task")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully updated task")
 
     def _get_fields(self, param, action_result):
 
         fields = param.get('fields')
 
         # fields is an optional field
-        if (not fields):
+        if not fields:
             return RetVal(phantom.APP_SUCCESS, None)
 
         # we take in as a dictionary string, first try to load it as is
         try:
             fields = json.loads(fields)
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_FIELDS_JSON_PARSE, e), None)
+            error_msg = self._get_error_message_from_exception(e)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, THEHIVE_ERR_FIELDS_JSON_PARSE.format(error=error_msg)), None)
 
         return RetVal(phantom.APP_SUCCESS, fields)
 
@@ -455,7 +471,6 @@ class ThehiveConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         case_id = param.get('ticket_id')
@@ -463,12 +478,13 @@ class ThehiveConnector(BaseConnector):
 
         # make rest call
         endpoint = "api/case/artifact/_search"
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Content-Type': 'application/json', 'Authorization': authToken}
         data = {"query": { "_parent": { "_type": "case", "_query": { "_id": case_id}}}}
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=data, params=None, method="post", headers=headers)
+        params = {'range': 'all'}
+        ret_val, response = self._make_rest_call(endpoint, action_result, data=data, params=params, method="post", headers=headers)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         if data_type:
@@ -478,22 +494,19 @@ class ThehiveConnector(BaseConnector):
 
         for resp in response_formatted:
             if 'attachment' in resp and 'hashes' in resp.get('attachment'):
-                hashes = resp.get('attachment').get('hashes')
+                hashes = resp.get('attachment').get('hashes', [])
                 if len(hashes) > 0:
                     resp['attachment']['sha256'] = hashes[0]
                     resp['attachment']['sha1'] = hashes[1]
                     resp['attachment']['md5'] = hashes[2]
 
-        if (phantom.is_fail(ret_val)):
-            # the call to the 3rd party device or service failed, action result should contain all the error details
-            # so just return from here
-            return action_result.get_status()
+            # Django template in the custom view cannot access the keys starting with underscore
+            resp['parent'] = resp.get('_parent')
 
-        action_result.add_data(response_formatted)
+            action_result.add_data(resp)
 
         return action_result.set_status(phantom.APP_SUCCESS, "Num observables found: {}".format(len(response_formatted)))
 
-    # Now post process the data,  uncomment code as you deem fit
     def _handle_create_observable(self, param):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -510,6 +523,8 @@ class ThehiveConnector(BaseConnector):
         try:
             tags = [x.strip() for x in tags.split(',')]
             tags = list(filter(None, tags))
+            if not tags:
+                return action_result.set_status(phantom.APP_ERROR, "Tags format invalid. Please supply one or more tags separated by a comma")
         except:
             return action_result.set_status(phantom.APP_ERROR, "Tags format invalid. Please supply one or more tags separated by a comma")
 
@@ -521,14 +536,23 @@ class ThehiveConnector(BaseConnector):
             vault_id = param.get('vault_id')
 
             if not vault_id:
-                return action_result.set_status(phantom.APP_ERROR, "Parameter Vault ID is mandatory if data_type is file")
+                return action_result.set_status(phantom.APP_ERROR, "Parameter Vault ID is mandatory if 'data_type' is file")
 
-            _, _, vault_file_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
+            try:
+                _, _, vault_file_info = ph_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
+                vault_file_info = list(vault_file_info)
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
+                self.debug_print(error_msg)
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    "Unable to find specified Vault file. Please check Vault ID and try again. {}".format(error_msg)
+                )
 
-            if len(list(vault_file_info)) != 1:
+            if len(vault_file_info) != 1:
                 return action_result.set_status(phantom.APP_ERROR, "Unable to find specified Vault file. Please check Vault ID and try again.")
 
-            vault_file_info = list(vault_file_info)[0]
+            vault_file_info = vault_file_info[0]
             file_path = vault_file_info.get('path')
             file_name = vault_file_info.get('name')
 
@@ -536,7 +560,7 @@ class ThehiveConnector(BaseConnector):
             file_data = {'attachment': (file_name, open(file_path, 'rb'), magic.Magic(mime=True).from_file(file_path))}
 
         endpoint = "api/case/{0}/artifact".format(case_id)
-        authToken = "Bearer " + self._api_key
+        authToken = "Bearer {}".format(self._api_key)
         headers = {'Authorization': authToken}
         mesg = {
             "dataType": data_type,
@@ -555,22 +579,44 @@ class ThehiveConnector(BaseConnector):
             headers['Content-Type'] = 'application/json'
             ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=headers, data=mesg, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # need to flatten hashes if file was uploaded
         if response.get('attachment'):
-            hashes = response.get('attachment').get('hashes')
+            hashes = response.get('attachment').get('hashes', [])
             response['attachment']['sha256'] = hashes[0]
             response['attachment']['sha1'] = hashes[1]
             response['attachment']['md5'] = hashes[2]
 
             del response['attachment']['hashes']
 
-        # Add the response into the data section
         action_result.add_data(response)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created Observable")
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created observable")
+
+    def _handle_create_task_log(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        task_id = param['task_id']
+
+        # encoding task_id
+        task_id = quote(task_id, safe='')
+
+        message = param['message']
+        data = dict()
+        data.update({'message': message})
+        endpoint = 'api/case/task/{}/log'.format(task_id)
+        authToken = "Bearer {}".format(self._api_key)
+        headers = {'Content-Type': 'application/json', 'Authorization': authToken}
+        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, data=data, headers=headers,
+                                                 method="post")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully created task log")
 
     def handle_action(self, param):
 
@@ -579,7 +625,7 @@ class ThehiveConnector(BaseConnector):
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
 
-        self.debug_print("action_id", self.get_action_identifier())
+        self.debug_print("action_id: {}".format(self.get_action_identifier()))
 
         if action_id == 'test_connectivity':
             ret_val = self._handle_test_connectivity(param)
@@ -606,13 +652,16 @@ class ThehiveConnector(BaseConnector):
             ret_val = self._handle_search(param, "task")
 
         elif action_id == 'update_task':
-            ret_val = self._handle_update_task(param, "task")
+            ret_val = self._handle_update_task(param)
 
         elif action_id == 'get_observables':
             ret_val = self._handle_get_observables(param)
 
         elif action_id == 'create_observable':
             ret_val = self._handle_create_observable(param)
+
+        elif action_id == 'create_task_log':
+            ret_val = self._handle_create_task_log(param)
 
         return ret_val
 
@@ -621,10 +670,17 @@ class ThehiveConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, THEHIVE_STATE_FILE_CORRUPT_ERR)
+
         config = self.get_config()
         self._base_url = config['base_url']
         if not self._base_url.endswith('/'):
-            self._base_url = self._base_url + "/"
+            self._base_url = "{}/".format(self._base_url)
 
         self._api_key = config['api_key']
 
