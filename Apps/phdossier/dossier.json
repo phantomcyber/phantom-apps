@@ -8,18 +8,18 @@
     "logo_dark": "logo_dossier_dark.svg",
     "product_name": "Dossier",
     "product_version_regex": ".*",
-    "publisher": "Splunk",
+    "publisher": "Splunk Community",
     "contributors": [
         {
           "name": "Chris Marrison (chris@infoblox.com)"
         }
       ],
-    "license": "Copyright (c) Splunk, 2019",
+    "license": "Copyright (c) 2019-2021 Splunk Inc.",
     "app_version": "1.0.1",
     "utctime_updated": "2019-09-24T13:19:33.963396Z",
     "package_name": "phantom_dossier",
     "main_module": "dossier_connector.pyc",
-    "min_phantom_version": "4.5.15922",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_key": {
@@ -60,14 +60,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
@@ -441,6 +433,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Threat confidence: 70, Threat level: 70"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.threat_confidence",
                     "data_type": "numeric",
                     "example_values": [
@@ -452,13 +459,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         70
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Threat confidence: 70, Threat level: 70"
                     ]
                 },
                 {
@@ -500,14 +500,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
@@ -765,10 +757,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.results",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        71
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -776,6 +769,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Results: 71"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        71
                     ]
                 },
                 {
@@ -819,16 +819,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.hash",
                     "data_type": "string",
@@ -3132,11 +3122,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
@@ -3178,14 +3178,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
@@ -3495,11 +3487,19 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {

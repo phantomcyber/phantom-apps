@@ -1,5 +1,5 @@
 # File: dossier_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 import phantom.app as phantom
@@ -7,10 +7,10 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 # Usage of the consts file is recommended
-# from dossier_consts import *
+from dossier_consts import *
 import json
 import requests
-# from bs4 import BeautifulSoup
+from bs4 import UnicodeDammit
 
 
 class RetVal(tuple):
@@ -32,6 +32,49 @@ class DossierConnector(BaseConnector):
         # modify this as you deem fit.
         self._base_url = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        error_code = ERR_CODE_MSG
+        error_msg = ERR_MSG_UNAVAILABLE
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
     def _make_rest_call(self, endpoint):
 
         base_url = "https://csp.infoblox.com/api/services/intel/lookup"
@@ -48,13 +91,7 @@ class DossierConnector(BaseConnector):
 
     def _handle_test_connectivity(self, param):
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # NOTE: test connectivity does _NOT_ take any parameters
-        # i.e. the param dictionary passed to this handler will be empty.
-        # Also typically it does not add any data into an action_result either.
-        # The status and progress messages are more important.
 
         self.save_progress("Connecting to endpoint")
         # make rest call
@@ -71,10 +108,7 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         domain = param['domain']
@@ -91,14 +125,18 @@ class DossierConnector(BaseConnector):
             threat_level = 0
             threat_confidence = 0
 
-            # this gets the highest theat level and confidence score for the summary
-            for i in response["results"][0]["data"]["threat"]:
+            try:
+                # this gets the highest threat level and confidence score for the summary
+                for i in response["results"][0]["data"]["threat"]:
 
-                if i["threat_level"] > threat_level:
-                    threat_level = i["threat_level"]
+                    if i["threat_level"] > threat_level:
+                        threat_level = i["threat_level"]
 
-                if "confidence" in i and i["confidence"] > threat_confidence:
-                    self.debug_print(i['confidence'])
+                    if "confidence" in i and i["confidence"] > threat_confidence:
+                        self.debug_print(i['confidence'])
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
@@ -106,7 +144,6 @@ class DossierConnector(BaseConnector):
             summary['threat_confidence'] = threat_confidence
 
             # Return success, no need to set the message, only the status
-            # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
             return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
@@ -115,10 +152,7 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         hash = param['hash']
@@ -134,14 +168,17 @@ class DossierConnector(BaseConnector):
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            if response.get("results"):
-                if response["results"][0]["data"].get("details", {}).get("av_match_count"):
-                    summary['results'] = response["results"][0]["data"].get("details", {}).get("av_match_count")
-                else:
-                    summary['results'] = 0
+            try:
+                if response.get("results"):
+                    if response["results"][0]["data"].get("details", {}).get("av_match_count"):
+                        summary['results'] = response["results"][0]["data"].get("details", {}).get("av_match_count")
+                    else:
+                        summary['results'] = 0
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
             # Return success, no need to set the message, only the status
-            # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
             return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
@@ -150,10 +187,7 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         # submitted_url comes from phantom. not the best name, i know.
@@ -171,11 +205,14 @@ class DossierConnector(BaseConnector):
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            if response.get("results"):
-                summary['results'] = response["results"][0]["data"]["record_count"]
+            try:
+                if response.get("results"):
+                    summary['results'] = response["results"][0]["data"]["record_count"]
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
             # Return success, no need to set the message, only the status
-            # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
             return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
@@ -184,10 +221,7 @@ class DossierConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
-
-        # Access action parameters passed in the 'param' dictionary
 
         # Required values can be accessed directly
         ip = param['ip']
@@ -203,14 +237,17 @@ class DossierConnector(BaseConnector):
 
             # Add a dictionary that is made up of the most important values from data into the summary
             summary = action_result.update_summary({})
-            if response.get("results"):
-                if response["results"][0]["data"].get("record_count"):
-                    summary['results'] = response["results"][0]["data"]["record_count"]
-                else:
-                    summary['results'] = 0
+            try:
+                if response.get("results"):
+                    if response["results"][0]["data"].get("record_count"):
+                        summary['results'] = response["results"][0]["data"]["record_count"]
+                    else:
+                        summary['results'] = 0
+            except Exception as e:
+                err_msg = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, err_msg)
 
             # Return success, no need to set the message, only the status
-            # BaseConnector will create a textual message based off of the summary dictionary
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
             return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
@@ -249,16 +286,6 @@ class DossierConnector(BaseConnector):
 
         # get the asset config
         config = self.get_config()
-
-        """
-        # Access values in asset config by the name
-
-        # Required values can be accessed directly
-        required_config_name = config['required_config_name']
-
-        # Optional values should use the .get() function
-        optional_config_name = config.get('optional_config_name')
-        """
 
         self._base_url = config.get('base_url')
 
@@ -300,7 +327,7 @@ if __name__ == '__main__':
         try:
             login_url = DossierConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -313,11 +340,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -333,6 +360,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
