@@ -4878,7 +4878,7 @@
         {
             "action": "get file",
             "description": "Download a file from Carbon Black Response and add it to the vault",
-            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If the hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
+            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If the hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).<br>Note: For Carbon Black Response version 7.x, Get File action is failing sometimes for valid hash. The action is replicating the result of the API.",
             "type": "investigate",
             "identifier": "get_file",
             "read_only": true,

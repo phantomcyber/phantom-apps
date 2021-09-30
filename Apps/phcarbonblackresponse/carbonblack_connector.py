@@ -211,7 +211,7 @@ class CarbonblackConnector(BaseConnector):
             return (phantom.APP_SUCCESS, response if response is not None else r.text)
 
         # Look for errors
-        if r.status_code != requests.codes.ok:  # pylint: disable=E1101
+        if not r.ok:  # pylint: disable=E1101
             # return (action_result.set_status(phantom.APP_ERROR, "REST Api Call returned error, status_code: {0}, data: {1}".format(r.status_code,
             #     self._normalize_reply(r.text))), r.text)
 
