@@ -14,7 +14,7 @@
 from datetime import datetime
 import json
 from logging import getLogger
-from threatqsdk import exceptions
+from . import exceptions
 
 _logger = getLogger(__name__)
 

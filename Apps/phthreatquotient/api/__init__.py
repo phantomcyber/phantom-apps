@@ -1,5 +1,5 @@
-from indicator_parser import IndicatorParser
-from utils import Utils
+from .indicator_parser import IndicatorParser
+from .utils import Utils
 
 __all__ = [
     'IndicatorParser',

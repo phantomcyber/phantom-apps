@@ -15,7 +15,7 @@
 
 from abc import ABCMeta, abstractmethod
 import datetime
-from threatqsdk.exceptions import ActionFailedError
+from .exceptions import ActionFailedError
 import warnings
 
 

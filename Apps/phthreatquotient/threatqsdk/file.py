@@ -14,9 +14,9 @@
 import os
 import random
 
-from threatqsdk import exceptions
-from threatqsdk.bulk_object import ThreatQSource
-from threatqsdk.tqobject import ThreatQuotientObject
+from . import exceptions
+from .bulk_object import ThreatQSource
+from .tqobject import ThreatQuotientObject
 
 
 class File(ThreatQuotientObject):

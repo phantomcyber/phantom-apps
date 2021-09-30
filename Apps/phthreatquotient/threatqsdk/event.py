@@ -11,9 +11,9 @@
 # written permission is obtained from ThreatQuotient, Inc.
 ###########################################################################################################
 
-from threatqsdk import exceptions
-from threatqsdk.bulk_object import ThreatQSource
-from threatqsdk.tqobject import ThreatQuotientObject
+from . import exceptions
+from .bulk_object import ThreatQSource
+from .tqobject import ThreatQuotientObject
 
 
 class Event(ThreatQuotientObject):

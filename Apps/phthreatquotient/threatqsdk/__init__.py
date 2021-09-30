@@ -30,9 +30,9 @@ from . import source # NOQA
 from . import event # NOQA
 
 # reexport some commonly used types
-from file import File  # NOQA
-from event import Event
-from bulk_object import ThreatQObject, ThreatQSource, ThreatQAttribute
+from .file import File  # NOQA
+from .event import Event
+from .bulk_object import ThreatQObject, ThreatQSource, ThreatQAttribute
 
 __all__ = [
     # submodules

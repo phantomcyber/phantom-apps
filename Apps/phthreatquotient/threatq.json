@@ -1,7 +1,7 @@
 {
     "appid": "76740c11-1738-4220-afd3-bca9fc25d41f",
     "name": "ThreatQ",
-    "description": "Integrates a variety of ThreatQ services into Splunk SOAR",
+    "description": "Integrates a variety of ThreatQ services into Splunk SOAR.",
     "publisher": "ThreatQuotient",
     "contributors": [
       {
@@ -17,10 +17,10 @@
     "product_vendor": "ThreatQuotient",
     "product_name": "ThreatQ",
     "product_version_regex": "4.*",
-    "min_phantom_version": "4.10",
-    "python_version": "3",
+    "min_phantom_version": "4.8.0",
     "logo": "assets/tq-light-bg.png",
     "logo_dark": "assets/tq-dark-bg.png",
+    "python_version": "3",
     "configuration": {
         "tq_server": {
             "description": "Server IP/Hostname",
@@ -55,7 +55,7 @@
     },
     "actions": [{
         "action": "test connectivity",
-        "description": "Validate the asset configuration for connectivity",
+        "description": "Validate the asset configuration for connectivity.",
         "type": "test",
         "identifier": "test_asset_connectivity",
         "read_only": true,
@@ -240,8 +240,7 @@
                 "description": "A comma-separated or line-separated list adversary names",
                 "data_type": "string",
                 "primary": true,
-                "required": true,
-                "order": 0
+                "required": true
             }
         },
         "render": {
@@ -428,47 +427,47 @@
         "read_only": true,
         "parameters": {
             "task_prefix": {
-                "description": "Prefix for the task name",
+                "description": "prefix for the task name",
                 "data_type": "string",
                 "required": false,
                 "default": "Investigate Event",
                 "order": 0
             },
             "task_name": {
-                "description": "Task name",
+                "description": "task name",
                 "data_type": "string",
                 "primary": true,
                 "required": true,
                 "order": 1
             },
             "assigned_to": {
-                "description": "Threatq user to assign the task to",
+                "description": "threatq user to assign the task to",
                 "data_type": "string",
                 "required": false,
                 "order": 2
             },
             "task_status": {
-                "description": "Task status in threatq",
+                "description": "task status in threatq",
                 "data_type": "string",
                 "required": true,
                 "value_list": ["To Do", "In Progress", "Review", "Done"],
                 "order": 3
             },
             "task_priority": {
-                "description": "Task priority in threatq",
+                "description": "task priority in threatq",
                 "data_type": "string",
                 "required": true,
                 "value_list": ["Low", "Medium", "High"],
                 "order": 4
             },
             "task_description": {
-                "description": "Task description in threatq",
+                "description": "task description in threatq",
                 "data_type": "string",
                 "required": false,
                 "order": 5
             },
             "indicator_list": {
-                "description": "List of indicator values (use format node)",
+                "description": "list of indicator values (use format node)",
                 "data_type": "string",
                 "required": false,
                 "order": 6
