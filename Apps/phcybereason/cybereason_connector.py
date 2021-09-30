@@ -771,6 +771,94 @@ class CybereasonConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
+    def _handle_upgrade_sensor(self, param):
+        self.save_progress("In _handle_upgrade_sensor function")
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Get the parameters
+        sensorid = self._get_string_param(param.get('sensorid'))
+
+        try:
+            # Create a session to call the rest APIs
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/sensors/action/upgrade".format(self._base_url)
+            self.save_progress(url)
+            sensor_id_arr = []
+            # Look for the multiple sensor ids
+            if "," in sensorid:
+                filter_arr = sensorid.strip().split(",")
+                sensor_id_arr.extend(filter_arr)
+            else:
+                sensor_id_arr.append(sensorid)
+            query = json.dumps({"sensorsIds": sensor_id_arr})
+
+            res = cr_session.post(url, data=query, headers=self._headers)
+            if res.status_code == 204:
+                return action_result.set_status(phantom.APP_ERROR, "Status Code:204. The sensor names are incorrect or the filters are not valid")
+            if res.status_code < 200 or res.status_code >= 399:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
+            self.save_progress("Sensors Upgrade Requested")
+            json_res = res.json()
+            action_result.update_summary(json_res)
+            # Data will typically be the raw JSON if we need to use it in a playbook
+            action_result.add_data(json_res)
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
+
+        return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Requested Upgrade")
+
+    def _handle_restart_sensor(self, param):
+        self.save_progress("In _handle_restart_sensor function")
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Get the parameters
+        sensorid = self._get_string_param(param.get('sensorid'))
+
+        try:
+            # Create a session to call the rest APIs
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/sensors/action/restart".format(self._base_url)
+            self.save_progress(url)
+
+            sensor_id_arr = []
+            if "," in sensorid:
+                filter_arr = sensorid.strip().split(",")
+                sensor_id_arr.extend(filter_arr)
+            else:
+                sensor_id_arr.append(sensorid)
+            query = json.dumps({"sensorsIds": sensor_id_arr})
+
+            res = cr_session.post(url, data=query, headers=self._headers)
+            if res.status_code == 204:
+                return action_result.set_status(phantom.APP_ERROR, "Status Code:204. The sensor names are incorrect or the filters are not valid")
+            if res.status_code < 200 or res.status_code >= 399:
+                self._process_response(res, action_result)
+                return action_result.get_status()
+
+            json_res = res.json()
+            self.save_progress("Sensors Restart Requested")
+            action_result.update_summary(json_res)
+            # Data will typically be the raw JSON if we need to use it in a playbook
+            action_result.add_data(json_res)
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
+
+        return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Executed a sensor Restart")
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -818,6 +906,12 @@ class CybereasonConnector(BaseConnector):
 
         elif action_id == 'set_reputation':
             ret_val = self._handle_set_reputation(param)
+
+        elif action_id == 'upgrade_sensor':
+            ret_val == self._handle_upgrade_sensor(param)
+
+        elif action_id == 'restart_sensor':
+            ret_val = self._handle_restart_sensor(param)
 
         elif action_id == 'query_processes':
             query_action = CybereasonQueryActions()

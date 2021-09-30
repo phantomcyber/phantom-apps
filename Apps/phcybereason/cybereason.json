@@ -1758,6 +1758,128 @@
                 "type": "table"
             },
             "versions": "EQ(*)"
+        },
+        {
+            "action": "upgrade sensor",
+            "description": "Upgrade a sensor",
+            "verbose": "Upgrade a sensor using the sensor id provided as an input",
+            "type": "generic",
+            "identifier": "upgrade_sensor",
+            "read_only": false,
+            "parameters": {
+                "sensorid": {
+                    "contains": [
+                        "cybereason sensor id"
+                    ],
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The sensor ID targeted for upgrade",
+                    "required": true,
+                    "primary": true,
+                    "default": "",
+                    "value_list": []
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.sensorid",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason sensor id"
+                    ],
+                    "column_name": "sensorid",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 4
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "restart sensor",
+            "description": "Restart a sensor",
+            "verbose": "Restart a sensor using the sensor id provided as an input",
+            "type": "generic",
+            "identifier": "restart_sensor",
+            "read_only": false,
+            "parameters": {
+                "sensorid": {
+                    "contains": [
+                        "cybereason sensor id"
+                    ],
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The sensor ID targeted for restart",
+                    "required": true,
+                    "primary": true,
+                    "default": "",
+                    "value_list": []
+                }
+            },
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.sensorid",
+                    "data_type": "string",
+                    "contains": [
+                        "cybereason sensor id"
+                    ],
+                    "column_name": "sensorid",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string",
+                    "column_name": "Data",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "column_name": "Summary",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message",
+                    "column_order": 4
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ]
 }
