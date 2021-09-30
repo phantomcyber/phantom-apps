@@ -1774,7 +1774,63 @@
                 "height": 5,
                 "title": "Update Alert"
             },
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Result: success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.result",
+                    "data_type": "string",
+                    "column_name": "Result",
+                    "column_order": 2,
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "Resolved"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.unique_id",
+                    "data_type": "string",
+                    "column_name": "Unique ID",
+                    "column_order": 0,
+                    "example_values": [
+                        "a031cb9f-ad48-4391-9d09-eeb5def57484"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
