@@ -1738,11 +1738,51 @@
             "versions": "EQ(*)"
         },
         {
-            "action": "update alerts",
+            "action": "update alert",
+            "description": "Update the status of a single alert",
+            "verbose": "Allows for the update of the status of a single alert by unique_id.",
+            "type": "generic",
+            "identifier": "update_alert",
+            "read_only": false,
+            "parameters": {
+                "unique_id": {
+                    "description": "Unique ID of alert",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "carbon black alert id"
+                    ],
+                    "required": true
+                },
+                "status": {
+                    "description": "Status of the alert",
+                    "data_type": "string",
+                    "value_list": [
+                        "Resolved",
+                        "Unresolved",
+                        "In Progress",
+                        "False Positive"
+                    ],
+                    "order": 1,
+                    "required": true
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Update Alert"
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "bulk update",
             "description": "Alert update and resolution",
             "verbose": "Allows for update of one or more alerts by alert id(s) or by query.",
             "type": "generic",
-            "identifier": "update_alerts",
+            "identifier": "bulk_update",
             "read_only": false,
             "parameters": {
                 "query": {
@@ -1820,6 +1860,7 @@
                     "order": 1,
                     "required": true,
                     "value_list": [
+                        "alert",
                         "binary",
                         "process"
                     ],

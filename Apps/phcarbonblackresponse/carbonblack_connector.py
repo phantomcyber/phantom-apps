@@ -37,10 +37,12 @@ import datetime
 class CarbonblackConnector(BaseConnector):
 
     # The actions supported by this connector
+    ACTION_ID_TEST_CONNECTIVITY = "test_connectivity"
     ACTION_ID_HUNT_FILE = "hunt_file"
     ACTION_ID_CREATE_ALERT = "create_alert"
     ACTION_ID_LIST_ALERTS = "list_alerts"
-    ACTION_ID_UPDATE_ALERTS = "update_alerts"
+    ACTION_ID_UPDATE_ALERT = "update_alert"
+    ACTION_ID_BULK_UPDATE = "bulk_update"
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_QUARANTINE_DEVICE = "quarantine_device"
@@ -1611,17 +1613,59 @@ class CarbonblackConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_DISPLAYING_RESULTS_TOTAL.format(
                 displaying=len(search_results.get('results', [])), query_type=query_type, total=search_results.get('total_results', 'Unknown')))
 
-    def _update_alerts(self, param):
+    def _update_alert(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
 
-        data = {}
+        unique_id = param['unique_id']
+        status = param['status']
+
+        request_data = {
+            "unique_id": unique_id,
+            "status": status
+        }
+
+        ret_val, results = self._make_rest_call("/v1/alert/{}".format(unique_id), action_result, method="post", data=request_data)
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.update_summary(results)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _bulk_update(self, param):
+
+        action_result = self.add_action_result(ActionResult(param))
+
+        request_data = {}
 
         query = param.get('query')
-        alert_ids = param.get('alert_ids').split()
+        if query:
+            if "cb.urlver=1&" not in query:
+                query = "cb.urlver=1&" + query
+
+            if "q=" not in query:
+                query = "q=" + query
+
+            request_data['query'] = query
+
+        alert_ids = param.get('alert_ids')
+        if alert_ids:
+            alert_ids = alert_ids.split(',')
+            request_data['alert_ids'] = alert_ids
+
         requested_status = param.get('requested_status')
+        if requested_status:
+            request_data['requested_status'] = requested_status
+
         set_ignored = param.get('set_ignored')
+        if set_ignored:
+            request_data['set_ignored'] = set_ignored
+
         assigned_to = param.get('assigned_to')
+        if assigned_to:
+            request_data['assigned_to'] = assigned_to
 
         # query or alert_ids are required, but not both
         if (not query and not alert_ids) or (query and alert_ids):
@@ -1631,15 +1675,7 @@ class CarbonblackConnector(BaseConnector):
         if assigned_to and not requested_status:
             return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_ASSIGNED_TO)
 
-        data = {
-                'query': query,
-                'alert_ids': alert_ids,
-                'requested_status': requested_status,
-                'set_ignored': set_ignored,
-                'assigned_to': assigned_to
-        }
-
-        ret_val, alert = self._make_rest_call("/v1/alerts", action_result, method="post", data=data)
+        ret_val, alert = self._make_rest_call("/v1/alerts", action_result, method="post", data=request_data)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
@@ -2082,69 +2118,46 @@ class CarbonblackConnector(BaseConnector):
 
     def handle_action(self, param):
 
-        result = None
+        # Get the action that we are supposed to execute for this app run
+        self.debug_print("action_id", self.get_action_identifier())
+
+        action_mapping = {
+            self.ACTION_ID_TEST_CONNECTIVITY: self._test_connectivity,
+            self.ACTION_ID_HUNT_FILE: self._hunt_file,
+            self.ACTION_ID_LIST_ALERTS: self._list_alerts,
+            self.ACTION_ID_LIST_ENDPOINTS: self._list_endpoints,
+            self.ACTION_ID_CREATE_ALERT: self._create_alert,
+            self.ACTION_ID_UPDATE_ALERT: self._update_alert,
+            self.ACTION_ID_BULK_UPDATE: self._bulk_update,
+            self.ACTION_ID_RUN_QUERY: self._run_query,
+            self.ACTION_ID_QUARANTINE_DEVICE: self._quarantine_device,
+            self.ACTION_ID_UNQUARANTINE_DEVICE: self._unquarantine_device,
+            self.ACTION_ID_SYNC_EVENTS: self._sync_events,
+            self.ACTION_ID_GET_SYSTEM_INFO: self._get_system_info,
+            self.ACTION_ID_LIST_PROCESSES: self._list_processes,
+            self.ACTION_ID_TERMINATE_PROCESS: self._terminate_process,
+            self.ACTION_ID_GET_FILE: self._get_file,
+            self.ACTION_ID_GET_FILE_INFO: self._get_file_info,
+            self.ACTION_ID_BLOCK_HASH: self._block_hash,
+            self.ACTION_ID_UNBLOCK_HASH: self._unblock_hash,
+            self.ACTION_ID_LIST_CONNECTIONS: self._list_connections,
+            self.ACTION_ID_GET_LICENSE: self._get_license,
+            self.ACTION_ID_ON_POLL: self._on_poll,
+            self.ACTION_ID_PUT_FILE: self._put_file,
+            self.ACTION_ID_RUN_COMMAND: self._run_command,
+            self.ACTION_ID_EXECUTE_PROGRAM: self._execute_program,
+            self.ACTION_ID_RESET_SESSION: self._reset_session,
+            self.ACTION_ID_MEMORY_DUMP: self._memory_dump
+        }
+
         action = self.get_action_identifier()
+        action_execution_status = phantom.APP_SUCCESS
 
-        # test connectivity is handled differently
-        if (action != phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
-            action_result = ActionResult(param)
-            # validate the version, this internally makes all the rest calls to validate the config also
-            if (phantom.is_fail(self._validate_version(action_result))):
-                self.add_action_result(action_result)
-                return action_result.get_status()
+        if action in action_mapping.keys():
+            action_function = action_mapping[action]
+            action_execution_status = action_function(param)
 
-        if (action == self.ACTION_ID_HUNT_FILE):
-            result = self._hunt_file(param)
-        elif (action == self.ACTION_ID_LIST_ALERTS):
-            result = self._list_alerts(param)
-        elif (action == self.ACTION_ID_LIST_ENDPOINTS):
-            result = self._list_endpoints(param)
-        elif (action == self.ACTION_ID_CREATE_ALERT):
-            result = self._create_alert(param)
-        elif (action == self.ACTION_ID_UPDATE_ALERTS):
-            result = self._update_alerts(param)
-        elif (action == self.ACTION_ID_RUN_QUERY):
-            result = self._run_query(param)
-        elif (action == self.ACTION_ID_QUARANTINE_DEVICE):
-            result = self._quarantine_device(param)
-        elif (action == self.ACTION_ID_UNQUARANTINE_DEVICE):
-            result = self._unquarantine_device(param)
-        elif (action == self.ACTION_ID_SYNC_EVENTS):
-            result = self._sync_events(param)
-        elif (action == self.ACTION_ID_GET_SYSTEM_INFO):
-            result = self._get_system_info(param)
-        elif (action == self.ACTION_ID_LIST_PROCESSES):
-            result = self._list_processes(param)
-        elif (action == self.ACTION_ID_TERMINATE_PROCESS):
-            result = self._terminate_process(param)
-        elif (action == self.ACTION_ID_GET_FILE):
-            result = self._get_file(param)
-        elif (action == self.ACTION_ID_GET_FILE_INFO):
-            result = self._get_file_info(param)
-        elif (action == self.ACTION_ID_BLOCK_HASH):
-            result = self._block_hash(param)
-        elif (action == self.ACTION_ID_UNBLOCK_HASH):
-            result = self._unblock_hash(param)
-        elif (action == self.ACTION_ID_LIST_CONNECTIONS):
-            result = self._list_connections(param)
-        elif (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
-            result = self._test_connectivity(param)
-        elif (action == self.ACTION_ID_GET_LICENSE):
-            result = self._get_license(param)
-        elif (action == self.ACTION_ID_ON_POLL):
-            result = self._on_poll(param)
-        elif (action == self.ACTION_ID_PUT_FILE):
-            result = self._put_file(param)
-        elif (action == self.ACTION_ID_RUN_COMMAND):
-            result = self._run_command(param)
-        elif (action == self.ACTION_ID_EXECUTE_PROGRAM):
-            result = self._execute_program(param)
-        elif (action == self.ACTION_ID_RESET_SESSION):
-            result = self._reset_session(param)
-        elif (action == self.ACTION_ID_MEMORY_DUMP):
-            result = self._memory_dump(param)
-
-        return result
+        return action_execution_status
 
 
 if __name__ == '__main__':
