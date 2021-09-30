@@ -7228,9 +7228,7 @@
                     ],
                     "contains": [
                         "defender atp event id"
-                    ],
-                    "column_name": "Event ID",
-                    "column_order": 0
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -7258,18 +7256,14 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ],
-                    "column_name": "Exit Code",
-                    "column_order": 3
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.script_name",
                     "data_type": "string",
                     "example_values": [
                         "script4.ps1"
-                    ],
-                    "column_name": "Script Name",
-                    "column_order": 2
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.script_errors",
@@ -7280,13 +7274,15 @@
                     "data_type": "string",
                     "example_values": [
                         "Transcript started, output file is C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\Temp\\PSScriptOutputs\\PSScript_Transcript_{66D7B239-34C7-43EF-BB6D-2F6D4C03086E}.txt x is smaller than y"
-                    ],
-                    "column_name": "Script Output",
-                    "column_order": 1
+                    ]
                 }
             ],
             "render": {
-                "type": "table"
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "windowsdefenderatp_view.run_script",
+                "title": "Run Script"
             },
             "versions": "EQ(*)"
         },
