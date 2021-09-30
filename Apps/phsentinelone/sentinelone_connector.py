@@ -634,6 +634,7 @@ class SentineloneConnector(BaseConnector):
             header["Authorization"] = "APIToken %s" % self.token
             params = {"ids": [ret_val]}
             ret_val, response = self._make_rest_call('/web/api/v2.1/agents', action_result, headers=header, params=params)
+            action_result.add_data(response)
             self.save_progress("Ret_val: {0}".format(ret_val))
             if phantom.is_fail(ret_val):
                 self.save_progress("Failed to get the endpoint information.  Error: {0}".format(action_result.get_message()))
@@ -650,6 +651,7 @@ class SentineloneConnector(BaseConnector):
         header["Authorization"] = "APIToken %s" % self.token
         params = {"ids": [s1_threat_id]}
         ret_val, response = self._make_rest_call('/web/api/v2.1/threats', action_result, headers=header, params=params)
+        action_result.add_data(response)
         self.save_progress("Ret_val: {0}".format(ret_val))
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -707,7 +709,7 @@ class SentineloneConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip_hostname = param['ip_hostname']
         try:
-            ret_val = self._get_site_id(action_result)
+            ret_val = self._get_agent_id(ip_hostname, action_result)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         self.save_progress('Agent query: {}'.format(ret_val))
@@ -718,10 +720,10 @@ class SentineloneConnector(BaseConnector):
         else:
             summary = action_result.update_summary({})
             summary['ip_hostname'] = ip_hostname
-            summary['site_id'] = ret_val
+            summary['agent_id'] = ret_val
             header = self.HEADER
             header["Authorization"] = "APIToken %s" % self.token
-            params = {"siteIds": ret_val}
+            params = {"agentIds": ret_val}
             ret_val, response = self._make_rest_call('/web/api/v2.1/device-control/events', action_result, headers=header, params=params)
             action_result.add_data(response)
             self.save_progress("Ret_val: {0}".format(ret_val))
@@ -778,7 +780,6 @@ class SentineloneConnector(BaseConnector):
             return str(-1)
         endpoints_found = len(response['data'])
         self.save_progress("Endpoints found: {}".format(str(endpoints_found)))
-        action_result.add_data(response)
         if endpoints_found == 0:
             return '0'
         elif endpoints_found > 1:
