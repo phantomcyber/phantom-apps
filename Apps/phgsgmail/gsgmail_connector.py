@@ -14,7 +14,6 @@ import phantom.utils as ph_utils
 from gsgmail_consts import *
 from bs4 import UnicodeDammit
 
-
 # Fix to add __init__.py in dependencies folder
 import os
 import requests
@@ -55,6 +54,8 @@ class GSuiteConnector(BaseConnector):
         self._key_dict = None
         self._domain = None
         self._state = {}
+        self._python_version = None
+        self._login_email = None
 
         # Call the BaseConnectors init first
         super(GSuiteConnector, self).__init__()
@@ -102,7 +103,7 @@ class GSuiteConnector(BaseConnector):
 
         self._login_email = config['login_email']
 
-        if (not ph_utils.is_email(self._login_email)):
+        if not ph_utils.is_email(self._login_email):
             return self.set_status(phantom.APP_ERROR, "Asset config 'login_email' failed validation")
 
         try:
@@ -188,28 +189,17 @@ class GSuiteConnector(BaseConnector):
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
     def _get_email_details(self, action_result, email_addr, email_id, service, results_format='metadata'):
-
-        """
-        import web_pdb
-        web_pdb.set_trace()
-        """
-
         kwargs = {'userId': email_addr, 'id': email_id, 'format': results_format}
 
         try:
             email_details = service.users().messages().get(**kwargs).execute()
         except Exception as e:
             return RetVal2(action_result.set_status(phantom.APP_ERROR, GSGMAIL_EMAIL_FETCH_FAILURE,
-                self._get_error_message_from_exception(e)))
+                                                    self._get_error_message_from_exception(e)))
 
         return RetVal2(phantom.APP_SUCCESS, email_details)
 
     def _map_email_details(self, input_email):
-
-        """
-        import web_pdb
-        web_pdb.set_trace()
-        """
 
         # The dictionary of header values
         header_dict = dict()
@@ -220,21 +210,20 @@ class GSuiteConnector(BaseConnector):
         # get the payload
         email_headers = input_email.pop('payload', {}).get('headers')
 
-        if (not email_headers):
+        if not email_headers:
             return input_email
 
         for x in email_headers:
-
-            if (not headers_to_parse):
+            if not headers_to_parse:
                 break
 
             header_name = x.get('name')
             header_value = x.get('value', '')
 
-            if (not header_name):
+            if not header_name:
                 continue
 
-            if (header_name.lower() not in headers_to_parse):
+            if header_name.lower() not in headers_to_parse:
                 continue
 
             key_name = header_name.lower().replace('-', '_')
@@ -244,19 +233,11 @@ class GSuiteConnector(BaseConnector):
 
         input_email.update(header_dict)
 
-        return (phantom.APP_SUCCESS, input_email)
+        return phantom.APP_SUCCESS, input_email
 
-    def _get_email_headers_from_part(self, part, charset=None):
+    def _get_email_headers_from_part(self, part):
 
         email_headers = list(part.items())
-
-        # TODO: the next 2 ifs can be condensed to use 'or'
-        if charset is None:
-            charset = part.get_content_charset()
-
-        if charset is None:
-            charset = 'utf8'
-
         if not email_headers:
             return {}
 
@@ -358,7 +339,7 @@ class GSuiteConnector(BaseConnector):
 
         ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", user_email)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # create the query string
@@ -372,11 +353,11 @@ class GSuiteConnector(BaseConnector):
 
         query_string = ' '.join('{}:{}'.format(key, value) for key, value in query_dict.items() if value is not None)
 
-        if ('body' in param):
+        if 'body' in param:
             query_string += " {0}".format(self._handle_py_ver_compat_for_input_str(param.get('body')))
 
         # if query is present, then override everything
-        if ('query' in param):
+        if 'query' in param:
             query_string = self._handle_py_ver_compat_for_input_str(param.get('query'))
 
         """
@@ -389,10 +370,10 @@ class GSuiteConnector(BaseConnector):
         if max_results is None:
             return action_result.get_status()
 
-        kwargs = { 'maxResults': max_results, 'userId': user_email, 'q': query_string }
+        kwargs = {'maxResults': max_results, 'userId': user_email, 'q': query_string}
 
         page_token = self._handle_py_ver_compat_for_input_str(param.get('page_token'))
-        if (page_token):
+        if page_token:
             kwargs.update({'pageToken': page_token})
 
         try:
@@ -410,17 +391,17 @@ class GSuiteConnector(BaseConnector):
 
             ret_val, email_details_resp = self._get_email_details(curr_email_ar, user_email, curr_message['id'], service)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 continue
 
             ret_val, email_details_resp = self._map_email_details(email_details_resp)
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 continue
 
             action_result.add_data(email_details_resp)
 
-        if (next_page):
+        if next_page:
             summary['next_page_token'] = next_page
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -437,7 +418,7 @@ class GSuiteConnector(BaseConnector):
         self.save_progress("Creating GMail service object")
         ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", user_email)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         query_string = ""
@@ -460,7 +441,7 @@ class GSuiteConnector(BaseConnector):
 
             ret_val, email_details_resp = self._get_email_details(curr_email_ar, user_email, curr_message['id'], service, 'raw')
 
-            if (phantom.is_fail(ret_val)):
+            if phantom.is_fail(ret_val):
                 continue
 
             raw_encoded = base64.urlsafe_b64decode(email_details_resp.pop('raw').encode('UTF8'))
@@ -506,7 +487,7 @@ class GSuiteConnector(BaseConnector):
 
         ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", user_email)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         email_ids = [x.strip() for x in param['id'].split(',')]
@@ -545,7 +526,7 @@ class GSuiteConnector(BaseConnector):
                 "All the provided emails were already deleted, Ignored Ids : {}".format(summary['ignored_ids'])
             )
 
-        kwargs = { 'body': { 'ids': email_ids }, 'userId': user_email }
+        kwargs = {'body': {'ids': email_ids}, 'userId': user_email}
 
         try:
             service.users().messages().batchDelete(**kwargs).execute()
@@ -578,7 +559,7 @@ class GSuiteConnector(BaseConnector):
 
         ret_val, service = self._create_service(action_result, scopes, "admin", "directory_v1", self._login_email)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self.save_progress("Getting list of users for domain: {0}".format(self._domain))
@@ -590,7 +571,7 @@ class GSuiteConnector(BaseConnector):
         kwargs = {'domain': self._domain, 'maxResults': max_users, 'orderBy': 'email', 'sortOrder': 'ASCENDING'}
 
         page_token = self._handle_py_ver_compat_for_input_str(param.get('page_token'))
-        if (page_token):
+        if page_token:
             kwargs.update({'pageToken': page_token})
 
         try:
@@ -608,7 +589,7 @@ class GSuiteConnector(BaseConnector):
         for curr_user in users:
             action_result.add_data(curr_user)
 
-        if (next_page):
+        if next_page:
             summary['next_page_token'] = next_page
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -629,7 +610,7 @@ class GSuiteConnector(BaseConnector):
         self.save_progress("Creating AdminSDK service object")
         ret_val, service = self._create_service(action_result, scopes, "admin", "directory_v1", self._login_email)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
             return action_result.get_status()
 
@@ -645,7 +626,8 @@ class GSuiteConnector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_email_ids_to_process(self, service, action_result, max_results, user_id='me', labels=[], include_spam_trash=False, q=None, include_sent=False, use_ingest_limit=False):
+    def _get_email_ids_to_process(self, service, action_result, max_results, user_id='me', labels=[], include_spam_trash=False, q=None, include_sent=False,
+                                  use_ingest_limit=False):
 
         kwargs = {
             'userId': user_id,
@@ -858,9 +840,9 @@ if __name__ == '__main__':
     password = args.password
 
     if (username is not None and password is None):
-
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
     if (username and password):
