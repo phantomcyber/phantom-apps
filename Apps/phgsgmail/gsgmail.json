@@ -111,7 +111,6 @@
         "label": {
             "description": "Mailbox Label (folder) to be polled",
             "data_type": "string",
-            "required": false,
             "value_list": [],
             "default": "",
             "order": 2
@@ -146,42 +145,36 @@
         "extract_attachments": {
             "description": "Extract Attachments",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 6
         },
         "extract_urls": {
             "description": "Extract URLs",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 7
         },
         "extract_ips": {
             "description": "Extract IPs",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 8
         },
         "extract_domains": {
             "description": "Extract Domain Names",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 9
         },
         "extract_hashes": {
             "description": "Extract Hashes",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 10
         },
         "extract_email_attachments": {
             "description": "Extract Email Attachments",
             "data_type": "boolean",
-            "required": false,
             "default": false,
             "order": 11
         }
