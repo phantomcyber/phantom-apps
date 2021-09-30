@@ -438,6 +438,9 @@ class CybereasonConnector(BaseConnector):
 
         machine_name_or_ip = self._get_string_param(param.get('machine_name_or_ip'))
         ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
+        action_result.add_data({
+                    "sensor_ids": sensor_ids
+                })
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -682,12 +685,15 @@ class CybereasonConnector(BaseConnector):
         try:
             ret_val, sensors_by_name = self._get_sensor_by_machine_name(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_name) == 0):
-                sensor_ids.append(sensors_by_name)
+                sensor_ids.extend(sensors_by_name)
 
             ret_val, sensors_by_ip = self._get_sensor_by_machine_ip(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_ip) == 0):
-                sensor_ids.append(sensors_by_ip)
-
+                sensor_ids.extend(sensors_by_ip)
+            action_result.add_data({
+                "sensor_ids_by_machine_ip": sensors_by_ip,
+                "sensor_ids_by_machine_name": sensors_by_name
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(err)
@@ -716,15 +722,21 @@ class CybereasonConnector(BaseConnector):
             self.save_progress("Calling {} with query {}".format(url, str(query_path)))
             res = cr_session.post(url, json=query_path, headers=self._headers)
 
+            action_result.add_data({
+                "debug_response": res.json()
+            })
             if res.status_code < 200 or res.status_code >= 399:
                 return self._process_response(res, action_result)
 
             self.save_progress("Got result from {}".format(url))
             totalResults = res.json()["totalResults"]
             if totalResults > 0:
-                machines_dict = res.json()["sensors"]
-                for _, machine_details in machines_dict.items():
-                    sensor_ids.append(str(machine_details['pylumId']))
+                sensors = res.json()["sensors"]
+                for sensor in sensors:
+                    sensor_ids.append(sensor['pylumId'])
+                action_result.add_data({
+                    "debug_sensors": sensors
+                })
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -760,9 +772,9 @@ class CybereasonConnector(BaseConnector):
             self.save_progress("Got result from {}".format(url))
             totalResults = res.json()["totalResults"]
             if totalResults > 0:
-                machines_dict = res.json()["sensors"]
-                for _, machine_details in machines_dict.items():
-                    sensor_ids.append(str(machine_details['pylumId']))
+                sensors = res.json()["sensors"]
+                for sensor in sensors:
+                    sensor_ids.append(sensor['pylumId'])
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
