@@ -646,6 +646,8 @@ class ThreatQConnector(BaseConnector):
         # Convert input to a list
         items = self.get_value_list(values)
 
+        # Create action result
+        action_result = ActionResult(dict(params))
         self.save_progress("Creating [{}] adversaries in ThreatQ".format(len(items)))
 
         # Build new source with TLP
@@ -662,8 +664,7 @@ class ThreatQConnector(BaseConnector):
         uploaded = [ind for ind in objects if ind.oid]
         msg = "Successfully uploaded [{}] adversaries".format(len(uploaded))
 
-        # Create action result
-        action_result = ActionResult(dict(params))
+        # Update action result
         action_result.update_summary({"total": len(uploaded)})
 
         # Save progress
