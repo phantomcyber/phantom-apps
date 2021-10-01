@@ -866,7 +866,7 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Executed a sensor Restart")
 
-      def _get_machine_name_by_machine_ip(self, machine_ip, action_result):
+    def _get_machine_name_by_machine_ip(self, machine_ip, action_result):
         machine_names = []
         try:
             cr_session = CybereasonSession(self).get_session()
