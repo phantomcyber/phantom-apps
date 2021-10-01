@@ -638,7 +638,7 @@ class ThreatQConnector(BaseConnector):
 
         # Create action result
         action_result = ActionResult(dict(params))
-        
+
         # Get container info
         _, container_info, _ = self.get_container_info()
         tlp = container_info.get('sensitivity')
