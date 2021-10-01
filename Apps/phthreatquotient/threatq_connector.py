@@ -92,7 +92,7 @@ class ThreatQConnector(BaseConnector):
             Threatq(host, auth_data, verify=verify, private=oauth)
             return self.set_status_save_progress(phantom.APP_SUCCESS, SUCC_CONNECTIVITY_TEST)
         except Exception as e:
-            msg = '{} -- {}'.format(e.message, traceback.format_exc())
+            msg = '{} -- {}'.format(str(e), traceback.format_exc())
             return self.set_status_save_progress(phantom.APP_ERROR, ERR_CONNECTIVITY_TEST, msg)
 
     def query_indicators(self, params):

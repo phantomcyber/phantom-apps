@@ -13,7 +13,6 @@ This section will describe how you can install the app into your Phantom instanc
 
 **WARNING**: This release (v2.x) has fundamentally changed how the App operates! 
 If you are upgrading from v1.x, please refer to the `App Instructions -> Upgrading from 1.x to 2.x` section!
-Splunk SOAR App works just on python 2
 
 1. Download the Splunk SOAR App (tar.gz) for ThreatQ via any of these methods:
     - Marketplace
