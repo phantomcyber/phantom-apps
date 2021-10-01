@@ -2188,25 +2188,12 @@
                     "required": true,
                     "order": 0
                 },
-                "os_type": {
-                    "description": "OS Type",
-                    "data_type": "string",
-                    "required": true,
-                    "value_list": [
-                        "windows_legacy",
-                        "macos",
-                        "linux",
-                        "windows"
-                    ],
-                    "default": "windows",
-                    "order": 1
-                },
                 "description":{
                     "description": "Description",
                     "data_type": "string",
                     "required": true,
                     "default": "Added via Phantom",
-                    "order": 2
+                    "order": 1
                 },
                 "type":{
                     "description": "Type of the remote host",
@@ -2218,13 +2205,13 @@
                         "cidr"
                     ],
                     "default": "fqdn",
-                    "order": 3
+                    "order": 2
                 },
                 "value":{
                     "description": "Value of the remote host",
                     "data_type": "string",
                     "required": true,
-                    "order": 4
+                    "order": 3
                 }
             },
             "output": [
@@ -2235,28 +2222,22 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.os_type",
-                    "data_type": "string",
-                    "column_name": "OS Type",
-                    "column_order": 2
-                },
-                {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
                     "column_name": "Description",
-                    "column_order": 3
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.type",
                     "data_type": "string",
                     "column_name": "Type of remote host",
-                    "column_order": 4
+                    "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.value",
                     "data_type": "string",
                     "column_name": "Value of remote host",
-                    "column_order": 5
+                    "column_order": 4
                 },
                 {
                     "data_path": "action_result.data",

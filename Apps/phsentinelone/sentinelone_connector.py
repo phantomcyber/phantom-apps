@@ -760,7 +760,6 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         rule_name = param['rule_name']
-        os_type = param["os_type"]
         description = param["description"]
         type = param["type"]
         value = param["value"]
@@ -768,48 +767,47 @@ class SentineloneConnector(BaseConnector):
             site_ids = self._get_site_id(action_result)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
-        if site_ids:
-            for site_id in site_ids:
-                self.save_progress('Agent query: {}'.format(site_id))
-                summary = action_result.update_summary({})
-                summary['rule_name'] = rule_name
-                summary['os_type'] = os_type
-                summary["description"] = description
-                summary["type"] = type
-                summary["value"] = value
-                summary['site_id'] = site_ids
-                header = self.HEADER
-                header["Authorization"] = "APIToken %s" % self.token
-                try:
-                    body = {
-                        "data": {
-                                    "name": rule_name,
-                                    "status": "Enabled",
-                                    "action": "Block",
-                                    "osType": os_type,
-                                    "description": description,
-                                    "remoteHosts": [
-                                        {
-                                            "type": type,
-                                            "values": [value]
-                                        }
-                                    ]
-                                },
-                        "filter": {
-                                    "siteIds": [site_id],
-                                    "tenant": "true"
-                                  }
-                            }
-                    ret_val, response = self._make_rest_call('/web/api/v2.1/firewall-control', action_result, headers=header, method='post', data=json.dumps(body))
-                    action_result.add_data(response)
-                    if phantom.is_fail(ret_val):
-                        return action_result.get_status()
-                    if response.get('data', {}).get('data') == 0:
-                        return action_result.set_status(phantom.APP_ERROR, "Firewall rule already exists.")
-                except Exception:
-                    return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
-        else:
-            action_result.set_status(phantom.APP_ERROR, "Site ID not found")
+
+        self.save_progress('Agent query: {}'.format(site_ids))
+        summary = action_result.update_summary({})
+        summary['rule_name'] = rule_name
+        summary["description"] = description
+        summary["type"] = type
+        summary["value"] = value
+        summary['site_ids'] = site_ids
+        header = self.HEADER
+        header["Authorization"] = "APIToken %s" % self.token
+        try:
+            body = {
+                "data": {
+                            "name": rule_name,
+                            "status": "Enabled",
+                            "action": "Block",
+                            "osTypes": [
+                                        "windows_legacy",
+                                        "macos",
+                                        "linux",
+                                        "windows"
+                                       ],
+                            "description": description,
+                            "remoteHosts": [
+                                {
+                                    "type": type,
+                                    "values": [value]
+                                }
+                            ]
+                        },
+                "filter": {
+                            "siteIds": site_ids,
+                            "tenant": "true"
+                          }
+                    }
+            ret_val, response = self._make_rest_call('/web/api/v2.1/firewall-control', action_result, headers=header, method='post', data=json.dumps(body))
+            action_result.add_data(response)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Did not get proper response from the server")
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully created firewall rule")
 
     def _get_agent_id(self, search_text, action_result):
