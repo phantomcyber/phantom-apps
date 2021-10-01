@@ -1854,18 +1854,18 @@
         {
             "action": "upgrade sensor",
             "description": "Upgrade a sensor",
-            "verbose": "Upgrade a sensor using the sensor id provided as an input",
+            "verbose": "Upgrade a sensor using the Cybereason sensor pylum id provided as an input",
             "type": "generic",
             "identifier": "upgrade_sensor",
             "read_only": false,
             "parameters": {
-                "sensorid": {
+                "pylumid": {
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason sensor pylum id"
                     ],
                     "data_type": "string",
                     "order": 0,
-                    "description": "The sensor ID targeted for upgrade",
+                    "description": "The Cybereason sensor pylum ID targeted for upgrade",
                     "required": true,
                     "primary": true,
                     "default": "",
@@ -1877,12 +1877,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.sensorid",
+                    "data_path": "action_result.parameter.pylumid",
                     "data_type": "string",
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason sensor pylum id"
                     ],
-                    "column_name": "sensorid",
+                    "column_name": "pylumid",
                     "column_order": 0
                 },
                 {
@@ -1915,18 +1915,18 @@
         {
             "action": "restart sensor",
             "description": "Restart a sensor",
-            "verbose": "Restart a sensor using the sensor id provided as an input",
+            "verbose": "Restart a sensor using the Cybereason sensor pylum id provided as an input",
             "type": "generic",
             "identifier": "restart_sensor",
             "read_only": false,
             "parameters": {
-                "sensorid": {
+                "pylumid": {
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason sensor pylum id"
                     ],
                     "data_type": "string",
                     "order": 0,
-                    "description": "The sensor ID targeted for restart",
+                    "description": "The Cybereason sensor pylum id targeted for restart",
                     "required": true,
                     "primary": true,
                     "default": "",
@@ -1938,12 +1938,12 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.sensorid",
+                    "data_path": "action_result.parameter.pylumid",
                     "data_type": "string",
                     "contains": [
-                        "cybereason sensor id"
+                        "cybereason sensor pylum id"
                     ],
-                    "column_name": "sensorid",
+                    "column_name": "pylumid",
                     "column_order": 0
                 },
                 {

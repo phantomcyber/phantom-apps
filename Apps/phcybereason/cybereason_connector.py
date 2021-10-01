@@ -685,11 +685,11 @@ class CybereasonConnector(BaseConnector):
     def _get_machine_sensor_ids(self, machine_name_or_ip, action_result):
         sensor_ids = []
         try:
-            ret_val, sensors_by_name = self._get_sensor_by_machine_name(machine_name_or_ip, action_result)
+            ret_val, sensors_by_name = self._get_pylumid_by_machine_name(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_name) == 0):
                 sensor_ids.extend(sensors_by_name)
 
-            ret_val, sensors_by_ip = self._get_sensor_by_machine_ip(machine_name_or_ip, action_result)
+            ret_val, sensors_by_ip = self._get_pylumid_by_machine_ip(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_ip) == 0):
                 sensor_ids.extend(sensors_by_ip)
             action_result.add_data({
@@ -703,7 +703,7 @@ class CybereasonConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
-    def _get_sensor_by_machine_name(self, machine_name, action_result):
+    def _get_pylumid_by_machine_name(self, machine_name, action_result):
         sensor_ids = []
         try:
             cr_session = CybereasonSession(self).get_session()
@@ -740,7 +740,7 @@ class CybereasonConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
-    def _get_sensor_by_machine_ip(self, machine_ip, action_result):
+    def _get_pylumid_by_machine_ip(self, machine_ip, action_result):
         sensor_ids = []
         try:
             cr_session = CybereasonSession(self).get_session()
@@ -786,7 +786,7 @@ class CybereasonConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Get the parameters
-        sensorid = self._get_string_param(param.get('sensorid'))
+        pylum_id = self._get_string_param(param.get('pylumid'))
 
         try:
             # Create a session to call the rest APIs
@@ -794,15 +794,22 @@ class CybereasonConnector(BaseConnector):
 
             url = "{0}/rest/sensors/action/upgrade".format(self._base_url)
             self.save_progress(url)
-            sensor_id_arr = []
+            pylum_ids = []
             # Look for the multiple sensor ids
-            if "," in sensorid:
-                filter_arr = sensorid.strip().split(",")
-                sensor_id_arr.extend(filter_arr)
+            if "," in pylum_id:
+                filter_arr = pylum_id.strip().split(",")
+                pylum_ids.extend(filter_arr)
             else:
-                sensor_id_arr.append(sensorid)
-            query = json.dumps({"sensorsIds": sensor_id_arr})
-
+                pylum_ids.append(pylum_id)
+            query = json.dumps({
+                "filters": [
+                    {
+                        "fieldName": "pylumId",
+                        "operator": "ContainsIgnoreCase",
+                        "values": pylum_ids
+                    }
+                ]
+            })
             res = cr_session.post(url, data=query, headers=self._headers)
             if res.status_code == 204:
                 return action_result.set_status(phantom.APP_ERROR, "Status Code:204. The sensor names are incorrect or the filters are not valid")
@@ -830,7 +837,7 @@ class CybereasonConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Get the parameters
-        sensorid = self._get_string_param(param.get('sensorid'))
+        pylum_id = self._get_string_param(param.get('pylumid'))
 
         try:
             # Create a session to call the rest APIs
@@ -839,13 +846,21 @@ class CybereasonConnector(BaseConnector):
             url = "{0}/rest/sensors/action/restart".format(self._base_url)
             self.save_progress(url)
 
-            sensor_id_arr = []
-            if "," in sensorid:
-                filter_arr = sensorid.strip().split(",")
-                sensor_id_arr.extend(filter_arr)
+            pylum_ids = []
+            if "," in pylum_id:
+                filter_arr = pylum_id.strip().split(",")
+                pylum_ids.extend(filter_arr)
             else:
-                sensor_id_arr.append(sensorid)
-            query = json.dumps({"sensorsIds": sensor_id_arr})
+                pylum_ids.append(pylum_id)
+            query = json.dumps({
+                "filters": [
+                    {
+                        "fieldName": "pylumId",
+                        "operator": "ContainsIgnoreCase",
+                        "values": pylum_ids
+                    }
+                ]
+            })
 
             res = cr_session.post(url, data=query, headers=self._headers)
             if res.status_code == 204:
@@ -864,7 +879,7 @@ class CybereasonConnector(BaseConnector):
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
 
-        return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Executed a sensor Restart")
+        return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Requested a Sensor Restart")
 
     def _get_machine_name_by_machine_ip(self, machine_ip, action_result):
         machine_names = []
