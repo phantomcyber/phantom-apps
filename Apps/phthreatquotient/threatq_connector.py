@@ -636,6 +636,9 @@ class ThreatQConnector(BaseConnector):
         Returns: Action result
         """
 
+        # Create action result
+        action_result = ActionResult(dict(params))
+        
         # Get container info
         _, container_info, _ = self.get_container_info()
         tlp = container_info.get('sensitivity')
@@ -646,8 +649,6 @@ class ThreatQConnector(BaseConnector):
         # Convert input to a list
         items = self.get_value_list(values)
 
-        # Create action result
-        action_result = ActionResult(dict(params))
         self.save_progress("Creating [{}] adversaries in ThreatQ".format(len(items)))
 
         # Build new source with TLP
