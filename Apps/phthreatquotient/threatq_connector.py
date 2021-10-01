@@ -639,44 +639,44 @@ class ThreatQConnector(BaseConnector):
         # Create action result
         action_result = ActionResult(dict(params))
 
-        # # Get container info
-        # _, container_info, _ = self.get_container_info()
-        # tlp = container_info.get('sensitivity')
-        #
-        # # Get the passed items
-        # values = params.get('adversary_list')
-        #
-        # # Convert input to a list
-        # items = self.get_value_list(values)
-        #
-        # self.save_progress("Creating [{}] adversaries in ThreatQ".format(len(items)))
-        #
-        # # Build new source with TLP
-        # source_obj = ThreatQSource("Phantom", tlp=tlp)
-        #
-        # objects = []
-        # for i in items:
-        #     obj = ThreatQObject(self.tq, 'adversaries')
-        #     obj.name = i
-        #     obj.add_source(source_obj)
-        #     objects.append(obj)
-        #
-        # ThreatQObject.bulk_upload(self.tq, objects)
-        # uploaded = [ind for ind in objects if ind.oid]
-        # msg = "Successfully uploaded [{}] adversaries".format(len(uploaded))
-        #
-        # # Update action result
-        # action_result.update_summary({"total": len(uploaded)})
-        #
-        # # Save progress
-        # self.save_progress(msg)
-        # if len(uploaded) == 0:
-        #     action_result.set_status(phantom.APP_ERROR, "No adversaries created in ThreatQ")
-        # else:
-        #     action_result.set_status(phantom.APP_SUCCESS, msg)
-        #
-        # # Add summary and data to action result and return
-        # action_result = self.set_data_response(action_result, uploaded)
+        # Get container info
+        _, container_info, _ = self.get_container_info()
+        tlp = container_info.get('sensitivity')
+
+        # Get the passed items
+        values = params.get('adversary_list')
+
+        # Convert input to a list
+        items = self.get_value_list(values)
+
+        self.save_progress("Creating [{}] adversaries in ThreatQ".format(len(items)))
+
+        # Build new source with TLP
+        source_obj = ThreatQSource("Phantom", tlp=tlp)
+
+        objects = []
+        for i in items:
+            obj = ThreatQObject(self.tq, 'adversaries')
+            obj.name = i
+            obj.add_source(source_obj)
+            objects.append(obj)
+
+        ThreatQObject.bulk_upload(self.tq, objects)
+        uploaded = [ind for ind in objects if ind.oid]
+        msg = "Successfully uploaded [{}] adversaries".format(len(uploaded))
+
+        # Update action result
+        action_result.update_summary({"total": len(uploaded)})
+
+        # Save progress
+        self.save_progress(msg)
+        if len(uploaded) == 0:
+            action_result.set_status(phantom.APP_ERROR, "No adversaries created in ThreatQ")
+        else:
+            action_result.set_status(phantom.APP_SUCCESS, msg)
+
+        # Add summary and data to action result and return
+        action_result = self.set_data_response(action_result, uploaded)
         return action_result
 
     def create_custom_objects(self, params):
