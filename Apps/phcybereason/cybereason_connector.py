@@ -453,7 +453,10 @@ class CybereasonConnector(BaseConnector):
             if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
-
+            action_result.add_data({
+                    "response_code_from_server": res.status_code,
+                    "response_from_server": res.json()
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
@@ -487,11 +490,13 @@ class CybereasonConnector(BaseConnector):
             query = json.dumps({"pylumIds": sensor_ids})
 
             res = cr_session.post(url, data=query, headers=self._headers)
-
             if res.status_code < 200 or res.status_code >= 399:
                 self._process_response(res, action_result)
                 return action_result.get_status()
-
+            action_result.add_data({
+                    "response_code_from_server": res.status_code,
+                    "response_from_server": res.json()
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             return action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err))
@@ -682,12 +687,15 @@ class CybereasonConnector(BaseConnector):
         try:
             ret_val, sensors_by_name = self._get_sensor_by_machine_name(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_name) == 0):
-                sensor_ids.append(sensors_by_name)
+                sensor_ids.extend(sensors_by_name)
 
             ret_val, sensors_by_ip = self._get_sensor_by_machine_ip(machine_name_or_ip, action_result)
             if not (phantom.is_fail(ret_val) or len(sensors_by_ip) == 0):
-                sensor_ids.append(sensors_by_ip)
-
+                sensor_ids.extend(sensors_by_ip)
+            action_result.add_data({
+                "sensor_ids_by_machine_ip": sensors_by_ip,
+                "sensor_ids_by_machine_name": sensors_by_name
+            })
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(err)
@@ -715,16 +723,15 @@ class CybereasonConnector(BaseConnector):
             }
             self.save_progress("Calling {} with query {}".format(url, str(query_path)))
             res = cr_session.post(url, json=query_path, headers=self._headers)
-
             if res.status_code < 200 or res.status_code >= 399:
                 return self._process_response(res, action_result)
 
             self.save_progress("Got result from {}".format(url))
             totalResults = res.json()["totalResults"]
             if totalResults > 0:
-                machines_dict = res.json()["sensors"]
-                for _, machine_details in machines_dict.items():
-                    sensor_ids.append(str(machine_details['pylumId']))
+                sensors = res.json()["sensors"]
+                for sensor in sensors:
+                    sensor_ids.append(sensor['pylumId'])
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -760,9 +767,9 @@ class CybereasonConnector(BaseConnector):
             self.save_progress("Got result from {}".format(url))
             totalResults = res.json()["totalResults"]
             if totalResults > 0:
-                machines_dict = res.json()["sensors"]
-                for _, machine_details in machines_dict.items():
-                    sensor_ids.append(str(machine_details['pylumId']))
+                sensors = res.json()["sensors"]
+                for sensor in sensors:
+                    sensor_ids.append(sensor['pylumId'])
 
         except Exception as e:
             err = self._get_error_message_from_exception(e)
@@ -859,6 +866,44 @@ class CybereasonConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, status_message="Successfully Executed a sensor Restart")
 
+      def _get_machine_name_by_machine_ip(self, machine_ip, action_result):
+        machine_names = []
+        try:
+            cr_session = CybereasonSession(self).get_session()
+
+            url = "{0}/rest/sensors/query".format(self._base_url)
+            self.save_progress(url)
+            query_path = {
+                "limit": 1000,
+                "offset": 0,
+                "filters": [
+                            {
+                                "fieldName": "externalIpAddress",
+                                "operator": "Equals",
+                                "values": [machine_ip]
+                            }
+                        ]
+            }
+            self.save_progress("Calling {} with query {}".format(url, str(query_path)))
+            res = cr_session.post(url, json=query_path, headers=self._headers)
+
+            if res.status_code < 200 or res.status_code >= 399:
+                return self._process_response(res, action_result)
+
+            self.save_progress("Got result from {}".format(url))
+            totalResults = res.json()["totalResults"]
+            if totalResults > 0:
+                sensors = res.json()["sensors"]
+                for sensor_details in sensors:
+                    machine_names.append(str(sensor_details['machineName']))
+
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            self.save_progress(err)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+
+        return RetVal(action_result.set_status(phantom.APP_SUCCESS), machine_names)
+
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
 
@@ -920,6 +965,10 @@ class CybereasonConnector(BaseConnector):
         elif action_id == 'query_machine':
             query_action = CybereasonQueryActions()
             ret_val = query_action._handle_query_machine(self, param)
+
+        elif action_id == 'query_machine_ip':
+            query_action = CybereasonQueryActions()
+            ret_val = query_action._handle_query_machine_ip(self, param)
 
         elif action_id == 'query_users':
             query_action = CybereasonQueryActions()

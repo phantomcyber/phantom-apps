@@ -1429,7 +1429,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.computerName",
+                    "data_path": "action_result.data.*.data.*.agentComputerName",
                     "data_type": "string",
                     "contains": [
                         "host name"
@@ -1438,19 +1438,19 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.domain",
+                    "data_path": "action_result.data.*.data.*.agentDomain",
                     "data_type": "string",
                     "column_name": "Agent Domain",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.id",
+                    "data_path": "action_result.data.*.data.*.agentId",
                     "data_type": "string",
                     "column_name": "Agent ID",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.infected",
+                    "data_path": "action_result.data.*.data.*.agentInfected",
                     "data_type": "boolean",
                     "column_name": "Agent Infected",
                     "column_order": 5,
@@ -1460,7 +1460,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.isActive",
+                    "data_path": "action_result.data.*.data.*.agentIsActive",
                     "data_type": "boolean",
                     "column_name": "Is Agent Active",
                     "column_order": 6,
@@ -1470,7 +1470,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.isDecommissioned",
+                    "data_path": "action_result.data.*.data.*.agentIsDecommissioned",
                     "data_type": "boolean",
                     "column_name": "Is Decommissioned Agent",
                     "column_order": 7,
@@ -1480,19 +1480,19 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.machineType",
+                    "data_path": "action_result.data.*.data.*.agentMachineType",
                     "data_type": "string",
                     "column_name": "Agent Machine Type",
                     "column_order": 8
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.networkStatus",
+                    "data_path": "action_result.data.*.data.*.agentNetworkStatus",
                     "data_type": "string",
                     "column_name": "Agent Network Status",
                     "column_order": 9
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.operationalState",
+                    "data_path": "action_result.data.*.data.*.agentOperationalState",
                     "data_type": "string",
                     "column_name": "Agent Operational State",
                     "column_order": 10
@@ -1504,7 +1504,7 @@
                     "column_order": 11
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.uuid",
+                    "data_path": "action_result.data.*.data.*.agentUuid",
                     "data_type": "string",
                     "column_name": "Agent UUID",
                     "column_order": 12
@@ -1586,7 +1586,7 @@
                     "column_order": 24
                 },
                 {
-                    "data_path": "action_result.data.*.data.*.version",
+                    "data_path": "action_result.data.*.data.*.agentVersion",
                     "data_type": "string",
                     "column_name": "Version",
                     "column_order": 25
@@ -1688,6 +1688,456 @@
                     "data_type": "string",
                     "column_name": "id",
                     "column_order": 9
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_value": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get devicecontrol events",
+            "description": "Get the data of Device Control events on Windows and macOS endpoints",
+            "type": "investigate",
+            "identifier": "get_device_control_events",
+            "read_only": true,
+            "parameters": {
+                "ip_hostname": {
+                "description": "The IP or hostname of an endpoint to get information",
+                "data_type": "string",
+                "required": true,
+                "primary": true,
+                "contains": [
+                    "host name",
+                    "ip"
+                ],
+                "order": 0
+            }
+        },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "host name",
+                        "ip"
+                    ],
+                    "column_name": "IP Host Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.agentId",
+                    "data_type": "string",
+                    "column_name": "Agent ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.computerName",
+                    "data_type": "string",
+                    "column_name": "Computer Name",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.deviceClass",
+                    "data_type": "string",
+                    "column_name": "Device Class",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.deviceName",
+                    "data_type": "string",
+                    "column_name": "Device Name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.eventId",
+                    "data_type": "string",
+                    "column_name": "Event ID",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.eventTime",
+                    "data_type": "string",
+                    "column_name": "Event Time",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.eventType",
+                    "data_type": "string",
+                    "column_name": "Event Type",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.interface",
+                    "data_type": "string",
+                    "column_name": "interface",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.lastLoggedInUserName",
+                    "data_type": "string",
+                    "column_name": "Last Logged In Username",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.lmpVersion",
+                    "data_type": "string",
+                    "column_name": "lmp Version",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.minorClass",
+                    "data_type": "string",
+                    "column_name": "Minor Class",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.productId",
+                    "data_type": "string",
+                    "column_name": "Product ID",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.profileUuids",
+                    "data_type": "string",
+                    "column_name": "Profile UUIDs",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.ruleId",
+                    "data_type": "string",
+                    "column_name": "Rule ID",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.serviceClass",
+                    "data_type": "string",
+                    "column_name": "Service Class",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.uId",
+                    "data_type": "string",
+                    "column_name": "UID",
+                    "column_order": 18
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 19
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.vendorId",
+                    "data_type": "string",
+                    "column_name": "Vendor ID",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get firewall rules",
+            "description": "Get the Firewall Control rules for a scope specified",
+            "type": "correct",
+            "identifier": "get_firewall_rules",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.data.*.action",
+                    "data_type": "string",
+                    "column_name": "Action",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.application.type",
+                    "data_type": "string",
+                    "column_name": "Application Type",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.data.*application.values",
+                    "data_type": "string",
+                    "column_name": "Application Value",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.createdAt",
+                    "data_type": "string",
+                    "column_name": "Created At",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.creator",
+                    "data_type": "string",
+                    "column_name": "Creator",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.creatorId",
+                    "data_type": "string",
+                    "column_name": "Creator ID",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.direction",
+                    "data_type": "string",
+                    "column_name": "Direction",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.editable",
+                    "data_type": "boolean",
+                    "column_name": "Editable",
+                    "column_order": 10,
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.id",
+                    "data_type": "string",
+                    "column_name": "ID",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.localHost.type",
+                    "data_type": "string",
+                    "column_name": "Localhost Type",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.localHost.values",
+                    "data_type": "string",
+                    "column_name": "Localhost value",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.localPort.type",
+                    "data_type": "string",
+                    "column_name": "Localport Type",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.localPort.values",
+                    "data_type": "string",
+                    "column_name": "Localport Values",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.location.type",
+                    "data_type": "string",
+                    "column_name": "Location Type",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.location.values",
+                    "data_type": "string",
+                    "column_name": "Location values",
+                    "column_order": 17
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Rule Name",
+                    "column_order": 18
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.order",
+                    "data_type": "numeric",
+                    "column_name": "Order",
+                    "column_order": 19
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.osType",
+                    "data_type": "string",
+                    "column_name": "OS Type",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.osTypes",
+                    "data_type": "string",
+                    "column_name": "OS Types",
+                    "column_order": 20
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.protocol",
+                    "data_type": "string",
+                    "column_name": "Protocol",
+                    "column_order": 22
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remoteHost.type",
+                    "data_type": "string",
+                    "column_name": "RemoteHost Type",
+                    "column_order": 23
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remoteHost.values",
+                    "data_type": "string",
+                    "column_name": "RemoteHost Values",
+                    "column_order": 24
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remoteHosts.type",
+                    "data_type": "string",
+                    "column_name": "RemoteHosts Type",
+                    "column_order": 25
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remoteHosts.values",
+                    "data_type": "string",
+                    "column_name": "RemoteHosts Values",
+                    "column_order": 26
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remotePort.type",
+                    "data_type": "string",
+                    "column_name": "RemotePort Type",
+                    "column_order": 27
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.remotePort.values",
+                    "data_type": "string",
+                    "column_name": "RemotePort Type",
+                    "column_order": 28
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.ruleCategory",
+                    "data_type": "string",
+                    "column_name": "Rule Category",
+                    "column_order": 29
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.scope",
+                    "data_type": "string",
+                    "column_name": "Scope",
+                    "column_order": 30
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.scopeId",
+                    "data_type": "string",
+                    "column_name": "Scope ID",
+                    "column_order": 31
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 32
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.tag",
+                    "data_type": "string",
+                    "column_name": "Tag",
+                    "column_order": 33
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.tagIds",
+                    "data_type": "string",
+                    "column_name": "Tag IDs",
+                    "column_order": 34
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.tagNames",
+                    "data_type": "string",
+                    "column_name": "Tag Names",
+                    "column_order": 35
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.tags",
+                    "data_type": "string",
+                    "column_name": "Tags",
+                    "column_order": 36
+                },
+                {
+                    "data_path": "action_result.data.*.data.*.updatedAt",
+                    "data_type": "string",
+                    "column_name": "Updated At",
+                    "column_order": 37
                 },
                 {
                     "data_path": "action_result.status",
