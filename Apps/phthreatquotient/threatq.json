@@ -408,7 +408,8 @@
                 "adversary_list": {
                     "description": "A comma-separated or line-separated list adversary names",
                     "data_type": "string",
-                    "required": true
+                    "required": true,
+                    "order": 0
                 }
             },
             "render": {
