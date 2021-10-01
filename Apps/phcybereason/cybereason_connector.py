@@ -908,7 +908,7 @@ class CybereasonConnector(BaseConnector):
             ret_val = self._handle_set_reputation(param)
 
         elif action_id == 'upgrade_sensor':
-            ret_val == self._handle_upgrade_sensor(param)
+            ret_val = self._handle_upgrade_sensor(param)
 
         elif action_id == 'restart_sensor':
             ret_val = self._handle_restart_sensor(param)
