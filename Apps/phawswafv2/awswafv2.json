@@ -518,7 +518,7 @@
             "action": "delete ip set",
             "identifier": "delete_ip_set",
             "description": "Remove the specified IP Set",
-            "verbose": "The ip_set_id or ip_set_name must be given as input for deleting an IP set, ip_set_id will be considered if both ip_set_id and ip_set_name is provided in input.",
+            "verbose": "The ip_set_id or ip_set_name must be given as input for deleting an IP set, ip_set_id will be used if both ip_set_id and ip_set_name is provided in input.",
             "type": "correct",
             "read_only": false,
             "parameters": {
