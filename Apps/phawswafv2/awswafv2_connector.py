@@ -220,7 +220,8 @@ class AwsWafConnector(BaseConnector):
             'list_ip_sets': ['list_ip_sets', 'IPSets'],
             'list_acls': ['list_web_acls', 'WebACLs'],
             'add_ip': ['list_ip_sets', 'IPSets'],
-            'delete_ip': ['list_ip_sets', 'IPSets']
+            'delete_ip': ['list_ip_sets', 'IPSets'],
+            'delete_ip_set': ['list_ip_sets', 'IPSets']
         }
 
         action_identifier = self.get_action_identifier()
@@ -376,11 +377,12 @@ class AwsWafConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        if not self._create_client(action_result, param):
-            return action_result.get_status()
-
         ip_set_id = param.get('ip_set_id')
         ip_set_name = param.get('ip_set_name')
+
+        ip_set = self.paginator(AWSWAF_DEFAULT_LIMIT, action_result, param)
+
+        ip_set_id, ip_set_name = self._verify_ip_set(action_result, ip_set, ip_set_id, ip_set_name)
 
         if not ip_set_id:
             return action_result.set_status(phantom.APP_ERROR, AWSWAF_INVALID_INPUT)

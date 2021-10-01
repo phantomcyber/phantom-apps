@@ -624,6 +624,8 @@
                 {
                     "data_path": "action_result.parameter.ip_set_id",
                     "data_type": "string",
+                    "column_name": "IP Set ID",
+                    "column_order": 0,
                     "example_values": [
                         "25b7e872-0645-4229-91d5-28e2369262aa"
                     ],
@@ -634,6 +636,8 @@
                 {
                     "data_path": "action_result.parameter.ip_set_name",
                     "data_type": "string",
+                    "column_name": "IP Set Name",
+                    "column_order": 1,
                     "example_values": [
                         "new_ip_set_1383662"
                     ],
