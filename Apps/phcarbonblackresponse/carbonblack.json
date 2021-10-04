@@ -44,7 +44,7 @@
             "action": "test connectivity",
             "description": "Validate the asset configuration by attempting to connect. This action runs a quick query on the device to check the connection and credentials",
             "type": "test",
-            "identifier": "test_asset_connectivity",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
