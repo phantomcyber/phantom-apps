@@ -16,10 +16,6 @@ GSGMAIL_AUTH_GMAIL_READ = 'https://www.googleapis.com/auth/gmail.readonly'
 GSGMAIL_AUTH_GMAIL_ADMIN_DIR = 'https://www.googleapis.com/auth/admin.directory.user'
 GSGMAIL_DELETE_EMAIL = 'https://mail.google.com/'
 
-INVALID_INT = "Please provide a valid integer value in the {param}"
-ERR_NEGATIVE_INT_PARAM = "Please provide a valid non-negative integer value in the {param}"
-NON_ZERO_ERROR = "Please provide non-zero positive integer in {param}"
-
 GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL = 2000
 GSMAIL_DEFAULT_MAX_CONTAINER = 100
 GSMAIL_MAX_RESULT = 10000
