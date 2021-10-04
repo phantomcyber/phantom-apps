@@ -1805,7 +1805,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Result: success, Total records updated: 4"
+                        "Result: success, Total records updated: 4",
+                        "Result: success, Total records updated: 1"
                     ]
                 },
                 {
@@ -1819,7 +1820,8 @@
                     "data_path": "action_result.summary.Total records updated",
                     "data_type": "numeric",
                     "example_values": [
-                        4
+                        4,
+                        1
                     ]
                 },
                 {
@@ -1833,7 +1835,8 @@
                     "data_path": "action_result.parameter.set_ignored",
                     "data_type": "numeric",
                     "example_values": [
-                        false
+                        false,
+                        true
                     ]
                 },
                 {
@@ -1855,6 +1858,20 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "a031cb9f-ad48-4391-9d09-eeb5def57484"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.assign_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
                     ]
                 }
             ],
