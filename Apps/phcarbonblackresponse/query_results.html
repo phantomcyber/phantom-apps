@@ -32,7 +32,7 @@
       {% for cell in row %}
         <td class="widget-td" style="border-bottom: 1px solid; white-space: {% if cell.value|length and value|length > 100 %}normal{% else %}nowrap{% endif %}; max-width:auto;">
           {% if cell.contains and cell.value and cell.value != None %}
-            <a href="javascript:;" onclick="context_menu(this, {{ cell.id }}, {{ container.id }}, '{{ cell.data_path|escapejs }}', {{ cell.contains|jslist }}, {{ cell.offset|default:0 }}, boundry);">
+            <a href="javascript:;" onclick="context_menu(this, [{'contains': {{ cell.contains }}, 'value':'{{ cell.value }}' }], 0, {{ container.id }}, null, false);">
                {{ cell.value }}
                &nbsp;<span class="fa fa-caret-down"></span>
             </a>
