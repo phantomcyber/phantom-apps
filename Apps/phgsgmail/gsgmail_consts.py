@@ -16,9 +16,10 @@ GSGMAIL_AUTH_GMAIL_READ = 'https://www.googleapis.com/auth/gmail.readonly'
 GSGMAIL_AUTH_GMAIL_ADMIN_DIR = 'https://www.googleapis.com/auth/admin.directory.user'
 GSGMAIL_DELETE_EMAIL = 'https://mail.google.com/'
 
-GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL = 2000
+GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL = 1000
 GSMAIL_DEFAULT_MAX_CONTAINER = 100
 GSMAIL_MAX_RESULT = 10000
+GSMAIL_DEFAULT_INGEST_MANNER = 'oldest first'
 
 FAILED_CREATE_SERVICE = "Failed to create service object for API: {0}-{1}. {2} {3}"
 GSMAIL_USER_VALID_MESSAGE = "Please make sure the user '{0}' is valid and the service account has the proper scopes enabled."

@@ -626,7 +626,7 @@ class GSuiteConnector(BaseConnector):
         self.save_progress("Test Connectivity Passed")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_email_ids_to_process(self, service, action_result, max_results, user_id='me', labels=[], include_spam_trash=False, q=None, include_sent=False,
+    def _get_email_ids_to_process(self, service, action_result, max_results, ingest_manner, user_id='me', labels=[], include_spam_trash=False, q=None, include_sent=False,
                                   use_ingest_limit=False):
 
         kwargs = {
@@ -662,9 +662,8 @@ class GSuiteConnector(BaseConnector):
         if not include_sent:
             query.append('-in:sent')
 
-        config = self.get_config()
-        using_oldest = config['ingest_manner'] == "oldest first"
-        using_latest = config['ingest_manner'] == "latest first"
+        using_oldest = ingest_manner == "oldest first"
+        using_latest = ingest_manner == "latest first"
 
         if use_ingest_limit:
             if 'last_email_epoch' in self._state and using_oldest:
@@ -746,12 +745,13 @@ class GSuiteConnector(BaseConnector):
         email_id = param.get(phantom.APP_JSON_CONTAINER_ID, False)
         email_ids = [email_id]
         if not email_id:
-            self.save_progress("Getting {0} '{1}' email ids".format(max_emails, config['ingest_manner']))
-            self.debug_print("Getting {0} '{1}' email ids".format(max_emails, config['ingest_manner']))
+            ingest_manner = config.get('ingest_manner', GSMAIL_DEFAULT_INGEST_MANNER)
+            self.save_progress("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
+            self.debug_print("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
             labels = []
             if "label" in config:
                 labels = [config['label']]
-            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, labels=labels,
+            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner,  labels=labels,
                                                                 use_ingest_limit=True)
 
             if phantom.is_fail(ret_val):
