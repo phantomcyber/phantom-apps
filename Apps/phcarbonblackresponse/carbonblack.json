@@ -1827,6 +1827,9 @@
                 {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
+                    "contains": [
+                        "carbon black query"
+                    ],
                     "example_values": [
                         "\"c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe\""
                     ]
@@ -1863,6 +1866,9 @@
                 {
                     "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
+                    "contains": [
+                        "carbon black alert id"
+                    ],
                     "example_values": [
                         "a031cb9f-ad48-4391-9d09-eeb5def57484"
                     ]
