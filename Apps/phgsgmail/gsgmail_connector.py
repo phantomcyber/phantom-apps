@@ -751,7 +751,7 @@ class GSuiteConnector(BaseConnector):
             labels = []
             if "label" in config:
                 labels = [config['label']]
-            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner,  labels=labels,
+            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner, labels=labels,
                                                                 use_ingest_limit=True)
 
             if phantom.is_fail(ret_val):
