@@ -41,8 +41,7 @@ class CarbonblackConnector(BaseConnector):
     ACTION_ID_HUNT_FILE = "hunt_file"
     ACTION_ID_CREATE_ALERT = "create_alert"
     ACTION_ID_LIST_ALERTS = "list_alerts"
-    ACTION_ID_UPDATE_ALERT = "update_alert"
-    ACTION_ID_BULK_UPDATE = "bulk_update"
+    ACTION_ID_UPDATE_ALERTS = "update_alerts"
     ACTION_ID_LIST_ENDPOINTS = "list_endpoints"
     ACTION_ID_RUN_QUERY = "run_query"
     ACTION_ID_QUARANTINE_DEVICE = "quarantine_device"
@@ -1613,72 +1612,52 @@ class CarbonblackConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS, CARBONBLACK_DISPLAYING_RESULTS_TOTAL.format(
                 displaying=len(search_results.get('results', [])), query_type=query_type, total=search_results.get('total_results', 'Unknown')))
 
-    def _update_alert(self, param):
+    def _update_alerts(self, param):
 
         action_result = self.add_action_result(ActionResult(param))
 
-        unique_id = param['unique_id']
-        status = param['status']
-
-        request_data = {
-            "unique_id": unique_id,
-            "status": status
-        }
-
-        ret_val, results = self._make_rest_call("/v1/alert/{}".format(unique_id), action_result, method="post", data=request_data)
-
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
-
-        action_result.update_summary(results)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _bulk_update(self, param):
-
-        action_result = self.add_action_result(ActionResult(param))
-
-        request_data = {}
+        update_data = {}
+        total_results = 0
 
         query = param.get('query')
         if query:
-            if "cb.urlver=1&" not in query:
-                query = "cb.urlver=1&" + query
+            search_data = { "q": [query] }
+            update_data['query'] = "{}{}".format("q=", six.moves.urllib.parse.quote(query))
 
-            if "q=" not in query:
-                query = "q=" + query
-
-            request_data['query'] = query
+            # run a pre-query to get the number of results for bulk update since it is not returned by bulk alert update API
+            ret_val, result = self._make_rest_call("/v1/alert", action_result, method="post", data=search_data)
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            total_results = result.get('total_results', 0)
 
         alert_ids = param.get('alert_ids')
         if alert_ids:
             alert_ids = alert_ids.split(',')
-            request_data['alert_ids'] = alert_ids
+            update_data['alert_ids'] = alert_ids
+            total_results = len(alert_ids)
 
         requested_status = param.get('requested_status')
         if requested_status:
-            request_data['requested_status'] = requested_status
+            update_data['requested_status'] = requested_status
 
         set_ignored = param.get('set_ignored')
         if set_ignored:
-            request_data['set_ignored'] = set_ignored
+            update_data['set_ignored'] = set_ignored
 
         assigned_to = param.get('assigned_to')
         if assigned_to:
-            request_data['assigned_to'] = assigned_to
+            update_data['assigned_to'] = assigned_to
 
         # query or alert_ids are required, but not both
         if (not query and not alert_ids) or (query and alert_ids):
             return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_IDS)
 
-        # If assigned_to is set, then requested_status is required
-        if assigned_to and not requested_status:
-            return action_result.set_status(phantom.APP_ERROR, CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_ASSIGNED_TO)
-
-        ret_val, alert = self._make_rest_call("/v1/alerts", action_result, method="post", data=request_data)
+        ret_val, result = self._make_rest_call("/v1/alerts", action_result, method="post", data=update_data)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
+
+        action_result.update_summary({'result': result['result'], 'Total records updated': total_results})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1794,16 +1773,22 @@ class CarbonblackConnector(BaseConnector):
 
     def _search(self, search_type, action_result, query, start, rows):
 
-        data = {
-                "params": "server_added_timestamp desc",
-                "start": start,
-                "rows": rows,
-                "facet": ['true', 'true'],
-                "cb.urlver": ['1'],
-                "q": [query]}
+        search_data = {
+                    "params": "server_added_timestamp desc",
+                    "start": start,
+                    "rows": rows,
+                    "facet": ['true', 'true'],
+                    "cb.urlver": ['1'],
+                    "q": [query]
+        }
+
+        if search_type == 'alert':
+            search_data = {
+                "q": [query]
+            }
 
         # Search results are returned as lists
-        ret_val, response = self._make_rest_call("/v1/{0}".format(search_type), action_result, method="post", data=data, additional_succ_codes={204: []})
+        ret_val, response = self._make_rest_call("/v1/{0}".format(search_type), action_result, method="post", data=search_data, additional_succ_codes={204: []})
 
         if (phantom.is_fail(ret_val)):
             return (action_result.get_status(), None)
@@ -2127,8 +2112,7 @@ class CarbonblackConnector(BaseConnector):
             self.ACTION_ID_LIST_ALERTS: self._list_alerts,
             self.ACTION_ID_LIST_ENDPOINTS: self._list_endpoints,
             self.ACTION_ID_CREATE_ALERT: self._create_alert,
-            self.ACTION_ID_UPDATE_ALERT: self._update_alert,
-            self.ACTION_ID_BULK_UPDATE: self._bulk_update,
+            self.ACTION_ID_UPDATE_ALERTS: self._update_alerts,
             self.ACTION_ID_RUN_QUERY: self._run_query,
             self.ACTION_ID_QUARANTINE_DEVICE: self._quarantine_device,
             self.ACTION_ID_UNQUARANTINE_DEVICE: self._unquarantine_device,
