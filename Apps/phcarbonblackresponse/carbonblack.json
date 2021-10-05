@@ -1777,7 +1777,7 @@
                     "required": true
                 },
                 "set_ignored": {
-                    "description": "If set to true, modifies threat report so that any further hits on IOCs contained within that report will no longer trigger an Alert",
+                    "description": "If set to true, modifies threat report so that any further hits on IOCs contained within that report will no longer trigger an alert",
                     "data_type": "boolean",
                     "order": 3,
                     "default": false
