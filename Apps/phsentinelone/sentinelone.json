@@ -2176,6 +2176,124 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "create firewall rule",
+            "description": "Create a Firewall Control rule",
+            "type": "contain",
+            "identifier": "create_firewall_rule",
+            "read_only": false,
+            "parameters": {
+                "rule_name": {
+                    "description": "The name of the firewall rule",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "tag_ids": {
+                    "description": "Tag id",
+                    "data_type": "string",
+                    "required": false,
+                    "order": 1
+                },
+                "description":{
+                    "description": "Description",
+                    "data_type": "string",
+                    "required": true,
+                    "default": "Added via Phantom",
+                    "order": 2
+                },
+                "type":{
+                    "description": "Type of the remote host",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "fqdn",
+                        "addresses",
+                        "cidr"
+                    ],
+                    "default": "fqdn",
+                    "order": 3
+                },
+                "value":{
+                    "description": "Value of the remote host",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 4
+                }    
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.rule_name",
+                    "data_type": "string",
+                    "column_name": "Rule Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.tag_ids",
+                    "data_type": "string",
+                    "column_name": "Tag ID",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "column_name": "Type of remote host",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "column_name": "Value of remote host",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 6,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "on poll",
             "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
