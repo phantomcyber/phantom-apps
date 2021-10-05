@@ -1822,10 +1822,7 @@ class CarbonblackConnector(BaseConnector):
 
     def _hunt_file(self, param):
 
-        query_type = param.get(CARBONBLACK_JSON_QUERY_TYPE, CARBONBLACK_QUERY_TYPE_BINARY)
-
-        # Add the query type in the parameter, since the view needs it to be there
-        param[CARBONBLACK_JSON_QUERY_TYPE] = query_type
+        query_type = param[CARBONBLACK_JSON_QUERY_TYPE]
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 

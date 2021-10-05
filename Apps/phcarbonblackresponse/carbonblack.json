@@ -81,6 +81,8 @@
                     "contains": [
                         "carbon black query type"
                     ],
+                    "required": true,
+                    "default": "binary",
                     "primary": true
                 },
                 "range": {
