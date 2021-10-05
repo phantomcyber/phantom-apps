@@ -1879,6 +1879,13 @@
                     "example_values": [
                         "admin"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
                 }
             ],
             "versions": "EQ(*)"

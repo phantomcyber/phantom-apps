@@ -1659,6 +1659,8 @@ class CarbonblackConnector(BaseConnector):
 
         action_result.update_summary({'result': result['result'], 'Total records updated': total_results})
 
+        action_result.add_data(result)
+
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_alert(self, param):
