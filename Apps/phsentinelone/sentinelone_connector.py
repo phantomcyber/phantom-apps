@@ -760,6 +760,7 @@ class SentineloneConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         rule_name = param['rule_name']
+        tag_ids = param.get('tag_ids')
         description = param["description"]
         type = param["type"]
         value = param["value"]
@@ -775,6 +776,7 @@ class SentineloneConnector(BaseConnector):
         summary["type"] = type
         summary["value"] = value
         summary['site_ids'] = site_ids
+        summary['tag_ids'] = tag_ids
         header = self.HEADER
         header["Authorization"] = "APIToken %s" % self.token
         try:
@@ -782,6 +784,7 @@ class SentineloneConnector(BaseConnector):
                 "data": {
                             "name": rule_name,
                             "status": "Enabled",
+                            "tagIds": [],
                             "action": "Block",
                             "osTypes": [
                                         "windows_legacy",
@@ -802,6 +805,10 @@ class SentineloneConnector(BaseConnector):
                             "tenant": "true"
                           }
                     }
+            if tag_ids:
+                if tag_ids is not None or len(tag_ids) > 0:
+                    tag_ids = tag_ids.split(',')
+                    body['data']['tagIds'] = tag_ids
             ret_val, response = self._make_rest_call('/web/api/v2.1/firewall-control', action_result, headers=header, method='post', data=json.dumps(body))
             action_result.add_data(response)
             if phantom.is_fail(ret_val):
@@ -1042,6 +1049,8 @@ class SentineloneConnector(BaseConnector):
             ret_val = self._handle_get_firewall_rules(param)
         elif action_id == 'create_firewall_rule':
             ret_val = self._handle_create_firewall_rule(param)
+        elif action_id == 'hash_reputation':
+            ret_val = self._handle_hash_reputation(param)
         return ret_val
 
     def initialize(self):
