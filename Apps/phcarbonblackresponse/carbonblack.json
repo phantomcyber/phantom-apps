@@ -14,7 +14,8 @@
     "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
-        "On-prem, Version 6.1.0"
+        "On-prem, Version 6.1.0",
+        "On-prem, Version 7.5.0"
     ],
     "logo": "logo_carbonblack.svg",
     "logo_dark": "logo_carbonblack_dark.svg",
@@ -4089,6 +4090,8 @@
                 {
                     "data_path": "action_result.parameter.sensor_id",
                     "data_type": "numeric",
+                    "column_name": "Sensor ID",
+                    "column_order": 1,
                     "contains": [
                         "carbon black sensor id"
                     ],
@@ -5029,7 +5032,7 @@
         {
             "action": "get file",
             "description": "Download a file from Carbon Black Response and add it to the vault",
-            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If the hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
+            "verbose": "To get a file from a source, provide a sensor_id, file_source, optional offset, and optional get_count. Otherwise, provide a hash, which also tries to get file information from the Carbon Black Response server if available. If the hash is provided, all the other input parameters will be ignored.<br>A file that shows up in the results of the <b>hunt file</b> action might still not be available for download in case the endpoint sensor is not connected to the server. This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).<br>Note: For Carbon Black Response version 7.x, the 'get file' action sometimes fails for valid hashes. The action replicates the API result.",
             "type": "investigate",
             "identifier": "get_file",
             "read_only": true,
@@ -5709,6 +5712,9 @@
                     "example_values": [
                         110
                     ],
+                    "contains": [
+                        "carbon black session id"
+                    ],
                     "column_name": "Session ID",
                     "column_order": 1
                 },
@@ -5971,6 +5977,9 @@
                     "example_values": [
                         115,
                         286
+                    ],
+                    "contains": [
+                        "carbon black session id"
                     ],
                     "column_name": "Session ID",
                     "column_order": 1
@@ -6274,6 +6283,7 @@
             "action": "memory dump",
             "identifier": "memory_dump",
             "description": "Memory dump for a specified path",
+            "verbose": "This action will work for the windows endpoint.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -6515,7 +6525,11 @@
                     "data_type": "numeric",
                     "order": 0,
                     "description": "Carbon Black session id",
-                    "required": true
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "carbon black session id"
+                    ]
                 }
             },
             "render": {
@@ -6537,6 +6551,9 @@
                     "data_type": "numeric",
                     "example_values": [
                         104
+                    ],
+                    "contains": [
+                        "carbon black session id"
                     ],
                     "column_name": "Session ID",
                     "column_order": 2

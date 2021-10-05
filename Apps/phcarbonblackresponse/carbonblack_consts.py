@@ -70,6 +70,8 @@ CARBONBLACK_COMMAND_FAILED = "Command {command} failed with code: {code}, desc: 
 CARBONBLACK_ERR_POLL_TIMEOUT = 'Could not get a connection to a live active session on the endpoint after {max_tries} polls.'
 CARBONBLACK_ERR_MULTI_ENDPOINTS = "{num_endpoints} endpoints matched (see results for a list). Please specify an IP/Host Name that uniquely identifies an online endpoint."
 CARBONBLACK_ERR_FILE_EXISTS = "File id for sensor already exists. "
+CARBONBLACK_ERR_INVALID_PATH = "Windows cannot find specified path"
+CARBONBLACK_ERR_INVALID_DEST_FILE = "Please check if the destination filename already exists at the specified path"
 CARBONBLACK_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value in the "{param}"'
 MAX_POLL_TRIES = 10
 
@@ -79,6 +81,6 @@ CARBONBLACK_ERR_CODE_MSG = "Error code unavailable"
 CARBONBLACK_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Carbon Black Response server."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG += " Please check the asset configuration and|or the action parameters."
-
 CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_IDS = "Either 'query' or 'alert_ids' parameters are required for this action."
 CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_ASSIGNED_TO = "If 'assigned_to' parameter is set, then 'requested status' is required."
+CARBONBLACK_GROUP_ID_MSG = "Group ID unavailable"
