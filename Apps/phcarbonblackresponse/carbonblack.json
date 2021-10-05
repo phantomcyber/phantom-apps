@@ -1747,7 +1747,7 @@
             "read_only": false,
             "parameters": {
                 "query": {
-                    "description": "Query to run (Carbon Black Response search language)",
+                    "description": "Query to run (Carbon Black Response search language). Parameter accepts the same data as the alert search box on the Triage Alerts page",
                     "data_type": "string",
                     "order": 0,
                     "primary": true,
