@@ -1,0 +1,102 @@
+{
+	"info": {
+		"_postman_id": "b0552aca-a67b-477e-b3a1-383d2c279f60",
+		"name": "PhishTank",
+		"description": "<h3>Collection of endpoints contacted by <b>PhishTank</b> Splunk SOAR App</h3>",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "URL Reputation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "url",
+							"value": "{{url}}",
+							"type": "text"
+						},
+						{
+							"key": "format",
+							"value": "json",
+							"type": "text"
+						},
+						{
+							"key": "app_key",
+							"value": "{{API key}}",
+							"type": "text",
+							"disabled": true
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://checkurl.phishtank.com/checkurl/",
+					"protocol": "https",
+					"host": [
+						"checkurl",
+						"phishtank",
+						"com"
+					],
+					"path": [
+						"checkurl",
+						""
+					]
+				},
+				"description": "<p>Used by `url reputation` action. Queries PhishTank for URL's phishing reputation.\nIf URL information is unavailable in PhishTank, only 'url' and 'in_database' property would be populated.</p>\n<p>Takes `url`, `format`,  and `app_key`(optional) as keys in request body.\n<p>\n<ul>\n<li>url: The URL to check</li>\n<li>format: The format in which you would like the response data</li>\n<li> app_key: The API key. Optional, but without it the rate at which you can make requests will be much more limited</li>\n</ul>"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "https://www.google.com"
+		},
+		{
+			"key": "API key",
+			"value": ""
+		}
+	]
+}
