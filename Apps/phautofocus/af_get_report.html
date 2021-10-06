@@ -83,6 +83,8 @@ a:hover {
   <h3 class="wf-h3-style">AutoFocus Get Report</h3>
   {% if result.message %} <!------------------- Message ---------------------->
     <p>{{ result.message }}</p>
+  {% elif not result.data %}
+    <h4 class="wf-h4-style">No data found</h4>
   {% else %}
     <br>
     <h3 class="wf-h3-style">{{ result.data.tag.tag_name}}</h3>
