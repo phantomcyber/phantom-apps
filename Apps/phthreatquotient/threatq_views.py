@@ -1,4 +1,6 @@
 ###########################################################################################################
+# File: threatq_views.py
+#
 # ThreatQuotient Proprietary and Confidential
 # Copyright (c)2021 ThreatQuotient, Inc. All rights reserved.
 #
@@ -70,7 +72,7 @@ def render_summarize(provides, all_app_runs, context):
 
             results.append(ctx_result)
 
-    return "view_summarize.html"
+    return "threatq_view_summarize.html"
 
 
 def render_uploaded(provides, all_app_runs, context):
@@ -95,4 +97,4 @@ def render_uploaded(provides, all_app_runs, context):
 
             results.append(ctx_result)
 
-    return "view_uploaded.html"
+    return "threatq_view_uploaded.html"
