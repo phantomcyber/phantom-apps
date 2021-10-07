@@ -152,6 +152,8 @@ class ThreatQConnector(BaseConnector):
                 details = self.query_object_details('indicators', item, exact=exact, relationships=relationships)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
+                msg = '{} -- {}'.format(error_msg, traceback.format_exc())
+                self.debug_print(msg)
                 action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_QUERY_OBJECT_DETAILS.format(error=error_msg))
                 results.append(action_result)
                 continue
@@ -1181,8 +1183,8 @@ class ThreatQConnector(BaseConnector):
                 ThreatQObject.bulk_upload(self.tq, objs)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
-                msg = '{} -- {}'.format(error_msg, traceback.format_exc())
-                self.debug_print("{}. {}".format(THREATQ_ERR_BULK_UPLOAD, msg))
+                msg = '{} -- {}'.format(THREATQ_ERR_BULK_UPLOAD.format(error=error_msg), traceback.format_exc())
+                self.debug_print(msg)
                 continue
 
             uploaded.extend([u_obj for u_obj in objs if u_obj.oid])
