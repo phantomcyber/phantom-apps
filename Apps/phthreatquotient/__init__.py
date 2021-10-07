@@ -12,11 +12,3 @@
 # Dissemination of this information or reproduction of this material is strictly forbidden unless prior
 # written permission is obtained from ThreatQuotient, Inc.
 ###########################################################################################################
-
-from .indicator_parser import IndicatorParser
-from .utils import Utils
-
-__all__ = [
-    'IndicatorParser',
-    'Utils'
-]
