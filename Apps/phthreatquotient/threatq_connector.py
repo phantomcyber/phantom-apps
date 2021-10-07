@@ -152,7 +152,6 @@ class ThreatQConnector(BaseConnector):
                 details = self.query_object_details('indicators', item, exact=exact, relationships=relationships)
             except Exception as e:
                 error_msg = self._get_error_message_from_exception(e)
-                action_result.add_data({'display_value': 'test'})
                 action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_QUERY_OBJECT_DETAILS.format(error=error_msg))
                 results.append(action_result)
                 continue
