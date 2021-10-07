@@ -139,8 +139,6 @@ INPUT_TYPE_VALUE_LIST_ALERTS = ["All", "Domain", "File Hash", "IP"]
 TYPE_VALUE_LIST = ["Full", "Selective"]
 SCAN_TYPE_VALUE_LIST = ["Quick", "Full"]
 INPUT_TYPE_VALUE_LIST_DEVICES = ["All", "Domain", "File Hash"]
-INDICATOR_TYPE_LIST = ["FileSha1", "FileSha256", "IpAddress", "DomainName", "Url"]
-INDICATOR_ACTION_LIST = ["Alert", "AlertAndBlock", "Allowed"]
 INDICATOR_SEVERITY_LIST = ["", "Informational", "Low", "Medium", "High", None]
 
 # Constants relating to 'Indicators'

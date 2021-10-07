@@ -1756,13 +1756,9 @@ class WindowsDefenderAtpConnector(BaseConnector):
 
         # 'indicator_type' input parameter
         indicator_type = param[DEFENDERATP_JSON_INDICATOR_TYPE]
-        if indicator_type not in INDICATOR_TYPE_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_INDICATOR_TYPE)
 
         # 'action' input parameter
         action = param[DEFENDERATP_JSON_ACTION]
-        if action not in INDICATOR_ACTION_LIST:
-            return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_ACTION)
 
         application = param.get(DEFENDERATP_JSON_APPLICATION)
         recommended_actions = param.get(DEFENDERATP_JSON_RECOMMENDED_ACTIONS)

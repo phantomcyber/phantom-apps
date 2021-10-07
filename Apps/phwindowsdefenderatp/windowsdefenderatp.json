@@ -4588,6 +4588,12 @@
                     "data_path": "action_result.data.*.action",
                     "data_type": "string",
                     "example_values": [
+                        "Alert",
+                        "Warn",
+                        "Block",
+                        "Audit",
+                        "BlockAndRemediate",
+                        "AlertAndBlock",
                         "Allowed"
                     ],
                     "column_name": "Action",
@@ -4651,7 +4657,13 @@
                     "data_path": "action_result.data.*.indicatorType",
                     "data_type": "string",
                     "example_values": [
-                        "FileSha1"
+                        "FileSha1",
+                        "FileMd5",
+                        "CertificateThumbprint",
+                        "FileSha256",
+                        "IpAddress",
+                        "DomainName",
+                        "Url"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 5
@@ -4678,8 +4690,10 @@
                         "63b79504702c9c977e7165ad75d2e6989b2c5962"
                     ],
                     "contains": [
+                        "defender atp indicator value",
                         "sha1",
                         "sha256",
+                        "md5",
                         "domain",
                         "ip",
                         "ipv6",
@@ -4809,7 +4823,7 @@
         {
             "action": "submit indicator",
             "description": "Submit or Update new Indicator entity",
-            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/post-ti-indicator?view=o365-worldwide\" target=\"_blank\">Submit or Update Indicator API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. There is a limit of 15,000 active indicators per tenant.",
+            "verbose": "Based on the link (<a href=\"https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/post-ti-indicator?view=o365-worldwide\" target=\"_blank\">Submit or Update Indicator API Documentation</a>), rate limitations for this action are 100 calls per minute and 1500 calls per hour. There is a limit of 15,000 active indicators per tenant.<br><b>Notes:</b><ul><li>For the possible values of given action parameters, refer to the documentation link provided above.<li>CIDR notation for IPs is not supported.</li></ul>",
             "type": "generic",
             "identifier": "submit_indicator",
             "read_only": false,
@@ -4830,13 +4844,6 @@
                     "description": "Type of the indicator",
                     "data_type": "string",
                     "required": true,
-                    "value_list": [
-                        "FileSha1",
-                        "FileSha256",
-                        "IpAddress",
-                        "DomainName",
-                        "Url"
-                    ],
                     "order": 2
                 },
                 "indicator_value": {
@@ -4845,8 +4852,10 @@
                     "required": true,
                     "primary": true,
                     "contains": [
+                        "defender atp indicator value",
                         "sha1",
                         "sha256",
+                        "md5",
                         "ip",
                         "ipv6",
                         "url",
@@ -4858,11 +4867,6 @@
                     "description": "The action that will be taken if the indicator will be discovered in the organization",
                     "data_type": "string",
                     "required": true,
-                    "value_list": [
-                        "Alert",
-                        "AlertAndBlock",
-                        "Allowed"
-                    ],
                     "order": 4
                 },
                 "application": {
@@ -4923,6 +4927,12 @@
                     "data_path": "action_result.data.*.action",
                     "data_type": "string",
                     "example_values": [
+                        "Alert",
+                        "Warn",
+                        "Block",
+                        "Audit",
+                        "BlockAndRemediate",
+                        "AlertAndBlock",
                         "Allowed"
                     ],
                     "column_name": "Action",
@@ -4986,7 +4996,13 @@
                     "data_path": "action_result.data.*.indicatorType",
                     "data_type": "string",
                     "example_values": [
-                        "DomainName"
+                        "FileSha1",
+                        "FileMd5",
+                        "CertificateThumbprint",
+                        "FileSha256",
+                        "IpAddress",
+                        "DomainName",
+                        "Url"
                     ],
                     "column_name": "Indicator Type",
                     "column_order": 5
@@ -5026,10 +5042,12 @@
                         "test.com"
                     ],
                     "contains": [
+                        "defender atp indicator value",
                         "ip",
                         "ipv6",
                         "sha1",
                         "sha256",
+                        "md5",
                         "domain",
                         "url"
                     ],
@@ -5137,6 +5155,12 @@
                     "data_path": "action_result.parameter.action",
                     "data_type": "string",
                     "example_values": [
+                        "Alert",
+                        "Warn",
+                        "Block",
+                        "Audit",
+                        "BlockAndRemediate",
+                        "AlertAndBlock",
                         "Allowed"
                     ]
                 },
@@ -5165,7 +5189,13 @@
                     "data_path": "action_result.parameter.indicator_type",
                     "data_type": "string",
                     "example_values": [
-                        "DomainName"
+                        "FileSha1",
+                        "FileMd5",
+                        "CertificateThumbprint",
+                        "FileSha256",
+                        "IpAddress",
+                        "DomainName",
+                        "Url"
                     ]
                 },
                 {
@@ -5182,8 +5212,10 @@
                         "domain.com"
                     ],
                     "contains": [
+                        "defender atp indicator value",
                         "sha1",
                         "sha256",
+                        "md5",
                         "ip",
                         "ipv6",
                         "url",
