@@ -220,7 +220,8 @@ class AwsWafConnector(BaseConnector):
             'list_ip_sets': ['list_ip_sets', 'IPSets'],
             'list_acls': ['list_web_acls', 'WebACLs'],
             'add_ip': ['list_ip_sets', 'IPSets'],
-            'delete_ip': ['list_ip_sets', 'IPSets']
+            'delete_ip': ['list_ip_sets', 'IPSets'],
+            'delete_ip_set': ['list_ip_sets', 'IPSets']
         }
 
         action_identifier = self.get_action_identifier()
@@ -370,6 +371,48 @@ class AwsWafConnector(BaseConnector):
 
         return action_result.get_status()
 
+    def _handle_delete_ip_set(self, param):
+        self.save_progress(AWSWAF_INFO_ACTION.format(self.get_action_identifier()))
+
+        # Add an action result object to self (BaseConnector) to represent the action for this param
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ip_set_id = param.get('ip_set_id')
+        ip_set_name = param.get('ip_set_name')
+
+        ip_set = self.paginator(AWSWAF_DEFAULT_LIMIT, action_result, param)
+
+        ip_set_id, ip_set_name = self._verify_ip_set(action_result, ip_set, ip_set_id, ip_set_name)
+
+        if not ip_set_id:
+            return action_result.set_status(phantom.APP_ERROR, AWSWAF_INVALID_INPUT)
+
+        try:
+            ret_val, resp_json = self._make_boto_call(action_result, 'get_ip_set', Name=ip_set_name, Id=ip_set_id)
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(phantom.APP_ERROR, AWSWAF_ERR_GET_IPSET)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, str(e))
+
+        lock_token = resp_json.get('LockToken')
+
+        try:
+            ret_val, resp_json = self._make_boto_call(action_result, 'delete_ip_set', Name=ip_set_name,
+                                                      Id=ip_set_id, LockToken=lock_token)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, str(e))
+
+        summary = action_result.update_summary({})
+
+        if phantom.is_fail(ret_val):
+            summary['delete_status'] = AWSWAF_DELETE_IPSET_FAILED
+            return action_result.get_status()
+        summary['delete_status'] = AWSWAF_DELETE_IPSET_SUCCESS
+
+        action_result.add_data(resp_json)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_list_acls(self, param):
 
         self.save_progress(AWSWAF_INFO_ACTION.format(self.get_action_identifier()))
@@ -429,6 +472,7 @@ class AwsWafConnector(BaseConnector):
             'test_connectivity': self._handle_test_connectivity,
             'add_ip': self._handle_add_ip,
             'delete_ip': self._handle_delete_ip,
+            'delete_ip_set': self._handle_delete_ip_set,
             'list_acls': self._handle_list_acls,
             'list_ip_sets': self._handle_list_ip_sets
         }

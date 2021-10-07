@@ -5,14 +5,14 @@
     "publisher": "Splunk",
     "package_name": "phantom_phishtank",
     "type": "investigative",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "main_module": "phishtank_connector.py",
     "app_version": "2.0.1",
     "utctime_updated": "2020-12-08T09:55:55.000000Z",
     "product_vendor": "OpenDNS",
     "product_name": "PhishTank",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.8.24304",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud, API: checkurl.phishtank.com/checkurl/, January 31 2020"
