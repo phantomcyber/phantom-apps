@@ -187,20 +187,20 @@ class AutoFocusConnector(BaseConnector):
                     if 'tag' in i['_source']:
                         for tag in i['_source']['tag']:
                             tag_set.add(tag)
+
+            for tag in tag_set:
+                r = self._afapi.tag(tagname=tag)
+                if not self._validate_api_call(r, action_result):
+                    # Something wrong is going on if it reaches here
+                    continue
+                tag_data = {}
+                tag_data['description'] = r.json['tag']['description']
+                tag_data['tag_name'] = r.json['tag']['tag_name']
+                tag_data['public_tag_name'] = r.json['tag']['public_tag_name']
+                tag_data['count'] = r.json['tag']['count']
+                action_result.add_data(tag_data)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
-
-        for tag in tag_set:
-            r = self._afapi.tag(tagname=tag)
-            if not self._validate_api_call(r, action_result):
-                # Something wrong is going on if it reaches here
-                continue
-            tag_data = {}
-            tag_data['description'] = r.json['tag']['description']
-            tag_data['tag_name'] = r.json['tag']['tag_name']
-            tag_data['public_tag_name'] = r.json['tag']['public_tag_name']
-            tag_data['count'] = r.json['tag']['count']
-            action_result.add_data(tag_data)
 
         action_result.update_summary({'total_tags_matched': action_result.get_data_size()})
 

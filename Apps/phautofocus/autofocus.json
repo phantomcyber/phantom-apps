@@ -12,6 +12,7 @@
     "product_name": "AutoFocus",
     "product_version_regex": ".*",
     "min_phantom_version": "4.10.0.40961",
+    "python_version": "2.7",
     "logo": "logo_paloaltonetworks.svg",
     "logo_dark": "logo_paloaltonetworks_dark.svg",
     "license": "Copyright (c) 2021 Splunk Inc.",
@@ -62,8 +63,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
