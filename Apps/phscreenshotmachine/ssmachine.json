@@ -32,7 +32,7 @@
             "order": 1
         },
         "cache_limit": {
-            "description": "Cache Limit (how old cached images are accepted (in days))",
+            "description": "Cache Limit (how old cached images are accepted (in days), Default: 0)",
             "data_type": "numeric",
             "default": 0,
             "order": 2
