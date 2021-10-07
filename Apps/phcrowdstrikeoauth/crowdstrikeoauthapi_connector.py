@@ -1761,20 +1761,22 @@ class CrowdstrikeConnector(BaseConnector):
         if ioc and not ioc_type and not resource_id:
             return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE)
 
+        params = {}
         if resource_id:
-            params = {
-                'ids': resource_id
-            }
-            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
+            params = {'filter': CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID.format(resource_id)}
 
         else:
             params = {'filter': CROWDSTRIKE_FILTER_GET_CUSTOM_IOC.format(ioc_type, ioc)}
-            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=params)
 
-        if phantom.is_fail(ret_val):
+        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=params)
+
+        if phantom.is_fail(ret_val) and '404' not in action_result.get_message():
             return action_result.get_status()
 
         action_result.add_data(resp_json)
+
+        if '404' in action_result.get_message() or len(resp_json.get('resources', [])) == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_GET_ALERT)
 
@@ -2208,7 +2210,7 @@ class CrowdstrikeConnector(BaseConnector):
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
         if not ioc and not resource_id:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE)
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC)
 
         if resource_id:
             api_data = {'ids': resource_id}

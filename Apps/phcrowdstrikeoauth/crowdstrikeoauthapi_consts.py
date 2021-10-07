@@ -85,7 +85,7 @@ CROWDSTRIKE_SUCC_GET_ALERT = "Indicator fetched successfully"
 CROWDSTRIKE_SUCC_POST_ALERT = "IOC uploaded successfully"
 CROWDSTRIKE_SUCC_DELETE_ALERT = "Successfully deleted indicator"
 CROWDSTRIKE_SUCC_UPDATE_ALERT = "Successfully updated indicator"
-CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE = "Please provide at least one of the parameter"
+CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE = "Please provide either 'resource id' or 'indicator type' and 'indicator value'"
 CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE = "Please provide indicator value"
 CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE = "Please provide indicator type"
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
@@ -108,7 +108,8 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_name__contains="{2}"'\
                                  '&_filter_start_time__gte="{3}"'
 CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
-CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "type:'{}'+value:'{}',deleted:'true',deleted:'false'"
+CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
+CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -179,3 +180,5 @@ CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT = {
 CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
+CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
+CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC = 'Please provide at least one of the parameter'

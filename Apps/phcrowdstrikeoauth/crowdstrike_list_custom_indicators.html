@@ -158,11 +158,15 @@ a:hover {
           {{ curr_entry.type | default:"None"}}
         </td>
         <td>
+          {% if curr_entry.value %}
           <a href="javascript:;" onclick="context_menu(this, [{'contains': ['md5'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value | default:"None"}}
+            {{ curr_entry.value }}
             &nbsp;
             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
           </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.severity | default:"None" }}
@@ -208,11 +212,15 @@ a:hover {
           {{ curr_entry.type | default:"None"}}
         </td>
         <td>
+          {% if curr_entry.value %}
           <a href="javascript:;" onclick="context_menu(this, [{'contains': ['sha256'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value | default:"None"}}
+            {{ curr_entry.value }}
             &nbsp;
             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
           </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.severity | default:"None" }}
@@ -258,11 +266,15 @@ a:hover {
           {{ curr_entry.type | default:"None"}}
         </td>
         <td>
+          {% if curr_entry.value %}
           <a href="javascript:;" onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value | default:"None"}}
+            {{ curr_entry.value}}
             &nbsp;
             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
           </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.severity | default:"None" }}
@@ -308,11 +320,15 @@ a:hover {
           {{ curr_entry.type | default:"None"}}
         </td>
         <td>
+          {% if curr_entry.value %}
           <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value | default:"None"}}
+            {{ curr_entry.value}}
             &nbsp;
             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
           </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.severity | default:"None" }}
@@ -358,11 +374,15 @@ a:hover {
           {{ curr_entry.type | default:"None"}}
         </td>
         <td>
+          {% if curr_entry.value %}
           <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_entry.value }}' }], 0, {{ container.id }}, null, false);">
-            {{ curr_entry.value | default:"None"}}
+            {{ curr_entry.value }}
             &nbsp;
             <span class="fa fa-caret-down" style="font-size: smaller;"></span>
           </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.severity | default:"None" }}
