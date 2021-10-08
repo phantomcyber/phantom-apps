@@ -1774,10 +1774,14 @@ class WindowsDefenderAtpConnector(BaseConnector):
         rbac_group_names = param.get(DEFENDERATP_JSON_RBAC_GROUP_NAMES)
         if rbac_group_names:
             # Load the json value
-            rbac_group_names_list = json.loads(rbac_group_names)
-            # Check for valid JSON formatted list
-            if not isinstance(rbac_group_names_list, list):
-                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_LIST_JSON_ERR.format("rbac_group_names")), None
+            try:
+                rbac_group_names_list = json.loads(rbac_group_names)
+                # Check for valid JSON formatted list
+                if not isinstance(rbac_group_names_list, list):
+                    return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_LIST_JSON_ERR.format("rbac_group_names"))
+            except Exception as e:
+                self.debug_print("Exception occurred while checking rbac_group_names: {}".format(self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR, DEFENDERATP_INVALID_LIST_JSON_ERR.format("rbac_group_names"))
             # Remove empty values from the list
             rbac_group_names_list = list(filter(None, rbac_group_names_list))
             if not rbac_group_names_list:
