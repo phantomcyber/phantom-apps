@@ -1748,7 +1748,7 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
+        ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
         ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
@@ -1763,17 +1763,22 @@ class CrowdstrikeConnector(BaseConnector):
 
         params = {}
         if resource_id:
-            params = {'filter': CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID.format(resource_id)}
-
+            params = {
+                'ids': resource_id
+            }
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_INDICATOR_ENDPOINT, params=params)
         else:
             params = {'filter': CROWDSTRIKE_FILTER_GET_CUSTOM_IOC.format(ioc_type, ioc)}
-
-        ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=params)
+            ret_val, resp_json = self._make_rest_call_helper_oauth2(action_result, CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT, params=params)
 
         if phantom.is_fail(ret_val) and '404' not in action_result.get_message():
             return action_result.get_status()
 
-        action_result.add_data(resp_json)
+        if '404' not in action_result.get_message():
+            for indicator_data in resp_json.get('resources', []):
+                action_result.add_data(indicator_data)
+        else:
+            action_result.add_data(resp_json)
 
         if '404' in action_result.get_message() or len(resp_json.get('resources', [])) == 0:
             return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_GET_RESOURCE_NOT_FOUND)

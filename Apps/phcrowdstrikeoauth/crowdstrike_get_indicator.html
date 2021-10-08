@@ -113,8 +113,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for indicator in result.data %}
-                                {% for resource in indicator.resources %}
+                            {% for resource in result.data %}
                                     <tr>
                                         <td>
                                             {% if resource.id %}
@@ -171,7 +170,6 @@
                                             {{ resource.expiration | default:"None"}}
                                         </td>
                                     </tr>
-                                {% endfor %}
                             {% endfor %}
                         </tbody>
                     </table>

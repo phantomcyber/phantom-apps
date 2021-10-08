@@ -7002,12 +7002,20 @@
                 "indicator_type": {
                     "data_type": "string",
                     "description": "The type of the indicator",
+                    "primary": true,
                     "order": 1,
                     "value_list": [
                         "sha256",
                         "md5",
                         "domain",
                         "ipv4",
+                        "ipv6"
+                    ],
+                    "contains": [
+                        "domain",
+                        "md5",
+                        "sha256",
+                        "ip",
                         "ipv6"
                     ]
                 },
@@ -7035,6 +7043,13 @@
                     "data_type": "string",
                     "example_values": [
                         "domain"
+                    ],
+                    "contains": [
+                        "domain",
+                        "md5",
+                        "sha256",
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
