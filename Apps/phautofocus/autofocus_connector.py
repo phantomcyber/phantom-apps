@@ -183,9 +183,9 @@ class AutoFocusConnector(BaseConnector):
             # Truthfully I'm not sure what could cause either of these first two loops to iterate more than once
             # But they return lists so it must be possible somehow
             for r in self._afapi.samples_search_results(data=body):
-                for i in r.json['hits']:
-                    if 'tag' in i['_source']:
-                        for tag in i['_source']['tag']:
+                for i in r.json.get('hits', []):
+                    if 'tag' in i.get('_source'):
+                        for tag in i.get('_source', {}).get('tag', []):
                             tag_set.add(tag)
 
             for tag in tag_set:
@@ -194,10 +194,10 @@ class AutoFocusConnector(BaseConnector):
                     # Something wrong is going on if it reaches here
                     continue
                 tag_data = {}
-                tag_data['description'] = r.json['tag']['description']
-                tag_data['tag_name'] = r.json['tag']['tag_name']
-                tag_data['public_tag_name'] = r.json['tag']['public_tag_name']
-                tag_data['count'] = r.json['tag']['count']
+                tag_data['description'] = r.json.get('tag', {}).get('description')
+                tag_data['tag_name'] = r.json.get('tag', {}).get('tag_name')
+                tag_data['public_tag_name'] = r.json.get('tag', {}).get('public_tag_name')
+                tag_data['count'] = r.json.get('tag', {}).get('count')
                 action_result.add_data(tag_data)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
