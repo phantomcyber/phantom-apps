@@ -132,13 +132,23 @@ class ThreatQConnector(BaseConnector):
         Returns: List of action results (per input indicator)
         """
 
+        # Add action results
+        action_result = ActionResult(dict(params))
+
         # Get the passed items
         values = params['indicator_list']
         exact = params.get('exact', False)
         relationships = params.get('with_all_relationships', False)
 
         # Convert input to a list
-        items = self.get_value_list(values)
+        try:
+            items = self.get_value_list(values)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            msg = '{} -- {}'.format(error_msg, traceback.format_exc())
+            self.debug_print(msg)
+            action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_PARSE_INDICATOR_LIST.format(error=error_msg))
+            return action_result
 
         results = []
         for index, item in enumerate(items):
@@ -967,7 +977,14 @@ class ThreatQConnector(BaseConnector):
         values = params['adversary_list']
 
         # Convert input to a list
-        items = self.get_value_list(values)
+        try:
+            items = self.get_value_list(values)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            msg = '{} -- {}'.format(error_msg, traceback.format_exc())
+            self.debug_print(msg)
+            action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_PARSE_ADVERSARY_LIST.format(error=error_msg))
+            return action_result
 
         self.save_progress("Creating [{}] adversaries in ThreatQ".format(len(items)))
 
@@ -1024,6 +1041,8 @@ class ThreatQConnector(BaseConnector):
         Returns: Action result
         """
 
+        action_result = ActionResult(dict(params))
+
         # Get container info
         _, container_info, _ = self.get_container_info()
         tlp = container_info.get('sensitivity')
@@ -1033,10 +1052,16 @@ class ThreatQConnector(BaseConnector):
         object_type = params['object_type']
 
         # Convert input to a list
-        items = self.get_value_list(values)
+        try:
+            items = self.get_value_list(values)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            msg = '{} -- {}'.format(error_msg, traceback.format_exc())
+            self.debug_print(msg)
+            action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_PARSE_OBJECT_LIST.format(error=error_msg))
+            return action_result
 
         # Make sure the object type is valid
-        action_result = ActionResult(dict(params))
         obj_data = Utils.match_name_to_object(object_type)
         if not obj_data:
             action_result.set_status(phantom.APP_ERROR, "Invalid object type provided!")
@@ -1237,7 +1262,14 @@ class ThreatQConnector(BaseConnector):
         self.save_progress("Fetching related [{}] in ThreatQ".format(obj_data.get('display_name_plural')))
 
         # Convert the input values into a list
-        items = self.get_value_list(values)
+        try:
+            items = self.get_value_list(values)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            msg = '{} -- {}'.format(error_msg, traceback.format_exc())
+            self.debug_print(msg)
+            action_result.set_status(phantom.APP_ERROR, THREATQ_ERR_PARSE_OBJECT_LIST.format(error=error_msg))
+            return action_result
 
         results = []
         for index, item in enumerate(items):

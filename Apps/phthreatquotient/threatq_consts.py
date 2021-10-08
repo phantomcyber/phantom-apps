@@ -42,6 +42,7 @@ THREATQ_ERR_QUERY_OBJECT_DETAILS = "Error occurred while querying for object det
 THREATQ_ERR_GET_RELATED_OBJECTS = "Error occurred while fetching related objects. {error}"
 THREATQ_ERR_SET_DATA_RESPONSE = "Error occurred while adding data and summary to the action result. {error}"
 THREATQ_ERR_PARSE_INDICATOR_LIST = "Error occurred while parsing the 'indicator_list' action parameter. {error}"
+THREATQ_ERR_PARSE_ADVERSARY_LIST = "Error occurred while parsing the 'adversary_list' action parameter. {error}"
 THREATQ_ERR_PARSE_OBJECT_LIST = "Error occurred while parsing the 'object_list' action parameter. {error}"
 THREATQ_ERR_BULK_UPLOAD = "Error occurred while uploading a list of ThreatObjects. {error}"
 THREATQ_ERR_GET_USERS = "Error occurred while getting users. {error}"
