@@ -48,6 +48,10 @@ class PhishlabsConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
@@ -154,7 +158,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/data/cases', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             self.save_progress("Test Connectivity Failed.")
@@ -181,7 +185,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/data/cases/{0}'.format(case_id), action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -247,7 +251,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/create/newCase', action_result, params=None, headers=None, method="post", data=request)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -279,7 +283,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/data/cases', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -312,7 +316,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/create/brands', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -325,7 +329,7 @@ class PhishlabsConnector(BaseConnector):
         # make rest call
         ret_val, response = self._make_rest_call('/create/caseTypes', action_result, params=None, headers=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             # the call to the 3rd party device or service failed, action result should contain all the error details
             # so just return from here
             return action_result.get_status()
@@ -411,15 +415,15 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get("https://127.0.0.1/login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -432,11 +436,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = 'https://127.0.0.1/login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -447,11 +451,11 @@ if __name__ == '__main__':
         connector = PhishlabsConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

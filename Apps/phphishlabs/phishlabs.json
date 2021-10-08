@@ -10,11 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "1.0.8",
+    "app_version": "2.0.0",
     "utctime_updated": "2018-12-07T02:01:07.000000Z",
     "package_name": "phantom_phishlabs",
-    "main_module": "phishlabs_connector.pyc",
-    "min_phantom_version": "3.0.284",
+    "main_module": "phishlabs_connector.py",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, October 8, 2021"
+    ],
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
@@ -35,7 +39,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -46,7 +49,6 @@
             "action": "get ticket",
             "identifier": "get_ticket",
             "description": "Get case (issue) information",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -58,7 +60,6 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -67,7 +68,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -339,7 +341,6 @@
             "action": "create ticket",
             "identifier": "create_ticket",
             "description": "Create a new case submission",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -348,28 +349,21 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
-                    "default": "",
                     "order": 0
                 },
                 "url": {
                     "description": "URL",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "url"
                     ],
-                    "default": "",
                     "order": 1
                 },
                 "description": {
                     "description": "Description of the case",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
-                    "contains": [],
-                    "default": "",
                     "order": 2
                 },
                 "case_type": {
@@ -380,7 +374,6 @@
                     "contains": [
                         "phishlabs case type"
                     ],
-                    "default": "",
                     "order": 3
                 },
                 "brand": {
@@ -391,7 +384,6 @@
                     "contains": [
                         "phishlabs brand"
                     ],
-                    "default": "",
                     "order": 4
                 }
             },
@@ -400,7 +392,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -428,7 +421,6 @@
                 {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
-                    "contains": [],
                     "example_values": [
                         "This is my description"
                     ],
@@ -438,7 +430,6 @@
                 {
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
-                    "contains": [],
                     "example_values": [
                         "my_case_title"
                     ],
@@ -466,7 +457,7 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "column_name": "Case Id",
+                    "column_name": "Case ID",
                     "column_order": 0
                 },
                 {
@@ -540,7 +531,6 @@
             "action": "list tickets",
             "identifier": "list_tickets",
             "description": "Get a list of cases in PhishLabs",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -549,7 +539,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -571,7 +562,7 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "column_name": "Case Id",
+                    "column_name": "Case ID",
                     "column_order": 4
                 },
                 {
@@ -738,10 +729,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.resolutionStatus",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.title",
@@ -795,13 +783,6 @@
             "identifier": "get_config",
             "read_only": true,
             "parameters": {},
-            "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 5,
-                "title": "Get Config",
-                "view": "phishlabs_view.display_config"
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -867,6 +848,13 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "title": "Get Config",
+                "view": "phishlabs_view.display_config"
+            },
             "versions": "EQ(*)"
         }
     ]
