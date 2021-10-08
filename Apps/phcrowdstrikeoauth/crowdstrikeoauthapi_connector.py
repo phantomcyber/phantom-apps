@@ -1748,7 +1748,9 @@ class CrowdstrikeConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
+        ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
+        if ioc_type:
+            ioc_type = ioc_type.lower()
         ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
@@ -2137,7 +2139,8 @@ class CrowdstrikeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.add_data(response)
+        for indicator_data in response.get('resources', []):
+            action_result.add_data(indicator_data)
 
         return action_result.set_status(phantom.APP_SUCCESS, CROWDSTRIKE_SUCC_POST_ALERT)
 

@@ -7077,28 +7077,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0.002269266
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.trace_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "6a4b970e-93a9-4151-bac4-e721ff3925a8"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.action",
+                    "data_path": "action_result.data.*.action",
                     "data_type": "string",
                     "example_values": [
                         "none"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.applied_globally",
+                    "data_path": "action_result.data.*.applied_globally",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -7106,28 +7092,28 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "example_values": [
                         "C16JJOUVVY125J3O50FF"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_path": "action_result.data.*.created_on",
                     "data_type": "string",
                     "example_values": [
                         "2021-09-09T08:51:04.131068458Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_timestamp",
+                    "data_path": "action_result.data.*.created_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2018-08-17T15:19:31Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.deleted",
+                    "data_path": "action_result.data.*.deleted",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -7135,28 +7121,28 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
                         "test description"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expiration",
+                    "data_path": "action_result.data.*.expiration",
                     "data_type": "string",
                     "example_values": [
                         "2022-09-09T08:51:03Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expiration_timestamp",
+                    "data_path": "action_result.data.*.expiration_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2018-09-16T00:00:00Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expired",
+                    "data_path": "action_result.data.*.expired",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -7164,7 +7150,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.from_parent",
+                    "data_path": "action_result.data.*.from_parent",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -7172,77 +7158,99 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
                         "99cd3772bf570aebea6e58059532ac902798583d6e75e6817364da70a062673a"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_path": "action_result.data.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
                     "data_type": "string",
                     "example_values": [
                         "ae2000074e144336ea1de4de9dc1bd39"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_path": "action_result.data.*.modified_on",
                     "data_type": "string",
                     "example_values": [
                         "2021-09-09T08:51:04.131068458Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_timestamp",
+                    "data_path": "action_result.data.*.modified_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2018-08-17T15:19:31Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.policy",
+                    "data_path": "action_result.data.*.policy",
                     "data_type": "string",
                     "example_values": [
                         "none"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.severity",
+                    "data_path": "action_result.data.*.severity",
                     "data_type": "string",
                     "example_values": [
                         "medium"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.share_level",
+                    "data_path": "action_result.data.*.share_level",
                     "data_type": "string",
                     "example_values": [
                         "red"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.source",
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
                         "test source"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_path": "action_result.data.*.tags",
                     "data_type": "string",
                     "example_values": [
                         "tag1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_path": "action_result.data.*.type",
                     "data_type": "string",
                     "example_values": [
                         "domain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.value",
+                    "data_path": "action_result.data.*.value",
                     "data_type": "string",
                     "example_values": [
                         "xyz"
@@ -8115,60 +8123,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.errors",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.pagination.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.powered_by",
-                    "data_type": "string",
-                    "example_values": [
-                        "ioc-manager"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric",
-                    "example_values": [
-                        5.154201499
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.trace_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "cb5cb5f4-13b5-4623-88e5-a0e3a6ae7768"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.resources.*.action",
+                    "data_path": "action_result.data.*.action",
                     "data_type": "string",
                     "example_values": [
                         "no_action"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.applied_globally",
+                    "data_path": "action_result.data.*.applied_globally",
                     "data_type": "boolean",
                     "example_values": [
                         false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "example_values": [
                         "ae1690074e144356ae2de5de8dc1bd93"
@@ -8178,49 +8147,49 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_on",
+                    "data_path": "action_result.data.*.created_on",
                     "data_type": "string",
                     "example_values": [
                         "2021-09-15T09:52:27.651770437Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.deleted",
+                    "data_path": "action_result.data.*.deleted",
                     "data_type": "boolean",
                     "example_values": [
                         false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
                         "Test description"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expiration",
+                    "data_path": "action_result.data.*.expiration",
                     "data_type": "string",
                     "example_values": [
                         "2021-09-25T09:52:27Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expired",
+                    "data_path": "action_result.data.*.expired",
                     "data_type": "boolean",
                     "example_values": [
                         false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.from_parent",
+                    "data_path": "action_result.data.*.from_parent",
                     "data_type": "boolean",
                     "example_values": [
                         false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.host_groups",
+                    "data_path": "action_result.data.*.host_groups",
                     "data_type": "string",
                     "example_values": [
                         "0491ecd214614b5ab3bca1037a15390b"
@@ -8230,7 +8199,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.id",
+                    "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "example_values": [
                         "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
@@ -8240,14 +8209,29 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.metadata.filename",
+                    "data_path": "action_result.data.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.filename",
                     "data_type": "string",
                     "example_values": [
                         "test_file_name"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_path": "action_result.data.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
                     "data_type": "string",
                     "example_values": [
                         "ae1690074e144356ae2de5de8dc1bd93"
@@ -8257,49 +8241,49 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_on",
+                    "data_path": "action_result.data.*.modified_on",
                     "data_type": "string",
                     "example_values": [
                         "2021-09-15T09:52:27.651770437Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.platforms",
+                    "data_path": "action_result.data.*.platforms",
                     "data_type": "string",
                     "example_values": [
                         "mac"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.severity",
+                    "data_path": "action_result.data.*.severity",
                     "data_type": "string",
                     "example_values": [
                         "high"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.source",
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
                         "Test source"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.tags",
+                    "data_path": "action_result.data.*.tags",
                     "data_type": "string",
                     "example_values": [
                         "test_tag"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_path": "action_result.data.*.type",
                     "data_type": "string",
                     "example_values": [
                         "ipv4"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.value",
+                    "data_path": "action_result.data.*.value",
                     "data_type": "string",
                     "example_values": [
                         "8.8.8.8"
