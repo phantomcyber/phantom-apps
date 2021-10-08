@@ -299,9 +299,9 @@ class ThreatQConnector(BaseConnector):
         if prefix:
             prefix = prefix.strip()
             if prefix.endswith(':'):
-                prefix = prefix[:-1]
-            if prefix.endswith(' - '):
-                prefix = prefix[:-3]
+                prefix = prefix[:-1].strip()
+            if prefix.endswith('-'):
+                prefix = prefix[:-1].strip()
             name = '{}: {}'.format(prefix, name)
 
         # Match the assignee to a user ID
@@ -481,7 +481,7 @@ class ThreatQConnector(BaseConnector):
             due_time = None
 
         # Get event data from params
-        event_type = params.get('event_type', "Incident")
+        event_type = params['event_type']
         values = params.get('indicator_list', '')
 
         try:
@@ -689,7 +689,7 @@ class ThreatQConnector(BaseConnector):
 
         # Get parameters from request
         vault_id = params['vault_id']
-        parse = params.get('parse_for_indicators', False)
+        parse = params['parse_for_indicators']
         indicator_status = params.get('default_indicator_status', 'Review')
 
         # Get the file from the vault
@@ -733,7 +733,7 @@ class ThreatQConnector(BaseConnector):
         if tq_file.fid:
             self.save_progress('File already exists in ThreatQ. Not re-uploading or re-parsing')
         else:
-            self.save_progress('Uploading spearphish event to ThreatQ')
+            self.save_progress('Uploading file to ThreatQ')
             try:
                 tq_file.upload(sources=source_obj)
             except Exception as e:
@@ -821,8 +821,8 @@ class ThreatQConnector(BaseConnector):
         name = params['investigation_name']
         priority = params['investigation_priority']
         desc = params.get('investigation_description', '')
-        visibility = params.get('investigation_visibility', 'Private')
-        values = params.get('indicator_list', '')
+        visibility = params['investigation_visibility']
+        values = params['indicator_list']
 
         try:
             found, unknown = Utils.parse_agnostic_input(values)
@@ -964,7 +964,7 @@ class ThreatQConnector(BaseConnector):
         tlp = container_info.get('sensitivity')
 
         # Get the passed items
-        values = params.get('adversary_list')
+        values = params['adversary_list']
 
         # Convert input to a list
         items = self.get_value_list(values)
@@ -1029,8 +1029,8 @@ class ThreatQConnector(BaseConnector):
         tlp = container_info.get('sensitivity')
 
         # Get the passed items
-        values = params.get('object_list')
-        object_type = params.get('object_type')
+        values = params['object_list']
+        object_type = params['object_type']
 
         # Convert input to a list
         items = self.get_value_list(values)
@@ -1130,10 +1130,10 @@ class ThreatQConnector(BaseConnector):
         source_obj = ThreatQSource("Phantom", tlp=tlp)
 
         # Get the passed items
-        values = params.get('object_list')
-        object_type = params.get('object_type')
-        attribute_name = params.get('attribute_name')
-        attribute_value = params.get('attribute_value')
+        values = params['object_list']
+        object_type = params['object_type']
+        attribute_name = params['attribute_name']
+        attribute_value = params['attribute_value']
 
         # Make sure the object type is valid
         obj_data = Utils.match_name_to_object(object_type)
@@ -1222,9 +1222,9 @@ class ThreatQConnector(BaseConnector):
         """
 
         # Get the passed items
-        values = params.get('object_list')
-        object_type = params.get('object_type')
-        related_object_type = params.get('related_object_type')
+        values = params['object_list']
+        object_type = params['object_type']
+        related_object_type = params['related_object_type']
 
         # Make sure the object type is valid
         action_result = ActionResult(dict(params))
@@ -1329,8 +1329,8 @@ class ThreatQConnector(BaseConnector):
         source_obj = ThreatQSource("Phantom", tlp=tlp)
 
         # Get the passed items
-        values = params.get('indicator_list')
-        indicator_status = params.get('indicator_status', self.default_status)
+        values = params['indicator_list']
+        indicator_status = params['indicator_status']
 
         try:
             found, unknown = Utils.parse_agnostic_input(values)
