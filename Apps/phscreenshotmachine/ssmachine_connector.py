@@ -47,7 +47,7 @@ class SsmachineConnector(BaseConnector):
             if DEFAULT_CACHE_LIMIT <= float(cache_limit) <= MAX_CACHE_LIMIT:
                 self.cache_limit = float(cache_limit)
             else:
-                self.cache_limit = DEFAULT_CACHE_LIMIT
+                return self.set_status(phantom.APP_ERROR, VALID_CACHE_LIMIT_MSG)
         except:
             return self.set_status(phantom.APP_ERROR, VALID_CACHE_LIMIT_MSG)
 
