@@ -5,6 +5,9 @@
 #
 # --
 SSMACHINE_JSON_DOMAIN = "https://api.screenshotmachine.com/"
+MAX_CACHE_LIMIT = 14
+DEFAULT_CACHE_LIMIT = 0
+VALID_CACHE_LIMIT_MSG = "Please provide a valid value in the 'Cache Limit' configuration parameter, the allowed range is [0-14]"
 
 # Constants relating to '_get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"
