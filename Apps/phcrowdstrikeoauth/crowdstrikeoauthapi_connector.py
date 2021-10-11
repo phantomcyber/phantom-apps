@@ -100,9 +100,9 @@ class CrowdstrikeConnector(BaseConnector):
         :param input_ip_address: IP address
         :return: status (success/failure)
         """
-        ip_address_input = input_ip_address
+
         try:
-            ipaddress.ip_address(UnicodeDammit(ip_address_input).unicode_markup)
+            ipaddress.ip_address(input_ip_address)
         except Exception:
             return False
         return True
