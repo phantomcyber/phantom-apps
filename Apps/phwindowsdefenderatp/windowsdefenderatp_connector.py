@@ -2142,7 +2142,7 @@ class WindowsDefenderAtpConnector(BaseConnector):
             file_name = result.headers.get("Content-Disposition")
             file_name = unquote(str(re.findall("filename=(.+)", file_name)[0]).strip('"').rsplit('.gz', 1)[0])
         except:
-            summary['live_response_result'] = "Error occured while getting the file name"
+            summary['live_response_result'] = "Error occurred while getting the file name"
             return action_result.set_status(phantom.APP_ERROR)
 
         ret_val, vault_id = self._vault_file(filename=file_name, content=result.content)
