@@ -17,6 +17,10 @@ from bs4 import UnicodeDammit
 import sys
 import simplejson as json
 import requests
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 import os
 os.sys.path.insert(0, '{}/pan-python/lib'.format(os.path.dirname(os.path.abspath(__file__))))  # noqa
 import pan.afapi  # noqa
@@ -287,7 +291,7 @@ class AutoFocusConnector(BaseConnector):
         try:
             r = self._afapi.tag(tagname=tag)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
+            return action_result.set_status(phantom.APP_ERROR, unquote(self._get_error_message_from_exception(e)))
         ret_val = self._validate_api_call(r, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
