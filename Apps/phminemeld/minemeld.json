@@ -1,0 +1,323 @@
+{
+    "appid": "06bb531b-86e7-4c10-9e6b-58fbc9b018b3",
+    "name": "MineMeld",
+    "description": "This app integrates with the Palo Alto Networks MindMeld  threat intelligence processing tool to execute actions like 'upload indicator'.",
+    "type": "sandbox",
+    "product_vendor": "Palo Alto Networks",
+    "logo": "minemeld.png",
+    "logo_dark": "minemeld_dark.png",
+    "product_name": "MineMeld",
+    "product_version_regex": ".*",
+    "publisher": "Phantom",
+    "license": "Copyright (c) Phantom, 2020",
+    "app_version": "1.0.1",
+    "utctime_updated": "2020-01-09T08:17:52.745569Z",
+    "package_name": "phantom_minemeld",
+    "main_module": "minemeld_connector.py",
+    "min_phantom_version": "4.5.15922",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "endpoint": {
+            "description": "Endpoint URL",
+            "verbose": "Endpoint URL, for example: https://10.0.0.2:443/",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "",
+            "order": 0
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "value_list": [],
+            "default": "admin",
+            "order": 1
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 2
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Test connectivity",
+            "type": "investigate",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table",
+                "title": "Resilient Incident"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "upload file",
+            "identifier": "upload_file",
+            "description": "Upload a file in the given node name.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID of file to detonate",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id",
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "txt",
+                        "log",
+                        "ppt",
+                        "file"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "node_name": {
+                    "description": "Target Node Name (For Example: wlWhiteListIPv4)",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "file_type": {
+                    "description": "File type",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "file type"
+                    ],
+                    "value_list": [
+                        "IPv4",
+                        "IPv6",
+                        "domain",
+                        "URL" ],
+                    "default": "IPv4",
+                    "order": 2
+                },
+                "dry_run": {
+                    "description": "Dry Run",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 3
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "column_name": "vault_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "file_name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "process indicator",
+            "identifier": "send_indicator",
+            "description": "Send indicator(s) to given node name (blacklist, whitelist, etc).",
+            "verbose": "",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "indicator": {
+                    "description": "Indicator such as IP, Domain, or Url.",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "node_name": {
+                    "description": "Target Node Name",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [
+                        "file name"
+                    ],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "file_type": {
+                    "description": "File type",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [
+                        "file type"
+                    ],
+                    "value_list": [
+                        "IPv4",
+                        "IPv6",
+                        "domain",
+                        "URL",
+                        "Automatic" ],
+                    "default": "Automatic",
+                    "order": 2
+                },
+                "dry_run": {
+                    "description": "Dry Run",
+                    "data_type": "boolean",
+                    "required": true,
+                    "primary": false,
+                    "default": false,
+                    "order": 3
+                },
+                "share_level": {
+                    "description": "Share Level",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "green",
+                    "value_list" : [
+                        "green",
+                        "white",
+                        "yellow",
+                        "red"],
+                    "order": 4
+                },
+                "is_remove": {
+                    "description": "Remove Indicator",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 5
+                },
+                "is_update": {
+                    "description": "Update Indicator",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "default": false,
+                    "order": 6
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "pe file",
+                        "pdf",
+                        "flash",
+                        "apk",
+                        "jar",
+                        "doc",
+                        "xls",
+                        "ppt"
+                    ],
+                    "column_name": "vault_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.file_name",
+                    "data_type": "string",
+                    "contains": [
+                        "file name"
+                    ],
+                    "column_name": "file_name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
