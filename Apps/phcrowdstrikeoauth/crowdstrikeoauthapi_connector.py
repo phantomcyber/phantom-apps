@@ -1764,8 +1764,8 @@ class CrowdstrikeConnector(BaseConnector):
         ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
         if ioc_type:
             ioc_type = ioc_type.lower()
-        if ioc_type not in ["sha256", "md5", "domain", "ipv4", "ipv6"]:
-            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+            if ioc_type not in ["sha256", "md5", "domain", "ipv4", "ipv6"]:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
         ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
