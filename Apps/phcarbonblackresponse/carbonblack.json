@@ -1784,7 +1784,7 @@
                     "order": 3,
                     "default": false
                 },
-                "assign_to": {
+                "assigned_to": {
                     "description": "Assign owner of alert",
                     "data_type": "string",
                     "order": 4
@@ -1829,6 +1829,8 @@
                 {
                     "data_path": "action_result.parameter.query",
                     "data_type": "string",
+                    "column_name": "Query",
+                    "column_order": 0,
                     "contains": [
                         "carbon black query"
                     ],
@@ -1839,6 +1841,8 @@
                 {
                     "data_path": "action_result.parameter.set_ignored",
                     "data_type": "numeric",
+                    "column_name": "Set Ignored",
+                    "column_order": 3,
                     "example_values": [
                         false,
                         true
@@ -1847,6 +1851,8 @@
                 {
                     "data_path": "action_result.parameter.requested_status",
                     "data_type": "string",
+                    "column_name": "Requested Status",
+                    "column_order": 4,
                     "example_values": [
                         "Resolved"
                     ]
@@ -1868,6 +1874,8 @@
                 {
                     "data_path": "action_result.parameter.alert_ids",
                     "data_type": "string",
+                    "column_name": "Alert Id(s)",
+                    "column_order": 1,
                     "contains": [
                         "carbon black alert id"
                     ],
@@ -1876,8 +1884,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.assign_to",
+                    "data_path": "action_result.parameter.assigned_to",
                     "data_type": "string",
+                    "column_name": "Assigned To",
+                    "column_order": 2,
                     "example_values": [
                         "admin"
                     ]
