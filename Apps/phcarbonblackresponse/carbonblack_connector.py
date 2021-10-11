@@ -1646,7 +1646,7 @@ class CarbonblackConnector(BaseConnector):
             update_data['query'] = "{}{}".format("q=", six.moves.urllib.parse.quote(query))
 
             # run a pre-query to get the number of results for bulk update since it is not returned by bulk alert update API
-            ret_val, result = self._make_rest_call("/v1/alert", action_result, method="post", data=search_data)
+            ret_val, result = self._make_rest_call("/v2/alert", action_result, method="post", data=search_data)
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
             total_results = result.get('total_results', 0)
@@ -1798,6 +1798,7 @@ class CarbonblackConnector(BaseConnector):
 
     def _search(self, search_type, action_result, query, start, rows):
 
+        api_version = 1
         search_data = {
                     "params": "server_added_timestamp desc",
                     "start": start,
@@ -1808,12 +1809,12 @@ class CarbonblackConnector(BaseConnector):
         }
 
         if search_type == 'alert':
-            search_data = {
-                "q": [query]
-            }
+            api_version = 2
+            del search_data['facet']
+            del search_data['cb.urlver']
 
         # Search results are returned as lists
-        ret_val, response = self._make_rest_call("/v1/{0}".format(search_type), action_result, method="post", data=search_data, additional_succ_codes={204: []})
+        ret_val, response = self._make_rest_call("/v{0}/{1}".format(api_version, search_type), action_result, method="post", data=search_data, additional_succ_codes={204: []})
 
         if phantom.is_fail(ret_val):
             return (action_result.get_status(), None)
