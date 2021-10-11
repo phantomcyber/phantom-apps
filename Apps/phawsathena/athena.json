@@ -9,12 +9,11 @@
     "product_name": "Athena",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2017-2021 Splunk Inc.",
     "app_version": "2.2.0",
     "utctime_updated": "2021-09-09T03:12:40.000000Z",
     "package_name": "phantom_athena",
     "main_module": "athena_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud API, July 28, 2021"
