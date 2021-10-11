@@ -173,8 +173,7 @@ CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT = {
     CROWDSTRIKE_IOCS_ACTION: 'action',
     CROWDSTRIKE_IOCS_SEVERITY: 'severity',
     CROWDSTRIKE_IOC_DATE_ADDED: 'created_on',
-    CROWDSTRIKE_IOC_LAST_MODIFIED: 'modified_on',
-    CROWDSTRIKE_IOC_EXPIRATION_DATE: 'expiration'
+    CROWDSTRIKE_IOC_LAST_MODIFIED: 'modified_on'
 }
 
 CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
@@ -182,3 +181,6 @@ CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
 CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
 CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
 CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC = 'Please provide at least one of the parameter'
+CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE = "Please enter valid value in '{}' parameter"
+CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc", "last_modified.asc",
+"indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]

@@ -1050,10 +1050,11 @@ class CrowdstrikeConnector(BaseConnector):
             else:
                 filter_query = "value:'{}'".format(param.get(CROWDSTRIKE_JSON_LIST_IOC))
         if CROWDSTRIKE_IOCS_ACTION in param:
+            ioc_action = param.get(CROWDSTRIKE_IOCS_ACTION).lower()
             if filter_query:
-                filter_query = "{}+action:'{}'".format(filter_query, param.get(CROWDSTRIKE_IOCS_ACTION))
+                filter_query = "{}+action:'{}'".format(filter_query, ioc_action)
             else:
-                filter_query = "action:'{}'".format(param.get(CROWDSTRIKE_IOCS_ACTION))
+                filter_query = "action:'{}'".format(ioc_action)
         if CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION in param:
             if filter_query:
                 filter_query = "{}+expiration:>='{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION))
@@ -1069,8 +1070,9 @@ class CrowdstrikeConnector(BaseConnector):
                 filter_query = "{}+source:'{}'".format(filter_query, param.get(CROWDSTRIKE_IOCS_SOURCE))
             else:
                 filter_query = "source:'{}'".format(param.get(CROWDSTRIKE_IOCS_SOURCE))
-        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) != "all":
-            if param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE) == "hash":
+        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param and param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower() != "all":
+            search_ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
+            if search_ioc_type == "hash":
                 source_list = ["md5", "sha256"]
                 if filter_query:
                     filter_query = "{}+type:{}".format(filter_query, source_list)
@@ -1078,9 +1080,9 @@ class CrowdstrikeConnector(BaseConnector):
                     filter_query = "type:{}".format(source_list)
             else:
                 if filter_query:
-                    filter_query = "{}+type:'{}'".format(filter_query, param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+                    filter_query = "{}+type:'{}'".format(filter_query, search_ioc_type)
                 else:
-                    filter_query = "type:'{}'".format(param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE))
+                    filter_query = "type:'{}'".format(search_ioc_type)
         return filter_query
 
     def _handle_list_custom_indicators(self, param):
@@ -1094,6 +1096,18 @@ class CrowdstrikeConnector(BaseConnector):
             return action_result.get_status()
 
         indicator_sort_criteria = param.get(CROWDSTRIKE_IOCS_SORT)
+        if indicator_sort_criteria:
+            indicator_sort_criteria = indicator_sort_criteria.lower()
+            if indicator_sort_criteria not in CROWDSTRIKE_SORT_CRITERIA_LIST:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_IOCS_SORT))
+        if CROWDSTRIKE_IOCS_ACTION in param:
+            ioc_action = param.get(CROWDSTRIKE_IOCS_ACTION).lower()
+            if ioc_action not in ["no_action", "allow", "prevent_no_ui", "prevent", "detect"]:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_IOCS_ACTION))
+        if CROWDSTRIKE_SEARCH_IOCS_TYPE in param:
+            search_ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE).lower()
+            if search_ioc_type not in ["all", "hash", "ipv4", "ipv6", "md5", "sha256", "domain"]:
+                return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
         api_data = {
             "limit": 2000  # 2000 is the max, this could be tuned
         }
@@ -1146,7 +1160,6 @@ class CrowdstrikeConnector(BaseConnector):
         if data:
             data = dict(data)
             if indicator_sort_criteria:
-                indicator_sort_criteria = indicator_sort_criteria.lower()
                 for key, value in data.items():
                     data[key] = self.helper_sort_ioc_data(indicator_sort_criteria, value)
 
@@ -1751,6 +1764,8 @@ class CrowdstrikeConnector(BaseConnector):
         ioc_type = param.get(CROWDSTRIKE_SEARCH_IOCS_TYPE)
         if ioc_type:
             ioc_type = ioc_type.lower()
+        if ioc_type not in ["sha256", "md5", "domain", "ipv4", "ipv6"]:
+            return action_result.set_status(phantom.APP_ERROR, CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE.format(CROWDSTRIKE_SEARCH_IOCS_TYPE))
         ioc = param.get(CROWDSTRIKE_JSON_LIST_IOC)
         resource_id = param.get(CROWDSTRIKE_RESOURCE_ID)
 
