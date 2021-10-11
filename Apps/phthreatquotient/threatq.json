@@ -9,7 +9,7 @@
         }
     ],
     "package_name": "phantom_threatq",
-    "type": "information service",
+    "type": "information",
     "license": "Copyright (c) 2021 ThreatQuotient, Inc.",
     "main_module": "threatq_connector.py",
     "app_version": "2.0.0",
@@ -49,6 +49,7 @@
         "trust_ssl": {
             "description": "Trust SSL Certificate?",
             "data_type": "boolean",
+            "default": true,
             "order": 4
         }
     },
@@ -65,7 +66,7 @@
         },
         {
             "action": "query indicators",
-            "description": "Query ThreatQ for Indicator Context",
+            "description": "Query ThreatQ for indicator context",
             "type": "investigate",
             "identifier": "query_indicators",
             "read_only": true,
@@ -348,6 +349,9 @@
                         "process name",
                         "sha1",
                         "user name"
+                    ],
+                    "example_values": [
+                        "IP Address: 1.1.1.1"
                     ]
                 },
                 {
@@ -405,7 +409,7 @@
             "read_only": false,
             "parameters": {
                 "adversary_list": {
-                    "description": "A comma-separated or line-separated list adversary names",
+                    "description": "A comma-separated or line-separated list of adversary names",
                     "data_type": "string",
                     "required": true,
                     "order": 0
@@ -753,6 +757,9 @@
                         "process name",
                         "sha1",
                         "user name"
+                    ],
+                    "example_values": [
+                        "IP Address: 1.1.1.1"
                     ]
                 },
                 {
@@ -1121,17 +1128,11 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.indicator_list",
-                    "data_type": "string",
-                    "example_values": [
-                        "Anonymization"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.investigation_description",
-                    "data_type": "string",
-                    "example_values": [
-                        "Anonymization"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.investigation_name",
@@ -1239,6 +1240,9 @@
                     "data_type": "string",
                     "contains": [
                         "vault id"
+                    ],
+                    "example_values": [
+                        "b69473ee89a6f7d216fb601e71d6e1f9d483c5de"
                     ]
                 },
                 {
@@ -1343,6 +1347,9 @@
                     "data_type": "string",
                     "contains": [
                         "vault id"
+                    ],
+                    "example_values": [
+                        "b69473ee89a6f7d216fb601e71d6e1f9d483c5de"
                     ]
                 },
                 {
