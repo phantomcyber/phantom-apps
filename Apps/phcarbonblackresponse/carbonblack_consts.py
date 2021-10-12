@@ -39,6 +39,7 @@ CARBONBLACK_SUCC_CONNECTIVITY_TEST = "Test Connectivity Passed"
 CARBONBLACK_ERR_PROCESS_SEARCH = "Process search failed"
 CARBONBLACK_ERR_INVALID_QUERY_TYPE = "Invalid query type, valid types are '{types}'"
 CARBONBLACK_ERR_INVALID_RANGE = "Invalid range, please specify in the format of start-end"
+CARBONBLACK_ERR_INVALID_ALERT_STATUS = "Invalid alert status, valid values are '{status}'"
 CARBONBLACK_SUCC_SYNC_EVENTS = "Successfully synchronized sensor events."
 CARBONBLACK_SUCC_QUARANTINE = "Quarantine action succeeded. It might take some time for the endpoint to get isolated."
 CARBONBLACK_SUCC_UNQUARANTINE = "Unquarantine action succeeded. It might take some time for the endpoint to take effect."
@@ -64,6 +65,16 @@ CARBONBLACK_QUERY_TYPE_PROCESS = 'process'
 VALID_QUERY_TYPE = [CARBONBLACK_QUERY_TYPE_ALERT,
                     CARBONBLACK_QUERY_TYPE_BINARY,
                     CARBONBLACK_QUERY_TYPE_PROCESS]
+
+CARBONBLACK_ALERT_STATUS_RESOLVED = 'Resolved'
+CARBONBLACK_ALERT_STATUS_FALSE_POSITIVE = 'False Positive'
+CARBONBLACK_ALERT_STATUS_IN_PROGRESS = 'In Progress'
+CARBONBLACK_ALERT_STATUS_UNRESOLVED = 'Unresolved'
+
+VALID_ALERT_STATUS = [CARBONBLACK_ALERT_STATUS_RESOLVED,
+                      CARBONBLACK_ALERT_STATUS_FALSE_POSITIVE,
+                      CARBONBLACK_ALERT_STATUS_IN_PROGRESS,
+                      CARBONBLACK_ALERT_STATUS_UNRESOLVED]
 
 CARBONBLACK_SLEEP_SECS = 5
 CARBONBLACK_COMMAND_FAILED = "Command {command} failed with code: {code}, desc: {desc}"
