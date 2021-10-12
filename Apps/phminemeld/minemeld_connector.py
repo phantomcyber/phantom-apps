@@ -1,13 +1,14 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: minemeld_connector.py
+# Copyright (c) 2021 Splunk Inc.
+#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 
 # Phantom App imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 from phantom.vault import Vault
-
 
 # Usage of the consts file is recommended
 # from minemeld_consts import *
@@ -17,6 +18,7 @@ from bs4 import BeautifulSoup
 import subprocess
 import os
 import tempfile
+from minemeld_consts import *
 
 
 class RetVal(tuple):
@@ -191,10 +193,10 @@ class MinemeldConnector(BaseConnector):
 
         # Return success
         if "8.8.8.8 (add)" in stdout:
-            self.save_progress("Test Connectivity Passed!")
+            self.save_progress(MINEMELD_SUCCESS_TEST_CONNECTIVITY)
         else:
-            self.save_progress("Test Connectivity Failed.")
-            return action_result.set_status(phantom.APP_ERROR, "Check input parameter. For example: Endpoint: https://host:port  User: admin Password: ****")
+            self.save_progress(MINEMELD_ERR_TEST_CONNECTIVITY)
+            return action_result.set_status(phantom.APP_ERROR, MINEMELD_ERR_INVALID_CONFIG_PARAM)
 
         # For now return Error with a message, in case of success we don't set the message, but use the summary
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -225,11 +227,11 @@ class MinemeldConnector(BaseConnector):
 
         # check if vault path is accessible
         if not vault_path:
-            return action_result.set_status(phantom.APP_ERROR, "MINEMELD_VAULT_ID_NOT_FOUND")
+            return action_result.set_status(phantom.APP_ERROR, MINEMELD_VAULT_ID_NOT_FOUND)
 
         # check if vault info is accessible
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, "MINEMELD_VAULT_ID_NOT_FOUND")
+            return action_result.set_status(phantom.APP_ERROR, MINEMELD_VAULT_ID_NOT_FOUND)
 
         file_info = vault_info[0]
         file_name = file_info['path']
