@@ -479,6 +479,12 @@ class ProcessMail:
 
         return phantom.APP_SUCCESS
 
+    def _get_file_name(self, input_str):
+        try:
+            return str(make_header(decode_header(input_str)))
+        except Exception:
+            return self._decode_uni_string(input_str, input_str)
+
     def _parse_email_headers(self, parsed_mail, part, charset=None, add_email_id=None):
 
         email_header_artifacts = parsed_mail[PROC_EMAIL_JSON_EMAIL_HEADERS]
@@ -636,6 +642,7 @@ class ProcessMail:
                 self._base_connector.debug_print("part: {0}".format(part.__dict__))
                 self._base_connector.debug_print("part type", type(part))
                 if part.is_multipart():
+                    self.check_and_update_eml(part)
                     continue
                 try:
                     ret_val = self._handle_part(part, i, tmp_dir, extract_attach, parsed_mail)
@@ -802,22 +809,23 @@ class ProcessMail:
             self._base_connector.debug_print(message)
             return phantom.APP_ERROR, message, []
 
-        self._base_connector.debug_print(mail.get_payload())
-        if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
-            try:
-                for msg in mail.get_payload()[1:]:
-                    file_path = os.path.join(tmp_dir, msg.get_filename())
-                    if ".eml" not in file_path:
-                        continue
-                    with open(file_path, 'wb') as f:  # noqa
-                        f.write(msg.as_bytes())
-                    self._attachments.append({'file_name': msg.get_filename(), 'file_path': file_path})
-            except Exception as err:
-                self._base_connector.debug_print(err)
-
         results = [{'container': self._container, 'artifacts': self._artifacts, 'files': self._attachments, 'temp_directory': tmp_dir}]
 
         return ret_val, PROC_EMAIL_PARSED, results
+
+    def check_and_update_eml(self, part):
+        if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
+            try:
+                tmp_dir = tempfile.mkdtemp(prefix='ph_email')
+                filename = self._get_file_name(part.get_filename())
+                if filename.endswith('.eml'):
+                    file_path = os.path.join(tmp_dir, filename)
+                    msg = part.get_payload()[0]
+                    with open(file_path, 'wb') as f:  # noqa
+                        f.write(msg.as_bytes())
+                    self._attachments.append({'file_name': filename, 'file_path': file_path})
+            except Exception as e:
+                self._base_connector.debug_print("Exception occurred: {}".format(e))
 
     def process_email(self, rfc822_email, email_id, epoch):
         try:
