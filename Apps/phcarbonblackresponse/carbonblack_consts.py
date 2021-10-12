@@ -31,7 +31,7 @@ CARBONBLACK_JSON_CB_ID = "carbonblack_process_id"
 CARBONBLACK_JSON_VAULT_ID = "vault_id"
 CARBONBLACK_JSON_DESTINATION_PATH = "destination"
 
-CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the endpint ip/name."
+CARBONBLACK_MSG_MORE_THAN_ONE = "More than one ONLINE system matched the endpoint ip/name."
 CARBONBLACK_MSG_MORE_THAN_ONE += "<br>Please specify input params that matches a single ONLINE endpoint.<br>Systems Found:<br>{systems_error}"
 
 CARBONBLACK_ERR_CONNECTIVITY_TEST = "Test Connectivity Failed"
@@ -39,6 +39,7 @@ CARBONBLACK_SUCC_CONNECTIVITY_TEST = "Test Connectivity Passed"
 CARBONBLACK_ERR_PROCESS_SEARCH = "Process search failed"
 CARBONBLACK_ERR_INVALID_QUERY_TYPE = "Invalid query type, valid types are '{types}'"
 CARBONBLACK_ERR_INVALID_RANGE = "Invalid range, please specify in the format of start-end"
+CARBONBLACK_ERR_INVALID_ALERT_STATUS = "Invalid alert status, valid values are '{status}'"
 CARBONBLACK_SUCC_SYNC_EVENTS = "Successfully synchronized sensor events."
 CARBONBLACK_SUCC_QUARANTINE = "Quarantine action succeeded. It might take some time for the endpoint to get isolated."
 CARBONBLACK_SUCC_UNQUARANTINE = "Unquarantine action succeeded. It might take some time for the endpoint to take effect."
@@ -57,11 +58,23 @@ CARBONBLACK_USING_BASE_URL = "Using base url: {base_url}"
 CARBONBLACK_RUNNING_QUERY = "Running query"
 CARBONBLACK_DISPLAYING_RESULTS_TOTAL = "Displaying {displaying} '{query_type}' results of total {total}"
 
+CARBONBLACK_QUERY_TYPE_ALERT = 'alert'
 CARBONBLACK_QUERY_TYPE_BINARY = 'binary'
 CARBONBLACK_QUERY_TYPE_PROCESS = 'process'
 
-VALID_QUERY_TYPE = [CARBONBLACK_QUERY_TYPE_BINARY,
+VALID_QUERY_TYPE = [CARBONBLACK_QUERY_TYPE_ALERT,
+                    CARBONBLACK_QUERY_TYPE_BINARY,
                     CARBONBLACK_QUERY_TYPE_PROCESS]
+
+CARBONBLACK_ALERT_STATUS_RESOLVED = 'Resolved'
+CARBONBLACK_ALERT_STATUS_FALSE_POSITIVE = 'False Positive'
+CARBONBLACK_ALERT_STATUS_IN_PROGRESS = 'In Progress'
+CARBONBLACK_ALERT_STATUS_UNRESOLVED = 'Unresolved'
+
+VALID_ALERT_STATUS = [CARBONBLACK_ALERT_STATUS_RESOLVED,
+                      CARBONBLACK_ALERT_STATUS_FALSE_POSITIVE,
+                      CARBONBLACK_ALERT_STATUS_IN_PROGRESS,
+                      CARBONBLACK_ALERT_STATUS_UNRESOLVED]
 
 CARBONBLACK_SLEEP_SECS = 5
 CARBONBLACK_COMMAND_FAILED = "Command {command} failed with code: {code}, desc: {desc}"
@@ -73,10 +86,11 @@ CARBONBLACK_ERR_INVALID_DEST_FILE = "Please check if the destination filename al
 CARBONBLACK_ERR_INVALID_INTEGER_VALUE = 'Please provide a valid {msg} integer value in the "{param}"'
 MAX_POLL_TRIES = 10
 
-CARBONBLACK_FINISHED_PROCESSESING = "Finished Processing {0:.0%}"
+CARBONBLACK_FINISHED_PROCESSING = "Finished Processing {0:.0%}"
 
 CARBONBLACK_ERR_CODE_MSG = "Error code unavailable"
 CARBONBLACK_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG = "Error occurred while connecting to the Carbon Black Response server."
 CARBONBLACK_UNICODE_DAMMIT_TYPE_ERR_MSG += " Please check the asset configuration and|or the action parameters."
+CARBONBLACK_ERR_UPDATE_ALERTS_PARAM_IDS = "Either 'query' or 'alert_ids' parameters are required for this action."
 CARBONBLACK_GROUP_ID_MSG = "Group ID unavailable"

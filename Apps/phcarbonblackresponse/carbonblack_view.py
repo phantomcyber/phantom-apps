@@ -16,8 +16,10 @@ def fill_table(query_type, table, data, result):
     rows = table['rows'] = []
 
     # The Headers
-    if (query_type == consts.CARBONBLACK_QUERY_TYPE_BINARY):
+    if query_type == consts.CARBONBLACK_QUERY_TYPE_BINARY:
         table['headers'] = ["MD5", "Endpoints", "Signed", "Company Name", "Product Name", "Is Executable", "File Length", "Filenames"]
+    elif query_type == consts.CARBONBLACK_QUERY_TYPE_ALERT:
+        table['headers'] = ["Username", "Alert Type", "Watchlist ID", "Feed Name", "Created Time", "IOC Type", "Watchlist Name", "Alert Severity", "Status", "Unique ID"]
     else:
         table['headers'] = ["Process Name", "Process Path", "MD5", "User Name", "Host Name", "Start", "PID", "Parent PID", "Host Type", "OS", "Unique ID", "Cmdline"]
     # every action result will have a single data
@@ -28,7 +30,7 @@ def fill_table(query_type, table, data, result):
         rows.append(new_row)
 
         # Append the various columns in the row
-        if (query_type == consts.CARBONBLACK_QUERY_TYPE_BINARY):
+        if query_type == consts.CARBONBLACK_QUERY_TYPE_BINARY:
             # MD5
             new_row.append({'value': data_row['md5'], 'contains': ['md5'], 'id': result.id, 'offset': i})
             # Endpoints
@@ -46,7 +48,29 @@ def fill_table(query_type, table, data, result):
             # Filenames
             new_row.append({'value': '\n'.join(data_row['observed_filename'])})
 
-        elif(query_type == consts.CARBONBLACK_QUERY_TYPE_PROCESS):
+        elif query_type == consts.CARBONBLACK_QUERY_TYPE_ALERT:
+            # Username
+            new_row.append({'value': data_row['username']})
+            # Alert Type
+            new_row.append({'value': data_row['alert_type']})
+            # Watchlist ID
+            new_row.append({'value': data_row['watchlist_id']})
+            # Feed Name
+            new_row.append({'value': data_row['feed_name']})
+            # Created Time
+            new_row.append({'value': data_row['created_time']})
+            # IOC Type
+            new_row.append({'value': data_row['ioc_type']})
+            # Watchlist Name
+            new_row.append({'value': data_row['watchlist_name']})
+            # Alert Severity
+            new_row.append({'value': data_row['alert_severity']})
+            # Status
+            new_row.append({'value': data_row['status']})
+            # Unique ID
+            new_row.append({'value': data_row['unique_id']})
+
+        else:
             # Process Name
             new_row.append({'value': data_row['process_name'], 'contains': ['process name'], 'id': result.id, 'offset': i})
             # Process Path
@@ -88,7 +112,7 @@ def query_results(provides, all_results, context):
             table['type'] = parameter['type'].capitalize()
 
             data = result.get_data()
-            if (not data):
+            if not data:
                 continue
 
             # every action result will have a single data
@@ -110,17 +134,17 @@ def hunt_file(provides, all_results, context):
             table = {}
             parameter = result.get_param()
 
-            if (not parameter):
+            if not parameter:
                 continue
 
             query_type = parameter.get('type')
 
-            if (not query_type):
+            if not query_type:
                 continue
 
             data = result.get_data()
 
-            if (not data):
+            if not data:
                 continue
 
             # get the binary data
@@ -151,12 +175,12 @@ def get_file_detail_ctx(result):
 
     data = result.get_data()
 
-    if (not data):
+    if not data:
         return ctx_result
 
     data = data[0]
 
-    if (not data):
+    if not data:
         return ctx_result
 
     ctx_result['data'] = data
@@ -165,7 +189,7 @@ def get_file_detail_ctx(result):
     # work on the endpoint list
     endpoints = data.get('file_details', {}).get('endpoint')
 
-    if (endpoints):
+    if endpoints:
         try:
             data['file_details']['endpoint'] = [dict(zip(('host', 'sensor'), x.split('|'))) for x in endpoints]
         except:
@@ -173,10 +197,10 @@ def get_file_detail_ctx(result):
 
     summary = result.get_summary()
 
-    if (summary):
+    if summary:
         ctx_result['cb_url'] = summary.get('cb_url')
         file_type = summary.get('file_type')
-        if (file_type):
+        if file_type:
             contains = [str(x) for x in file_type.split(',')]
             contains.append('vault id')
             ctx_result['vault_contains'] = contains
@@ -191,7 +215,7 @@ def display_file_details(provides, all_app_runs, context):
         for result in action_results:
 
             ctx_result = get_file_detail_ctx(result)
-            if (not ctx_result):
+            if not ctx_result:
                 continue
             results.append(ctx_result)
 
