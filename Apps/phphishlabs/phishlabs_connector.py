@@ -137,7 +137,6 @@ class PhishlabsConnector(BaseConnector):
                             auth=(config[PHISHLABS_JSON_USERNAME], config[PHISHLABS_JSON_PASSWORD]),  # basic authentication
                             json=data,
                             headers=headers,
-                            verify=config.get('verify_server_cert', False),
                             params=params)
         except Exception as e:
             return RetVal(action_result.set_status( phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)

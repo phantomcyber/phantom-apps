@@ -150,7 +150,7 @@
                     "data_path": "action_result.data.*.customer",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ],
                     "column_name": "Customer",
                     "column_order": 0
@@ -349,7 +349,7 @@
                     "data_path": "action_result.data.*.createdBy.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -363,32 +363,32 @@
                     "data_path": "action_result.data.*.brandAbuseFlag",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sourcePhishlabs",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.primaryMarketplace",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.crimewareLoadFailure",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -701,7 +701,7 @@
                     "data_path": "action_result.data.*.customer",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -874,7 +874,7 @@
                     "data_path": "action_result.data.*.createdBy.organization",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -888,32 +888,32 @@
                     "data_path": "action_result.data.*.brandAbuseFlag",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sourcePhishlabs",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.primaryMarketplace",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.crimewareLoadFailure",
                     "data_type": "boolean",
                     "example_values": [
-                        false,
-                        true
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1034,8 +1034,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "failed",
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
