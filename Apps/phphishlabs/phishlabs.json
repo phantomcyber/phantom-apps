@@ -330,6 +330,73 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.appDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "0001-01-01T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Client Submitted (CCAPI)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.brandAbuseFlag",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourcePhishlabs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryMarketplace",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crimewareLoadFailure",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resolution",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test case"
+                    ]
                 }
             ],
             "render": {
@@ -519,6 +586,27 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.caseId",
+                    "data_type": "string",
+                    "example_values": [
+                        "dbf4a861-2b1a-11ec-b1c8-0efb1918365c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.caseNumber",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2648042
                     ]
                 }
             ],
@@ -766,6 +854,164 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.appDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "0001-01-01T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phantom"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Client Submitted (CCAPI)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.brandAbuseFlag",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourcePhishlabs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryMarketplace",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crimewareLoadFailure",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b27a1db-2a97-11ec-984b-0ad24386a0d6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.fileURL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://caseapi.phishlabs.com/v1/data/attachment/1b27a1db-2a97-11ec-984b-0ad24386a0d6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "requested-screenshot-2021-10-11T13:28:22Z.jpg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.dateAdded",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-11T13:28:22Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Automatic Screenshot for submitted URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resolution",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test case."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "test1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseId",
+                    "data_type": "string",
+                    "example_values": [
+                        "5a0321e3-273d-11ec-b912-0a8e0de89b4e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phishing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.linkType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Clone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseNumber",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2639769
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.linkCreated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-11T13:48:55.568376569Z"
                     ]
                 }
             ],
