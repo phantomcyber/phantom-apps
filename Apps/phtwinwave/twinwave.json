@@ -1,0 +1,4208 @@
+{
+    "appid": "507379b9-c12c-4b1e-8124-8ebf0c3eee53",
+    "name": "TwinWave",
+    "description": "A threat analysis platform to reduce the friction of repetitive manual tasks typically associated with investigating threats.",
+    "type": "reputation",
+    "product_vendor": "TwinWave",
+    "logo": "TwinWave-Logo-1x.png",
+    "logo_dark": "TwinWave-Logo-1xdark.png",
+    "product_name": "TwinWave",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "TwinWave",
+    "license": "Copyright (c) TwinWave, 2021",
+    "app_version": "1.0.0",
+    "utctime_updated": "2021-06-15T21:58:52.481735Z",
+    "package_name": "phantom_twinwave",
+    "main_module": "twinwave_connector.pyc",
+    "min_phantom_version": "4.10.4.56260",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "api_token": {
+            "description": "api token from the app",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "verify_certificate": {
+            "description": "certificate of verification",
+            "data_type": "boolean",
+            "required": false,
+            "default": false,
+            "order": 1
+        },
+        "proxy": {
+            "description": "proxy server or not",
+            "data_type": "string",
+            "required": false,
+            "value_list": [],
+            "default": "",
+            "order": 2
+        },
+        "since": {
+            "data_type": "numeric",
+            "order": 3,
+            "description": "Start of time range stated in hours",
+            "verbose": "If not specified, the default is past 3 days"
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": false,
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "dns_view.display_ips",
+                "title": "Lookup Domain"
+                },
+            "parameters": {
+                "container_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "Container IDs to limit the ingestion to.",
+                    "allow_list": true
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is past 10 days"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is now"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Maximum number of container records to query for."
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "order": 4,
+                    "description": "Maximum number of artifact records to query for."
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "search jobs resources",
+            "identifier": "twinwave_search_across_jobs_and_resources",
+            "description": "search across jobs and resources",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "term": {
+                    "description": "terms",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "field": {
+                    "description": "field",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                },
+                "count": {
+                    "description": "count",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2
+                },
+                "shared_only": {
+                    "description": "shared_only",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 3
+                },
+                "submitted_by": {
+                    "description": "submitted_by",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 4
+                },
+                "timeframe": {
+                    "description": "timeframe",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 5
+                },
+                "page": {
+                    "description": "page",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 6
+                },
+                "type": {
+                    "description": "type",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 7
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.term",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "term",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.field",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "field",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.count",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.parameter.shared_only",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "shared_only",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.parameter.submitted_by",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "submitted_by",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.parameter.timeframe",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "timeframe",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.parameter.page",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "page",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.parameter.type",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "type",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.Label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedToken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKeyID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.TenantID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.StartedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Parameters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CompletedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.ForensicsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ResourceCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.RequestsEngines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SubmissionScource",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get artifact url",
+            "identifier": "twinwave_get_artifact_url",
+            "description": "Get a temporary artifact url",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "path": {
+                    "description": "ArtifactPath associated with the artifact",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "job_id": {
+                    "description": "job id of the resource you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.artifact_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.parent_action_run",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "download submitted resource",
+            "identifier": "twinwave_download_submitted_resource",
+            "description": "Download the Submitted Resource. Download a password-protected Zip archive of the Resource. Use the password 'infected' to decrypt the archive. All Resources discovered during the analysis are available for download via this endpoint. To get the list of SHA256s for the Job's Resources, see The Resources array from Get a Job Summary.",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "job id of the resource you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "sha256": {
+                    "description": "string of the hash associated with the job",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.sha256",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "sha256",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.artifact_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.parent_action_run",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get taskraw forensics",
+            "identifier": "twinwave_get_task_raw_forensics",
+            "description": "get tasks raw forensics data",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "job id with the task of the raw forensics data",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "task_id": {
+                    "description": "task id of the forensics you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.task_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "task_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CAPE",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.info.*.ended",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.custom",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.manager",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.started_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.machine.*.shutdown_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.options.*.route",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.options.*.procdump",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.started",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.started",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.timeout",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.*.info.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.duration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.info.*.parent_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.shrike_msg",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.shrike_sid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.shrike_url",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.info.*.shrike_refer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.ttps.*.T1045",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.ttps.*.T1055",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.debug.*.log",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.debug.*.errors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.feeds.*.Bad_Authenticode_Certs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.resubs",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.icon",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.dirents.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.dirents.*.size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.dirents.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.exports",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imphash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imports.*.d11",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imports.*.imports.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imports.*.imports.*.address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.overlay",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.pdbpath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.entropy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.raw_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.size_of_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.virtual_size",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.characteristics",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.virtual_address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.sections.*.characteristics_raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.icon_hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imagebase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.osversion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.resources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.entrypoint",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.icon_fuzzy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.versioninfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_shal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_error",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_valid",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_signers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.guest_signers.*.aux_error_desc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.actual_checksum",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.digital_signers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.peid_signatures",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.exported_dll_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.reported_checksum",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.static.pe.*.imported_dll_count",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.xmlns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Level",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Opcode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Channel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.EventID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Computer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Keywords",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Provider.*.@Guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Provider.*.@Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Security.*.@UserID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Execution.*.@ThreadID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Execution.*.@ProcessID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.Correlation",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.TimeCreated.*.@SystemTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.System.*.EventRecordID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.EventData.DataNormalized.*.Image",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.EventData.DataNormalized.*.UtcTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.EventData.DataNormalized.*.RuleName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.EventData.DataNormalized.*.ProcessId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.sysmon.*.EventData.DataNormalized.*.ProcessGuid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.shal",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.yara",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.crc32",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.clamav",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.sha512",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.ep_bytes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.cape_yara",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.entrypoint",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.target.file.*.guest_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.target.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.baddoms",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.curtain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.md5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.yara",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.crc32",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.clamav",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.sha512",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.ep_bytes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.cape_yara",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.entrypoint",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.guest_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.dropped.*.guest_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.saz2pcap",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.saz2pcap_sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.pid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.dest",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.sport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.ishttps",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.process",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.fiddler.*.sessions.*.user-agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.dns.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.dns.*.request",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.dns.*.answers.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.dns.*.answers.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.irc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.ja3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.dst",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.src",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.dport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.sport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.tcp.*.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.dst",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.src",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.dport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.sport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.offset",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.udp.*.dst",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.host",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.http.*.user-agent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.icmp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.smtp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.hosts.*.ip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.hosts.*.hostname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.hosts.*.inaddrarpa",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.hosts.*.country_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.network.*.domains.pcap_sha256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.strings",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.anomaly",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.keys",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.files",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.mutexes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.read_keys",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.read_files",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.write_keys",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.delete_keys",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.write_files.",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.delete_files",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.resolved_apis",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.created_services",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.started_servies",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.summary.*.executed_commands",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.enchanced",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.calls",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.retval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.OSMajor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.OSMinor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.TempPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.UserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.is_success",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.CommandLine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.InstallDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.MachineGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.MainExeBase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.MainExeSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.ProductName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.WindowsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.RegisteredOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.SystemVolumeGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.RegisteredOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.environ.*.SystemVolumeSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.threads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.parent_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.first_seen",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.process_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.module_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.process_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.pid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processes.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.retval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.OSMajor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.OSMinor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.TempPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.UserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.is_success",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.CommandLine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.InstallDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.MachineGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.MainExeBase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.MainExeSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.ProductName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.WindowsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.RegisteredOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.SystemVolumeGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.RegisteredOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.environ.*.SystemVolumeSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.threads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.pid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.retval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.OSMajor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.OSMinor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.TempPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.UserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.is_success",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.CommandLine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.InstallDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.MachineGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.MainExeBase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.MainExeSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.ProductName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.WindowsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.RegisteredOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.SystemVolumeGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.RegisteredOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.environ.*.SystemVolumeSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.threads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.children",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.parent_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.children.*.module_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.parent_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.processtree.*.module_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.behavior.*.encryptedbuffers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.malscore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.dns",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.ssh",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.tls",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.ua",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.uri",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.dstip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.srcip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.dstport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.srcport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.hostname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.referrer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http.*.contenttype",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.perf",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.files",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.gid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.rev",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.sid",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.dstip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.srcip",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.dstport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.srcport",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.category",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.signature",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alerts.*.timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.fileinfo",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.dns_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.eve_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.ssh_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.tls_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.file_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.http_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.suricata.*.alert_log_full_path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.malfamily",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.alert",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.weight",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.families",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.new_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.confidence",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.references",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.signatures.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.reporting.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.reporting.*.time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.processing.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.processing.*.time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.signatures.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.statistics.*.signatures.*.time",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.virustotal.*.resource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.virustotal.*.verbose_msg",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.virustotal.*.response_code",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.*.CAPE_children",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.decompression",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.malfamily_tag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.deduplicated_shots",
+                    "data_type": "string"
+                },
+
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.guid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.artifact_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.*.context.*.parent_action_run",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get tasknormalized forensics",
+            "identifier": "twinwave_get_task_normalized_forensics",
+            "description": "Get a tasks normalized forensics",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "job id of the with the task forensics you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                },
+                "task_id": {
+                    "description": "task id of the forensics you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.task_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "task_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.URL",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Source.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Source.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Hostname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.TotalSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.UserAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.TotalSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.UserAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.StatusCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Destination.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Destination.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.RequestSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.ResponseSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.RequestHeaders",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.ResponseHeaders",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Logs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.URL",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.Context",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.LinkText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Context",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.SHA1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.CRC32",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.ClamAV",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.SHA512",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.GuestPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.FileName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.FileType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.NetworkSources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.ASN",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Houstname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Engine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.Resource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.ImageHashes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.ArtifactPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.DetectedObjects",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.TaskID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Machine.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Machine.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Machine.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Machine.*.manager",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Machine.*.started_on",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.Duration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.ParentID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.Tasks.*.MalFamily",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EndTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Mutexes.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Source.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Source.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Destination.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Destination.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Strings.*.String",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Strings.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Verdict",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.PID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.PPID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.*.Calls",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Threads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.retval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.OSMajor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.OSMinor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.TempPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.UserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.is_success",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.CommandLine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.InstallDate",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MachineGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MainExeBase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MainExeSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.ProductName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.WindowsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.RegisteredOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.SystemVolumeGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.RegisteredOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.SystemVolumeSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Arguements",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.StartTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSServers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Server",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.QueryType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Responses.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Responses.*.Value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.URI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.Resource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.ImageHashes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.ArtifactPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.RegistryKeys.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.RegistryKeys.*.Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.PhishedBrands",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MalwareConfigs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SavedArtifacts.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SavedArtifacts.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SavedArtifacts.ArtifactPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MalwareFamilies",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get jobnormalized forensics",
+            "identifier": "twinwave_get_job_normalized_forensics",
+            "description": "Get a Job's normalized forensics",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "job id of the forensics you want pulled",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Issuer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Source.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Source.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Details.JA3",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Subject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Destination.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Destination.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.TLS.*.Fingerprint",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.URL",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Source.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Source.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Hostname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.TotalSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.UserAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.TotalSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.UserAgent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.StatusCode",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Destination.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.Destination.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.RequestSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.ResponseSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.RequestHeaders",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.HTTP.*.ResponseHeaders",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Logs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.URL",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.Context",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.URLs.*.LinkText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Context",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.SHA1",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.CRC32",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.ClamAV",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.SHA512",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.Details.*.GuestPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.FileName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.FileType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Files.*.NetworkSources",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Inputs.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Inputs.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Inputs.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Inputs.*.SourceCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Inputs.*.Placeholder",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.method",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.PageURL",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Forms.*.SourceCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.ASN",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Houstname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Hosts.*.Organization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Engine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.Resource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.ImageHashes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.ArtifactPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Images.*.DetectedObjects",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Details.engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.EndTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Mutexes.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Mutexes.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Length",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Source.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Source.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Service",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Protocol",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Destination.*.IP",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Network.*.Destination.*.Port",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Strings.*.String",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Strings.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Verdict",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Version",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.PID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.PPID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.*.Calls",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Threads",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.retval",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.OSMajor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.OSMinor",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.TempPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.UserName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.is_success",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.CommandLine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.InstallDate",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MachineGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MainExeBase",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.MainExeSize",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.ProductName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.WindowsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.ComputerName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.RegisteredOwner",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.SystemVolumeGUID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.RegisteredOrganization",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Environment.*.SystemVolumeSerialNumber",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Processes.*.Details.Arguements",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.StartTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSServers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Details.Data.*.Hit",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Severity",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Detections.*.Description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Server",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.QueryType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Responses.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DNSRequests.*.Responses.*.Value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.URI",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.Resource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.ImageHashes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Screenshots.*.ArtifactPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks.*.Tactic",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks.*.Technique",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MitreAttacks.*.SubTechnique",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Registrykeys.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Registrykeys.*.Action",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Registrykeys.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Org",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.City",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.DNSSec",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Emails",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Address",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Country",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Engines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.ZipCode",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.ExpiresAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.Registrar",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.DomainName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.NameServers",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.WhoisResults.*.WhoisServer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.PhishedBrands",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MalwareConfigs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SavedArtifacts",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.MalwareFamilies",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get job summary",
+            "identifier": "twinwave_get_job_summary",
+            "description": "Get a job summary",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "job id of the job summary you want to fetch",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.*.data.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Engine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.ID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Target",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Duration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.FileSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.ParentID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Completed",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.GuestName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.GuestLabel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.MalwareFamilies",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Forensics.*.Raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Forensics.*.Normalized",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StartedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StateText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StateText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.ResourceID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.Label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.ID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Jobs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.ShareToken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKeyID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.TenantID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.JobID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ParentID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.Size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.FileType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.MimeType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.IsEncrypted",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.InjectionMetadata.*.AddedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.InjectionMetadata.*.AddedBecause",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.StartedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Parameters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CompletedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.ForensicsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ResourceCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.RequestedEngines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SubmissionSource",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list recent jobs",
+            "identifier": "twinwave_list_recent_jobs",
+            "description": "Get a list of recent",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.State",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Engine",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.ID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Ssdeep",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Target",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Duration",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.FileSize",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.ParentID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.Completed",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.GuestName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.GuestLabel",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Tasks.*.MalwareFamilies",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Details.*.Package",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Forensics.*.Raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Results.*.Forensics.*.Normalized",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.Priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StartedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StateText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.StateText",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Tasks.*.ResourceID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKey.*.Label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.ID",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Jobs",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Labels.*.Value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Profile",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.SharedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Sharing.*.ShareToken",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.APIKeyID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Priority",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.TenantID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Username",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.JobID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.Location",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.ParentID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.CreatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.Size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.FileType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.MimeType",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.FileMetadata.*.IsEncrypted",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.InjectionMetadata.*.AddedBy",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Resources.*.InjectionMetadata.*.AddedBecause",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.StartedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.UpdatedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Parameters",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.MD5",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.Submissions.*.SHA256",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.CompletedAt",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DisplayScore",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.ForensicsPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ResourceCount",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.RequestedEngines",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SubmissionSource",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "resubmit job",
+            "identifier": "twinwave_resubmit_job",
+            "description": "Resubmit a job",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "job_id": {
+                    "description": "Job Id you want to resubmit",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.job_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "job_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.JobID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.QueueDepth",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.QuotaRemaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "submit file",
+            "identifier": "twinwave_submit_file",
+            "description": "Submit File for Scanning",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "file": {
+                    "description": "file hash to submit",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": ["vault id"],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.file",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "file",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.JobID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.QueueDepth",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.QuotaRemaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "submit url",
+            "identifier": "twinwave_submit_url",
+            "description": "Submit New URL for Scanning",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "url": {
+                    "description": "url to submit",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "value_list": [],
+                    "default": "",
+                    "order": 0
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "column_name": "url",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.JobID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.QueueDepth",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.QuotaRemaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get engines",
+            "identifier": "twinwave_get_engines",
+            "description": "List Available Engines",
+            "verbose": "",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.Name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.DefaultEnabled",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.SupportedTypes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                }
+
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}

@@ -1,0 +1,925 @@
+commonfields:
+  id: Twinwave
+  version: -1
+vcShouldKeepItemLegacyProdMachine: false
+name: Twinwave
+display: Twinwave
+category: Data Enrichment & Threat Intelligence
+image: data:image/png;base64,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
+description: Stealth mode cybersecurity startup
+configuration:
+- display: Twinwave API token
+  name: api-token
+  type: 4
+  required: true
+- display: Trust any certificate (not secure)
+  name: insecure
+  type: 8
+  required: false
+- display: Number of jobs to first fetch
+  name: initial_fetch
+  defaultvalue: "10"
+  type: 0
+  required: false
+- display: Use system proxy settings
+  name: proxy
+  type: 8
+  required: false
+- display: Filter incidents by submission source.
+  name: source
+  defaultvalue: all
+  type: 15
+  required: false
+  options:
+  - all
+  - ui
+  - api
+- display: Filter UI incidents by username. Exact match only. (Cannot use if source
+    is all or api)
+  name: username
+  type: 0
+  required: false
+- display: Fetch incidents
+  name: isFetch
+  type: 8
+  required: false
+- display: Incident type
+  name: incidentType
+  type: 13
+  required: false
+script:
+  script: |-
+    ''' IMPORTS '''
+
+    import json
+    import requests
+    import shutil
+
+    # Disable insecure warnings
+    requests.packages.urllib3.disable_warnings()
+
+    ''' CONSTANTS '''
+    DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+    API_HOST = "https://api.twinwave.io"
+    API_VERSION = "v1"
+    EXPIRE_SECONDS = 86400
+    URL_REGEX = r'(?:(?:https?|ftp|hxxps?):\/\/|www\[?\.\]?|ftp\[?\.\]?)(?:[-\w\d]+\[?\.\]?)+[-\w\d]+(?::\d+)?' \
+                r'(?:(?:\/|\?)[-\w\d+&@#\/%=~_$?!\-:,.\(\);]*[\w\d+&@#\/%=~_$\(\);])?'
+
+
+    class AuthenticationException(Exception):
+        pass
+
+
+    class Client(BaseClient):
+        """
+            Client to connect to the API
+        """
+
+        def __init__(self, api_token, verify, proxy, host=API_HOST, version=API_VERSION):
+            self.host = f"{host}/{version}"
+            self.api_token = api_token
+            self._verify = verify
+            self._proxy = proxy
+
+        def get_token(self):
+            auth_url = f"{self.host}/accesstoken"
+            resp = requests.get(auth_url, verify=self._verify, proxies=self._proxy)
+            if resp.ok:
+                return resp.json()
+            else:
+                raise AuthenticationException("Error getting access token, Please check the username and password")
+
+        def get_header(self):
+            return {'X-API-KEY': self.api_token}
+
+        def get_recent_jobs(self, num_jobs=10, username=None, source=None, state=None):
+            url = f"{self.host}/jobs/recent"
+            params = {}
+            params["count"] = num_jobs
+            if username:
+                params["username"] = username
+            if source:
+                params["source"] = source
+            if state:
+                params["state"] = state
+            resp = requests.get(url, params=params, headers=self.get_header(), verify=self._verify,
+                                proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def get_engines(self):
+            url = f"{self.host}/engines"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def get_job(self, job_id):
+            url = f"{self.host}/jobs/{job_id}"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def get_task_normalized_forensics(self, job_id, task_id):
+            url = f"{self.host}/jobs/{job_id}/tasks/{task_id}/forensics"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def get_job_normalized_forensics(self, job_id):
+            url = f"{self.host}/jobs/{job_id}/forensics"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def get_task_raw_forensics(self, job_id, task_id):
+            url = f"{self.host}/jobs/{job_id}/tasks/{task_id}/rawforensics"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+
+            # do not raise an exception for 404
+            if resp.status_code == 404:
+                return resp.json()
+            resp.raise_for_status()
+            return resp.json()
+
+        def submit_url(self, scan_url, engine_list=[], parameters=None, priority=None, profile=None):
+            url = f"{self.host}/jobs/urls"
+            req = {"url": scan_url, "engines": engine_list, "parameters": parameters}
+            if priority:
+                req['priority'] = priority
+            if profile:
+                req['profile'] = profile
+
+            resp = requests.post(url, json=req, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def submit_file(self, file_name, file_obj, engine_list=[], priority=None, profile=None):
+            url = f"{self.host}/jobs/files"
+            payload = {}
+            file_dict = {"filedata": file_obj}
+            payload["engines"] = (None, json.dumps(engine_list))
+            payload['filename'] = (None, file_name)
+            payload['priority'] = priority
+            payload['profile'] = profile
+
+            resp = requests.post(url, data=payload, files=file_dict, headers=self.get_header(), verify=self._verify,
+                                 proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def resubmit_job(self, job_id):
+            url = f"{self.host}/jobs/{job_id}/reanalyze"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def download_submitted_resources(self, job_id, sha256):
+            url = f"{self.host}/jobs/{job_id}/resources/{sha256}"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp
+
+        def get_temp_artifact_url(self, path):
+            url = f"{self.host}/jobs/artifact/url?path={path}"
+            resp = requests.get(url, headers=self.get_header(), verify=self._verify, proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+        def search_across_jobs_and_resources(self, term, field, count, shared_only, submitted_by, timeframe, page, type):
+            query_params = {}
+            if term:
+                query_params['term'] = term
+            if field:
+                query_params['field'] = field
+            if count:
+                query_params['count'] = count
+            if shared_only:
+                query_params['shared_only'] = shared_only
+            if submitted_by:
+                query_params['submitted_by'] = submitted_by
+            if timeframe:
+                query_params['timeframe'] = timeframe
+            if page:
+                query_params['page'] = page
+            if type:
+                query_params['type'] = type
+            url = f"{self.host}/jobs/search"
+            resp = requests.get(url, headers=self.get_header(), params=query_params, verify=self._verify,
+                                proxies=self._proxy)
+            resp.raise_for_status()
+            return resp.json()
+
+
+    def test_module(client):
+        """
+        Returning 'ok' indicates that the integration works like it is supposed to. Connection to the service is successful.
+
+        Args:
+            client: HelloWorld client
+
+        Returns:
+            'ok' if test passed, anything else will fail the test.
+        """
+        try:
+            header = get_engines(client)
+            if header:
+                return 'ok'
+            else:
+                return_error('Authentication failed! Please check the username and password before continuing.')
+        except Exception as ex:
+            return_error('Authentication failed! Please check the username and password before continuing.')
+
+
+    def get_engines(client):
+        """
+            List of engines
+        """
+        result = client.get_engines()
+        # readable output will be in markdown format
+        readable_output = f'## List of Engines\n'
+        readable_output += tableToMarkdown('Twinwave Engines', result, headers=['Name', 'SupportedTypes', 'DefaultEnabled'])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.Engines",
+            outputs_key_field='Name',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def validate_priority(priority):
+        int_priority = 0
+        validate_string = "Validation failed. Please make sure the priority is a numeric value within 1-225"
+        if priority:
+            if not priority.isnumeric():
+                return_error(validate_string)
+            else:
+                try:
+                    int_priority = int(priority)
+                except ValueError:
+                    return_error(validate_string)
+
+                if int_priority <= 0 or int_priority >= 256:
+                    return_error(validate_string)
+        else:
+            return_error(validate_string)
+
+        return int_priority
+
+
+    def submit_url(client, args):
+        """
+            Submit the URL
+        """
+        url = args.get('url')
+        engines = args.get('engines')
+        parameters = args.get('parameters')
+        priority = args.get('priority', 10)
+        profile = args.get('profile')
+
+        # validation for priority
+        priority = validate_priority(priority)
+
+        # validate the url
+        regex_matches = re.match(URL_REGEX, url)
+        if not regex_matches:
+            return_error("Validation Failed. Please check the format of the submitted URL")
+
+        # passing the validated url into the search
+        result = client.submit_url(scan_url=regex_matches.group(0), engine_list=engines, parameters=parameters,
+                                   priority=priority, profile=profile)
+
+        # readable output will be in markdown format
+        readable_output = f'## Submitted URL\n'
+        readable_output += tableToMarkdown('Twinwave Submissions', result, headers=['JobID'])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.Submissions",
+            outputs_key_field='JobID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def submit_file(client, args):
+        """
+            Submit the URL
+        """
+        file_entry_id = args.get('entry_id')
+        file_path = demisto.getFilePath(file_entry_id)['path']
+        file_name = demisto.getFilePath(file_entry_id)['name']
+        priority = args.get('priority', 10)
+        profile = args.get('profile')
+
+        # validation for priority
+        priority = validate_priority(priority)
+
+        try:
+            shutil.copy(file_path, file_name)
+        except Exception:
+            raise Exception('Failed to prepare file for upload.')
+
+        try:
+            with open(file_name, 'rb') as file:
+                result = client.submit_file(file_name=file_name, file_obj=file.read(), priority=priority, profile=profile)
+
+            readable_output = f'## Submitted File\n'
+            readable_output += tableToMarkdown('Twinwave Submissions', result,
+                                               headers=['JobID'])
+
+            return CommandResults(
+                readable_output=readable_output,
+                outputs_prefix="Twinwave.Submissions",
+                outputs_key_field='JobID',
+                outputs=result,
+                raw_response=result  # raw response - the original response
+            )
+
+        finally:
+            shutil.rmtree(file_name, ignore_errors=True)
+
+
+    def resubmit_job(client, args):
+        """
+            Re submit a job
+        """
+        job_id = args.get('job_id')
+
+        result = client.resubmit_job(job_id=job_id)
+        # readable output will be in markdown format
+        readable_output = f'## Resubmitted Job'
+        readable_output += tableToMarkdown('Twinwave Submissions', result, headers=['JobID'])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.Submissions",
+            outputs_key_field='JobID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def list_recent_jobs(client, args):
+        incidents = []
+        last_run = demisto.getLastRun()
+        jobs = []
+
+        count = args.get('initial_fetch', 10)
+        state = args.get('state')
+        username = args.get('username')
+        source = args.get('source')
+
+        if source == 'all':
+            source = None
+
+        # initial fetch
+        if not last_run:
+            jobs = client.get_recent_jobs(num_jobs=count, state=state, username=username, source=source)
+        else:
+            # logic to fetch the incidents from the last run onwards
+            # retrieving 50 incidents at a time assuming
+            # there will not be 50 events submitted concurrently within a 1 min period
+            retrieved_jobs = client.get_recent_jobs(num_jobs=50, state=state, username=username, source=source)
+            for job in retrieved_jobs:
+                # comparing the time to see if the last fetch time is less than or equal
+                # to the incidents that are being fetched
+                # if last fetch time is lower, will fetch the incidents
+                if int(date_to_timestamp(job.get('CreatedAt'), date_format=DATE_FORMAT)) <= int(
+                        last_run.get('last_created_at')):
+                    break
+                else:
+                    jobs.append(job)
+
+        for job in jobs:
+            incident = {
+                'name': job.get('ID'),
+                'occurred': job['CreatedAt'],
+                'rawJSON': json.dumps(job)
+            }
+            incidents.append(incident)
+        # set the last run
+        if jobs:
+            # access the first of the array and set the start date and time to last run
+            demisto.setLastRun({
+                'last_created_at': date_to_timestamp(jobs[0].get('CreatedAt'), date_format=DATE_FORMAT)
+            })
+
+        # return the incidents
+        return incidents
+
+
+    def search_across_jobs_and_resources(client, args):
+        """
+            Search across jobs and resources
+        """
+        term = args.get('term')
+        field = args.get('field')
+        type = args.get('type')
+        count = args.get('count')
+        shared_only = args.get('shared_only')
+        submitted_by = args.get('submitted_by')
+        timeframe = args.get('timeframe')
+        page = args.get('page')
+        result = client.search_across_jobs_and_resources(term=term, field=field, type=type, count=count,
+                                                         shared_only=shared_only, submitted_by=submitted_by,
+                                                         timeframe=timeframe, page=page)
+        readable_output = f'## Search Across Jobs and Resources \n'
+        readable_output += tableToMarkdown('Jobs and Resources', result.get('Jobs'),
+                                           headers=[])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.JobsAndResources",
+            outputs_key_field='Jobs.ID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def get_job_summary(client, args):
+        """
+            Job Summary
+        """
+        job_id = args.get('job_id')
+        result = client.get_job(job_id=job_id)
+        indicators = []
+
+        # Setting the DbotScore
+        twinwave_score = round(float(result.get('Score')) * 100, 2)
+        if twinwave_score >= 70:
+            score = Common.DBotScore.BAD
+        elif twinwave_score >= 30:
+            score = Common.DBotScore.SUSPICIOUS
+        else:
+            score = Common.DBotScore.GOOD
+
+        submission = result.get('Submission')
+        resources = result.get('Resources')
+        tasks = result.get('Tasks')
+        created_at = result.get('CreatedAt')
+
+        readable_output = f'## Job Summary\n'
+
+        # check if the job is a file
+        if submission.get('SHA256'):
+            size = None
+            mime_type = None
+
+            # if Twinwave scan is not completed, don't set the DBotScore
+            if result.get('State') == 'done':
+                # extracting more information from the job
+                if resources:
+                    for resource in resources:
+                        file_metadata = resource.get('FileMetadata')
+                        if file_metadata:
+                            if file_metadata.get('SHA256') == submission.get('SHA256'):
+                                size = file_metadata.get('Size')
+                                mime_type = file_metadata.get('MimeType')
+
+                dbot_score = Common.DBotScore(
+                    indicator=submission.get('SHA256'),
+                    indicator_type=DBotScoreType.FILE,
+                    integration_name='Twinwave',
+                    score=score
+                )
+
+                file = Common.File(
+                    name=submission.get('Name'),
+                    md5=submission.get('MD5'),
+                    sha256=submission.get('SHA256'),
+                    size=size,
+                    dbot_score=dbot_score
+                )
+
+                indicators.append(file)
+            # Adding the SHA256 to the Result
+            result['SHA256'] = submission.get('SHA256')
+            result['DisplayScore'] = twinwave_score
+            readable_output += tableToMarkdown('Twinwave Job Summary', result,
+                                               headers=['ID', 'SHA256', 'State', 'DisplayScore', 'ResourceCount',
+                                                        'CreatedAt'])
+        # check if the job is a URL
+        else:
+            # if Twinwave scan is not completed, don't set the DBotScore
+            if result.get('State') == 'done':
+                detection_engines = set()
+                positive_engines = set()
+
+                for task in tasks:
+                    detection_engines.add(task.get('Engine'))
+                    if task.get('Results') and task.get('Results').get('Score') > 0:
+                        positive_engines.add(task.get('Engine'))
+
+                dbot_score = Common.DBotScore(
+                    indicator=submission.get('Name'),
+                    indicator_type=DBotScoreType.URL,
+                    integration_name='Twinwave',
+                    score=score
+                )
+
+                url = Common.URL(
+                    url=submission.get('Name'),
+                    detection_engines=list(detection_engines),
+                    dbot_score=dbot_score
+                )
+
+                indicators.append(url)
+
+            # Adding the URL to the Result
+            result['URL'] = submission.get('Name')
+            # Adding the DisplayScore to the result
+            result['DisplayScore'] = twinwave_score
+            readable_output += tableToMarkdown('Twinwave Job Summary', result,
+                                               headers=['ID', 'URL', 'State', 'DisplayScore',
+                                                        'ResourceCount', 'CreatedAt'])
+
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.JobSummary",
+            outputs_key_field='ID',
+            outputs=result,
+            raw_response=result,  # raw response - the original response
+            indicators=indicators
+        )
+
+
+    def get_job_normalized_forensics(client, args):
+        """
+            Job Normalized Forensics
+        """
+        job_id = args.get('job_id')
+        result = client.get_job_normalized_forensics(job_id=job_id)
+        # adding the job id to the results
+        if result and isinstance(result, dict):
+            result['JobID'] = job_id
+        # readable output will be in markdown format
+        readable_output = f'## Normalized Forensics\n'
+        readable_output += tableToMarkdown('Twinwave Job Normalized Forensics', result,
+                                           headers=['JobID', 'Version', 'Engine', 'DisplayScore', 'Verdict', 'StartTime',
+                                                    'EndTime'])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.JobNormalizedForensics",
+            outputs_key_field='JobID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def get_task_normalized_forensics(client, args):
+        """
+            Task Normalized Forensics
+        """
+        job_id = args.get('job_id')
+        task_id = args.get('task_id')
+        result = client.get_task_normalized_forensics(job_id=job_id, task_id=task_id)
+        # adding the job id and task id to the results
+        if result and isinstance(result, dict):
+            result['TaskID'] = task_id
+            result['JobID'] = job_id
+        # readable output will be in markdown format
+        readable_output = f'## Normalized Forensics\n'
+        readable_output += tableToMarkdown('Twinwave Task Normalized Forensics', result,
+                                           headers=['JobID', 'TaskID', 'Version', 'Engine', 'DisplayScore', 'Verdict',
+                                                    'StartTime', 'EndTime'])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.TaskNormalizedForensics",
+            outputs_key_field='TaskID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def get_task_raw_forensics(client, args):
+        """
+            Task Raw Forensics
+        """
+        job_id = args.get('job_id')
+        task_id = args.get('task_id')
+        result = client.get_task_raw_forensics(job_id=job_id, task_id=task_id)
+        # adding the job id and task id to the results
+        if result and isinstance(result, dict):
+            result['TaskID'] = task_id
+            result['JobID'] = job_id
+        # readable output will be in markdown format
+        readable_output = f'## Raw Forensics\n'
+        readable_output += tableToMarkdown('Twinwave Task Raw Forensics', result,
+                                           headers=[])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.TaskRawForensics",
+            outputs_key_field='TaskID',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def download_submitted_resource(client, args):
+        """
+            Download submitted resource
+        """
+        job_id = args.get('job_id')
+        sha256 = args.get('sha256')
+        result = client.download_submitted_resources(job_id=job_id, sha256=sha256)
+        return fileResult("resources.zip", data=result.content)
+
+
+    def get_temp_artifact_url(client, args):
+        """
+            Get Temp Artifact URL
+        """
+        path = args.get('path')
+        result = client.get_temp_artifact_url(path=path)
+        # readable output will be in markdown format
+        readable_output = f'## Get Temp Artifact URL \n'
+        readable_output += tableToMarkdown('Temp Artifact URL', result,
+                                           headers=[])
+        return CommandResults(
+            readable_output=readable_output,
+            outputs_prefix="Twinwave.TempArtifactURL",
+            outputs_key_field='URL',
+            outputs=result,
+            raw_response=result  # raw response - the original response
+        )
+
+
+    def main():
+        """
+            PARSE AND VALIDATE INTEGRATION PARAMS
+        """
+        params = demisto.params()
+
+        api_token = params.get('api-token')
+        verify_certificate = not params.get('insecure', False)
+        proxy = params.get('proxy', False)
+
+        LOG(f'Command being called is {demisto.command()}')
+        try:
+            client = Client(api_token=api_token, verify=verify_certificate, proxy=proxy)
+
+            if demisto.command() == 'test-module':
+                # This is the call made when pressing the integration Test button.
+                result = test_module(client)
+                return_results(result)
+
+            elif demisto.command() == 'fetch-incidents':
+                demisto.incidents(list_recent_jobs(client, params))
+
+            elif demisto.command() == 'twinwave-get-engines':
+                return_results(get_engines(client))
+
+            elif demisto.command() == 'twinwave-submit-url':
+                return_results(submit_url(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-submit-file':
+                return_results(submit_file(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-resubmit-job':
+                return_results(resubmit_job(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-list-recent-jobs':
+                return_results(list_recent_jobs(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-get-job-summary':
+                return_results(get_job_summary(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-get-job-normalized-forensics':
+                return_results(get_job_normalized_forensics(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-get-task-normalized-forensics':
+                return_results(get_task_normalized_forensics(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-get-task-raw-forensics':
+                return_results(get_task_raw_forensics(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-download-submitted-resource':
+                return_results(download_submitted_resource(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-get-temp-artifact-url':
+                return_results(get_temp_artifact_url(client, demisto.args()))
+
+            elif demisto.command() == 'twinwave-search-across-jobs-and-resources':
+                return_results(search_across_jobs_and_resources(client, demisto.args()))
+
+                # Log exceptions
+        except Exception as e:
+            return_error(f'Failed to execute {demisto.command()} command. Error: {str(e)}')
+
+
+    if __name__ in ('__main__', '__builtin__', 'builtins'):
+        main()
+  type: python
+  commands:
+  - name: twinwave-submit-url
+    arguments:
+    - name: url
+      required: true
+      description: The target URL to visit and analyze. Unlike the UI, the API does
+        not automatically un-defang the submitted URL.
+    - name: engines
+      description: 'Array of strings (EngineName). List of engines to be used during
+        the analysis. If you''d like to use the default Engines for your account,
+        omit this field or specify the empty array []. '
+    - name: parameters
+      description: 'Optional list of parameters to customize behavior during analysis
+        of the job. (E.g., passwords for archives.) {"archive_document_password":
+        "", "decode_rewritten_urls": "true/false"}'
+    - name: priority
+      description: The job's priority relative to other jobs. Jobs with a lower priority
+        value are processed before those with a higher value. (e.g., a priority=1
+        job will be processed before a priority=2 job.) Valid priority values are
+        between 1 and 255. You may omit this field, in which case a default priority
+        (10) is used.
+      defaultValue: "10"
+    - name: profile
+      description: An optional profile name that defines the analysis behavior to
+        be used during the analysis for this job. Profiles names map to behaviors
+        like identifying what collection of engines will be used. If no profile name
+        is submitted the system will use the default profile.
+    outputs:
+    - contextPath: Twinwave.Submissions.JobID
+      description: Job ID
+      type: Unknown
+    description: Submit New URL for Scanning
+  - name: twinwave-submit-file
+    arguments:
+    - name: entry_id
+      required: true
+    - name: priority
+      description: The job's priority relative to other jobs. Jobs with a lower priority
+        value are processed before those with a higher value. (e.g., a priority=1
+        job will be processed before a priority=2 job.) Valid priority values are
+        between 1 and 255. You may omit this field, in which case a default priority
+        (10) is used.
+      defaultValue: "10"
+    - name: profile
+      description: An optional profile name that defines the analysis behavior to
+        be used during the analysis for this job. Profiles names map to behaviors
+        like identifying what collection of engines will be used. If no profile name
+        is submitted the system will use the default profile.
+    outputs:
+    - contextPath: Twinwave.Submissions.JobID
+      description: Job ID
+      type: Unknown
+    description: Submit File for Scanning
+  - name: twinwave-resubmit-job
+    arguments: []
+    outputs:
+    - contextPath: Twinwave.Submissions.JobID
+      description: Job ID
+      type: Unknown
+    description: Resubmit a Job
+  - name: twinwave-get-job-summary
+    arguments:
+    - name: job_id
+      required: true
+    outputs:
+    - contextPath: Twinwave.JobSummary
+      description: Twinwave Job Summary
+      type: Unknown
+    - contextPath: Twinwave.JobSummary.ID
+      description: Job ID
+      type: Unknown
+    - contextPath: Twinwave.JobSummary.Tasks.ID
+      description: Task ID
+      type: Unknown
+    - contextPath: Twinwave.JobSummary.Tasks.JobID
+      description: Job ID associated to the task
+      type: Unknown
+    description: Get Job Summary
+  - name: twinwave-get-job-normalized-forensics
+    arguments:
+    - name: job_id
+      required: true
+    outputs:
+    - contextPath: Twinwave.JobNormalizedForensics
+      description: Twinwave Job Normalized Forensics
+      type: Unknown
+    - contextPath: Twinwave.JobNormalizedForensics.JobID
+      description: Job ID
+      type: Unknown
+    description: Get a Job's Normalized Forensics
+  - name: twinwave-get-task-normalized-forensics
+    arguments:
+    - name: job_id
+      required: true
+    - name: task_id
+      required: true
+    outputs:
+    - contextPath: Twinwave.TaskNormalizedForensics
+      description: Twinwave Task Normalized Forensics
+      type: Unknown
+    - contextPath: Twinwave.TaskNormalizedForensics.TaskID
+      description: Task ID
+      type: Unknown
+    - contextPath: Twinwave.TaskNormalizedForensics.JobID
+      description: Job ID
+      type: Unknown
+    description: Get a Task's Normalized Forensics
+  - name: twinwave-get-task-raw-forensics
+    arguments:
+    - name: job_id
+      required: true
+    - name: task_id
+      required: true
+    outputs:
+    - contextPath: Twinwave.TaskRawForensics
+      description: Twinwave Task Raw Forensics
+      type: Unknown
+    - contextPath: Twinwave.TaskRawForensics.JobID
+      description: Job ID
+      type: Unknown
+    - contextPath: Twinwave.TaskRawForensics.TaskID
+      description: Task ID
+      type: Unknown
+    description: Get a Task's Raw Forensics
+  - name: twinwave-download-submitted-resource
+    arguments:
+    - name: job_id
+      required: true
+    - name: sha256
+      required: true
+    outputs:
+    - contextPath: File.Name
+      description: Name of the file
+      type: Unknown
+    - contextPath: File.EntryID
+      description: Entry ID of the file
+      type: Unknown
+    description: "Download the Submitted Resource. \n\nDownload a password-protected
+      Zip archive of the Resource. Use the password 'infected' to decrypt the archive.\n\nAll
+      Resources discovered during the analysis are available for download via this
+      endpoint. To get the list of SHA256s for the Job's Resources, see The Resources
+      array from Get a Job Summary."
+  - name: twinwave-get-engines
+    arguments: []
+    outputs:
+    - contextPath: Twinwave.Engines
+      description: Available Engines
+      type: Unknown
+    - contextPath: Twinwave.Engines.Name
+      description: Name of the engine
+      type: Unknown
+    - contextPath: Twinwave.Engines.DefaultEnabled
+      description: Default Enabled (True/False)
+      type: Unknown
+    - contextPath: Twinwave.Engines.SupportedTypes
+      description: Supported Types
+      type: Unknown
+    description: List Available Engines
+  - name: twinwave-search-across-jobs-and-resources
+    arguments:
+    - name: term
+      description: Specify the string to search for in the specified field. (E.g.
+        .exe or example.com)
+    - name: field
+      description: 'Enum: "filename" "url" "tag" "sha256" "md5"'
+    - name: type
+      description: 'Enum: "exact" "substring"'
+    - name: count
+      description: Specify the maximum number of results to be returned. This has
+        a hard limit of 100; specifying a number greater than that will result in
+        a 400 Bad Request and the search will not be performed.
+    - name: shared_only
+      description: Specify true to only search across Jobs (and their Resources) which
+        have been shared.
+    - name: submitted_by
+      description: Specify a username or part of a username (e.g. alice@example.com
+        or alice) to only search across Jobs (and their Resources) submitted by the
+        matching user.
+    - name: timeframe
+      description: Specify the maximum number of days back to search for results.
+        Specify 0 for no limit. For example, setting this to 7 returns results within
+        the last week
+    - name: page
+      description: The page for which you want results. This defaults to 1 the first
+        page. See HasNext in the response of your search to know whether or not there
+        are more pages for your search criteria.
+    outputs:
+    - contextPath: Twinwave.JobsAndResources
+      description: Jobs and Resources
+      type: Unknown
+    - contextPath: Twinwave.JobsAndResources.Jobs
+      description: Job Details
+      type: Unknown
+    - contextPath: Twinwave.JobsAndResources.Jobs.ID
+      description: Job ID
+      type: Unknown
+    description: Search Across Jobs and Resources
+  - name: twinwave-get-temp-artifact-url
+    arguments:
+    - name: path
+      required: true
+      description: |-
+        Throughout the analysis of a Resource, a variety of Artifacts may be generated. These include things like Screenshots, PCAPs, HAR files, etc. This API endpoint generates a temporary URL that can be used to download the contents of an artifact.
+
+        After making a call to this endpoint, the URL field will contain a link to a signed URL for the desired Artifact. This link has a limited lifetime, so upon receiving it, you should immediately make a GET request to retrieve the actual Artifact.
+    outputs:
+    - contextPath: Twinwave.TempArtifactURL.URL
+      description: Temporary URL
+      type: Unknown
+    description: Get a Temporary Artifact URL
+  dockerimage: demisto/python3:3.7.4.2245
+  isfetch: true
+  runonce: false
+  subtype: python3
