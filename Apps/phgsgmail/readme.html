@@ -21,12 +21,12 @@
   <h3>On-Poll</h3>
     <b>Configuration:</b><br>
     <ul>
-    <li>label - To fetch the emails from the given folder name (default - all folders).</li>
+    <li>label - To fetch the emails from the given folder name (default - all folders). <br> <b>Note:- </b>  Reply email in the email thread would not be ingested if you provide a specific label in the configuration (eg. Inbox). It will ingest the reply email only if you leave the label configuration parameter empty.<br><br></li>
     <li>ingest_manner - To select the oldest first or newest first preference for ingestion (default - oldest first).</li>
     <li>first_run_max_emails - Maximum containers to poll for the first scheduled polling (default - 1000).</li>
     <li>max_containers - Maximum containers to poll after the first scheduled poll completes (default - 100).</li>
     <li>extract_attachments - Extract all the attachments included in emails.</li>
-    <li>extract_email_attachments - Extract the email attachments which has been sent as an attachment with the original emails.</li>
+    <li>download_eml_attachments - Downloads the EML file attached with the mail.</li>
     <li>extract_urls - Extracts the URLs present in the emails.</li>
     <li>extract_ips - Extracts the IP addresses present in the emails.</li>
     <li>extract_domains - Extract the domain names present in the emails.</li>

@@ -750,9 +750,11 @@ class GSuiteConnector(BaseConnector):
             self.debug_print("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
             labels = []
             if "label" in config:
-                labels = [config['label']]
+                labels_val = config['label']
+                labels = [x.strip() for x in labels_val.split(',')]
+                labels = list(filter(None, labels))
             ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner, labels=labels,
-                                                                use_ingest_limit=True)
+                                                                use_ingest_limit=True, include_sent=True)
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
