@@ -612,8 +612,13 @@ class ThreatQConnector(BaseConnector):
         file_path = v_file.get('path')
 
         # Read the file
-        with open(file_path, 'r') as f:
-            file_text = f.read()
+        try:
+            with open(file_path, 'r') as f:
+                file_text = f.read()
+        except Exception:
+            self.debug_print("Error occurred while reading the file in text mode ('r'). Hence, switching to binary mode ('rb') to read the contents of file.")
+            with open(file_path, 'rb') as f:
+                file_text = f.read()
 
         source_obj = ThreatQSource("Phantom", tlp=tlp)
         spearphish = Event(self.tq)
