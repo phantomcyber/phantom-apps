@@ -320,7 +320,7 @@ class MinemeldConnector(BaseConnector):
 
         indicator = param['indicator']
 
-        share_level = param['share_level']
+        share_level = param.get('share_level')
 
         # Optional values should use the .get() function
         node_name = param.get('node_name', 'wlWhiteListIPv4')
