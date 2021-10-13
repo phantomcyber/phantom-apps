@@ -90,7 +90,7 @@ a:hover {
   <tr>
   {% if result.param.ioc %}
   <td>
-    <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ result.param.ioc_type }}' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+    <a href="javascript:;" onclick="context_menu(this, [{'contains': [ 'ip', 'ipv6', 'sha256', 'md5', 'domain' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
     {{ result.param.ioc }}
     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>

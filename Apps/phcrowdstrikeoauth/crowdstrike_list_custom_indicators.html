@@ -169,10 +169,26 @@ a:hover {
           {% endif %}
         </td>
         <td>
-          {{ curr_entry.severity | default:"None" }}
+          {% if curr_entry.severity %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.severity }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
-          {{ curr_entry.action | default:"None" }}
+          {% if curr_entry.action %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.action }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.created_on | default:"None" }}
@@ -223,10 +239,26 @@ a:hover {
           {% endif %}
         </td>
         <td>
-          {{ curr_entry.severity | default:"None" }}
+          {% if curr_entry.severity %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.severity }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
-          {{ curr_entry.action | default:"None" }}
+          {% if curr_entry.action %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.action }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.created_on | default:"None" }}
@@ -277,10 +309,26 @@ a:hover {
           {% endif %}
         </td>
         <td>
-          {{ curr_entry.severity | default:"None" }}
+          {% if curr_entry.severity %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.severity }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
-          {{ curr_entry.action | default:"None" }}
+          {% if curr_entry.action %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.action }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.created_on | default:"None" }}
@@ -331,10 +379,26 @@ a:hover {
           {% endif %}
         </td>
         <td>
-          {{ curr_entry.severity | default:"None" }}
+          {% if curr_entry.severity %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.severity }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
-          {{ curr_entry.action | default:"None" }}
+          {% if curr_entry.action %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.action }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.created_on | default:"None" }}
@@ -385,10 +449,26 @@ a:hover {
           {% endif %}
         </td>
         <td>
-          {{ curr_entry.severity | default:"None" }}
+          {% if curr_entry.severity %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ curr_entry.severity }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.severity }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
-          {{ curr_entry.action | default:"None" }}
+          {% if curr_entry.action %}
+          <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ curr_entry.action }}' }], 0, {{ container.id }}, null, false);">
+            {{ curr_entry.action }}
+            &nbsp;
+            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+          </a>
+          {% else %}
+            None
+          {% endif %}
         </td>
         <td>
           {{ curr_entry.created_on | default:"None" }}

@@ -126,10 +126,20 @@
                                                 None
                                             {% endif %}
                                         </td>
-                                        <td>{{ resource.type | default:"None"}}</td>
+                                        <td>
+                                            {% if resource.type %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator type'], 'value': '{{ resource.type }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ resource.type }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                            {% else %}
+                                                None
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             {% if resource.value %}
-                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': [ '{{ resource.type }}' ], 'value': '{{ resource.value }}' }], 0, {{ container.id }}, null, false);">
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': [ 'domain', 'ip', 'ipv6', 'sha256', 'md5' ], 'value': '{{ resource.value }}' }], 0, {{ container.id }}, null, false);">
                                             {{ resource.value }}
                                             &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                             </a>
@@ -138,7 +148,15 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {{ resource.action | default:"None"}}
+                                            {% if resource.action %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator action'], 'value': '{{ resource.action }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ resource.action }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                            {% else %}
+                                                None
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {{ resource.source | default:"None"}}
@@ -150,13 +168,27 @@
                                             {{ resource.created_by | default:"None"}}
                                         </td>
                                         <td>
-                                            {{ resource.severity | default:"None"}}
+                                            {% if resource.severity %}
+                                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['severity'], 'value': '{{ resource.severity }}' }], 0, {{ container.id }}, null, false);">
+                                                {{ resource.severity }}
+                                                &nbsp;
+                                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                            </a>
+                                            {% else %}
+                                                None
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if resource.platforms %}
                                             <ul>
                                                 {% for platform in resource.platforms %}
-                                                    <li style="list-style-type: none;">{{ platform }}</li>
+                                                    <li style="list-style-type: none;">
+                                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['crowdstrike indicator platforms'], 'value': '{{ platform }}' }], 0, {{ container.id }}, null, false);">
+                                                            {{ platform }}
+                                                        &nbsp;
+                                                        <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                        </a>
+                                                    </li>
                                                 {% endfor %}
                                             </ul>
                                             {% else %}
