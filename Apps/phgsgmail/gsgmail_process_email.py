@@ -487,7 +487,6 @@ class ProcessMail:
                 else:
                     self._base_connector.debug_print('Failed to write file: {}'.format(e))
 
-
         return phantom.APP_SUCCESS
 
     def _get_file_name(self, input_str):
