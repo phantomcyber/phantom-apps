@@ -7,7 +7,7 @@
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as phrules
 
 # Usage of the consts file is recommended
 # from minemeld_consts import *
@@ -221,19 +221,21 @@ class MinemeldConnector(BaseConnector):
         vault_id = param['vault_id']
 
         # Find vault path  and info for given vault ID
-        vault_path = Vault.get_file_path(vault_id)
-        vault_info = Vault.get_file_info(vault_id)
+        try:
+            success, message, vault_info = phrules.vault_info(vault_id=vault_id)
+            vault_info = list(vault_info)[0]
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_FILE_NOT_FOUND), None
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_VAULT_ID_NOT_VALID), None
 
-        # check if vault path is accessible
-        if not vault_path:
-            return action_result.set_status(phantom.APP_ERROR, MINEMELD_VAULT_ID_NOT_FOUND)
-
-        # check if vault info is accessible
         if not vault_info:
-            return action_result.set_status(phantom.APP_ERROR, MINEMELD_VAULT_ID_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR,
+                                            "Error while fetching the vault information of the vault id: '{}'".format(vault_id))
 
-        file_info = vault_info[0]
-        file_name = file_info['path']
+        file_name = vault_info.get('path')
+        if file_name is None:
+            return action_result.set_status(phantom.APP_ERROR, VAULT_ERR_PATH_NOT_FOUND)
 
         # Optional values should use the .get() function
         node_name = param.get('node_name', 'wlWhiteListIPv4')
@@ -272,10 +274,6 @@ class MinemeldConnector(BaseConnector):
         if is_update:
             final_cmd = "{} {}".format(final_cmd, update_arg)
 
-        # self.save_progress("[-] final_cmd: {}".format(final_cmd))
-
-        # make rest call
-        # ret_val, response = self._make_rest_call('/endpoint', action_result, params=None, headers=None)
         out = subprocess.Popen(final_cmd.split(" "), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         stdout, stderr = out.communicate()
 
@@ -352,8 +350,8 @@ class MinemeldConnector(BaseConnector):
         self.save_progress("[-] file_type: {}".format(file_type))
 
         # Create a tmp file to store input parameter (IOC)
-        if hasattr(Vault, 'get_vault_tmp_dir'):
-            tmp_file_path = tempfile.NamedTemporaryFile(dir=Vault.get_vault_tmp_dir(), delete=False)
+        if hasattr(phrules, 'get_vault_tmp_dir'):
+            tmp_file_path = tempfile.NamedTemporaryFile(dir=phrules.get_vault_tmp_dir(), delete=False)
             input_file = tmp_file_path.name
         else:
             tmp_file_path = tempfile.NamedTemporaryFile(dir="/opt/phantom/vault/tmp/", delete=False)
