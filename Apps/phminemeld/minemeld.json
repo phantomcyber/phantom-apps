@@ -16,6 +16,7 @@
     "main_module": "minemeld_connector.py",
     "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
+    "python_version": "2.7",
     "configuration": {
         "endpoint": {
             "description": "Endpoint URL",
@@ -63,18 +64,7 @@
                     "required": true,
                     "primary": true,
                     "contains": [
-                        "vault id",
-                        "pe file",
-                        "pdf",
-                        "flash",
-                        "apk",
-                        "jar",
-                        "doc",
-                        "xls",
-                        "txt",
-                        "log",
-                        "ppt",
-                        "file"
+                        "vault id"
                     ],
                     "order": 0
                 },
@@ -123,15 +113,6 @@
                     "data_type": "boolean"
                 },
                 {
-                    "data_path": "action_result.parameter.file_name",
-                    "data_type": "string",
-                    "contains": [
-                        "file name"
-                    ],
-                    "column_name": "File Name",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.file_type",
                     "data_type": "string",
                     "contains": [
@@ -146,14 +127,7 @@
                     "data_path": "action_result.parameter.vault_id",
                     "data_type": "string",
                     "contains": [
-                        "pe file",
-                        "pdf",
-                        "flash",
-                        "apk",
-                        "jar",
-                        "doc",
-                        "xls",
-                        "ppt"
+                        "vault id"
                     ],
                     "column_name": "Vault ID",
                     "column_order": 0
@@ -281,15 +255,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.file_name",
-                    "data_type": "string",
-                    "contains": [
-                        "file name"
-                    ],
-                    "column_name": "File Name",
-                    "column_order": 1
-                },
-                {
                     "data_path": "action_result.parameter.file_type",
                     "data_type": "string",
                     "contains": [
@@ -326,22 +291,6 @@
                 {
                     "data_path": "action_result.parameter.share_level",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "pe file",
-                        "pdf",
-                        "flash",
-                        "apk",
-                        "jar",
-                        "doc",
-                        "xls",
-                        "ppt"
-                    ],
-                    "column_name": "Vault ID",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data",
