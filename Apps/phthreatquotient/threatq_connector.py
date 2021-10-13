@@ -11,6 +11,8 @@
 #
 # Dissemination of this information or reproduction of this material is strictly forbidden unless prior
 # written permission is obtained from ThreatQuotient, Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 ###########################################################################################################
 
 import json
@@ -20,6 +22,7 @@ import traceback
 
 from datetime import datetime
 from dateutil.parser import parse as parse_date
+from urllib.parse import unquote_plus
 
 # Phantom imports
 import phantom.app as phantom
@@ -116,7 +119,7 @@ class ThreatQConnector(BaseConnector):
             self.save_progress(THREATQ_SUCC_CONNECTIVITY_TEST)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_msg = unquote_plus(self._get_error_message_from_exception(e))
             msg = '{} -- {}'.format(error_msg, traceback.format_exc())
             self.debug_print(msg)
             self.save_progress(THREATQ_ERR_CONNECTIVITY_TEST.format(error=error_msg))
@@ -1575,7 +1578,7 @@ class ThreatQConnector(BaseConnector):
             # Re-authenticate with ThreatQ
             self.tq = Threatq(tq_host, auth_data, verify=(not trust_ssl))
         except Exception as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_msg = unquote_plus(self._get_error_message_from_exception(e))
             msg = '{} -- {}'.format(error_msg, traceback.format_exc())
             self.debug_print(msg)
             return self.set_status(phantom.APP_ERROR, THREATQ_ERR_CONNECTIVITY_TEST.format(error=error_msg))

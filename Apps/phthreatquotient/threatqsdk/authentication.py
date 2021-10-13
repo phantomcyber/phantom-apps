@@ -11,6 +11,8 @@
 #
 # Dissemination of this information or reproduction of this material is strictly forbidden unless prior
 # written permission is obtained from ThreatQuotient, Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 ###########################################################################################################
 
 from datetime import datetime

@@ -10,6 +10,8 @@
 
     Dissemination of this information or reproduction of this material is strictly forbidden unless prior
     written permission is obtained from ThreatQuotient, Inc.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
 <!DOCTYPE html>
@@ -134,7 +136,7 @@
         <p class="has-line-data" data-line-start="115" data-line-end="116"><strong>Description:</strong> Creates a file (attachment) in ThreatQ</p>
         <p class="has-line-data" data-line-start="117" data-line-end="118"><strong>Parameters:</strong></p>
         <ul>
-            <li class="has-line-data" data-line-start="118" data-line-end="119">vault_id: The ID of an file in your Phantom vault</li>
+            <li class="has-line-data" data-line-start="118" data-line-end="119">vault_id: The ID of the file in your Phantom vault</li>
             <li class="has-line-data" data-line-start="119" data-line-end="120">parse_for_indicators: Whether or not to parse the file for indicators</li>
             <li class="has-line-data" data-line-start="120" data-line-end="122">default_indicator_status: The indicator status for any parsed indicators from the file</li>
         </ul>
@@ -190,7 +192,7 @@
         </p>
         <h2 class="code-line" data-line-start=182 data-line-end=183 ><a id="App_Instructions_182"></a>App Instructions</h2>
         <h3 class="code-line" data-line-start=184 data-line-end=185 ><a id="Formatting_an_Indicator_List_184"></a>Formatting an Indicator List</h3>
-        <p class="has-line-data" data-line-start="186" data-line-end="187">You can pass a list of indicators to an action in few different ways. Each being parsed, slightly differently, but with similar outcomes</p>
+        <p class="has-line-data" data-line-start="186" data-line-end="187">You can pass a list of indicators to action in few different ways. Each being parsed, slightly differently, but with similar outcomes</p>
         <ul>
             <li class="has-line-data" data-line-start="188" data-line-end="189">If only values are specified, the integration will attempt to “detect” the indicator types and upload the known values (i.e. <code>1.1.1.1, badurl.com</code>)</li>
             <li class="has-line-data" data-line-start="189" data-line-end="190">You can specify indicator types by separating the type and value by a <code>:</code> or <code>=</code> character (i.e. <code>IP Address: 1.1.1.1, FQDN: badurl.com</code>)</li>
@@ -216,7 +218,6 @@
             <li class="has-line-data" data-line-start="215" data-line-end="223">
                 Version 2.0.0
                 <ul>
-                    <li class="has-line-data" data-line-start="216" data-line-end="217">Rename the app</li>
                     <li class="has-line-data" data-line-start="217" data-line-end="218">Rewrite of the app to improve stability, error handling, and input support</li>
                     <li class="has-line-data" data-line-start="218" data-line-end="219">Remove all “reputation” actions, and replaced them with an all-in-one query action</li>
                     <li class="has-line-data" data-line-start="219" data-line-end="220">Adds actions to interact with custom objects</li>
