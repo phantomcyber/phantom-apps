@@ -58,6 +58,11 @@
         "`Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>` does not contain a period",
         "`Use the <b>scope</b> parameter to specify the data set to hunt in.<br>Valid values are: <ul><li>My Samples<br>Hunt within your enterprise data</li><li>Public Samples<br>Hunt within AutoFocus public data set</li><li>All Samples<br>Use both data sets</li></ul>` does not contain a period"
       ]
+    },
+    "Python Version": {
+      "verbose": [
+        "Please update the python_version field in the app JSON. We strongly suggest using python 3 since python 2 support will be dropped in the near future."
+      ]
     }
   },
   "phantom_bishopfox": {
