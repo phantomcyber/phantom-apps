@@ -18,6 +18,8 @@ import shutil
 import hashlib
 import json
 import magic
+import random
+import string
 import phantom.rules as phantom_rules
 from gsgmail_consts import *
 import sys
@@ -470,12 +472,21 @@ class ProcessMail:
 
         # This is an attachment, first check if it is another email or not
         if extract_attach:
+            _, file_extension = os.path.splitext(file_name)
             part_payload = part.get_payload(decode=True)
             if not part_payload:
                 return phantom.APP_SUCCESS
-            with open(file_path, 'wb') as f:  # noqa
-                f.write(part_payload)
-            files.append({'file_name': file_name, 'file_path': file_path})
+            try:
+                with open(file_path, 'wb') as f:  # noqa
+                    f.write(part_payload)
+                files.append({'file_name': file_name, 'file_path': file_path})
+            except IOError as e:
+                error_msg = str(e)
+                if "File name too long" in error_msg:
+                    self.write_with_new_filename(tmp_dir, part_payload, file_extension, files, as_byte=False)
+                else:
+                    self._base_connector.debug_print('Failed to write file: {}'.format(e))
+
 
         return phantom.APP_SUCCESS
 
@@ -815,17 +826,41 @@ class ProcessMail:
 
     def check_and_update_eml(self, part):
         if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
+            tmp_dir = None
+            msg = None
+            file_extension = ''
             try:
                 tmp_dir = tempfile.mkdtemp(prefix='ph_email')
                 filename = self._get_file_name(part.get_filename())
+                _, file_extension = os.path.splitext(filename)
                 if filename.endswith('.eml'):
                     file_path = os.path.join(tmp_dir, filename)
                     msg = part.get_payload()[0]
                     with open(file_path, 'wb') as f:  # noqa
                         f.write(msg.as_bytes())
                     self._attachments.append({'file_name': filename, 'file_path': file_path})
+            except IOError as e:
+                error_msg = str(e)
+                if "File name too long" in error_msg:
+                    self.write_with_new_filename(tmp_dir, msg, file_extension, self._attachments, as_byte=True)
+                else:
+                    self._base_connector.debug_print('Failed to write file: {}'.format(e))
             except Exception as e:
                 self._base_connector.debug_print("Exception occurred: {}".format(e))
+
+    def write_with_new_filename(self, tmp_dir, data, file_extension, dict_to_fill, as_byte=False):
+        try:
+            random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
+            new_file_name = "ph_long_file_name_{0}{1}".format(random_suffix, file_extension)
+            file_path = os.path.join(tmp_dir, new_file_name)
+            with open(file_path, 'wb') as f:
+                if as_byte:
+                    f.write(data.as_bytes())
+                else:
+                    f.write(data)
+            dict_to_fill.append({'file_name': new_file_name, 'file_path': file_path})
+        except Exception as e:
+            self._base_connector.debug_print('Exception while writing file: {}'.format(e))
 
     def process_email(self, rfc822_email, email_id, epoch):
         try:
