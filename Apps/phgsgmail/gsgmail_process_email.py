@@ -8,18 +8,20 @@ import tempfile
 from collections import OrderedDict
 import os
 import re
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 import phantom.app as phantom
 import phantom.utils as ph_utils
 import mimetypes
 import socket
-from email.header import decode_header
+from email.header import decode_header, make_header
 import shutil
 import hashlib
 import json
 import magic
 import phantom.rules as phantom_rules
 from gsgmail_consts import *
+import sys
+from requests.structures import CaseInsensitiveDict
 
 _container_common = {
     "run_automation": False  # Don't run any playbooks, when this artifact is added
@@ -72,6 +74,12 @@ class ProcessMail:
         self._container = dict()
         self._artifacts = list()
         self._attachments = list()
+        self._python_version = None
+
+        try:
+            self._python_version = int(sys.version_info[0])
+        except Exception:
+            raise Exception("Error occurred while getting the Phantom server's Python major version.")
 
     def _get_file_contains(self, file_path):
 
@@ -194,11 +202,20 @@ class ProcessMail:
         urls = parsed_mail[PROC_EMAIL_JSON_URLS]
         domains = parsed_mail[PROC_EMAIL_JSON_DOMAINS]
 
-        with open(local_file_path, 'r') as f:  # noqa
-            file_data = f.read()
+        file_data = None
 
-        if file_data is None or len(file_data) == 0:
+        try:
+            with open(local_file_path, 'r') as f:
+                file_data = f.read()
+        except Exception:
+            with open(local_file_path, 'rb') as f:
+                file_data = f.read()
+            self._base_connector.debug_print("Reading file data using binary mode")
+
+        if (file_data is None) or (len(file_data) == 0):
             return phantom.APP_ERROR
+
+        file_data = UnicodeDammit(file_data).unicode_markup.encode('utf-8').decode('utf-8')
 
         self._parse_email_headers_as_inline(file_data, parsed_mail, email_id)
 
@@ -247,8 +264,8 @@ class ProcessMail:
     def _parse_email_headers_as_inline(self, file_data, parsed_mail, email_id):
 
         # remove the 'Forwarded Message' from the email text and parse it
-        p = re.compile(r'.*Forwarded Message.*\r\n(.*)', re.IGNORECASE)
-        email_text = p.sub(r'\1', file_data.strip())
+        p = re.compile(r'(?<=\r\n).*Forwarded Message.*\r\n', re.IGNORECASE)
+        email_text = p.sub('', file_data.strip())
         mail = email.message_from_string(email_text)
         self._parse_email_headers(parsed_mail, mail, add_email_id=email_id)
 
@@ -311,12 +328,15 @@ class ProcessMail:
             decoded_strings = [decode_header(x)[0] for x in encoded_strings]
             decoded_strings = [{'value': x[0], 'encoding': x[1]} for x in decoded_strings]
         except Exception as e:
-            self._base_connector.debug_print("decoding: {0}".format(encoded_strings), e)
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            self._base_connector.debug_print("Decoding: {0}. Error code: {1}. Error message: {2}".format(encoded_strings, error_code, error_msg))
             return def_name
 
         # convert to dict for safe access, if it's an empty list, the dict will be empty
         decoded_strings = dict(enumerate(decoded_strings))
 
+        new_str = ''
+        new_str_create_count = 0
         for i, encoded_string in enumerate(encoded_strings):
 
             decoded_string = decoded_strings.get(i)
@@ -332,12 +352,26 @@ class ProcessMail:
                 # nothing to replace with
                 continue
 
-            if encoding != 'utf-8':
-                # value = unicode(value, encoding).encode('utf-8')
-                value = value.encode('utf-8')
+            try:
+                if encoding != 'utf-8':
+                    value = str(value, encoding)
+            except Exception:
+                pass
 
-            # substitute the encoded string with the decoded one
-            input_str = input_str.replace(encoded_string, value)
+            try:
+                # commenting the existing approach due to a new approach being deployed below
+                # substitute the encoded string with the decoded one
+                # input_str = input_str.replace(encoded_string, value)
+                # make new string insted of replacing in the input string because issue find in PAPP-9531
+                if value:
+                    new_str += UnicodeDammit(value).unicode_markup
+                    new_str_create_count += 1
+            except Exception:
+                pass
+        # replace input string with new string because issue find in PAPP-9531
+        if new_str and new_str_create_count == len(encoded_strings):
+            self._base_connector.debug_print("Creating a new string entirely from the encoded_strings and assiging into input_str")
+            input_str = new_str
 
         return input_str
 
@@ -353,9 +387,12 @@ class ProcessMail:
         if not subject:
             return def_cont_name
 
-        return self._decode_uni_string(subject, def_cont_name)
+        try:
+            return str(make_header(decode_header(subject)))
+        except Exception:
+            return self._decode_uni_string(subject, def_cont_name)
 
-    def _handle_if_body(self, content_disp, content_type, part, bodies, file_path):
+    def _handle_if_body(self, content_disp, content_type, part, bodies, file_path, parsed_mail):
 
         process_as_body = False
 
@@ -375,11 +412,14 @@ class ProcessMail:
         if not part_payload:
             return phantom.APP_SUCCESS, False
 
+        charset = part.get_content_charset()
+
         with open(file_path, 'wb') as f:  # noqa
             f.write(part_payload)
 
         bodies.append({'file_path': file_path, 'charset': part.get_content_charset()})
 
+        self._add_body_in_email_headers(parsed_mail, file_path, charset, content_type)
         return phantom.APP_SUCCESS, False
 
     def _handle_part(self, part, part_index, tmp_dir, extract_attach, parsed_mail):
@@ -408,8 +448,10 @@ class ProcessMail:
 
             file_name = "{0}{1}".format(name, extension)
         else:
-            file_name = self._decode_uni_string(file_name, file_name)
-
+            try:
+                file_name = str(make_header(decode_header(file_name)))
+            except Exception:
+                file_name = self._decode_uni_string(file_name, file_name)
         # Remove any chars that we don't want in the name
         file_path = "{0}/{1}_{2}".format(tmp_dir, part_index,
                                          file_name.translate(str.maketrans("", "", ''.join(['<', '>', ' ']))))
@@ -417,7 +459,7 @@ class ProcessMail:
         self._base_connector.debug_print("file_path: {0}".format(file_path))
 
         # is the part representing the body of the email
-        status, process_further = self._handle_if_body(content_disp, content_type, part, bodies, file_path)
+        status, process_further = self._handle_if_body(content_disp, content_type, part, bodies, file_path, parsed_mail)
 
         if not process_further:
             return phantom.APP_SUCCESS
@@ -437,24 +479,23 @@ class ProcessMail:
 
         return phantom.APP_SUCCESS
 
-    def _parse_email_headers(self, parsed_mail, part, add_email_id=None):
+    def _get_file_name(self, input_str):
+        try:
+            return str(make_header(decode_header(input_str)))
+        except Exception:
+            return self._decode_uni_string(input_str, input_str)
+
+    def _parse_email_headers(self, parsed_mail, part, charset=None, add_email_id=None):
 
         email_header_artifacts = parsed_mail[PROC_EMAIL_JSON_EMAIL_HEADERS]
         email_headers = part.items()
         if not email_headers:
             return 0
 
-        # Convert the header tuple into a dictionary
-        headers = {}
-        [headers.update({x[0]: str(x[1])}) for x in email_headers]
-
-        # Handle received separately
-        received_headers = [str(x[1]) for x in email_headers if x[0].lower() == 'received']
-
-        if received_headers:
-            headers['Received'] = received_headers
-
         # Parse email keys first
+
+        headers = self._get_email_headers_from_part(part, charset)
+
         cef_artifact = {}
         cef_types = {}
 
@@ -468,16 +509,15 @@ class ProcessMail:
             if emails:
                 cef_artifact.update({'toEmail': emails})
 
-        # if the header did not contain any email addresses then ignore this artifact
-        if not cef_artifact:
+        message_id = headers.get('Message-ID')
+        # if the header did not contain any email addresses and message ID then ignore this artifact
+        if not cef_artifact and not message_id:
             return 0
 
         cef_types.update({'fromEmail': ['email'], 'toEmail': ['email']})
 
         if headers:
             cef_artifact['emailHeaders'] = headers
-
-        cef_artifact["part"] = str(part)
 
         # Adding the email id as a cef artifact crashes the UI when trying to show the action dialog box
         # so not adding this right now. All the other code to process the emailId is there, but the refraining
@@ -497,6 +537,72 @@ class ProcessMail:
 
         return len(email_header_artifacts)
 
+    def _get_email_headers_from_part(self, part, charset=None):
+
+        email_headers = list(part.items())
+
+        # TODO: the next 2 ifs can be condensed to use 'or'
+        if charset is None:
+            charset = part.get_content_charset()
+
+        if charset is None:
+            charset = 'utf8'
+
+        if not email_headers:
+            return {}
+        # Convert the header tuple into a dictionary
+        headers = CaseInsensitiveDict()
+        try:
+            [headers.update({x[0]: self._get_string(x[1], charset)}) for x in email_headers]
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            err = "Error occurred while converting the header tuple into a dictionary"
+            self._base_connector.debug_print("{}. {}. {}".format(err, error_code, error_msg))
+
+        # Handle received separately
+        try:
+            received_headers = [self._get_string(x[1], charset) for x in email_headers if x[0].lower() == 'received']
+        except Exception as e:
+            error_code, error_msg = self._get_error_message_from_exception(e)
+            err = "Error occurred while handling the received header tuple separately"
+            self._base_connector.debug_print("{}. {}. {}".format(err, error_code, error_msg))
+
+        if received_headers:
+            headers['Received'] = received_headers
+
+        # handle the subject string, if required add a new key
+        subject = headers.get('Subject')
+
+        if subject:
+            try:
+                headers['decodedSubject'] = str(make_header(decode_header(subject)))
+            except Exception:
+                headers['decodedSubject'] = self._decode_uni_string(subject, subject)
+        return dict(headers)
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+        except Exception:
+            error_code = "Error code unavailable"
+            error_msg = "Error message unavailable. Please check the asset configuration and|or action parameters."
+
+        return error_code, error_msg
+
     def _handle_mail_object(self, mail, email_id, rfc822_email, tmp_dir, start_time_epoch):
 
         parsed_mail = OrderedDict()
@@ -511,7 +617,7 @@ class ProcessMail:
         charset = mail.get_content_charset()
 
         if charset is None:
-            charset = 'utf8'
+            charset = 'utf-8'
 
         # Extract fields and place it in a dictionary
         parsed_mail[PROC_EMAIL_JSON_SUBJECT] = mail.get('Subject', '')
@@ -536,6 +642,7 @@ class ProcessMail:
                 self._base_connector.debug_print("part: {0}".format(part.__dict__))
                 self._base_connector.debug_print("part type", type(part))
                 if part.is_multipart():
+                    self.check_and_update_eml(part)
                     continue
                 try:
                     ret_val = self._handle_part(part, i, tmp_dir, extract_attach, parsed_mail)
@@ -553,6 +660,7 @@ class ProcessMail:
             with open(file_path, 'wb') as f:  # noqa
                 f.write(mail.get_payload(decode=True))
             bodies.append({'file_path': file_path, 'charset': charset})
+            self._add_body_in_email_headers(parsed_mail, file_path, mail.get_content_charset(), 'text/plain')
 
         # get the container name
         container_name = self._get_container_name(parsed_mail, email_id)
@@ -597,12 +705,88 @@ class ProcessMail:
 
         return phantom.APP_SUCCESS
 
+    def _add_body_in_email_headers(self, parsed_mail, file_path, charset, content_type):
+
+        # Add email_bodies to email_headers
+        email_headers = parsed_mail[PROC_EMAIL_JSON_EMAIL_HEADERS]
+
+        try:
+            with open(file_path, 'r') as f:
+                body_content = f.read()
+        except Exception:
+            with open(file_path, 'rb') as f:
+                body_content = f.read()
+            self._base_connector.debug_print("Reading file data using binary mode")
+        # Add body to the last added Email artifact
+        body_content = UnicodeDammit(body_content).unicode_markup.encode('utf-8').decode('utf-8')
+        if 'text/plain' in content_type:
+            try:
+                email_headers[-1]['cef']['bodyText'] = self._get_string(
+                    body_content, charset)
+            except Exception as e:
+                try:
+                    email_headers[-1]['cef']['bodyText'] = str(make_header(decode_header(body_content)))
+                except Exception:
+                    email_headers[-1]['cef']['bodyText'] = self._decode_uni_string(body_content, body_content)
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                err = "Error occurred while parsing text/plain body content for creating artifacts"
+                self._base_connector.debug_print("{}. {}. {}".format(err, error_code, error_msg))
+
+        elif 'text/html' in content_type:
+            try:
+                email_headers[-1]['cef']['bodyHtml'] = self._get_string(
+                    body_content, charset)
+            except Exception as e:
+                try:
+                    email_headers[-1]['cef']['bodyHtml'] = str(make_header(decode_header(body_content)))
+                except Exception:
+                    email_headers[-1]['cef']['bodyHtml'] = self._decode_uni_string(body_content, body_content)
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                err = "Error occurred while parsing text/html body content for creating artifacts"
+                self._base_connector.debug_print("{}. {}. {}".format(err, error_code, error_msg))
+
+        else:
+            if not email_headers[-1]['cef'].get('bodyOther'):
+                email_headers[-1]['cef']['bodyOther'] = {}
+            try:
+                email_headers[-1]['cef']['bodyOther'][content_type] = self._get_string(
+                    body_content, charset)
+            except Exception as e:
+                try:
+                    email_headers[-1]['cef']['bodyOther'][content_type] = str(make_header(decode_header(body_content)))
+                except Exception:
+                    email_headers[-1]['cef']['bodyOther'][content_type] = self._decode_uni_string(body_content, body_content)
+                error_code, error_msg = self._get_error_message_from_exception(e)
+                err = "Error occurred while parsing bodyOther content for creating artifacts"
+                self._base_connector.debug_print("{}. {}. {}".format(err, error_code, error_msg))
+
+    def _get_string(self, input_str, charset):
+
+        try:
+            if input_str:
+                if self._python_version == 2:
+                    input_str = UnicodeDammit(input_str).unicode_markup.encode(charset)
+                else:
+                    input_str = UnicodeDammit(input_str).unicode_markup.encode(charset).decode(charset)
+        except Exception:
+            try:
+                input_str = str(make_header(decode_header(input_str)))
+            except Exception:
+                input_str = self._decode_uni_string(input_str, input_str)
+            self._base_connector.debug_print(
+                "Error occurred while converting to string with specific encoding {}".format(input_str))
+
+        return input_str
+
     def _set_email_id_contains(self, email_id):
 
         if not self._base_connector:
             return
 
-        email_id = str(email_id)
+        try:
+            email_id = self._get_string(email_id, 'utf-8')
+        except Exception:
+            email_id = str(email_id)
 
         if self._base_connector.get_app_id() == EXCHANGE_ONPREM_APP_ID and email_id.endswith('='):
             self._email_id_contains = ["exchange email id"]
@@ -625,22 +809,23 @@ class ProcessMail:
             self._base_connector.debug_print(message)
             return phantom.APP_ERROR, message, []
 
-        self._base_connector.debug_print(mail.get_payload())
-        if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
-            try:
-                for msg in mail.get_payload()[1:]:
-                    file_path = os.path.join(tmp_dir, msg.get_filename())
-                    if ".eml" not in file_path:
-                        continue
-                    with open(file_path, 'wb') as f:  # noqa
-                        f.write(msg.as_bytes())
-                    self._attachments.append({'file_name': msg.get_filename(), 'file_path': file_path})
-            except Exception as err:
-                self._base_connector.debug_print(err)
-
         results = [{'container': self._container, 'artifacts': self._artifacts, 'files': self._attachments, 'temp_directory': tmp_dir}]
 
         return ret_val, PROC_EMAIL_PARSED, results
+
+    def check_and_update_eml(self, part):
+        if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
+            try:
+                tmp_dir = tempfile.mkdtemp(prefix='ph_email')
+                filename = self._get_file_name(part.get_filename())
+                if filename.endswith('.eml'):
+                    file_path = os.path.join(tmp_dir, filename)
+                    msg = part.get_payload()[0]
+                    with open(file_path, 'wb') as f:  # noqa
+                        f.write(msg.as_bytes())
+                    self._attachments.append({'file_name': filename, 'file_path': file_path})
+            except Exception as e:
+                self._base_connector.debug_print("Exception occurred: {}".format(e))
 
     def process_email(self, rfc822_email, email_id, epoch):
         try:
@@ -786,7 +971,12 @@ class ProcessMail:
 
         file_name = self._decode_uni_string(file_name, file_name)
 
-        success, message, vault_id = phantom_rules.vault_add(container_id, local_file_path, file_name)
+        # success, message, vault_id = phantom_rules.vault_add(container_id, local_file_path, file_name)
+        try:
+            success, message, vault_id = phantom_rules.vault_add(file_location=local_file_path, container=container_id, file_name=file_name, metadata=vault_attach_dict)
+        except Exception as e:
+            self._base_connector.debug_print(phantom.APP_ERR_FILE_ADD_TO_VAULT.format(e))
+            return phantom.APP_ERROR, phantom.APP_ERROR
 
         if not success:
             self._base_connector.debug_print(PROC_EMAIL_FAILED_VAULT_ADD_FILE.format(message))
