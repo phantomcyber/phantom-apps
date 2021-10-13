@@ -864,6 +864,22 @@
                 "indicator_list": {
                     "description": "List of indicator values (use format node)",
                     "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
                     "order": 6
                 }
             },
@@ -881,7 +897,23 @@
                 },
                 {
                     "data_path": "action_result.parameter.indicator_list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.task_description",
@@ -1115,6 +1147,22 @@
                     "description": "List of comma-separated or line-separated indicator",
                     "data_type": "string",
                     "required": true,
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
                     "order": 4
                 }
             },
@@ -1128,7 +1176,23 @@
             "output": [
                 {
                     "data_path": "action_result.parameter.indicator_list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.investigation_description",
