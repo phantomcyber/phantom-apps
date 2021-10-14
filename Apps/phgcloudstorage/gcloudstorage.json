@@ -16,8 +16,8 @@
             "name": "Daniel Federschmidt"
         }
     ],
-    "app_version": "1.0.1",
-    "utctime_updated": "2020-07-10T10:07:34.904652Z",
+    "app_version": "1.0.2",
+    "utctime_updated": "2021-10-14T21:45:02.000000Z",
     "package_name": "phantom_gcloudstorage",
     "main_module": "gcloudstorage_connector.py",
     "min_phantom_version": "4.9.39220",
@@ -487,7 +487,7 @@
                 "path": {
                     "description": "Path in the bucket where to place the object",
                     "data_type": "string",
-                    "contains":[
+                    "contains": [
                         "file path"
                     ],
                     "order": 2,
@@ -498,7 +498,7 @@
                 {
                     "data_path": "action_result.parameter.path",
                     "data_type": "string",
-                    "contains":[
+                    "contains": [
                         "file path"
                     ],
                     "column_name": "Path",
