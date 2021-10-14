@@ -10,6 +10,14 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "TwinWave",
+    "contributors": [
+        {
+            "name": "Daniel Lim"
+        },
+        {
+            "name": "Nader Elziq"
+        }
+      ],
     "license": "Copyright (c) TwinWave, 2021",
     "app_version": "1.0.0",
     "utctime_updated": "2021-06-15T21:58:52.481735Z",
@@ -19,20 +27,20 @@
     "app_wizard_version": "1.0.0",
     "configuration": {
         "api_token": {
-            "description": "api token from the app",
+            "description": "Api token from the app.",
             "data_type": "password",
             "required": true,
             "order": 0
         },
         "verify_certificate": {
-            "description": "certificate of verification",
+            "description": "Certificate of verification.",
             "data_type": "boolean",
             "required": false,
             "default": false,
             "order": 1
         },
         "proxy": {
-            "description": "proxy server or not",
+            "description": "Proxy server or not.",
             "data_type": "string",
             "required": false,
             "value_list": [],
@@ -42,7 +50,7 @@
         "since": {
             "data_type": "numeric",
             "order": 3,
-            "description": "Start of time range stated in hours",
+            "description": "Start of time range stated in hours.",
             "verbose": "If not specified, the default is past 3 days"
         }
     },
@@ -50,7 +58,7 @@
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "description": "Validate the asset configuration for connectivity using supplied configuration.",
             "verbose": "",
             "type": "test",
             "read_only": true,
@@ -60,7 +68,7 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality",
+            "description": "Callback action for the on_poll ingest functionality.",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": false,
@@ -81,13 +89,13 @@
                 "start_time": {
                     "data_type": "numeric",
                     "order": 1,
-                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "description": "Start of time range, in epoch time (milliseconds).",
                     "verbose": "If not specified, the default is past 10 days"
                 },
                 "end_time": {
                     "data_type": "numeric",
                     "order": 2,
-                    "description": "End of time range, in epoch time (milliseconds)",
+                    "description": "End of time range, in epoch time (milliseconds).",
                     "verbose": "If not specified, the default is now"
                 },
                 "container_count": {
@@ -126,14 +134,14 @@
         {
             "action": "search jobs resources",
             "identifier": "twinwave_search_across_jobs_and_resources",
-            "description": "search across jobs and resources",
+            "description": "Search across jobs and resources.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "term": {
-                    "description": "terms",
-                    "data_type": "string",
+                    "description": "Terms.",
+                    "data_type": "string.",
                     "required": false,
                     "primary": false,
                     "contains": [],
@@ -142,7 +150,7 @@
                     "order": 0
                 },
                 "field": {
-                    "description": "field",
+                    "description": "Field.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -152,7 +160,7 @@
                     "order": 1
                 },
                 "count": {
-                    "description": "count",
+                    "description": "Count.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -162,7 +170,7 @@
                     "order": 2
                 },
                 "shared_only": {
-                    "description": "shared_only",
+                    "description": "Shared_only.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -172,7 +180,7 @@
                     "order": 3
                 },
                 "submitted_by": {
-                    "description": "submitted_by",
+                    "description": "Submitted_by.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -182,7 +190,7 @@
                     "order": 4
                 },
                 "timeframe": {
-                    "description": "timeframe",
+                    "description": "Timeframe.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -192,7 +200,7 @@
                     "order": 5
                 },
                 "page": {
-                    "description": "page",
+                    "description": "Page.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -202,7 +210,7 @@
                     "order": 6
                 },
                 "type": {
-                    "description": "type",
+                    "description": "Type.",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
@@ -408,13 +416,13 @@
         {
             "action": "get artifact url",
             "identifier": "twinwave_get_artifact_url",
-            "description": "Get a temporary artifact url",
+            "description": "Get a temporary artifact url.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "path": {
-                    "description": "ArtifactPath associated with the artifact",
+                    "description": "ArtifactPath associated with the artifact.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -424,14 +432,14 @@
                     "order": 0
                 },
                 "job_id": {
-                    "description": "job id of the resource you want pulled",
+                    "description": "Job id of the resource you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 0
+                    "order": 1
                 }
 
             },
@@ -496,7 +504,7 @@
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "job id of the resource you want pulled",
+                    "description": "Job id of the resource you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -506,7 +514,7 @@
                     "order": 0
                 },
                 "sha256": {
-                    "description": "string of the hash associated with the job",
+                    "description": "String of the hash associated with the job.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -578,13 +586,13 @@
         {
             "action": "get taskraw forensics",
             "identifier": "twinwave_get_task_raw_forensics",
-            "description": "get tasks raw forensics data",
+            "description": "Get tasks raw forensics data.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "job id with the task of the raw forensics data",
+                    "description": "Job id with the task of the raw forensics data.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -594,14 +602,14 @@
                     "order": 0
                 },
                 "task_id": {
-                    "description": "task id of the forensics you want pulled",
+                    "description": "Task id of the forensics you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
@@ -617,13 +625,13 @@
                     "data_type": "string",
                     "contains": [],
                     "column_name": "task_id",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -1995,13 +2003,13 @@
         {
             "action": "get tasknormalized forensics",
             "identifier": "twinwave_get_task_normalized_forensics",
-            "description": "Get a tasks normalized forensics",
+            "description": "Get a tasks normalized forensics.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "job id of the with the task forensics you want pulled",
+                    "description": "Job id of the with the task forensics you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -2011,14 +2019,14 @@
                     "order": 0
                 },
                 "task_id": {
-                    "description": "task id of the forensics you want pulled",
+                    "description": "Task id of the forensics you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
                     "contains": [],
                     "value_list": [],
                     "default": "",
-                    "order": 0
+                    "order": 1
                 }
             },
             "output": [
@@ -2034,13 +2042,13 @@
                     "data_type": "string",
                     "contains": [],
                     "column_name": "task_id",
-                    "column_order": 0
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "status",
-                    "column_order": 1
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.message",
@@ -2571,13 +2579,13 @@
         {
             "action": "get jobnormalized forensics",
             "identifier": "twinwave_get_job_normalized_forensics",
-            "description": "Get a Job's normalized forensics",
+            "description": "Get a Job's normalized forensics.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "job id of the forensics you want pulled",
+                    "description": "Job id of the forensics you want pulled.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -3258,13 +3266,13 @@
         {
             "action": "get job summary",
             "identifier": "twinwave_get_job_summary",
-            "description": "Get a job summary",
+            "description": "Get a job summary.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "job id of the job summary you want to fetch",
+                    "description": "Job id of the job summary you want to fetch.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -3617,7 +3625,7 @@
         {
             "action": "list recent jobs",
             "identifier": "twinwave_list_recent_jobs",
-            "description": "Get a list of recent",
+            "description": "Get a list of recent.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
@@ -3958,13 +3966,13 @@
         {
             "action": "resubmit job",
             "identifier": "twinwave_resubmit_job",
-            "description": "Resubmit a job",
+            "description": "Resubmit a job.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "job_id": {
-                    "description": "Job Id you want to resubmit",
+                    "description": "Job id you want to resubmit.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -4025,13 +4033,13 @@
         {
             "action": "submit file",
             "identifier": "twinwave_submit_file",
-            "description": "Submit File for Scanning",
+            "description": "Submit File for Scanning.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "file": {
-                    "description": "file hash to submit",
+                    "description": "File hash to submit.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -4092,13 +4100,13 @@
         {
             "action": "submit url",
             "identifier": "twinwave_submit_url",
-            "description": "Submit New URL for Scanning",
+            "description": "Submit New URL for Scanning.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "url": {
-                    "description": "url to submit",
+                    "description": "Url to submit.",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -4157,7 +4165,7 @@
         {
             "action": "get engines",
             "identifier": "twinwave_get_engines",
-            "description": "List Available Engines",
+            "description": "List Available Engines.",
             "verbose": "",
             "type": "generic",
             "read_only": false,
