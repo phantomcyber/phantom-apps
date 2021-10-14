@@ -85,7 +85,7 @@ class GSuiteConnector(BaseConnector):
         return RetVal2(phantom.APP_SUCCESS, service)
 
     def initialize(self):
-
+        self._state = self.load_state()
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
@@ -716,11 +716,6 @@ class GSuiteConnector(BaseConnector):
         self.debug_print("\n PRINTING PARAM : {0} ".format(param))
 
         login_email = config['login_email']
-        first_run_max_emails = self._validate_integer(action_result, config.get('first_run_max_emails', GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL), "first_max_emails", allow_zero=True)
-        max_containers = self._validate_integer(action_result, config.get('max_containers', GSMAIL_DEFAULT_MAX_CONTAINER), "max_containers", allow_zero=False)
-
-        if first_run_max_emails is None or max_containers is None:
-            return action_result.get_status()
         self.save_progress("login_email is {0}".format(login_email))
 
         ret_val, service = self._create_service(action_result, scopes, "gmail", "v1", login_email)
@@ -733,6 +728,11 @@ class GSuiteConnector(BaseConnector):
                 return action_result.get_status()
             self.save_progress(GSMAIL_POLL_NOW_PROGRESS)
         else:
+            first_run_max_emails = self._validate_integer(action_result, config.get('first_run_max_emails', GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL), "first_max_emails",
+                                                          allow_zero=False)
+            max_containers = self._validate_integer(action_result, config.get('max_containers', GSMAIL_DEFAULT_MAX_CONTAINER), "max_containers", allow_zero=False)
+            if first_run_max_emails is None or max_containers is None:
+                return action_result.get_status()
             if self._state.get('first_run', True):
                 self._state['first_run'] = False
                 max_emails = first_run_max_emails
@@ -784,7 +784,7 @@ class GSuiteConnector(BaseConnector):
 
             process_email = ProcessMail(self, config)
             process_email.process_email(raw_decode, emid, timestamp)
-
+        self.save_state(self._state)
         return phantom.APP_SUCCESS
 
     def finalize(self):
