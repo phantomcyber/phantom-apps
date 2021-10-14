@@ -11,7 +11,11 @@
     "product_version_regex": ".*",
     "publisher": "Splunk Community",
     "license": "Copyright (c) 2021 Splunk Inc.",
-    "contributors": "Daniel Federschmidt",
+    "contributors": [
+        {
+            "name": "Daniel Federschmidt"
+        }
+    ],
     "app_version": "1.0.1",
     "utctime_updated": "2020-07-10T10:07:34.904652Z",
     "package_name": "phantom_gcloudstorage",
