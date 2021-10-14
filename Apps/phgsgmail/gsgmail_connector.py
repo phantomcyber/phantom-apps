@@ -784,7 +784,6 @@ class GSuiteConnector(BaseConnector):
 
             process_email = ProcessMail(self, config)
             process_email.process_email(raw_decode, emid, timestamp)
-        self.save_state(self._state)
         return phantom.APP_SUCCESS
 
     def finalize(self):

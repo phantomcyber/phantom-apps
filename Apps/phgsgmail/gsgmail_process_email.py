@@ -847,7 +847,7 @@ class ProcessMail:
             except Exception as e:
                 self._base_connector.debug_print("Exception occurred: {}".format(e))
 
-    def write_with_new_filename(self, tmp_dir, data, file_extension, dict_to_fill, original_file_name, as_byte=False):
+    def write_with_new_filename(self, tmp_dir, data, file_extension, dict_to_fill, file_name, as_byte=False):
         try:
             random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
             new_file_name = "ph_long_file_name_{0}{1}".format(random_suffix, file_extension)
@@ -857,7 +857,7 @@ class ProcessMail:
                     f.write(data.as_bytes())
                 else:
                     f.write(data)
-            dict_to_fill.append({'file_name': original_file_name, 'file_path': file_path})
+            dict_to_fill.append({'file_name': file_name, 'file_path': file_path})
         except Exception as e:
             self._base_connector.debug_print('Exception while writing file: {}'.format(e))
 
