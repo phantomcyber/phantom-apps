@@ -1,0 +1,237 @@
+<!-- File: readme.html
+
+    ThreatQuotient Proprietary and Confidential
+    Copyright (c)2021 ThreatQuotient, Inc. All rights reserved.
+
+    NOTICE: All information contained herein, is, and remains the property of ThreatQuotient, Inc.
+    The intellectual and technical concepts contained herein are proprietary to ThreatQuotient, Inc.
+    and its suppliers and may be covered by U.S. and Foreign Patents, patents in process, and are
+    protected by trade secret or copyright law.
+
+    Dissemination of this information or reproduction of this material is strictly forbidden unless prior
+    written permission is obtained from ThreatQuotient, Inc.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>ThreatQ</title>
+    </head>
+    <body>
+        <h1 class="code-line" data-line-start=0 data-line-end=1 ><a id="Splunk_SOAR_App_0"></a>Splunk SOAR App</h1>
+        <h2 class="code-line" data-line-start=2 data-line-end=3 ><a id="Introduction_2"></a>Introduction</h2>
+        <p class="has-line-data" data-line-start="4" data-line-end="8">The Splunk SOAR App for ThreatQ allows a user to execute a variety of actions on ThreatQ from a Phantom playbook.<br>
+            With ThreatQ as a single source of truth for Threat Intelligence, you will be able to accurately triage a sighting, and ultimately, make a quick decision.<br>
+            This will allow your analysts to focus on what’s important to their organization, instead of getting inundated with sightings of non-malicious indicators.<br>
+            The goal being, to increase your response time and improve your ROI.
+        </p>
+        <h2 class="code-line" data-line-start=9 data-line-end=10 ><a id="Installation_9"></a>Installation</h2>
+        <p class="has-line-data" data-line-start="11" data-line-end="12">This section will describe how you can install the app into your Phantom instance</p>
+        <p class="has-line-data" data-line-start="13" data-line-end="16"><strong>WARNING</strong>: This release (v2.x) has fundamentally changed how the App operates!<br>
+            If you are upgrading from v1.x, please refer to the <code>App Instructions -&gt; Upgrading from 1.x to 2.x</code> section!
+        </p>
+        <ol>
+            <li class="has-line-data" data-line-start="17" data-line-end="21">
+                Download the Splunk SOAR App (tar.gz) for ThreatQ via any of these methods:
+                <ul>
+                    <li class="has-line-data" data-line-start="18" data-line-end="19">Marketplace</li>
+                    <li class="has-line-data" data-line-start="19" data-line-end="20">Download Center</li>
+                    <li class="has-line-data" data-line-start="20" data-line-end="21">Splunkbase</li>
+                </ul>
+            </li>
+            <li class="has-line-data" data-line-start="21" data-line-end="22">Login to your Phantom instance</li>
+            <li class="has-line-data" data-line-start="22" data-line-end="23">In your navigation dropdown, select <code>Apps</code></li>
+            <li class="has-line-data" data-line-start="23" data-line-end="24">Click on the <code>Install App</code> button at the top right of your Apps page</li>
+            <li class="has-line-data" data-line-start="24" data-line-end="26">Select the Splunk SOAR App for ThreatQ tar.gz file</li>
+        </ol>
+        <h2 class="code-line" data-line-start=26 data-line-end=27 ><a id="Configuration_26"></a>Configuration</h2>
+        <p class="has-line-data" data-line-start="28" data-line-end="29">Once the app is installed, you will see a ThreatQ logo on your Apps page. If you do not, you can search for <code>ThreatQ</code> in the search bar</p>
+        <ol>
+            <li class="has-line-data" data-line-start="30" data-line-end="31">Next to the ThreatQ logo, click on the <code>Configure New Asset</code> button</li>
+            <li class="has-line-data" data-line-start="31" data-line-end="36">
+                Fill out the following information in the <code>Asset Info</code> tab, and save:
+                <ul>
+                    <li class="has-line-data" data-line-start="32" data-line-end="33"><strong>Asset name</strong>: threatq</li>
+                    <li class="has-line-data" data-line-start="33" data-line-end="34"><strong>Asset description</strong>: Integration with the ThreatQ Threat Intelligence Platform</li>
+                    <li class="has-line-data" data-line-start="34" data-line-end="35"><strong>Product vendor</strong>: ThreatQuotient</li>
+                    <li class="has-line-data" data-line-start="35" data-line-end="36"><strong>Product name</strong>: ThreatQ</li>
+                </ul>
+            </li>
+            <li class="has-line-data" data-line-start="36" data-line-end="42">
+                Fill out the following information in the <code>Asset Settings</code> tab, and save:
+                <ul>
+                    <li class="has-line-data" data-line-start="37" data-line-end="38"><strong>Server IP/Hostname</strong>: Enter the hostname or IP address for your ThreatQ instance</li>
+                    <li class="has-line-data" data-line-start="38" data-line-end="39"><strong>Client ID</strong>: Enter your API Credentials found under your <code>My Account</code> page in ThreatQ</li>
+                    <li class="has-line-data" data-line-start="39" data-line-end="40"><strong>Username</strong>: Enter your username to authenticate with ThreatQ</li>
+                    <li class="has-line-data" data-line-start="40" data-line-end="41"><strong>Password</strong>: Enter your password to authenticate with ThreatQ</li>
+                    <li class="has-line-data" data-line-start="41" data-line-end="42"><strong>Trust SSL Certificate?</strong>: Check this box if you want to trust the ThreatQ certificate (default: checked)</li>
+                </ul>
+            </li>
+            <li class="has-line-data" data-line-start="42" data-line-end="44">
+                Click the <code>Test Connectivity</code> button after saving to test your connection information
+                <ul>
+                    <li class="has-line-data" data-line-start="43" data-line-end="44">If this test fails, verify your Phantom instance has access to your ThreatQ instance, as well as make sure your credentials are correct</li>
+                </ul>
+            </li>
+            <li class="has-line-data" data-line-start="44" data-line-end="46">The ThreatQ App should now be configurable within a playbook!</li>
+        </ol>
+        <h2 class="code-line" data-line-start=46 data-line-end=47 ><a id="App_Actions_46"></a>App Actions</h2>
+        <p class="has-line-data" data-line-start="48" data-line-end="49">The following actions come out of the box with the Splunk SOAR App for ThreatQ</p>
+        <h3 class="code-line" data-line-start=50 data-line-end=51 ><a id="Query_Indicators_50"></a>Query Indicators</h3>
+        <p class="has-line-data" data-line-start="52" data-line-end="53"><strong>Name:</strong> query_indicators</p>
+        <p class="has-line-data" data-line-start="54" data-line-end="55"><strong>Description:</strong> Query a list of indicators against ThreatQ</p>
+        <p class="has-line-data" data-line-start="56" data-line-end="57"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="57" data-line-end="59">indicator_list: A list of indicator values to query</li>
+        </ul>
+        <h3 class="code-line" data-line-start=59 data-line-end=60 ><a id="Create_Indicators_59"></a>Create Indicators</h3>
+        <p class="has-line-data" data-line-start="61" data-line-end="62"><strong>Name:</strong> create_indicators</p>
+        <p class="has-line-data" data-line-start="63" data-line-end="64"><strong>Description:</strong> Create indicators in ThreatQ</p>
+        <p class="has-line-data" data-line-start="65" data-line-end="66"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="66" data-line-end="68">indicator_list: A list of indicators to add</li>
+        </ul>
+        <p class="has-line-data" data-line-start="68" data-line-end="70"><strong>Formatting:</strong><br>
+            See <em>Details &gt; Formatting an Indicator List</em>
+        </p>
+        <h3 class="code-line" data-line-start=71 data-line-end=72 ><a id="Create_Task_71"></a>Create Task</h3>
+        <p class="has-line-data" data-line-start="73" data-line-end="74"><strong>Name:</strong> create_task</p>
+        <p class="has-line-data" data-line-start="75" data-line-end="76"><strong>Description:</strong> Create a task in ThreatQ</p>
+        <p class="has-line-data" data-line-start="77" data-line-end="78"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="78" data-line-end="79">task_name: The name of the task to create</li>
+            <li class="has-line-data" data-line-start="79" data-line-end="80">assigned_to: The email or username of a user within ThreatQ to assign the task to</li>
+            <li class="has-line-data" data-line-start="80" data-line-end="81">task_status: The task status in ThreatQ</li>
+            <li class="has-line-data" data-line-start="81" data-line-end="82">task_priority: The task priority in ThreatQ</li>
+            <li class="has-line-data" data-line-start="82" data-line-end="83">task_description: The description of the task</li>
+            <li class="has-line-data" data-line-start="83" data-line-end="85">indicator_list: A list of indicators to relate to the task</li>
+        </ul>
+        <p class="has-line-data" data-line-start="85" data-line-end="87"><strong>Formatting:</strong><br>
+            See <em>Details &gt; Formatting an Indicator List</em>
+        </p>
+        <h3 class="code-line" data-line-start=88 data-line-end=89 ><a id="Create_Event_88"></a>Create Event</h3>
+        <p class="has-line-data" data-line-start="90" data-line-end="91"><strong>Name:</strong> create_event</p>
+        <p class="has-line-data" data-line-start="92" data-line-end="93"><strong>Description:</strong> Creates an event in ThreatQ, based on the container metadata in Phantom</p>
+        <p class="has-line-data" data-line-start="94" data-line-end="95"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="95" data-line-end="96">event_type: The type of event to create in ThreatQ</li>
+            <li class="has-line-data" data-line-start="96" data-line-end="98">indicator_list: A list of indicators to relate to the event</li>
+        </ul>
+        <p class="has-line-data" data-line-start="98" data-line-end="100"><strong>Formatting:</strong><br>
+            See <em>Details &gt; Formatting an Indicator List</em>
+        </p>
+        <h3 class="code-line" data-line-start=101 data-line-end=102 ><a id="Create_Spearphish_101"></a>Create Spearphish</h3>
+        <p class="has-line-data" data-line-start="103" data-line-end="104"><strong>Name:</strong> upload_spearphish</p>
+        <p class="has-line-data" data-line-start="105" data-line-end="106"><strong>Description:</strong> Creates a spearphish event in ThreatQ, based on a spearphish email in the Phantom vault</p>
+        <p class="has-line-data" data-line-start="107" data-line-end="108"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="108" data-line-end="109">vault_id: The ID of an email file in your Phantom vault</li>
+            <li class="has-line-data" data-line-start="109" data-line-end="111">indicator_status: The indicator status for any parsed indicators from the spearphish</li>
+        </ul>
+        <h3 class="code-line" data-line-start=111 data-line-end=112 ><a id="Upload_File_111"></a>Upload File</h3>
+        <p class="has-line-data" data-line-start="113" data-line-end="114"><strong>Name:</strong> upload_file</p>
+        <p class="has-line-data" data-line-start="115" data-line-end="116"><strong>Description:</strong> Creates a file (attachment) in ThreatQ</p>
+        <p class="has-line-data" data-line-start="117" data-line-end="118"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="118" data-line-end="119">vault_id: The ID of the file in your Phantom vault</li>
+            <li class="has-line-data" data-line-start="119" data-line-end="120">parse_for_indicators: Whether or not to parse the file for indicators</li>
+            <li class="has-line-data" data-line-start="120" data-line-end="122">default_indicator_status: The indicator status for any parsed indicators from the file</li>
+        </ul>
+        <h3 class="code-line" data-line-start=122 data-line-end=123 ><a id="Start_Investigation_122"></a>Start Investigation</h3>
+        <p class="has-line-data" data-line-start="124" data-line-end="125"><strong>Name:</strong> start_investigation</p>
+        <p class="has-line-data" data-line-start="126" data-line-end="127"><strong>Description:</strong> Start an investigation within ThreatQ</p>
+        <p class="has-line-data" data-line-start="128" data-line-end="129"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="129" data-line-end="130">investigation_name: The name of the investigation to create in ThreatQ</li>
+            <li class="has-line-data" data-line-start="130" data-line-end="131">investigation_priority: The priority of the investigation in ThreatQ</li>
+            <li class="has-line-data" data-line-start="131" data-line-end="132">investigation_description: The description of the investigation in ThreatQ</li>
+            <li class="has-line-data" data-line-start="132" data-line-end="133">investigation_visibility: Whether the investigation is public or private</li>
+            <li class="has-line-data" data-line-start="133" data-line-end="135">indicator_list: A list of indicators to relate to the investigation</li>
+        </ul>
+        <p class="has-line-data" data-line-start="135" data-line-end="137"><strong>Formatting:</strong><br>
+            See <em>Details &gt; Formatting an Indicator List</em>
+        </p>
+        <h3 class="code-line" data-line-start=138 data-line-end=139 ><a id="Create_Adversaries_138"></a>Create Adversaries</h3>
+        <p class="has-line-data" data-line-start="140" data-line-end="141"><strong>Name:</strong> create_adversaries</p>
+        <p class="has-line-data" data-line-start="142" data-line-end="143"><strong>Description:</strong> Create adversaries in ThreatQ</p>
+        <p class="has-line-data" data-line-start="144" data-line-end="145"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="145" data-line-end="147">adversary_list: A list of adversary names to create in ThreatQ</li>
+        </ul>
+        <h3 class="code-line" data-line-start=147 data-line-end=148 ><a id="Create_Custom_Objects_147"></a>Create Custom Objects</h3>
+        <p class="has-line-data" data-line-start="149" data-line-end="150"><strong>Name:</strong> create_custom_objects</p>
+        <p class="has-line-data" data-line-start="151" data-line-end="152"><strong>Description:</strong> Creates custom objects in ThreatQ</p>
+        <p class="has-line-data" data-line-start="153" data-line-end="154"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="154" data-line-end="155">object_list: A list of custom object values in ThreatQ</li>
+            <li class="has-line-data" data-line-start="155" data-line-end="157">object_type: The type of object that the object list specifies</li>
+        </ul>
+        <h3 class="code-line" data-line-start=157 data-line-end=158 ><a id="Add_Attribute_157"></a>Add Attribute</h3>
+        <p class="has-line-data" data-line-start="159" data-line-end="160"><strong>Name:</strong> add_attribute</p>
+        <p class="has-line-data" data-line-start="161" data-line-end="162"><strong>Description:</strong> Adds an attribute to a list of custom objects</p>
+        <p class="has-line-data" data-line-start="163" data-line-end="164"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="164" data-line-end="165">object_list: A list of custom object values in ThreatQ</li>
+            <li class="has-line-data" data-line-start="165" data-line-end="166">object_type: The type of object that the object list specifies</li>
+            <li class="has-line-data" data-line-start="166" data-line-end="167">attribute_name: The name for the attribute to add</li>
+            <li class="has-line-data" data-line-start="167" data-line-end="169">attribute_value: The value for the attribute to add</li>
+        </ul>
+        <h3 class="code-line" data-line-start=169 data-line-end=170 ><a id="Set_Indicator_Status_169"></a>Set Indicator Status</h3>
+        <p class="has-line-data" data-line-start="171" data-line-end="172"><strong>Name:</strong> set_indicator_status</p>
+        <p class="has-line-data" data-line-start="173" data-line-end="174"><strong>Description:</strong> Sets the status of an indicator in ThreatQ</p>
+        <p class="has-line-data" data-line-start="175" data-line-end="176"><strong>Parameters:</strong></p>
+        <ul>
+            <li class="has-line-data" data-line-start="176" data-line-end="177">indicator_list: A list of indicators</li>
+            <li class="has-line-data" data-line-start="177" data-line-end="179">indicator_status: The status to give to the list of indicators</li>
+        </ul>
+        <p class="has-line-data" data-line-start="179" data-line-end="181"><strong>Formatting:</strong><br>
+            See <em>Details &gt; Formatting an Indicator List</em>
+        </p>
+        <h2 class="code-line" data-line-start=182 data-line-end=183 ><a id="App_Instructions_182"></a>App Instructions</h2>
+        <h3 class="code-line" data-line-start=184 data-line-end=185 ><a id="Formatting_an_Indicator_List_184"></a>Formatting an Indicator List</h3>
+        <p class="has-line-data" data-line-start="186" data-line-end="187">You can pass a list of indicators to action in few different ways. Each being parsed, slightly differently, but with similar outcomes</p>
+        <ul>
+            <li class="has-line-data" data-line-start="188" data-line-end="189">If only values are specified, the integration will attempt to “detect” the indicator types and upload the known values (i.e. <code>1.1.1.1, badurl.com</code>)</li>
+            <li class="has-line-data" data-line-start="189" data-line-end="190">You can specify indicator types by separating the type and value by a <code>:</code> or <code>=</code> character (i.e. <code>IP Address: 1.1.1.1, FQDN: badurl.com</code>)</li>
+            <li class="has-line-data" data-line-start="190" data-line-end="191">You can even pass the function a list of dictionaries, specifying the indicator type and value, like so:</li>
+        </ul>
+        <pre><code class="has-line-data" data-line-start="192" data-line-end="203" class="language-json">[
+    {
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"IP Address"</span></span>,
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"1.1.1.1"</span>
+    </span>},
+    {
+        "<span class="hljs-attribute">type</span>": <span class="hljs-value"><span class="hljs-string">"FQDN"</span></span>,
+        "<span class="hljs-attribute">value</span>": <span class="hljs-value"><span class="hljs-string">"badurl.com"</span>
+    </span>}
+]
+</code></pre>
+        <h3 class="code-line" data-line-start=204 data-line-end=205 ><a id="Upgrading_from_1x_to_2x_204"></a>Upgrading from 1.x to 2.x</h3>
+        <p class="has-line-data" data-line-start="206" data-line-end="207">While many of the actions in v2.x of the Phantom App look very similar to the v1.x App, they operate very differently. Chances are, you will need to recreate all of the ThreatQ App actions, and reconfigure them. Please review all of the actions under the <code>App Actions</code> section to see how to configure them.</p>
+        <h2 class="code-line" data-line-start=208 data-line-end=209 ><a id="Known_IssuesLimitations_208"></a>Known Issues/Limitations</h2>
+        <p class="has-line-data" data-line-start="210" data-line-end="211">N/A</p>
+        <h2 class="code-line" data-line-start=212 data-line-end=213 ><a id="Changelog_212"></a>Changelog</h2>
+        <ul>
+            <li class="has-line-data" data-line-start="215" data-line-end="223">
+                Version 2.0.0
+                <ul>
+                    <li class="has-line-data" data-line-start="217" data-line-end="218">Rewrite of the app to improve stability, error handling, and input support</li>
+                    <li class="has-line-data" data-line-start="218" data-line-end="219">Remove all “reputation” actions, and replaced them with an all-in-one query action</li>
+                    <li class="has-line-data" data-line-start="219" data-line-end="220">Adds actions to interact with custom objects</li>
+                    <li class="has-line-data" data-line-start="220" data-line-end="221">All response views now share the same template, including tables for attributes and related objects (including custom objects)</li>
+                    <li class="has-line-data" data-line-start="221" data-line-end="222">Response data is now better formatted to be used within phantom playbooks to make better decisions</li>
+                    <li class="has-line-data" data-line-start="222" data-line-end="223">Querying an indicator will query <em>all</em> information about that indicator, including attributes, score, status, and relationships. That information is then made accessible within the conditions block in order to make a decision</li>
+                </ul>
+            </li>
+            <li class="has-line-data" data-line-start="223" data-line-end="225">
+                Version 1.0.0
+                <ul>
+                    <li class="has-line-data" data-line-start="224" data-line-end="225">Initial release</li>
+                </ul>
+            </li>
+        </ul>
+    </body>
+</html>

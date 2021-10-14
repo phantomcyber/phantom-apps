@@ -1,0 +1,1611 @@
+{
+    "appid": "76740c11-1738-4220-afd3-bca9fc25d41f",
+    "name": "ThreatQ",
+    "description": "Integrates a variety of ThreatQ services into Splunk SOAR",
+    "publisher": "ThreatQuotient",
+    "contributors": [
+        {
+            "name": "Emanuel Rodrigues"
+        }
+    ],
+    "package_name": "phantom_threatq",
+    "type": "information",
+    "license": "Copyright (c) 2021 ThreatQuotient, Inc.",
+    "main_module": "threatq_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2020-03-13_12:00:00",
+    "product_vendor": "ThreatQuotient",
+    "product_name": "ThreatQ",
+    "product_version_regex": "4.*",
+    "min_phantom_version": "4.10.0.40961",
+    "logo": "logo_threatq.svg",
+    "logo_dark": "logo_threatq_dark.svg",
+    "python_version": "3",
+    "configuration": {
+        "tq_server": {
+            "description": "Server IP/Hostname",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "clientid": {
+            "description": "Client ID",
+            "data_type": "string",
+            "required": true,
+            "order": 1
+        },
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 2
+        },
+        "password": {
+            "description": "Password",
+            "data_type": "password",
+            "required": true,
+            "order": 3
+        },
+        "trust_ssl": {
+            "description": "Trust SSL Certificate?",
+            "data_type": "boolean",
+            "default": true,
+            "order": 4
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "query indicators",
+            "description": "Query ThreatQ for indicator context",
+            "type": "investigate",
+            "identifier": "query_indicators",
+            "read_only": true,
+            "parameters": {
+                "indicator_list": {
+                    "description": "A comma-separated or line-separated list of indicator values",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "exact": {
+                    "description": "Do we want to find an exact match or an approximate match?",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
+                },
+                "with_all_relationships": {
+                    "description": "Should we fetch all relationships with this action?",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_summarize",
+                "title": "ThreatQ Query Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.exact",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.with_all_relationships",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.adversaries.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attack_pattern.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.campaign.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.course_of_action.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.events.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.exploit_targets.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.identity.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.incident.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.indicators.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.intrusion_set.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.malware.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.report.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.signatures.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.signatures.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tool.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.ttp.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.vulnerability.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create indicators",
+            "description": "Create indicators within ThreatQ",
+            "type": "generic",
+            "identifier": "create_indicators",
+            "read_only": false,
+            "parameters": {
+                "indicator_list": {
+                    "description": "A comma-separated or line-separated list of indicators and indicator type (optional) name/value pairs (e.g.: IP Address: 1.1.1.1)",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "indicator_status": {
+                    "description": "The default status for the indicators uploaded to ThreatQ",
+                    "data_type": "string",
+                    "value_list": [
+                        "Review",
+                        "Active",
+                        "Whitelisted",
+                        "Indirect",
+                        "Expired"
+                    ],
+                    "default": "Active",
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "example_values": [
+                        "IP Address: 1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create adversaries",
+            "description": "Create adversaries within ThreatQ",
+            "type": "generic",
+            "identifier": "create_adversaries",
+            "read_only": false,
+            "parameters": {
+                "adversary_list": {
+                    "description": "A comma-separated or line-separated list of adversary names",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.adversary_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create custom objects",
+            "description": "Create custom objects within ThreatQ",
+            "type": "generic",
+            "identifier": "create_custom_objects",
+            "read_only": false,
+            "parameters": {
+                "object_list": {
+                    "description": "A comma-separated or line-separated list of custom object values",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "object_type": {
+                    "description": "The object type of the specified list values",
+                    "data_type": "string",
+                    "value_list": [
+                        "Adversary",
+                        "Attack Pattern",
+                        "Campaign",
+                        "Course of Action",
+                        "Exploit Target",
+                        "Identity",
+                        "Incident",
+                        "Indicator",
+                        "Intrusion Set",
+                        "Malware",
+                        "Report",
+                        "Tool",
+                        "TTP",
+                        "Vulnerability"
+                    ],
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Upload Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.object_list",
+                    "data_type": "string",
+                    "example_values": [
+                        "Identity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.object_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add attribute",
+            "description": "Adds an attribute to objects in ThreatQ",
+            "type": "generic",
+            "identifier": "add_attribute",
+            "read_only": false,
+            "parameters": {
+                "object_list": {
+                    "description": "A comma-separated or line-separated list of object values",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "object_type": {
+                    "description": "The object type of the specified list values",
+                    "data_type": "string",
+                    "value_list": [
+                        "Adversary",
+                        "Attack Pattern",
+                        "Campaign",
+                        "Course of Action",
+                        "Event",
+                        "Exploit Target",
+                        "Identity",
+                        "Incident",
+                        "Indicator",
+                        "Intrusion Set",
+                        "Malware",
+                        "Report",
+                        "Tool",
+                        "TTP",
+                        "Vulnerability"
+                    ],
+                    "required": true,
+                    "order": 1
+                },
+                "attribute_name": {
+                    "description": "The name of the attribute in ThreatQ",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 2
+                },
+                "attribute_value": {
+                    "description": "The value fo the attribute in ThreatQ",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 3
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.attribute_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.attribute_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.object_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.object_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Identity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set indicator status",
+            "description": "Set a status for a given list of indicators",
+            "type": "generic",
+            "identifier": "set_indicator_status",
+            "read_only": false,
+            "parameters": {
+                "indicator_list": {
+                    "description": "A comma-separated or line-separated list of indicators and indicator type (optional) name/value pairs (e.g.: IP Address: 1.1.1.1)",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "indicator_status": {
+                    "description": "The status to give to the list of indicators",
+                    "data_type": "string",
+                    "value_list": [
+                        "Review",
+                        "Active",
+                        "Whitelisted",
+                        "Indirect",
+                        "Expired"
+                    ],
+                    "default": "Active",
+                    "required": true,
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "example_values": [
+                        "IP Address: 1.1.1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Active"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create task",
+            "description": "Create a task within ThreatQ",
+            "type": "generic",
+            "identifier": "create_task",
+            "read_only": false,
+            "parameters": {
+                "task_prefix": {
+                    "description": "Prefix for the task name",
+                    "data_type": "string",
+                    "default": "Investigate Event",
+                    "order": 0
+                },
+                "task_name": {
+                    "description": "Task name",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 1
+                },
+                "assigned_to": {
+                    "description": "ThreatQ user to assign the task to",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "task_status": {
+                    "description": "Task status in ThreatQ",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "To Do",
+                        "In Progress",
+                        "Review",
+                        "Done"
+                    ],
+                    "order": 3
+                },
+                "task_priority": {
+                    "description": "Task priority in ThreatQ",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Low",
+                        "Medium",
+                        "High"
+                    ],
+                    "order": 4
+                },
+                "task_description": {
+                    "description": "Task description in ThreatQ",
+                    "data_type": "string",
+                    "order": 5
+                },
+                "indicator_list": {
+                    "description": "List of indicator values (use format node)",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "order": 6
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.assigned_to",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.task_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.task_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.task_prefix",
+                    "data_type": "string",
+                    "example_values": [
+                        "Investigate Event"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.task_priority",
+                    "data_type": "string",
+                    "example_values": [
+                        "Low"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.task_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "In Progress"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create event",
+            "description": "Create an event within ThreatQ",
+            "type": "generic",
+            "identifier": "create_event",
+            "read_only": false,
+            "parameters": {
+                "event_type": {
+                    "description": "The event type in ThreatQ",
+                    "data_type": "string",
+                    "value_list": [
+                        "Anonymization",
+                        "Command and Control",
+                        "Compromised PKI Certificate",
+                        "DoS Attack",
+                        "Exfiltration",
+                        "Host Characteristics",
+                        "Incident",
+                        "Login Compromised",
+                        "Malware",
+                        "Sighting",
+                        "SQL Injection Action",
+                        "Watchlist",
+                        "Watering Hole"
+                    ],
+                    "default": "Incident",
+                    "required": true,
+                    "order": 0
+                },
+                "indicator_list": {
+                    "description": "List of comma-separated or line-separated indicator",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.event_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Anonymization"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "start investigation",
+            "description": "Start an investigation within ThreatQ",
+            "type": "generic",
+            "identifier": "start_investigation",
+            "read_only": false,
+            "parameters": {
+                "investigation_name": {
+                    "description": "The investigation name",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "investigation_priority": {
+                    "description": "The investigation's priority",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Normal",
+                        "Escalated"
+                    ],
+                    "order": 1
+                },
+                "investigation_visibility": {
+                    "description": "The investigation's sharing status",
+                    "data_type": "string",
+                    "required": true,
+                    "value_list": [
+                        "Private",
+                        "Shared"
+                    ],
+                    "order": 2
+                },
+                "investigation_description": {
+                    "description": "The investigation's description",
+                    "data_type": "string",
+                    "order": 3
+                },
+                "indicator_list": {
+                    "description": "List of comma-separated or line-separated indicator",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ],
+                    "order": 4
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator_list",
+                    "data_type": "string",
+                    "contains": [
+                        "domain",
+                        "ip",
+                        "email",
+                        "url",
+                        "hash",
+                        "sha256",
+                        "string",
+                        "file name",
+                        "file path",
+                        "host name",
+                        "md5",
+                        "process name",
+                        "sha1",
+                        "user name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.investigation_description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.investigation_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.investigation_priority",
+                    "data_type": "string",
+                    "example_values": [
+                        "Normal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.investigation_visibility",
+                    "data_type": "string",
+                    "example_values": [
+                        "Shared"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "upload spearphish",
+            "description": "Upload a spearphish attempt to ThreatQ",
+            "type": "generic",
+            "identifier": "upload_spearphish",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "The Vault ID for the spearphish email file",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "order": 0
+                },
+                "indicator_status": {
+                    "description": "Default indicator status. If none selected, Review is used",
+                    "data_type": "string",
+                    "value_list": [
+                        "Review",
+                        "Active",
+                        "Whitelisted",
+                        "Indirect",
+                        "Expired"
+                    ],
+                    "default": "Review",
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Review"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "example_values": [
+                        "b69473ee89a6f7d216fb601e71d6e1f9d483c5de"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "upload file",
+            "description": "Upload (and parse) a file to ThreatQ",
+            "type": "generic",
+            "identifier": "upload_file",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "The Vault ID for the file to upload",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "order": 0
+                },
+                "parse_for_indicators": {
+                    "description": "Whether or not to parse the file for indicators",
+                    "data_type": "boolean",
+                    "required": true,
+                    "order": 1
+                },
+                "indicator_status": {
+                    "description": "Default indicator status. If none selected, Review is used",
+                    "data_type": "string",
+                    "value_list": [
+                        "Review",
+                        "Active",
+                        "Whitelisted",
+                        "Indirect",
+                        "Expired"
+                    ],
+                    "default": "Review",
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_uploaded",
+                "title": "ThreatQ Action Result"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.indicator_status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Review"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.parse_for_indicators",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "vault id"
+                    ],
+                    "example_values": [
+                        "b69473ee89a6f7d216fb601e71d6e1f9d483c5de"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get related objects",
+            "description": "Query ThreatQ for an object's relationships",
+            "type": "investigate",
+            "identifier": "get_related_objects",
+            "read_only": true,
+            "parameters": {
+                "object_list": {
+                    "description": "A comma-separated or line-separated list of custom object values",
+                    "data_type": "string",
+                    "required": true,
+                    "order": 0
+                },
+                "object_type": {
+                    "description": "The object type of the specified list values",
+                    "data_type": "string",
+                    "value_list": [
+                        "Adversary",
+                        "Attack Pattern",
+                        "Campaign",
+                        "Course of Action",
+                        "Event",
+                        "Exploit Target",
+                        "Identity",
+                        "Incident",
+                        "Indicator",
+                        "Intrusion Set",
+                        "Malware",
+                        "Report",
+                        "Tool",
+                        "TTP",
+                        "Vulnerability"
+                    ],
+                    "required": true,
+                    "order": 1
+                },
+                "related_object_type": {
+                    "description": "The object type of the relationships you want to find",
+                    "data_type": "string",
+                    "value_list": [
+                        "Adversary",
+                        "Attack Pattern",
+                        "Campaign",
+                        "Course of Action",
+                        "Event",
+                        "Exploit Target",
+                        "Identity",
+                        "Incident",
+                        "Indicator",
+                        "Intrusion Set",
+                        "Malware",
+                        "Report",
+                        "Tool",
+                        "TTP",
+                        "Vulnerability"
+                    ],
+                    "required": true,
+                    "order": 2
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 12,
+                "height": 12,
+                "view": "threatq_views.render_summarize",
+                "title": "ThreatQ Query Results"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.object_list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.object_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.related_object_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Event"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attributes",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.sources.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.title",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.type.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        }
+    ]
+}
