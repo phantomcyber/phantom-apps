@@ -1,7 +1,7 @@
 {
     "appid": "507379b9-c12c-4b1e-8124-8ebf0c3eee53",
     "name": "TwinWave",
-    "description": "A threat analysis platform to reduce the friction of repetitive manual tasks typically associated with investigating threats.",
+    "description": "A threat analysis platform to reduce the friction of repetitive manual tasks typically associated with investigating threats",
     "type": "reputation",
     "product_vendor": "TwinWave",
     "logo": "TwinWave-Logo-1x.png",
@@ -51,15 +51,15 @@
             "data_type": "numeric",
             "order": 3,
             "description": "Start of time range stated in hours.",
-            "verbose": "If not specified, the default is past 3 days"
+            "verbose": "If not specified, the default is past 3 days."
         }
     },
     "actions": [
         {
             "action": "test connectivity",
             "identifier": "test_connectivity",
-            "description": "Validate the asset configuration for connectivity using supplied configuration.",
-            "verbose": "",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": ".",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -68,7 +68,7 @@
         },
         {
             "action": "on poll",
-            "description": "Callback action for the on_poll ingest functionality.",
+            "description": "Callback action for the on_poll ingest functionality",
             "type": "ingest",
             "identifier": "on_poll",
             "read_only": false,
@@ -90,13 +90,13 @@
                     "data_type": "numeric",
                     "order": 1,
                     "description": "Start of time range, in epoch time (milliseconds).",
-                    "verbose": "If not specified, the default is past 10 days"
+                    "verbose": "If not specified, the default is past 10 days."
                 },
                 "end_time": {
                     "data_type": "numeric",
                     "order": 2,
                     "description": "End of time range, in epoch time (milliseconds).",
-                    "verbose": "If not specified, the default is now"
+                    "verbose": "If not specified, the default is now."
                 },
                 "container_count": {
                     "data_type": "numeric",
@@ -134,8 +134,8 @@
         {
             "action": "search jobs resources",
             "identifier": "twinwave_search_across_jobs_and_resources",
-            "description": "Search across jobs and resources.",
-            "verbose": "",
+            "description": "Search across jobs and resources",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -416,8 +416,8 @@
         {
             "action": "get artifact url",
             "identifier": "twinwave_get_artifact_url",
-            "description": "Get a temporary artifact url.",
-            "verbose": "",
+            "description": "Get a temporary artifact url",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -498,8 +498,8 @@
         {
             "action": "download submitted resource",
             "identifier": "twinwave_download_submitted_resource",
-            "description": "Download the Submitted Resource. Download a password-protected Zip archive of the Resource. Use the password 'infected' to decrypt the archive. All Resources discovered during the analysis are available for download via this endpoint. To get the list of SHA256s for the Job's Resources, see The Resources array from Get a Job Summary.",
-            "verbose": "",
+            "description": "Download the Submitted Resource Download a password-protected Zip archive of the Resource Use the password 'infected' to decrypt the archive All Resources discovered during the analysis are available for download via this endpoint To get the list of SHA256s for the Job's Resources, see The Resources array from Get a Job Summary",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -586,8 +586,8 @@
         {
             "action": "get taskraw forensics",
             "identifier": "twinwave_get_task_raw_forensics",
-            "description": "Get tasks raw forensics data.",
-            "verbose": "",
+            "description": "Get tasks raw forensics data",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -2003,8 +2003,8 @@
         {
             "action": "get tasknormalized forensics",
             "identifier": "twinwave_get_task_normalized_forensics",
-            "description": "Get a tasks normalized forensics.",
-            "verbose": "",
+            "description": "Get a tasks normalized forensics",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -2579,8 +2579,8 @@
         {
             "action": "get jobnormalized forensics",
             "identifier": "twinwave_get_job_normalized_forensics",
-            "description": "Get a Job's normalized forensics.",
-            "verbose": "",
+            "description": "Get a Job's normalized forensics",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -3266,8 +3266,8 @@
         {
             "action": "get job summary",
             "identifier": "twinwave_get_job_summary",
-            "description": "Get a job summary.",
-            "verbose": "",
+            "description": "Get a job summary",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -3625,8 +3625,8 @@
         {
             "action": "list recent jobs",
             "identifier": "twinwave_list_recent_jobs",
-            "description": "Get a list of recent.",
-            "verbose": "",
+            "description": "Get a list of recent",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {},
@@ -3966,8 +3966,8 @@
         {
             "action": "resubmit job",
             "identifier": "twinwave_resubmit_job",
-            "description": "Resubmit a job.",
-            "verbose": "",
+            "description": "Resubmit a job",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -4033,8 +4033,8 @@
         {
             "action": "submit file",
             "identifier": "twinwave_submit_file",
-            "description": "Submit File for Scanning.",
-            "verbose": "",
+            "description": "Submit File for Scanning",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -4100,8 +4100,8 @@
         {
             "action": "submit url",
             "identifier": "twinwave_submit_url",
-            "description": "Submit New URL for Scanning.",
-            "verbose": "",
+            "description": "Submit New URL for Scanning",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -4165,8 +4165,8 @@
         {
             "action": "get engines",
             "identifier": "twinwave_get_engines",
-            "description": "List Available Engines.",
-            "verbose": "",
+            "description": "List Available Engines",
+            "verbose": ".",
             "type": "generic",
             "read_only": false,
             "parameters": {},
