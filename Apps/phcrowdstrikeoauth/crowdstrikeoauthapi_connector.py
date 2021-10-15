@@ -574,6 +574,29 @@ class CrowdstrikeConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Device details fetched successfully")
 
+    def _handle_get_device_scroll(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        data = {
+            'offset': param.get('offset', None),
+            'limit': param.get('limit', None),
+            'sort': param.get('sort', None),
+            'filter': param.get('filter', None),
+        }
+
+        # More info on the endpoint at https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll
+        ret_val, response = self._make_rest_call_helper_oauth2(
+            action_result, CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, params=data)
+
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch device scroll", response)
+
+        action_result.add_data(response)
+
+        self.debug_print('Successfully fetched device scroll with response {0}'.format(response))
+        return action_result.set_status(phantom.APP_SUCCESS, "Device scroll fetched successfully")
+
     def _handle_get_process_detail(self, param):
 
         # Add an action result to the App Run
@@ -3014,7 +3037,8 @@ class CrowdstrikeConnector(BaseConnector):
             'download_report': self._handle_download_report,
             'detonate_file': self._handle_detonate_file,
             'detonate_url': self._handle_detonate_url,
-            'check_detonate_status': self._handle_check_detonate_status
+            'check_detonate_status': self._handle_check_detonate_status,
+            'get_device_scroll': self._handle_get_device_scroll,
         }
 
         action = self.get_action_identifier()

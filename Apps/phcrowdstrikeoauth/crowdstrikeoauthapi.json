@@ -15,7 +15,7 @@
         }
     ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.3.0",
+    "app_version": "3.4.0",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, July 19 2021, API version: v1, v2"
     ],
@@ -23,7 +23,7 @@
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -13051,6 +13051,126 @@
             "render": {
                 "width": 12,
                 "title": "Check Status",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "get device scroll",
+            "description": "Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)",
+            "verbose": "More info can be found at <a href='https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll' target='_blank'>here</a>.",
+            "type": "investigate",
+            "identifier": "get_device_scroll",
+            "read_only": true,
+            "parameters": {
+                "offset": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 0,
+                    "value_list": []
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "The maximum records to return. [1-5000]",
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "The property to sort by (e.g. status.desc or hostname.asc)",
+                    "order": 2
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 3,
+                    "value_list": []
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.code",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.id",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.message",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.expires_at",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1632462683095273200
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device scroll fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Device scrolls",
                 "type": "table",
                 "height": 5
             }
