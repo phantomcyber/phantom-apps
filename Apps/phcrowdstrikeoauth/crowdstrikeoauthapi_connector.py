@@ -28,7 +28,6 @@ import parse_cs_events as events_parser
 from bs4 import UnicodeDammit
 from _collections import defaultdict
 import traceback
-from urllib.parse import urlencode
 
 
 class RetVal(tuple):
@@ -585,14 +584,10 @@ class CrowdstrikeConnector(BaseConnector):
             'sort': param.get('sort', None),
             'filter': param.get('filter', None),
         }
-        query_pairs = [(k, v) for k, v in data.items() if v]
-        query = urlencode(query_pairs)
-        url = '{0}?{1}'.format(CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, query)
-
-        self.debug_print('Getting device scroll from {0}'.format(url))
 
         # More info on the endpoint at https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll
-        ret_val, response = self._make_rest_call_helper_oauth2(action_result, url)
+        ret_val, response = self._make_rest_call_helper_oauth2(
+            action_result, CROWDSTRIKE_GET_DEVICE_SCROLL_ENDPOINT, params=data)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Failed to fetch device scroll", response)
