@@ -14794,6 +14794,33 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "platform_name:'windows'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "status.desc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "string",
+                    "example_values": []
                 }
             ],
             "versions": "EQ(*)",
