@@ -1,0 +1,646 @@
+{
+	"info": {
+		"_postman_id": "af29f699-f96c-4c53-86fa-6c14984d1737",
+		"name": "AWS Security Hub",
+		"description": "## Postman Collection of Endpoints used by AWS Security Hub App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, Set this all fields before run the request.\n\n| Variable Name | Description |\n| ------ | ------ |\n| access_key  | The access key associated with an IAM account (in environment variables) |\n| secret_key  | The secret key associated with an IAM account (in environment variables)|\n| region | AWS Region (in environment variables)|\n| service_name | AWS Service Name (in environment variables)|\n\n\n- ### Variables needed to run the actions \n\n| Action Name | Variable(s) Name |\n| ------ | ------ |\n| on poll  | start_date, end_date |\n| get findings  | is_archived, resource_id,  region, network_source_mac, network_source_ipv4, Resource_ec2_ipv4_addresses, limit|\n| get related findings  | findings_id |\n| archive findings  | findings_id, note |\n| unarchive findings  | findings_id, note |\n| add note  | findings_id, note |",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Test Connectivity",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"service_name\", \"securityhub\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"MaxResults\" : 1\n}"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "Validate the asset's connectivity using provided configuration."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Related Findings",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"let findings_id =  pm.collectionVariables.get(\"findings_id\")",
+							"",
+							"filter = {",
+							"    \"Id\": [{\"Value\": findings_id, \"Comparison\": \"EQUALS\"}]",
+							"}",
+							"",
+							"",
+							"filter = {\"Filters\": filter}",
+							"pm.collectionVariables.set(\"filter\", JSON.stringify(filter));",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{filter}}\n\n\n"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "### Variables\n\n| Variable Name | Description |\n| ------ | ------ |\n| findings_id  | Identifier of security finding|"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Findings",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"filter = {}",
+							"",
+							"let is_archived =  pm.collectionVariables.get(\"is_archived\")",
+							"if (is_archived == \"true\"){",
+							"    filter = { ...{",
+							"    \"RecordState\": [{\"Value\": \"ARCHIVED\", \"Comparison\": \"EQUALS\"}]",
+							"    },",
+							"    ...filter",
+							"    }",
+							"}",
+							"else{",
+							"    filter = { ...{",
+							"    \"RecordState\": [{\"Value\": \"ACTIVE\", \"Comparison\": \"EQUALS\"}]",
+							"    },",
+							"    ...filter",
+							"    }",
+							"}",
+							"",
+							"let resource_id =  pm.collectionVariables.get(\"resource_id\")",
+							"if (Boolean(resource_id)){",
+							"",
+							" filter = {",
+							"     ...{\"ResourceId\": [{\"Value\": resource_id,\"Comparison\": \"EQUALS\"}]},",
+							"     ...filter",
+							"     }",
+							"}",
+							"",
+							"",
+							"",
+							"function arr_to_obj_of_arr(item) {",
+							"  return {\"Cidr\": item};",
+							"}",
+							"",
+							"",
+							"",
+							"let resource_ec2_ipv4_addresses =  pm.collectionVariables.get(\"resource_ec2_ipv4_addresses\")",
+							"",
+							"if (Boolean(resource_ec2_ipv4_addresses)){",
+							"",
+							"    ",
+							"",
+							" filter = {",
+							"     ...{\"ResourceAwsEc2InstanceIpV4Addresses\": resource_ec2_ipv4_addresses.split(\",\").map(arr_to_obj_of_arr)},",
+							"     ...filter",
+							"     }",
+							"}",
+							"",
+							"let network_source_ipv4 =  pm.collectionVariables.get(\"network_source_ipv4\")",
+							"if (Boolean(network_source_ipv4)){",
+							"",
+							" filter = {",
+							"     ...{\"NetworkSourceIpV4\": network_source_ipv4.split(\",\").map(arr_to_obj_of_arr)},",
+							"     ...filter",
+							"     }",
+							"}",
+							"",
+							"let network_source_mac =  pm.collectionVariables.get(\"network_source_mac\")",
+							"if (Boolean(network_source_mac)){",
+							"filter = {... {\"NetworkSourceMac\": [{",
+							"                    \"Value\": network_source_mac,",
+							"                    \"Comparison\": \"EQUALS\"",
+							"                }]},",
+							"                ... filter",
+							"}",
+							"}",
+							"",
+							"let limit =  pm.collectionVariables.get(\"limit\")",
+							"if (!Boolean(limit)){",
+							"limit = 5",
+							"}",
+							"",
+							"filter = {\"Filters\": filter, \"MaxResults\": parseInt(limit)}",
+							"pm.collectionVariables.set(\"filter\", JSON.stringify(filter));",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{filter}}\n\n\n"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "| Variable Name | Description |\n| ------ | ------ |\n| is_archived  | Set value as 'true' to fetch the archived findings and 'false' for active findings|\n| resource_id  | The canonical identifier for the given resource type |\n| region | The canonical AWS external region name where this resource is located |\n| network_source_mac | The source media access control (MAC) address of network-related information about a finding |\n| network_source_ipv4 | Comma-separated source IPv4 addresses of network-related information about a finding |\n| Resource_ec2_ipv4_addresses | Comma-separated IPv4 addresses associated with the instance |\n| limit | Maximum number of findings to be fetched |"
+			},
+			"response": []
+		},
+		{
+			"name": "Archive Findings",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let findings_id =  pm.collectionVariables.get(\"findings_id\")",
+							"let note =  pm.collectionVariables.get(\"note\")",
+							"",
+							"filter = {",
+							"    \"Id\": [{\"Value\": findings_id, \"Comparison\": \"EQUALS\"}],",
+							"}",
+							"",
+							"",
+							"filter = {\"Filters\": filter, \"RecordState\": \"ARCHIVED\", \"Note\": { ",
+							"      \"Text\": note,",
+							"      \"UpdatedBy\": \"postman-splunk\"",
+							"   },",
+							"   }",
+							"pm.collectionVariables.set(\"filter\", JSON.stringify(filter));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{{filter}}\n\n\n\n\n"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "### Variables\n\n| Variable Name | Description |\n| ------ | ------ |\n| findings_id  | Identifier of security finding|\n| note  | The text of a note|"
+			},
+			"response": []
+		},
+		{
+			"name": "Unarchive Findings",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let findings_id =  pm.collectionVariables.get(\"findings_id\")",
+							"let note =  pm.collectionVariables.get(\"note\")",
+							"",
+							"filter = {",
+							"    \"Id\": [{\"Value\": findings_id, \"Comparison\": \"EQUALS\"}],",
+							"}",
+							"",
+							"",
+							"filter = {\"Filters\": filter, \"RecordState\": \"ACTIVE\", \"Note\": { ",
+							"      \"Text\": note,",
+							"      \"UpdatedBy\": \"postman-splunk\"",
+							"   },",
+							"   }",
+							"pm.collectionVariables.set(\"filter\", JSON.stringify(filter));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{{filter}}\n\n\n\n\n"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "### Variables\n\n| Variable Name | Description |\n| ------ | ------ |\n| findings_id  | Identifier of security finding|\n| note  | The text of a note|"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Note",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let findings_id =  pm.collectionVariables.get(\"findings_id\")",
+							"let note =  pm.collectionVariables.get(\"note\")",
+							"",
+							"filter = {",
+							"    \"Id\": [{\"Value\": findings_id, \"Comparison\": \"EQUALS\"}],",
+							"}",
+							"",
+							"",
+							"filter = {\"Filters\": filter, \"Note\": { ",
+							"      \"Text\": note,",
+							"      \"UpdatedBy\": \"postman-splunk\"",
+							"   },",
+							"   }",
+							"pm.collectionVariables.set(\"filter\", JSON.stringify(filter));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\n{{filter}}\n\n\n\n\n"
+				},
+				"url": {
+					"raw": "https://securityhub.{{region}}.amazonaws.com/findings",
+					"protocol": "https",
+					"host": [
+						"securityhub",
+						"{{region}}",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"findings"
+					]
+				},
+				"description": "### Variables\n\n| Variable Name | Description |\n| ------ | ------ |\n| findings_id  | Identifier of security finding|\n| note  | The text of a note|"
+			},
+			"response": []
+		},
+		{
+			"name": "On Poll",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"sqs_url = pm.collectionVariables.get(\"sqs_url\");",
+							"if(Boolean(sqs_url)){",
+							"",
+							"    const obj = {",
+							"    \"QueueUrl\": sqs_url,",
+							"    \"Action\": \"ReceiveMessage\"",
+							"};",
+							"",
+							"    const on_poll_body = Object.keys(obj).reduce((acc, cur) => {",
+							"        return `${acc}${cur}=${obj[cur]}&`;",
+							"    }, '');",
+							"",
+							"    pm.collectionVariables.set('on_poll_body', on_poll_body);",
+							"",
+							"    pm.collectionVariables.set(\"on_poll_url\", \"https://queue.amazonaws.com/\");",
+							"    pm.collectionVariables.set(\"on_poll_content_type\", \"application/x-www-form-urlencoded\");",
+							"    pm.environment.set(\"service_name\", \"sqs\");",
+							"",
+							"",
+							"}",
+							"else{",
+							"    let region = pm.environment.get(\"region\")",
+							"    pm.collectionVariables.set(\"on_poll_url\", \"https://securityhub.\"+ region +\".amazonaws.com/findings\")",
+							"    let poll_now_days = pm.collectionVariables.get(\"poll_now_days\")",
+							"",
+							"",
+							"    ",
+							"    const moment = require('moment')",
+							"    let end_date = moment()",
+							"    let end_date_iso = end_date.toISOString() ",
+							"    let start_date = end_date.subtract(poll_now_days, \"days\");",
+							"    let start_date_iso = start_date.toISOString()",
+							"",
+							"",
+							"    filters = {",
+							"                        \"UpdatedAt\": [{",
+							"                            \"Start\": start_date_iso,",
+							"                            \"End\": end_date_iso",
+							"                        }]",
+							"                    }",
+							"    let filter = {\"Filters\": filters}",
+							"    pm.collectionVariables.set(\"on_poll_body\", JSON.stringify(filter));",
+							"",
+							"    pm.environment.set(\"service_name\", \"securityhub\");",
+							"}",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"sqs_url = pm.collectionVariables.get(\"sqs_url\");",
+							"if(Boolean(sqs_url)){",
+							"let response = xml2Json(responseBody)",
+							"ReceiptHandle = (response['ReceiveMessageResponse']['ReceiveMessageResult']['Message']['ReceiptHandle'])",
+							"console.log(response)",
+							"pm.collectionVariables.set(\"ReceiptHandle\", ReceiptHandle);",
+							"}",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{on_poll_content_type}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{on_poll_body}}"
+				},
+				"url": {
+					"raw": "{{on_poll_url}}",
+					"host": [
+						"{{on_poll_url}}"
+					]
+				},
+				"description": "### Variables\n\n| Variable Name | Description |\n| ------ | ------ |\n| poll_now_days | Poll last 'n' days|"
+			},
+			"response": []
+		},
+		{
+			"name": "On Poll (Delete Message)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"pm.environment.set(\"service_name\", \"sqs\");",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "{{on_poll_content_type}}",
+						"type": "text"
+					},
+					{
+						"key": "User-Agent",
+						"value": "Boto3/1.18.57 Python/3.9.6 Darwin/20.6.0 Botocore/1.21.57",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "Action",
+							"value": "DeleteMessage",
+							"type": "text"
+						},
+						{
+							"key": "QueueUrl",
+							"value": "{{sqs_url}}",
+							"type": "text"
+						},
+						{
+							"key": "ReceiptHandle",
+							"value": "{{ReceiptHandle}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{on_poll_url}}",
+					"host": [
+						"{{on_poll_url}}"
+					]
+				},
+				"description": "Run this to delete a message from SQS after receiving it by running on poll for sqs, otherwise the received message may be received again in the future."
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "awsv4",
+		"awsv4": [
+			{
+				"key": "service",
+				"value": "{{service_name}}",
+				"type": "string"
+			},
+			{
+				"key": "region",
+				"value": "{{region}}",
+				"type": "string"
+			},
+			{
+				"key": "secretKey",
+				"value": "{{secret_key}}",
+				"type": "string"
+			},
+			{
+				"key": "accessKey",
+				"value": "{{access_key}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "filter",
+			"value": "{}"
+		},
+		{
+			"key": "findings_id",
+			"value": ""
+		},
+		{
+			"key": "is_archived",
+			"value": "false"
+		},
+		{
+			"key": "limit",
+			"value": ""
+		},
+		{
+			"key": "network_source_ipv4",
+			"value": ""
+		},
+		{
+			"key": "network_source_mac",
+			"value": ""
+		},
+		{
+			"key": "note",
+			"value": ""
+		},
+		{
+			"key": "on_poll_body",
+			"value": ""
+		},
+		{
+			"key": "on_poll_content_type",
+			"value": ""
+		},
+		{
+			"key": "on_poll_url",
+			"value": ""
+		},
+		{
+			"key": "poll_now_days",
+			"value": ""
+		},
+		{
+			"key": "ReceiptHandle",
+			"value": ""
+		},
+		{
+			"key": "resource_ec2_ipv4_addresses",
+			"value": ""
+		},
+		{
+			"key": "resource_id",
+			"value": ""
+		},
+		{
+			"key": "sqs_url",
+			"value": ""
+		}
+	]
+}
