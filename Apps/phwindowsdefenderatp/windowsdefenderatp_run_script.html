@@ -1,0 +1,56 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+  <!-- File: windowsdefenderatp_run_script.html
+    Copyright (c) 2019-2021 Splunk Inc.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+  -->
+
+  <style>
+
+    .output {
+      font-family: Consolas,"courier new",monospace;
+      background-color: black;
+      color: beige;
+      overflow-y: scroll;
+      display: inline-block;
+      padding-left: 10px;
+      width: 100%;
+      height: 100%;
+    }
+
+    pre {
+      font-family: Consolas,"courier new",monospace;
+      background-color: black;
+      color: beige;
+      display: inline-block;
+    }
+
+    </style>
+  <div class="output"> <!-- Main Div -->
+  {% for result in results %} <!-- loop for each result -->
+    {% if  result.summary.event_id %}
+    <h5>Event ID:</h5>
+    <a href="javascript:;"
+        onclick="context_menu(this, [{'contains': ['defender atp event id'], 'value': '{{ result.summary.event_id }}' }], 0, {{ container.id }}, null, false);">
+        {{ result.summary.event_id }}&nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span></a>
+    {% endif %}
+
+    {% if not result.data %}
+            <h4 class="wf-h4-style">No data found</h4>
+    {% else %}
+        {% for data in result.data %}
+            <h5>Script Output:</h5>
+            <pre>{{ data.script_output}}</pre>
+            {% if  data.script_errors %}
+            <h5>Script Errors:</h5>
+            <pre>{{ data.script_errors}}</pre>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+ {% endfor %}
+  </div>
+{% endblock %}

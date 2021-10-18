@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!-- File: windowsdefenderatp_list_alerts.html
+<!-- File: windowsdefenderatp_update_alert.html
     Copyright (c) 2019-2021 Splunk Inc.
 
     Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -90,28 +90,46 @@
     {% else %}
         <h3 class="wf-h3-style">Action Parameters</h3>
         <table class="wf-table-vertical">
-            {% if result.param.input %}
+            {% if result.param.alert_id %}
                 <tr>
-                    <td>Input</td>
+                    <td>Alert ID</td>
                     <td><a href="javascript:;"
-                        onclick="context_menu(this, [{'contains': ['domain', 'sha1', 'sha256', 'md5', 'ip'], 'value': '{{ result.param.input }}' }], 0, {{ container.id }}, null, false);">
-                        {{ result.param.input }}
+                        onclick="context_menu(this, [{'contains': ['defender atp alert id'], 'value': '{{ result.param.alert_id }}' }], 0, {{ container.id }}, null, false);">
+                        {{ result.param.alert_id }}
                         &nbsp;
                         <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                         </a>
                     </td>
                 </tr>
-            {%endif%}
-            {% if result.param.input_type %}
+            {% endif %}
+            {% if result.param.status %}
                 <tr>
-                    <td>Type of input</td>
-                    <td>{{ result.param.input_type }}</td>
+                    <td>Status</td>
+                    <td>{{ result.param.status }}</td>
                 </tr>
             {%endif%}
-            {% if result.param.limit %}
+            {% if result.param.assigned_to %}
                 <tr>
-                    <td>Limit</td>
-                    <td>{{ result.param.limit }}</td>
+                    <td>Assigned To</td>
+                    <td>{{ result.param.assigned_to }}</td>
+                </tr>
+            {%endif%}
+            {% if result.param.classification %}
+                <tr>
+                    <td>Classification</td>
+                    <td>{{ result.param.classification }}</td>
+                </tr>
+            {%endif%}
+            {% if result.param.determination %}
+                <tr>
+                    <td>Determination</td>
+                    <td>{{ result.param.determination }}</td>
+                </tr>
+            {%endif%}
+            {% if result.param.comment %}
+                <tr>
+                    <td>Comment</td>
+                    <td>{{ result.param.comment }}</td>
                 </tr>
             {%endif%}
         </table>
@@ -124,51 +142,38 @@
                         <table class="wf-table-horizontal datatable">
                             <thead>
                                 <tr>
-                                    <th>Computer DNS Name</th>
                                     <th>Alert ID</th>
                                     <th>Title</th>
-                                    <th>Threat Family</th>
                                     <th>Status</th>
-                                    <th>Severity</th>
-                                    <th>Category</th>
-                                    <th>Creation Time</th>
                                     <th>Assigned To</th>
+                                    <th>Classification</th>
+                                    <th>Determination</th>
+                                    <th>Category</th>
+                                    <th>Severity</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for alert in result.data %}
                                     <tr>
-                                        <td>{{ alert.computerDnsName | default:"None" }}</td>
-                                        {% if alert.id %}
-                                            <td>
+                                        <td>
+                                            {% if alert.id %}
                                                 <a href="javascript:;"
-                                                onclick="context_menu(this, [{'contains': ['defender atp alert id'], 'value': '{{ alert.id }}' }], 0, {{ container.id }}, null, false);">
+                                                onclick="context_menu(this, [{'contains': ['defender atp device id'], 'value': '{{ alert.id }}' }], 0, {{ container.id }}, null, false);">
                                                     {{ alert.id }}
                                                     &nbsp;
                                                     <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                                 </a>
-                                            </td>
-                                        {% else %}
-                                            <td>None</td>
-                                        {% endif %}
+                                            {% else %}
+                                                None
+                                            {% endif %}
+                                        </td>
                                         <td>{{ alert.title | default:"None" }}</td>
-                                        <td>{{ alert.threatFamilyName | default:"None" }}</td>
                                         <td>{{ alert.status | default:"None" }}</td>
-                                        <td>{{ alert.severity | default:"None" }}</td>
+                                        <td>{{ alert.assignedTo | default:"None" }}</td>
+                                        <td>{{ alert.classification | default:"None" }}</td>
+                                        <td>{{ alert.determination | default:"None" }}</td>
                                         <td>{{ alert.category | default:"None" }}</td>
-                                        <td>{{ alert.alertCreationTime | default:"None" }}</td>
-                                        {% if alert.assignedTo %}
-                                            <td>
-                                                <a href="javascript:;"
-                                                onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ alert.assignedTo }}' }], 0, {{ container.id }}, null, false);">
-                                                    {{ alert.assignedTo }}
-                                                    &nbsp;
-                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                                                </a>
-                                            </td>
-                                        {% else %}
-                                            <td>None</td>
-                                        {% endif %}
+                                        <td>{{ alert.severity | default:"None" }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
