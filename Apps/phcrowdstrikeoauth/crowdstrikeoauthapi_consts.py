@@ -19,14 +19,30 @@ CROWDSTRIKE_JSON_IOC = "ioc"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_FALCON_DEVICE_ID = "id"
 CROWDSTRIKE_IOCS_EXPIRATION = "expiration"
 CROWDSTRIKE_IOCS_POLICY = "policy"
+CROWDSTRIKE_IOCS_ACTION = "action"
+CROWDSTRIKE_IOCS_TYPE = "type"
+CROWDSTRIKE_IOCS_LIMIT = "limit"
+CROWDSTRIKE_IOCS_VALUE = "value"
+CROWDSTRIKE_IOCS_SORT = "sort"
+CROWDSTRIKE_IOCS_METADATA = "metadata"
 CROWDSTRIKE_IOCS_SHARE_LEVEL = "share_level"
 CROWDSTRIKE_IOCS_SOURCE = "source"
+CROWDSTRIKE_IOCS_PLATFORMS = "platforms"
+CROWDSTRIKE_IOCS_SEVERITY = "severity"
+CROWDSTRIKE_IOCS_HOSTS = "host_groups"
+CROWDSTRIKE_IOCS_ALL_HOSTS = "applied_globally"
+CROWDSTRIKE_IOCS_TAGS = "tags"
+CROWDSTRIKE_IOC_DATE_ADDED = "date_added"
+CROWDSTRIKE_IOC_LAST_MODIFIED = "last_modified"
+CROWDSTRIKE_IOC_EXPIRATION_DATE = "expiration_date"
+CROWDSTRIKE_IOCS_FILENAME = "filename"
 CROWDSTRIKE_IOCS_DESCRIPTION = "description"
 CROWDSTRIKE_SEARCH_IOCS_TYPE = "indicator_type"
 CROWDSTRIKE_SEARCH_IOCS_FROM_EXPIRATION = "from_expiration"
 CROWDSTRIKE_SEARCH_IOCS_TO_EXPIRATION = "to_expiration"
 CROWDSTRIKE_JSON_LIST_IOC = "indicator_value"
 CROWDSTRIKE_POLL_INTERVAL = "detonate_timeout"
+CROWDSTRIKE_RESOURCE_ID = "resource_id"
 
 DEFAULT_POLLNOW_EVENTS_COUNT = 2000
 DEFAULT_EVENTS_COUNT = 10000
@@ -65,9 +81,13 @@ CROWDSTRIKE_ERR_UNSUPPORTED_HASH_TYPE = "Unsupported hash type"
 CROWDSTRIKE_ERR_EVENTS_FETCH = "Error occurred while fetching the DetectionSummaryEvents from the CrowdStrike server datafeed URL stream"
 CROWDSTRIKE_LIMIT_VALIDATION_ALLOW_ZERO_MSG = "Please provide zero or a valid positive integer value in the {parameter} parameter"
 CROWDSTRIKE_LIMIT_VALIDATION_MSG = "Please provide a valid non-zero positive integer value in the {parameter} parameter"
-CROWDSTRIKE_SUCC_GET_ALERT = "Successfully retrieved alert"
-CROWDSTRIKE_SUCC_DELETE_ALERT = "Successfully deleted alert"
-CROWDSTRIKE_SUCC_UPDATE_ALERT = "Successfully updated alert"
+CROWDSTRIKE_SUCC_GET_ALERT = "Indicator fetched successfully"
+CROWDSTRIKE_SUCC_POST_ALERT = "Indicator uploaded successfully"
+CROWDSTRIKE_SUCC_DELETE_ALERT = "Indicator deleted successfully"
+CROWDSTRIKE_SUCC_UPDATE_ALERT = "Indicator updated successfully"
+CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE = "Please either provide 'resource id' or 'indicator type' and 'indicator value'"
+CROWDSTRIKE_MISSING_INDICATOR_VALUE_ERROR_MESSAGE = "Please provide indicator value"
+CROWDSTRIKE_MISSING_INDICATOR_TYPE_ERROR_MESSAGE = "Please provide indicator type"
 CROWDSTRIKE_COMPLETED = "Completed {0:.0%}"
 CROWDSTRIKE_VALIDATE_INTEGER_MESSAGE = "Please provide a valid integer value in the {key} parameter"
 CROWDSTRIKE_ERROR_CODE_MESSAGE = "Error code unavailable"
@@ -87,7 +107,9 @@ CROWDSTRIKE_FILTER_REQUEST_STR = '{0}rest/container?page_size=0'\
                                  '&_filter_asset={1}'\
                                  '&_filter_name__contains="{2}"'\
                                  '&_filter_start_time__gte="{3}"'
-
+CROWDSTRIKE_FILTER_GET_IOC = "type:'{}'+value:'{}'"
+CROWDSTRIKE_FILTER_GET_CUSTOM_IOC = "(type:'{}' + value:'{}') + (deleted:'true', deleted: 'false')"
+CROWDSTRIKE_FILTER_GET_CUSTOM_IOC_RESOURCE_ID = "id:'{}' + (deleted:'true', deleted: 'false')"
 # endpoint
 CROWDSTRIKE_OAUTH_TOKEN_ENDPOINT = "/oauth2/token"
 CROWDSTRIKE_GET_DEVICE_ID_ENDPOINT = "/devices/queries/devices/v1"
@@ -109,9 +131,10 @@ CROWDSTRIKE_RUN_COMMAND_ENDPOINT = "/real-time-response/entities/command/v1"
 
 CROWDSTRIKE_GET_RTR_FILES_ENDPOINT = "/real-time-response/entities/file/v1"
 CROWDSTRIKE_GET_EXTRACTED_RTR_FILE_ENDPOINT = "/real-time-response/entities/extracted-file-contents/v1"
-CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/indicators/entities/iocs/v1"
+CROWDSTRIKE_GET_INDICATOR_ENDPOINT = "/iocs/entities/indicators/v1"
 CROWDSTRIKE_GET_DEVICE_COUNT_APIPATH = "/indicators/aggregates/devices-count/v1"
-CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT = "/indicators/queries/iocs/v1"
+CROWDSTRIKE_GET_CUSTOM_INDICATORS_ENDPOINT = "/iocs/queries/indicators/v1"
+CROWDSTRIKE_GET_COMBINED_CUSTOM_INDICATORS_ENDPOINT = "/iocs/combined/indicator/v1"
 CROWDSTRIKE_GET_DEVICES_RAN_ON_APIPATH = "/indicators/queries/devices/v1"
 CROWDSTRIKE_GET_PROCESSES_RAN_ON_APIPATH = "/indicators/queries/processes/v1"
 CROWDSTRIKE_GET_PROCESS_DETAIL_APIPATH = "/processes/entities/processes/v1"
@@ -144,3 +167,21 @@ CROWDSTRIKE_ENVIRONMENT_ID_DICT = {
     'windows 7, 64-bit': 110,
     'windows 7, 32-bit': 100
 }
+
+CROWDSTRIKE_SORT_FOR_CRITERIA_IOC_DICT = {
+    CROWDSTRIKE_SEARCH_IOCS_TYPE: 'type',
+    CROWDSTRIKE_JSON_LIST_IOC: 'value',
+    CROWDSTRIKE_IOCS_ACTION: 'action',
+    CROWDSTRIKE_IOCS_SEVERITY: 'severity',
+    CROWDSTRIKE_IOC_DATE_ADDED: 'created_on',
+    CROWDSTRIKE_IOC_LAST_MODIFIED: 'modified_on'
+}
+
+CROWDSTRIKE_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S%z"
+
+CROWDSTRIKE_DELETE_RESOURCE_NOT_FOUND = 'Failed to delete resource. Resource not found'
+CROWDSTRIKE_GET_RESOURCE_NOT_FOUND = 'Indicator not found'
+CROWDSTRIKE_MISSING_PARAMETER_ERROR_MESSAGE_DELETE_IOC = 'Please provide at least one of the parameter'
+CROWDSTRIKE_VALUE_LIST_ERROR_MESSAGE = "Please enter valid value in '{}' parameter"
+CROWDSTRIKE_SORT_CRITERIA_LIST = ["indicator_type.asc", "indicator_value.asc", "action.asc", "severity.asc", "date_added.asc", "last_modified.asc",
+"indicator_type.desc", "indicator_value.desc", "action.desc", "severity.desc", "date_added.desc", "last_modified.desc"]
