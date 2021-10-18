@@ -10,11 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "1.0.6",
-    "utctime_updated": "2018-03-12T21:32:38.000000Z",
+    "app_version": "2.0.0",
+    "utctime_updated": "2018-12-07T02:01:07.000000Z",
     "package_name": "phantom_phishlabs",
-    "main_module": "phishlabs_connector.pyc",
-    "min_phantom_version": "3.0.284",
+    "main_module": "phishlabs_connector.py",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, October 8, 2021"
+    ],
     "app_wizard_version": "1.0.0",
     "configuration": {
         "username": {
@@ -35,7 +39,6 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -46,7 +49,6 @@
             "action": "get ticket",
             "identifier": "get_ticket",
             "description": "Get case (issue) information",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {
@@ -58,7 +60,6 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "default": "",
                     "order": 0
                 }
             },
@@ -67,7 +68,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -148,7 +150,7 @@
                     "data_path": "action_result.data.*.customer",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ],
                     "column_name": "Customer",
                     "column_order": 0
@@ -328,6 +330,73 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.appDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "0001-01-01T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Client Submitted (CCAPI)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.brandAbuseFlag",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourcePhishlabs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryMarketplace",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crimewareLoadFailure",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resolution",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test case"
+                    ]
                 }
             ],
             "render": {
@@ -339,7 +408,6 @@
             "action": "create ticket",
             "identifier": "create_ticket",
             "description": "Create a new case submission",
-            "verbose": "",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -348,28 +416,21 @@
                     "data_type": "string",
                     "required": true,
                     "primary": false,
-                    "contains": [],
-                    "default": "",
                     "order": 0
                 },
                 "url": {
                     "description": "URL",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "url"
                     ],
-                    "default": "",
                     "order": 1
                 },
                 "description": {
                     "description": "Description of the case",
                     "data_type": "string",
-                    "required": false,
                     "primary": false,
-                    "contains": [],
-                    "default": "",
                     "order": 2
                 },
                 "case_type": {
@@ -380,7 +441,6 @@
                     "contains": [
                         "phishlabs case type"
                     ],
-                    "default": "",
                     "order": 3
                 },
                 "brand": {
@@ -391,7 +451,6 @@
                     "contains": [
                         "phishlabs brand"
                     ],
-                    "default": "",
                     "order": 4
                 }
             },
@@ -400,7 +459,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -428,7 +488,6 @@
                 {
                     "data_path": "action_result.parameter.description",
                     "data_type": "string",
-                    "contains": [],
                     "example_values": [
                         "This is my description"
                     ],
@@ -438,7 +497,6 @@
                 {
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
-                    "contains": [],
                     "example_values": [
                         "my_case_title"
                     ],
@@ -466,7 +524,7 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "column_name": "Case Id",
+                    "column_name": "Case ID",
                     "column_order": 0
                 },
                 {
@@ -529,6 +587,27 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.caseId",
+                    "data_type": "string",
+                    "example_values": [
+                        "dbf4a861-2b1a-11ec-b1c8-0efb1918365c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "New"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.updatedCase.caseNumber",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2648042
+                    ]
                 }
             ],
             "render": {
@@ -540,7 +619,6 @@
             "action": "list tickets",
             "identifier": "list_tickets",
             "description": "Get a list of cases in PhishLabs",
-            "verbose": "",
             "type": "generic",
             "read_only": true,
             "parameters": {},
@@ -549,7 +627,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -571,7 +650,7 @@
                     "contains": [
                         "phishlabs case id"
                     ],
-                    "column_name": "Case Id",
+                    "column_name": "Case ID",
                     "column_order": 4
                 },
                 {
@@ -622,7 +701,7 @@
                     "data_path": "action_result.data.*.customer",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom"
+                        "Splunk"
                     ]
                 },
                 {
@@ -738,10 +817,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.resolutionStatus",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.title",
@@ -779,6 +855,164 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.appDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "0001-01-01T00:00:00Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.createdBy.organization",
+                    "data_type": "string",
+                    "example_values": [
+                        "Splunk"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourceName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Client Submitted (CCAPI)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.brandAbuseFlag",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sourcePhishlabs",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryMarketplace",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.crimewareLoadFailure",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1b27a1db-2a97-11ec-984b-0ad24386a0d6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.fileURL",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://caseapi.phishlabs.com/v1/data/attachment/1b27a1db-2a97-11ec-984b-0ad24386a0d6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.fileName",
+                    "data_type": "string",
+                    "example_values": [
+                        "requested-screenshot-2021-10-11T13:28:22Z.jpg"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.dateAdded",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-11T13:28:22Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.attachments.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Automatic Screenshot for submitted URL"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.resolution",
+                    "data_type": "string",
+                    "example_values": [
+                        "This is a test case."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "test1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseId",
+                    "data_type": "string",
+                    "example_values": [
+                        "5a0321e3-273d-11ec-b912-0a8e0de89b4e"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Phishing"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.linkType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Clone"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseNumber",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2639769
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.caseStatus",
+                    "data_type": "string",
+                    "example_values": [
+                        "Rejected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.caseLinks.*.linkCreated",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-11T13:48:55.568376569Z"
+                    ]
                 }
             ],
             "render": {
@@ -795,20 +1029,13 @@
             "identifier": "get_config",
             "read_only": true,
             "parameters": {},
-            "render": {
-                "type": "custom",
-                "width": 10,
-                "height": 5,
-                "title": "Get Config",
-                "view": "phishlabs_view.display_config"
-            },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "failed",
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -867,6 +1094,13 @@
                     ]
                 }
             ],
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "title": "Get Config",
+                "view": "phishlabs_view.display_config"
+            },
             "versions": "EQ(*)"
         }
     ]
