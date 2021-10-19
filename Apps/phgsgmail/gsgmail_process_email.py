@@ -481,9 +481,9 @@ class ProcessMail:
                     f.write(part_payload)
                 files.append({'file_name': file_name, 'file_path': file_path})
             except IOError as e:
-                error_msg = str(e)
+                error_msg = self._get_error_message_from_exception(e)
                 if "File name too long" in error_msg:
-                    self.write_with_new_filename(tmp_dir, part_payload, file_extension, files, as_byte=False)
+                    self.write_with_new_filename(tmp_dir, part_payload, file_extension, files, file_name, as_byte=False)
                 else:
                     self._base_connector.debug_print('Failed to write file: {}'.format(e))
 
@@ -825,11 +825,11 @@ class ProcessMail:
 
     def check_and_update_eml(self, part):
         if self._config[PROC_EMAIL_JSON_EXTRACT_EMAIL_ATTACHMENTS]:
-            tmp_dir = None
             msg = None
+            tmp_dir = tempfile.mkdtemp(prefix='ph_email')
+            filename = ''
             file_extension = ''
             try:
-                tmp_dir = tempfile.mkdtemp(prefix='ph_email')
                 filename = self._get_file_name(part.get_filename())
                 _, file_extension = os.path.splitext(filename)
                 if filename.endswith('.eml'):
@@ -839,15 +839,15 @@ class ProcessMail:
                         f.write(msg.as_bytes())
                     self._attachments.append({'file_name': filename, 'file_path': file_path})
             except IOError as e:
-                error_msg = str(e)
+                error_msg = self._get_error_message_from_exception(e)
                 if "File name too long" in error_msg:
-                    self.write_with_new_filename(tmp_dir, msg, file_extension, self._attachments, as_byte=True)
+                    self.write_with_new_filename(tmp_dir, msg, file_extension, self._attachments, filename, as_byte=True)
                 else:
                     self._base_connector.debug_print('Failed to write file: {}'.format(e))
             except Exception as e:
                 self._base_connector.debug_print("Exception occurred: {}".format(e))
 
-    def write_with_new_filename(self, tmp_dir, data, file_extension, dict_to_fill, as_byte=False):
+    def write_with_new_filename(self, tmp_dir, data, file_extension, dict_to_fill, file_name, as_byte=False):
         try:
             random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
             new_file_name = "ph_long_file_name_{0}{1}".format(random_suffix, file_extension)
@@ -857,7 +857,7 @@ class ProcessMail:
                     f.write(data.as_bytes())
                 else:
                     f.write(data)
-            dict_to_fill.append({'file_name': new_file_name, 'file_path': file_path})
+            dict_to_fill.append({'file_name': file_name, 'file_path': file_path})
         except Exception as e:
             self._base_connector.debug_print('Exception while writing file: {}'.format(e))
 
