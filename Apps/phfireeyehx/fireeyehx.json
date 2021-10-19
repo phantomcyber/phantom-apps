@@ -25,7 +25,7 @@
     "utctime_updated": "2020-10-15T20:49:54.000000Z",
     "package_name": "phantom_fireeyehx",
     "main_module": "fireeyehx_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -443,7 +443,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Important data: value",
                         "Primary ip: 10.1.1.1, Hostname: random_565_4"
                     ]
                 },
@@ -465,13 +464,6 @@
                     ],
                     "contains": [
                         "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
                     ]
                 },
                 {
@@ -552,17 +544,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.message",
@@ -736,17 +718,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -827,17 +803,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.message",
@@ -916,11 +882,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1127,10 +1099,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1738,17 +1707,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1893,10 +1856,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.data.entries.*.last_exploit_block",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.data.entries.*.last_alert",
                     "data_type": "string"
                 },
@@ -1910,6 +1869,10 @@
                     "example_values": [
                         "2015-07-30T04:12:23.000Z"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.last_exploit_block",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.data.entries.*.last_exploit_block_timestamp",
@@ -1993,13 +1956,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.exploit_alerts",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.data.entries.*.stats.exploit_blocks",
                     "data_type": "numeric",
                     "example_values": [
@@ -2063,6 +2019,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.entries.*.stats.exploit_alerts",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -2076,14 +2039,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Important data: value"
+                        "Matched endpoints: 1"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.matched_endpoints",
+                    "data_type": "numeric",
                     "example_values": [
-                        "value"
+                        1
                     ]
                 },
                 {
@@ -2320,17 +2283,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2632,17 +2589,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2764,17 +2715,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2843,21 +2788,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.indicator",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.indicator._id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.indicator.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.event_id",
                     "data_type": "string"
                 },
@@ -2873,11 +2803,26 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.indicator",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.indicator._id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.indicator.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.md5values",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
@@ -2892,17 +2837,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",

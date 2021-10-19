@@ -667,9 +667,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # summary = action_result.update_summary({})
-        # summary['important_data'] = "value"
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_triage(self, param):
@@ -803,7 +800,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # action_result.add_data({})
         summary = action_result.update_summary({})
         sum_message = response.get('message')
         summary['message'] = sum_message
@@ -845,9 +841,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response.get('data'))
 
-        # summary = action_result.update_summary({})
-        # summary['important_data'] = "value"
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unquarantine_device(self, param):
@@ -885,9 +878,6 @@ class FireeyeHxConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # summary = action_result.update_summary({})
-        # summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -927,8 +917,6 @@ class FireeyeHxConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # action_result.add_data({})
 
         summary = action_result.update_summary({})
         sum_message = response['message']
