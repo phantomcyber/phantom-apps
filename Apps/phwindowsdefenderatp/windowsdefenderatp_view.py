@@ -4,6 +4,7 @@
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
+
 def get_ctx_result(result):
 
     ctx_result = {}
@@ -34,3 +35,59 @@ def display_alerts(provides, all_app_runs, context):
             results.append(ctx_result)
 
     return 'windowsdefenderatp_list_alerts.html'
+
+
+def display_devices(provides, all_app_runs, context):
+
+    context['results'] = results = []
+
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+            ctx_result = get_ctx_result(result)
+            if (not ctx_result):
+                continue
+            results.append(ctx_result)
+
+    return 'windowsdefenderatp_get_devices.html'
+
+
+def get_alert(provides, all_app_runs, context):
+
+    context['results'] = results = []
+
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+            ctx_result = get_ctx_result(result)
+            if (not ctx_result):
+                continue
+            results.append(ctx_result)
+
+    return 'windowsdefenderatp_get_alert.html'
+
+
+def run_script(provides, all_app_runs, context):
+
+    context['results'] = results = []
+
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+            ctx_result = get_ctx_result(result)
+            if (not ctx_result):
+                continue
+            results.append(ctx_result)
+
+    return 'windowsdefenderatp_run_script.html'
+
+
+def update_alert(provides, all_app_runs, context):
+
+    context['results'] = results = []
+
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+            ctx_result = get_ctx_result(result)
+            if (not ctx_result):
+                continue
+            results.append(ctx_result)
+
+    return 'windowsdefenderatp_update_alert.html'

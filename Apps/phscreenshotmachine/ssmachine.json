@@ -7,15 +7,15 @@
     "type": "information",
     "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "main_module": "ssmachine_connector.py",
-    "app_version": "2.0.2",
+    "app_version": "2.1.0",
     "utctime_updated": "2021-03-12T08:26:00.000000Z",
     "product_vendor": "Screenshot Machine",
     "product_name": "Screenshot Machine",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
-        "Cloud, API api.screenshotmachine.com, January 22, 2021"
+        "Cloud, API api.screenshotmachine.com, September 29, 2021"
     ],
     "logo": "logo_screenshotmachine.svg",
     "logo_dark": "logo_screenshotmachine_dark.svg",
@@ -30,6 +30,12 @@
             "description": "API Secret Phrase",
             "data_type": "password",
             "order": 1
+        },
+        "cache_limit": {
+            "description": "Cache Limit (how old cached images are accepted (in days), Default: 0)",
+            "data_type": "numeric",
+            "default": 0,
+            "order": 2
         }
     },
     "actions": [
