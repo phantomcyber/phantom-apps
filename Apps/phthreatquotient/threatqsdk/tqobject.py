@@ -2,7 +2,7 @@
 # File: tqobject.py
 #
 # ThreatQuotient Proprietary and Confidential
-# Copyright (c)2021 ThreatQuotient, Inc. All rights reserved.
+# Copyright (c) 2016-2021 ThreatQuotient, Inc. All rights reserved.
 #
 # NOTICE: All information contained herein, is, and remains the property of ThreatQuotient, Inc.
 # The intellectual and technical concepts contained herein are proprietary to ThreatQuotient, Inc.
