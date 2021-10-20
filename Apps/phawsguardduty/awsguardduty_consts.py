@@ -60,6 +60,7 @@ AWSGUARDDUTY_UNARCHIVE_FINDING_SUCC_MSG = "Successfully unarchived the findings"
 AWSGUARDDUTY_INVALID_SEVERITY_ERR_MSG = "Please provide a valid input value in the 'severity' action parameter"
 AWSGUARDDUTY_FINDING_ID_NOT_FOUND_ERR_MSG = "Please provide valid Finding IDs"
 AWSGUARDDUTY_FINDING_ID_IN_RECORD_STATE_ERR_MSG = "The provided finding IDs are already in {record_state}"
+AWSGUARDDUTY_BAD_ASSET_CONFIG_ERR_MSG = "Please provide access keys or select assume role check box in asset configuration"
 
 # Constants relating to 'get_error_message_from_exception'
 AWSGUARDDUTY_ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."

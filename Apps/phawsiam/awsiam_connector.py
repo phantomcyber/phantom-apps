@@ -1,5 +1,5 @@
 # File: awsiam_connector.py
-# Copyright (c) 2018-2020 Splunk Inc.
+# Copyright (c) 2018-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
@@ -15,6 +15,8 @@ import xmltodict
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
 from awsiam_consts import *
+import ast
+from boto3 import Session
 
 try:
     from urllib import urlencode, unquote
@@ -42,8 +44,33 @@ class AwsIamConnector(BaseConnector):
         self._state = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._response_metadata_dict = None
         self._python_version = None
+
+    def _handle_get_ec2_role(self):
+        """
+        This method will retrieve credentials from the EC2 role, if assigned to the instance
+        """
+        session = Session()
+        credentials = session.get_credentials()
+        return credentials
+
+    def _get_temp_credentials(self, action_result, param=None):
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role credentials for action")
+            except Exception as e:
+                err = self._get_error_message_from_exception(e)
+                return action_result.set_status(phantom.APP_ERROR, AWSIAM_ERR_TEMP_CREDENTIALS_FAILED.format(err=err))
+
+        return phantom.APP_SUCCESS
 
     def _handle_py_ver_compat_for_input_str(self, input_str, always_encode=False):
         """
@@ -304,6 +331,10 @@ class AwsIamConnector(BaseConnector):
         headers = dict()
         headers[AWSIAM_JSON_AMZ_DATE] = amzdate
         headers[AWSIAM_JSON_AUTHORIZATION] = authorization_header
+
+        # If using temporary STS credentials, add additional HTTP header parameter for security token
+        if self._session_token:
+            headers[AWSIAM_JSON_STS_TOKEN] = self._session_token
         return headers
 
     def _make_rest_call(self, action_result, params=None, data=None, method='get', timeout=None):
@@ -353,11 +384,16 @@ class AwsIamConnector(BaseConnector):
         self.save_progress(AWSIAM_CONNECTING_ENDPOINT_MSG)
 
         params = dict()
-        params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
+        config = self.get_config()
+
+        # Need to use different testing endpoint when using non-user credentials (assume role checkbox), since there is no user associated with the credentials
+        if config.get('use_role'):
+            params[AWSIAM_JSON_ACTION] = AWSIAM_LIST_ROLES_ENDPOINT
+        else:
+            params[AWSIAM_JSON_ACTION] = AWSIAM_TEST_CONNECTIVITY_ENDPOINT
 
         # make rest call
-        ret_val, response = self._make_rest_call(action_result=action_result, params=params,
-                                                 timeout=AWSIAM_TIME_OUT)
+        ret_val, response = self._make_rest_call(action_result=action_result, params=params, timeout=AWSIAM_TIMEOUT)
 
         if phantom.is_fail(ret_val):
             self.save_progress(AWSIAM_TEST_CONNECTIVITY_FAILED_MSG)
@@ -375,6 +411,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         response_dict = dict()
         username = param[AWSIAM_PARAM_USERNAME]
@@ -444,6 +484,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         username = param[AWSIAM_PARAM_USERNAME]
         password = param[AWSIAM_PARAM_PASSWORD]
@@ -518,6 +562,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
 
@@ -548,6 +596,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
 
@@ -577,6 +629,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
@@ -618,6 +674,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         policy_arn = param[AWSIAM_PARAM_POLICY_ARN]
 
@@ -657,6 +717,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
 
@@ -815,6 +879,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         role_name = param[AWSIAM_PARAM_ROLE_NAME]
         role_policy_doc = param[AWSIAM_PARAM_ROLE_POLICY_DOC]
         role_path = param.get(AWSIAM_PARAM_ROLE_PATH, '/').replace('\\', '/')
@@ -906,6 +974,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         username = param[AWSIAM_PARAM_USERNAME]
 
@@ -1027,6 +1099,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         group_name = param[AWSIAM_PARAM_GROUP_NAME]
 
@@ -1057,6 +1133,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         username = param[AWSIAM_PARAM_USERNAME]
         group_name = param[AWSIAM_PARAM_GROUP_NAME]
 
@@ -1086,6 +1166,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         username = param[AWSIAM_PARAM_USERNAME]
         user_details = dict()
@@ -1148,6 +1232,10 @@ class AwsIamConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
+
         if group_path and not group_path == '/' and (not group_path.startswith('/') or not group_path.endswith('/')):
             return action_result.set_status(phantom.APP_ERROR, AWSIAM_INVALID_GROUP_PATH_MSG)
 
@@ -1179,6 +1267,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         params = OrderedDict()
         user_path = param.get(AWSIAM_PARAM_USER_PATH)
@@ -1233,6 +1325,10 @@ class AwsIamConnector(BaseConnector):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        # Check to see if temporary credentials have been passed as a parameter to the action
+        if not self._get_temp_credentials(action_result, param):
+            return action_result.get_status()
 
         # 1. Fetch roles of an AWS account
         params = OrderedDict()
@@ -1391,9 +1487,21 @@ class AwsIamConnector(BaseConnector):
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
 
-        self._access_key = config[AWSIAM_ACCESS_KEY]
-        self._secret_key = config[AWSIAM_SECRET_KEY]
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, AWSIAM_ERR_EC2_ROLE_CREDENTIALS_FAILED)
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+        else:
+            self._access_key = config.get(AWSIAM_ACCESS_KEY)
+            self._secret_key = config.get(AWSIAM_SECRET_KEY)
+
         self._response_metadata_dict = self._get_response_metadata_dict()
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSIAM_ERR_BAD_ASSET_CONFIG)
 
         return phantom.APP_SUCCESS
 

@@ -1,0 +1,260 @@
+{% extends 'widgets/widget_template.html' %}
+{% load custom_template %}
+
+{% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
+{% block title1 %}{{ title1 }}{% endblock %}
+{% block title2 %}{{ title2 }}{% endblock %}
+{% block custom_tools %}
+{% endblock %}
+
+{% block widget_content %} <!-- Main Start Block -->
+
+<!-- File: thehive_display_get_observables.html
+  Copyright (c) 2018-2021 Splunk Inc.
+
+  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<style>
+
+.thehive-app a:hover {
+  text-decoration:underline;
+}
+
+.thehive-app .wf-table-vertical {
+  width: initial;
+  font-size: 12px;
+}
+
+.thehive-app .wf-table-vertical td {
+  padding: 5px;
+  border: 1px solid;
+}
+
+.thehive-app .wf-table-horizontal  {
+  margin-right: 10px;
+  width: initial;
+  border: 1px solid;
+  font-size: 12px;
+}
+
+.thehive-app .wf-table-horizontal th {
+  text-align: center;
+  border: 1px solid;
+  text-transform: uppercase;
+  font-weight: normal;
+  padding: 5px;
+}
+
+.thehive-app .wf-table-horizontal td {
+  border: 1px solid;
+  padding: 5px;
+  padding-left: 4px;
+}
+
+.thehive-app .wf-h3-style {
+  font-size : 20px
+}
+
+.thehive-app .wf-h4-style {
+  font-size : 16px
+}
+
+.thehive-app .wf-h5-style {
+  font-size : 14px
+}
+.thehive-app .wf-subheader-style {
+  font-size : 12px
+}
+
+</style>
+<div class="thehive-app" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+  {% for result in results %} <!-- loop for each result -->
+<br>
+
+<!------------------- For each Result ---------------------->
+
+  {% if result.data %}
+    {% for curr_data in result.data %}
+        <table class="wf-table-horizontal">
+            <tr>
+              <th colspan="2">INFO</th>
+            </tr>
+
+            {% if curr_data.parent %}
+              <tr>
+                <th>TICKET ID</th>
+                <td>
+                  <a href="javascript:;" onclick="context_menu(this, [{'contains': ['thehive ticket id'], 'value': '{{ curr_data.parent }}' }], 0, {{ container.id }}, null, false);">
+                    {{ curr_data.parent }}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% if curr_data.message %}
+              <tr>
+                  <th>DESCRIPTION</th>
+                  <td>
+                      {{ curr_data.message }}
+                  </td>
+              </tr>
+            {% endif %}
+
+            {% if curr_data.tlp is not None %}
+              <tr>
+                <th>TLP</th>
+                {% if curr_data.tlp == 0 %}
+                  <td>White</td>
+                {% elif curr_data.tlp == 1 %}
+                  <td>Green</td>
+                {% elif curr_data.tlp == 2 %}
+                  <td>Amber</td>
+                {% elif curr_data.tlp == 3 %}
+                  <td>Red</td>
+                {% else %}
+                  <td>{{ curr_data.tlp }}</td>
+                {% endif %}
+              </tr>
+            {% endif %}
+
+            <tr>
+              <th>DATA TYPE</th>
+              <td>
+                  {{ curr_data.dataType }}
+              </td>
+            </tr>
+
+            <tr>
+              <th>DATA</th>
+              {% if curr_data.data %}
+                {% if curr_data.dataType == 'url' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['url'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'ip' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['ip'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'domain' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['domain'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'mail' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['email'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'hash' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['hash'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% elif curr_data.dataType == 'filename' %}
+                  <td>
+                    <a href="javascript:;"
+                      onclick="context_menu(this, [{'contains': ['file name'], 'value': '{{ curr_data.data }}' }], 0, {{ container.data }}, null, false);">
+                      {{ curr_data.data }}
+                      &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                    </a>
+                  </td>
+                {% else %}
+                  <td>
+                    {{ curr_data.data }}
+                  </td>
+                {% endif %}
+              {% else %}
+                  <td>
+                    None
+                  </td>
+              {% endif %}
+            </tr>
+
+            {% if curr_data.attachment.sha256 %}
+              <tr>
+                <th>SHA256</th>
+                <td>
+                  <a href="javascript:;"
+                    onclick="context_menu(this, [{'contains': ['hash, sha256'], 'value': '{{ curr_data.attachment.sha256 }}' }], 0, {{ container.attachment.sha256 }}, null, false);">
+                    {{ curr_data.attachment.sha256 }}
+                    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                  </a>
+                </td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <th>IS IOC</th>
+              <td>
+                {{ curr_data.ioc }}
+              </td>
+            </tr>
+
+            {% if curr_data.tags %}
+              <tr>
+                <th>Tags</th>
+                <td>
+                  {% for tag in curr_data.tags %}
+                    <li>
+                      {{ tag }}
+                    </li>
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endif %}
+
+        </table>
+        <br>
+    {% endfor %}
+  {% else %}
+  <p> No data found </p>
+  {% endif %}
+
+<br>
+
+<!------------------- For each Result END ---------------------->
+
+{% endfor %} <!-- loop for each result end -->
+</div> <!-- Main Div -->
+
+<script>
+$.extend(true, $.fn.dataTable.defaults, {
+    "searching": true,
+    "bLengthChange": false,
+    "language": {
+      "paginate": {
+        "previous": "<i class='fa fa-angle-left fa-lg'></i>",
+        "next": "<i class='fa fa-angle-right fa-lg'></i>"
+      },
+      "emptyTable": "No data available"
+    },
+    "dom": '<"top">rt<"bottom"p><"clear">',
+    drawCallback: function(settings) {
+      var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+      pagination.toggle(this.api().page.info().pages > 1);
+    }
+  });
+  $('.dataTable').DataTable();
+
+</script>
+
+{% endblock %} <!-- Main Start Block -->

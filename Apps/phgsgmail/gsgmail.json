@@ -1,0 +1,1275 @@
+{
+    "appid": "9c73f233-2c4a-406a-855e-41d8d2497d0e",
+    "name": "G Suite for GMail",
+    "logo": "logo_google.svg",
+    "logo_dark": "logo_google_dark.svg",
+    "description": "Integrates with G Suite for various investigative and containment actions",
+    "publisher": "Splunk",
+    "type": "email",
+    "main_module": "gsgmail_connector.py",
+    "package_name": "phantom_gsgmail",
+    "product_vendor": "Google",
+    "product_name": "GMail",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "Cloud, September 27, 2021"
+    ],
+    "app_version": "2.3.2",
+    "product_version_regex": ".*",
+    "license": "Copyright (c) 2017-2021 Splunk Inc.",
+    "utctime_updated": "2021-10-18T09:13:26.000000Z",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa-4.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.9.2-py2-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google_auth-1.11.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/googleapiclient_wheel/google_api_python_client-1.6.4-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip3_dependencies": {
+        "wheel": [
+            {
+                "module": "oauth2client",
+                "input_file": "wheels/oauth2client_wheel/oauth2client-4.1.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa_wheel/rsa-4.7.2-py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2_wheel/httplib2-0.19.1-py3-none-any.whl"
+            },
+            {
+                "module": "google-auth",
+                "input_file": "wheels/google-auth/google_auth-1.30.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google-auth-httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.0.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-4.0.0-py3-none-any.whl"
+            },
+            {
+                "module": "google-api-python-client",
+                "input_file": "wheels/google-api-python-client-1.7.11.tar.gz"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-3.0.1-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "configuration": {
+        "login_email": {
+            "required": true,
+            "description": "Login (Admin) email",
+            "data_type": "string",
+            "order": 0
+        },
+        "key_json": {
+            "required": true,
+            "description": "Contents of Service Account JSON file",
+            "data_type": "password",
+            "order": 1
+        },
+        "label": {
+            "description": "Mailbox Label (folder) to be polled",
+            "data_type": "string",
+            "default": "",
+            "order": 2
+        },
+        "ingest_manner": {
+            "description": "How to ingest",
+            "data_type": "string",
+            "value_list": [
+                "oldest first",
+                "latest first"
+            ],
+            "default": "oldest first",
+            "order": 3
+        },
+        "first_run_max_emails": {
+            "description": "Maximum Containers for scheduled polling first time",
+            "data_type": "numeric",
+            "default": 1000,
+            "order": 4
+        },
+        "max_containers": {
+            "description": "Maximum Containers for scheduled polling",
+            "data_type": "numeric",
+            "default": 100,
+            "order": 5
+        },
+        "extract_attachments": {
+            "description": "Extract Attachments",
+            "data_type": "boolean",
+            "default": false,
+            "order": 6
+        },
+        "extract_urls": {
+            "description": "Extract URLs",
+            "data_type": "boolean",
+            "default": false,
+            "order": 7
+        },
+        "extract_ips": {
+            "description": "Extract IPs",
+            "data_type": "boolean",
+            "default": false,
+            "order": 8
+        },
+        "extract_domains": {
+            "description": "Extract Domain Names",
+            "data_type": "boolean",
+            "default": false,
+            "order": 9
+        },
+        "extract_hashes": {
+            "description": "Extract Hashes",
+            "data_type": "boolean",
+            "default": false,
+            "order": 10
+        },
+        "download_eml_attachments": {
+            "description": "Download EML attachments",
+            "data_type": "boolean",
+            "default": false,
+            "order": 11
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope: <b>https://www.googleapis.com/auth/admin.directory.user</b>.",
+            "type": "test",
+            "identifier": "test_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list users",
+            "description": "Get the list of users",
+            "verbose": "Action uses the Admin SDK API to get a list of users. Requires authorization with the following scope: <b>https://www.googleapis.com/auth/admin.directory.user</b>.<br>The action will limit the number of users returned to <b>max_items</b> or (if not specified) 500. If the system has any more users, a next page token will be returned in <b>action_result.summary.next_page_token</b>. Use this value as input to <b>page_token</b> in subsequent calls to <b>list users</b>.",
+            "type": "investigate",
+            "identifier": "get_users",
+            "read_only": true,
+            "parameters": {
+                "max_items": {
+                    "description": "Max users to get (max 500)",
+                    "data_type": "numeric",
+                    "order": 0
+                },
+                "page_token": {
+                    "description": "Token to specify next page in list",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "gsuite page token"
+                    ],
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_items",
+                    "data_type": "numeric",
+                    "example_values": [
+                        500
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "contains": [
+                        "gsuite page token"
+                    ],
+                    "example_values": [
+                        "0a38f80195e2ffffffff9c9e8c8c9e919b8d9ed19c9e9691bf979a8d929e919c908d8fd19d9685ff00fefffecccfc9c7c6c6c8c7ccc8c7cbfffe100221b346550b02f34e6639000000001d6afe00480150005a0b09f1d40ed2266dadd0100360f4b2c2bc03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.agreedToTerms",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.archived",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.changePasswordAtNextLogin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.customerId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.address",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.etag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.includeInGlobalAddressList",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipWhitelisted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isAdmin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isDelegatedAdmin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isEnforcedIn2Sv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isEnrolledIn2Sv",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isMailboxSetup",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.kind",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.lastLoginTime",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.fullName",
+                    "data_type": "string",
+                    "column_name": "Full Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name.givenName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.nonEditableAliases",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.orgUnitPath",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.phones.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.phones.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "9898989898"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.primaryEmail",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Primary Email",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.recoveryEmail",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.suspended",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.next_page_token",
+                    "data_type": "string",
+                    "contains": [
+                        "gsuite page token"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_users_returned",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully retrieved 10 users"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 2,
+                "height": 5,
+                "type": "custom",
+                "title": "List Users",
+                "view": "gsgmail_view.list_users"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run query",
+            "description": "Search emails with query/filtering options",
+            "verbose": "Action uses the GMail API to search in a users mailbox (specified in the <b>email</b> parameter).<br>Requires authorization with the following scope: <b>https://www.googleapis.com/auth/gmail.readonly</b>.<br>If none of the filtering parameters are specified the action will return all emails in the mailbox. If the <b>query</b> parameter is specified, all other filtering parameters are ignored.<br>The query parameter uses the same filtering options (operators) as the GMail search box. A brief description of these can be found <a href=\"https://support.google.com/mail/answer/7190?hl=en\">at this link</a>.<br>To page through results, execute the action without a <b>page_token</b> parameter and a valid <b>max_results</b> value. If the query matches more than <b>max_results</b>, the action will return a value in the <b>action_result.summary.next_page_token</b> data path. This value should be used as the input value to the <b>page_token</b> parameter in the next call to <b>run query</b> to get the next set of results.",
+            "type": "investigate",
+            "identifier": "run_query",
+            "read_only": true,
+            "parameters": {
+                "email": {
+                    "description": "User's Email (Mailbox to search in)",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "label": {
+                    "description": "Label (to search in)",
+                    "data_type": "string",
+                    "order": 1,
+                    "default": "Inbox",
+                    "contains": [
+                        "gmail label"
+                    ],
+                    "primary": true
+                },
+                "subject": {
+                    "description": "Substring to search in Subject",
+                    "data_type": "string",
+                    "order": 2
+                },
+                "sender": {
+                    "description": "Sender Email address to match",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 3,
+                    "primary": true
+                },
+                "body": {
+                    "description": "Substring to search in Body",
+                    "data_type": "string",
+                    "order": 4
+                },
+                "internet_message_id": {
+                    "description": "Internet Message ID",
+                    "data_type": "string",
+                    "order": 5,
+                    "primary": true,
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                "query": {
+                    "description": "Gmail Query string",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "max_results": {
+                    "description": "Max Results",
+                    "data_type": "numeric",
+                    "order": 7,
+                    "default": 100
+                },
+                "page_token": {
+                    "description": "Next page token",
+                    "data_type": "string",
+                    "order": 8
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.body",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mail content"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.internet_message_id",
+                    "data_type": "string",
+                    "contains": [
+                        "internet message id"
+                    ],
+                    "example_values": [
+                        "<EgJbSMFdx8wUfrVUc7r7Jg@notifications.google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail label"
+                    ],
+                    "example_values": [
+                        "Inbox"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "0a38f80195e2ffffffff9c9e8c8c9e919b8d9ed19c9e9691bf979a8d929e919c908d8fd19d9685ff00fefffecccfc9c7c6c6c8c7ccc8c7cbfffe100221b346550b02f34e6639000000001d6afe00480150005a0b09f1d40ed2266dadd0100360f4b2c2bc03"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "in:sent after:1388552400"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sender",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": [
+                        "no-reply@accounts.google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Password reset"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.delivered_to",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "string",
+                    "column_order": 1,
+                    "column_name": "From",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.historyId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Email ID",
+                    "contains": [
+                        "gmail email id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internalDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.labelIds",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.message_id",
+                    "data_type": "string",
+                    "column_order": 4,
+                    "column_name": "Internet Message ID",
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sizeEstimate",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.snippet",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "column_order": 3,
+                    "column_name": "Subject"
+                },
+                {
+                    "data_path": "action_result.data.*.threadId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "column_order": 2,
+                    "column_name": "To",
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.next_page_token",
+                    "data_type": "string",
+                    "example_values": [
+                        "01274238709826297998"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_messages_returned",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total messages returned: 20"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Run Query",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete email",
+            "description": "Delete emails",
+            "type": "contain",
+            "verbose": "Action uses the GMail API. Requires authorization with the following scope: <b>https://mail.google.com</b>.",
+            "read_only": false,
+            "identifier": "delete_email",
+            "parameters": {
+                "id": {
+                    "required": true,
+                    "description": "Message IDs to delete(Comma separated IDs allowed)",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "primary": true,
+                    "allow_list": true,
+                    "order": 0
+                },
+                "email": {
+                    "required": true,
+                    "description": "Email of the mailbox owner",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "order": 1,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "Email",
+                    "column_order": 1,
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "string",
+                    "column_name": "Email ID",
+                    "column_order": 0,
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.deleted_emails",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.ignored_ids",
+                    "data_type": "string",
+                    "contains": [
+                        "gmail email id"
+                    ],
+                    "example_values": [
+                        "15ec4d28294f950c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "All the provided emails were already deleted"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Delete Email",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on-poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "start_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_id": {
+                    "data_type": "string",
+                    "description": "Parameter Ignored in this app"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of emails to ingest",
+                    "required": true,
+                    "value": 100
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "description": "Maximum number of artifact to ingest",
+                    "required": true,
+                    "value": 1000
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get email",
+            "description": "Retrieve email details via internet message id",
+            "verbose": "Action uses the GMail API to search in a user's mailbox (specified in the <b>email</b> parameter). Use the <b>run query</b> action to retrieve <b>internet message id</b>.<br>Use <b>extract attachments</b> parameter to add attachments to vault and add corresponding vault artifacts.<br>Requires authorization with the following scope: <b>https://www.googleapis.com/auth/gmail.readonly</b>.",
+            "type": "investigate",
+            "identifier": "get_email",
+            "read_only": false,
+            "parameters": {
+                "email": {
+                    "description": "User's Email (Mailbox to search)",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "email"
+                    ],
+                    "primary": true,
+                    "required": true
+                },
+                "internet_message_id": {
+                    "description": "Internet Message ID",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                "extract_attachments": {
+                    "description": "Add attachments to vault and create vault artifacts",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 2
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.email",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.extract_attachments",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.internet_message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ],
+                    "contains": [
+                        "internet message id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_authentication_results",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; mx.google.com;\r\n       dkim=pass header.i=@google.com header.s=20161025 header.b=S15AEvGA;\r\n       spf=pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) smtp.mailfrom=33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_message_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;\r\n        h=to:from:subject:message-id:feedback-id:reply-to:date:mime-version\r\n         :dkim-signature;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=K0Q7B+6Dq2695j4C/fRV8QlFGfFo42i3i6TNVIVR3/xvcVZcChH7+XcQ4e43rT4bYz\r\n         /wZZzTVm1BbohPZOLvAsQE07vFMb0T7eggAAesqpoV0aPqahN7ECabqx6JXSPiYIhK/j\r\n         n6BdpvfBdYXhh34tKpNQKgblkkgrpZaiHRYcys+s+e06Xh41W+92j1KahxqKvujgQ50w\r\n         MtD0G492zoocCBJdUl1IGYYCNjbxSZTbO48u7UTqWS4xP1KNLmV9vRpPDp/QwjQDv5Ux\r\n         69G3NeFGJcH0z3REg1AhqHHKtF1/GX2yngvKSUyO4yUajI/tdQdXF0Uxz93w4aOYH5J7\r\n         FV8A=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.arc_seal",
+                    "data_type": "string",
+                    "example_values": [
+                        "i=1; a=rsa-sha256; t=1619925981; cv=none;\r\n        d=google.com; s=arc-20160816;\r\n        b=b1K9fT7s6nA56FOt2CMy22w5fhwxHjx63FzKVzpWlWmeHn4neo4mrtpauZFiiy7tQA\r\n         /VITLzcFg8GMtPaN7pDWQkHUVQ8qyuUi3Kl8xpYre8DoI1KzLfTUz8LqxaBKuYl3Ln00\r\n         rQ/fBj+v16+HuuVOKwd8roet3A5SCmDZBvSOk+pcRfjAtL7GDqF2LVEtDYVDJ0V7eUxx\r\n         V6eZjsFOg9tZTkyHTPq8S+pN7e5KCV7rIgelF25MJcYdt+4OJjs6jfmsn2p1NC14QvRP\r\n         ONhqWc1lMseCp6/GdtoM2tIDHORdLy/upg3mC63jhi5JDIRWiObg1HC2PI8AFxqhkJCW\r\n         rFCQ=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.authentication_results",
+                    "data_type": "string",
+                    "example_values": [
+                        "mx.google.com;\r\n       dkim=pass header.i=@google.com header.s=20161025 header.b=S15AEvGA;\r\n       spf=pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) smtp.mailfrom=33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com;\r\n       dmarc=pass (p=REJECT sp=REJECT dis=NONE) header.from=google.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_disposition",
+                    "data_type": "string",
+                    "example_values": [
+                        "attachment; filename=\"3902920193.pdf\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_transfer_encoding",
+                    "data_type": "string",
+                    "example_values": [
+                        "quoted-printable"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "multipart/mixed; boundary=\"000000000000a2607f05c15068be\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.date",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sat, 01 May 2021 20:26:20 -0700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.delivered_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.dkim_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=google.com; s=20161025;\r\n        h=mime-version:date:reply-to:feedback-id:message-id:subject:from:to;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=S15AEvGAEDpFXZ0KGsbNCqY8YVSzr6At0pUpF7crMh4ik5FmM0vGwomsUR59ONHoNF\r\n         SJ4U+IcxvsItH2mgCsQ7RjJK0dLLC7BkbhkDGHPY/IQ1KSZKcGEU0qfTXAsff5HENC3X\r\n         6LDYi7UqTdnjvSwv2dQdW1/yS96d27anFiPj9Wua4vd8GilRW5QOBJX1rl6yFas6uHD7\r\n         JWQRykXcpcNTKJpj2dvX2JIsT2IKiXy2BCpU69hITTZtvZCrsnl9IQFKM1Ky8H/BjoHv\r\n         jUL+fEuQTQUynp0S6yu/Kj9uvFRIXjhdxgHaGGTRMVtg/SE0tc62b8AxCckxHwrhS94G\r\n         ac9w=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.feedback_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "P-58-0:C10004962:M110105571-en-US:gamma"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.message_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.mime_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.received",
+                    "data_type": "string",
+                    "example_values": [
+                        "by 2002:a05:7110:5426:b029:b6:addf:f84f with SMTP id i6csp1772142geg;\r\n        Sat, 1 May 2021 20:26:21 -0700 (PDT)\nfrom mail-il1-x147.google.com (mail-il1-x147.google.com. [2607:f8b0:4864:20::147])\r\n        by mx.google.com with ESMTPS id b3si9189274iot.55.2021.05.01.20.26.20\r\n        for <admin@hermancorp.biz>\r\n        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);\r\n        Sat, 01 May 2021 20:26:21 -0700 (PDT)\nby mail-il1-x147.google.com with SMTP id d3-20020a9287430000b0290181f7671fa1so1924912ilm.9\r\n        for <admin@hermancorp.biz>; Sat, 01 May 2021 20:26:20 -0700 (PDT)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.received_spf",
+                    "data_type": "string",
+                    "example_values": [
+                        "pass (google.com: domain of 33buoybakbvceznb3cih-cdg3ean5dd5a3.1dbz2b7c63gbzc1dge.07o@scoutcamp.bounces.google.com designates 2607:f8b0:4864:20::147 as permitted sender) client-ip=2607:f8b0:4864:20::147;"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.reply_to",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.return_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "<33BuOYBAKBVcEzNB3CIH-CDG3EAN5DD5A3.1DBz2B7C63GBzC1DGE.07O@scoutcamp.bounces.google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Workspace: Your invoice is available for hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_gm_message_state",
+                    "data_type": "string",
+                    "example_values": [
+                        "AOAM532Nl7MnWYp7qLuC9ClJDlpx6s+kHPwvU7xiPvCBqzdGM36I9tqf\r\n\tLKCzGlzGEDydpiA="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_dkim_signature",
+                    "data_type": "string",
+                    "example_values": [
+                        "v=1; a=rsa-sha256; c=relaxed/relaxed;\r\n        d=1e100.net; s=20161025;\r\n        h=x-gm-message-state:mime-version:date:reply-to:feedback-id\r\n         :message-id:subject:from:to;\r\n        bh=z/kirlEQ2aVcgVc3qMye/grykWqFcVQv0Yr0y2Mbewo=;\r\n        b=tJdaiPfRyc4eMG2Yen3mdbA6h41cGBrVQ4yzJakfk1H+apl/RJq7xh1IYQ7+PXM3oH\r\n         IOzDgY6u9CQ2hyEZy6Yu1xuWtHwLYuTZl0iauzV9ve7tvDgXlxPWI7DryZrhge7J8GA/\r\n         dHFVfWU6LS9yBSjhAoiekws3Vhje30lg4kShkKoNXlH7QxkrEOYn5i31s5Gelx9E6m1f\r\n         Q3bs3xF4BbtyF52berodAZsS9tachQGHG2p124Y9mmLzPRsqi1fMCoXbHCXd0BxIFskJ\r\n         twUm+JQnxbX5N/q+MLWifUWYJ6fGkybAZ061JX6JgBp/2RMu0r5E48Q+0lHiUlenj4s6\r\n         TNkg=="
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "13608031"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_google_smtp_source",
+                    "data_type": "string",
+                    "example_values": [
+                        "ABdhPJyqpOGx6rwHwgtf1rUzc0U3BHjsBbH/I0nyqUnNdTHl957rDEZYB4OI7ovt9lbR1X2xjbTp"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_notifications",
+                    "data_type": "string",
+                    "example_values": [
+                        "GAMMA:<e3d885faf2cc04f261d3874bafe2dc8afc44a230-10004962-100081937@google.com>"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.email_headers.*.x_received",
+                    "data_type": "string",
+                    "example_values": [
+                        "by 2002:a05:6e02:102:: with SMTP id t2mr5411682ilm.182.1619925981145;\r\n        Sat, 01 May 2021 20:26:21 -0700 (PDT)\nby 2002:a05:6e02:d53:: with SMTP id h19mr10186694ilj.232.1619925980569;\r\n Sat, 01 May 2021 20:26:20 -0700 (PDT)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Payments <payments-noreply@google.com>"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.historyId",
+                    "data_type": "string",
+                    "example_values": [
+                        "62313"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "1792b1cd66228bf2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.internalDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "1619925980000"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.labelIds",
+                    "data_type": "string",
+                    "example_values": [
+                        "INBOX"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_html_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.parsed_plain_body",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.sizeEstimate",
+                    "data_type": "numeric",
+                    "example_values": [
+                        55260
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.snippet",
+                    "data_type": "string",
+                    "example_values": [
+                        "Your Google Workspace monthly invoice is available. Please find the PDF document attached at the bottom of this email. IMPORTANT: The balance will be automatically charged so you don&#39;t need to take"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.subject",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Workspace: Your invoice is available for hermancorp.biz"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.threadId",
+                    "data_type": "string",
+                    "example_values": [
+                        "1792b1cd66228bf2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin@hermancorp.biz"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_messages_returned",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total messages returned: 1"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 2,
+                "height": 5,
+                "type": "custom",
+                "title": "Get Email",
+                "view": "gsgmail_view.get_email"
+            }
+        }
+    ]
+}

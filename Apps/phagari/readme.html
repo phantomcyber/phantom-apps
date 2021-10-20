@@ -1,0 +1,648 @@
+<!-- File: readme.html
+
+    Copyright (c) Agari, 2021
+
+    This unpublished material is proprietary to Agari.
+    All rights reserved. The methods and
+    techniques described herein are considered trade secrets
+    and/or confidential. Reproduction or distribution, in whole
+    or in part, is forbidden except by express written permission
+    of Agari.
+
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+<html>
+
+<body>
+  <p>
+    It is recommended to read the documentation for the app to understand the functioning of the actions and the asset
+    configuration or the action parameters associated with it. For further details, refer to <a
+      href='https://developers.agari.com/agari-platform/docs' target="_blank"><u>Agari Docs</u></a>.
+  </p>
+  <p>
+  <h2>Steps to Generate Client ID and Client Secret</h2>
+  Follow these steps to obtain your Agari API credentials.
+  Once you have your Agari account, log into the Agari product and manually generate the 'client_id' and 'client_secret':
+    <ol>
+      <li>Log into your Agari product.</li>
+      <li>Click on your username in the upper right and select Settings.</li>
+      <li>Click on the Generate API Secret link to generate an API 'client_id' and 'client_secret' (the
+        link will read Regenerate API Secret if you have already generated an API client ID/secret
+        previously).</li>
+      <li>Copy both the 'client_id' and 'client_secret' that are generated and store them somewhere safe.</li>
+    </ol>
+    <b>Note: </b>
+    <ul>
+      <li>Keep your 'client_id' and 'client_secret' secure.</li>
+      <li>API clients can use your 'client_id' and 'client_secret' to gain access to the APIs as your user. Keep
+        these values somewhere safe and secure. Never share them with anyone.</li>
+      <li>For security purposes, the 'client_secret' will not be displayed again, however you may generate a
+        new one whenever needed by following the steps above.</li>
+    </ul>
+  <h2>Explanation of the Asset Configuration Parameters</h2>
+  The asset configuration parameters affect [test connectivity] and some other actions of the application. Below are the
+  explanation and usage of all these parameters. The parameters related to test connectivity action are Client ID and
+  Client Secret.
+  <ul>
+    <li>
+      <b>Client ID: </b>Client ID
+    </li>
+    <li>
+      <b>Client Secret: </b>Client Secret
+    </li>
+    <li>
+      <b>Policy Name: </b>This parameter allows the user to find by the policy name while fetching the policy events.
+    </li>
+    <li>
+      <b>Policy Action: </b>This parameter allows the user to find the policy action while fetching the policy events.
+      The valid values for this parameter include: deliver, move, inbox, delete, none, all.
+      <br><b>Note: </b>When 'all' is selected, 'policy_action' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.
+    </li>
+    <li>
+      <b>Exclude Alert Types: </b> This parameter allows the user to exclude the alert type while fetching the policy
+      events. The valid values for this parameter include MessageAlert, SystemAlert, None.
+      <br><b>Note: </b>When 'None' is selected, 'exclude_alert_types' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.
+    </li>
+    <li>
+      <b>Policy Enabled: </b> This parameter allows the user to find by the policies enabled while fetching the policy
+      events. The valid values for this parameter include: True, False, All.
+      <br><b>Note: </b>When 'All' is selected, 'policy_enabled' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.
+    </li>
+    <li>
+      <b>Filter: </b>This parameter allows filtering the policy events based on the search filters applied. It allows
+      multiple filters combined using and/or conjunctions. Refer to the <a
+        href='https://developers.agari.com/agari-platform/docs/filtering' target="_blank"><u>filtering</u></a> section in the Agari Docs
+      for more details.
+    </li>
+    <li>
+      <b>Add Fields: </b>This parameter allows the user to add the optional fields to the default message payload. It expects a
+      comma-delimited string as an input parameter.
+    </li>
+    <li>
+      <b>CEF mapping: </b>This parameter is a JSON dictionary represented as a serialized JSON string. Each key in the
+      dictionary is a potential key name in the message artifact that is to be renamed to the value. For example, if the
+      'cef_mapping' is {"message_trust_score":"message_ts"}, your artifact will have a ‘message_ts’ CEF field instead of
+      ‘message_trust_score’ CEF field.
+    </li>
+    <li>
+      <b>Start date: </b>This parameter allows the user to specify the earliest date time the search should target while
+      fetching the policy events. This parameter will be taken into consideration for the first run of scheduled polling
+      and Poll Now. The datetime should be in ISO 8601 format. The default value for the start date is the last 14 days. The
+      provided date cannot be greater than the last 14 days.
+    </li>
+    <li>
+      <b>Sort: </b>This parameter allows sorting the data based on the 'created_at' date. The following are the valid values that the
+      parameter can take:<br>
+      <ul>
+        <li>oldest_first</li>
+        <li>latest_first</li>
+      </ul>
+    </li>
+    <li>
+      <b>Max results: </b>The maximum number of results to ingest. The default value is 100.
+    </li>
+    <li>
+      <b>Max Workers for Polling: </b> This configuration parameter allows the user to configure the number of maximum
+      workers while fetching the results from the Agari server for On Poll action. The number of workers defined is
+      directly proportional to the number of threads created using ThreadPool Executor. ThreadPool Executor will provide
+      a simple abstraction to spin up multiple threads and will use those threads to perform tasks concurrently. For
+      example, if the number of workers is 10, the thread pool executor will essentially create 10 concurrent threads to
+      process any jobs that we submit to it. The threading concept will be majorly used for the 'get policy event' and
+      'get message' API call while fetching the results for ingestion. Please note that increasing the number of workers
+      will elevate the performance of the On Poll action in the Agari app. The only downside will be the increased
+      utilization of resources on the Phantom platform, which may lead to unexpected behavior on the Phantom platform.
+      The default value is 1.
+
+      <br><b>Note: </b>Assign the number of workers depending on the system configuration of the platform and the resources available.
+    </li>
+    <li>
+      <b>Note: </b>If non-required parameters are kept empty, then the default behavior of the API would be considered.
+    </li>
+  </ul>
+  </p>
+  <p>
+  <h2>Retry Mechanism</h2>
+  <ul>
+    <li>
+      The 429 status code (rate limit) will be handled using the backoff factor and number of retries parameters
+      in the session object.
+    </li>
+    <li>
+      <b>Number of Retries: </b> The number of retries defines the number of attempts for which the action will keep on retrying if the Agari
+      API continuously hits "429 Too Many Requests". If the intermittent error gets eliminated before the number of retries gets exhausted, then, the action execution will continue along its workflow and if
+      the intermittent error is still persistent and all the retries are exhausted, then, the action will fail
+      with the latest error message being displayed. The number of retries is <code>5</code>.
+    </li>
+    <li>
+      <b>Backoff Factor: </b> A backoff factor to apply between attempts after the second try (most errors are resolved
+      immediately by a second try without a delay). The backoff factor is <code>0.3</code>.
+      <ul>
+        <li>Sleep time calculation: <code>{backoff factor} * (2 ** ({number of total retries} - 1))</code> seconds.</li>
+      </ul>
+    </li>
+  </ul>
+  </p>
+  <p>
+  <h2>Explanation of the Agari Actions' Parameters</h2>
+  <ul>
+    <li>
+      <h3>Test Connectivity (Action Workflow Details)</h3>
+      <ul>
+        <li> This action will test the connectivity of the Phantom server to the Agari instance by making an initial API
+          call using the provided asset configuration parameters. This action can also be used to generate a new bearer
+          token.</li>
+        <li> The action validates the provided asset configuration parameters. Based on the API call response, the
+          appropriate success and failure message will be displayed when the action gets executed.</li>
+      </ul>
+    </li>
+
+    <li>
+      <h3>List Policy Events</h3>
+      Fetches a list of policy events from the Agari Platform. The user can filter the results based on the action
+      parameters as described below. The results can be sorted either in ascending or descending order based on the
+      field attribute used. The user can paginate through the responses based on the offset parameter. The max results
+      parameter can be used to limit the output responses.
+      <ul>
+        <li><b><u>Action Parameter:</u> Max results</b></li>
+        <ul>
+          <li>This parameter allows the user to limit the number of results. It expects a numeric value as an input. The
+            default value is 100 for which it will fetch the first 100 policy events from the response.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Offset</b></li>
+        <ul>
+          <li>This parameter allows the user to set the starting point or offset for the response. It expects a numeric
+            value as an input. If not provided, then 0 will be considered as the starting index.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Sort</b></li>
+        <ul>
+          <li>This parameter allows sorting the policy events based on the field specified with its sorting direction. It expects a comma-delimited string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Rem Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to remove the fields from the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Add Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to add the optional fields to the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the fields which are required to be fetched in the response. It
+            expects a comma-delimited string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Filter</b></li>
+        <ul>
+          <li>This parameter allows filtering the policy events based on the search filters applied. It allows multiple
+            filters combined using and/or conjunctions. Refer to the <a
+              href='https://developers.agari.com/agari-platform/docs/filtering' target="_blank"><u>filtering</u></a> section in the
+            Agari Docs for more details.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Start date</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the earliest date time the search should target while fetching
+            the policy events. The datetime should be in ISO 8601 format.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> End date</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the last date time the search should target while fetching the
+            policy events. The datetime should be in ISO 8601 format.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Name</b></li>
+        <ul>
+          <li>This parameter allows the user to find by the policy name while fetching the policy events.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Action</b></li>
+        <ul>
+          <li>This parameter allows the user to find the policy action while fetching the policy events. The valid
+            values for this parameter include: deliver, move, inbox, delete, none, all.
+            <br><b>Note: </b>When 'all' is selected, 'policy_action' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Exclude Alert Types</b></li>
+        <ul>
+          <li>This parameter allows the user to exclude the alert type while fetching the policy events. The valid
+            values for this parameter include MessageAlert, SystemAlert, None.
+            <br><b>Note: </b>When 'None' is selected, 'exclude_alert_types' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Enabled</b></li>
+        <ul>
+          <li>This parameter allows the user to find by the policies enabled while fetching the policy events. The valid values for
+            this parameter include: True, False, All.
+            <br><b>Note: </b>When 'All' is selected, 'policy_enabled' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b>Note: </b>If non-required parameters are kept empty, then the default behavior of the API would be considered.</li>
+        <li><b>Examples:</b>
+          <ul>
+            <li> List the policy events with the policy name ‘Untrusted Messages’, sorted based on ID in descending
+              order. Remove ‘notified_original_recipients’ and ‘summary’ from the response.
+              <ul style="list-style-type:none;">
+                <li> Policy Name = Untrusted Messages</li>
+                <li> Sort = id DESC </li>
+                <li> Rem Fields = notified_original_recipients, summary </li>
+              </ul>
+            </li>
+            <li> List the policy events updated between 2021-04-21T09:58:30Z and 2021-04-21T12:23:27Z and sort them
+              based on ‘updated at’ as the primary sort(ASC) and ID as the secondary sort(DESC). The results should also
+              be limited to 15.
+              <ul style="list-style-type:none;">
+                <li> Start Date = 2021-04-21T09:58:30Z </li>
+                <li> End Date = 2021-04-21T12:23:27Z </li>
+                <li> Sort = updated_at ASC, id DESC </li>
+                <li> Max Results = 15 </li>
+              </ul>
+            </li>
+            <b>Note:</b> Max Results value will be handled internally which will paginate through the policy events.
+            <li> List the policy events updated after 2020-04-20T07:21:33Z and offset as 10. Policy enabled should be
+              True and SystemAlert should be excluded. The results should be sorted based on created_at in ascending
+              order.
+              <ul style="list-style-type:none;">
+                <li> Offset = 10 </li>
+                <li> Filter = created_at.after(2020-04-20T07:21:33Z) </li>
+                <li> Exclude Alert Types = SystemAlert </li>
+                <li> Policy Enabled = True </li>
+                <li> Sort = created_at ASC </li>
+              </ul>
+            </li>
+            <b>Note: </b>The first 100 policy events will only be fetched as the max results parameter value is not provided
+            by the user in this use case.
+            <li> List the policy events having ID 640767758 or 640767759 or 640767760. Also, check whether the policy
+              action is ‘delete’ for them.
+              <ul style="list-style-type:none;">
+                <li> Filter = id.eq(640767758) or id.eq(640767759) or id.eq(640767760) </li>
+                <li> Policy Action = delete </li>
+              </ul>
+            </li>
+            <li> List the policy events with fields limited to ‘id’, ‘updated_at’, and ‘created_at’. Additionally, add
+              ‘alert_definition_name’ to the response.
+              <ul style="list-style-type:none;">
+                <li> Fields = id, updated_at, created_at </li>
+                <li> Add Fields = alert_definition_name </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <h3>Get Policy Event</h3>
+      Fetch a specific policy event from the Agari Platform for the provided ID.
+      <ul>
+        <li><b><u>Action Parameter:</u> ID</b></li>
+        <ul>
+          <li>The unique policy event ID. This ID can be fetched from the output of the List Policy Events action['id'].</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Rem Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to remove the fields from the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Add Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to add the optional fields to the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the fields which are required to be fetched in the response. It
+            expects a comma-delimited string as an input parameter.</li>
+        </ul>
+        <li><b>Note: </b>If non-required parameters are kept empty, then the default behavior of the API would be considered.</li>
+        <li><b>Examples:</b>
+          <ul>
+            <li> Fetch the policy event with ID 640767773.
+              <ul style="list-style-type:none;">
+                <li> ID = 640767773 </li>
+              </ul>
+            </li>
+          </ul>
+          <ul>
+            <li> Fetch policy event with ID 640767773 and display only created at time and collector message ID
+              associated with it.
+              <ul style="list-style-type:none;">
+                <li> ID = 640767773 </li>
+                <li> Fields = collector_message_id, created_at </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <h3>List Messages</h3>
+      Fetches a list of messages from the Agari Platform. The user can filter the results based on the action parameters
+      as described below. The results can be sorted either in ascending or descending order based on the field attribute
+      used. The user can paginate through the responses based on the offset parameter and can limit the output response
+      based on the max results parameter.
+      <ul>
+        <li><b><u>Action Parameter:</u> Max results</b></li>
+        <ul>
+          <li>This parameter allows the user to limit the number of results. It expects a numeric value as an input. The
+            default value is 100 for which it will fetch the first 100 messages from the response.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Offset</b></li>
+        <ul>
+          <li>This parameter allows the user to set the starting point or offset for the response. It expects a numeric
+            value as an input. If not provided, then 0 will be considered as the starting index.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Sort</b></li>
+        <ul>
+          <li>This parameter allows sorting the messages based on the field specified with its sorting direction. It
+            expects a comma-delimited string as an input parameter.
+          </li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Rem Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to remove the fields from the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Add Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to add the optional fields to the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the fields which are required to be fetched in the response. It
+            expects a comma-delimited string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Start date</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the earliest date time the search should target while fetching
+            the messages. The datetime should be in ISO 8601 format.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> End date</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the last date time the search should target while fetching the
+            messages. The datetime should be in ISO 8601 format.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Search</b></li>
+        <ul>
+          <li>This parameter allows searching the messages based on the search filters applied. It allows multiple
+            filters combined using and/or conjunctions. Refer to the <a
+              href='https://developers.agari.com/agari-platform/docs/searching' target="_blank"><u>searching</u></a> section in the
+            Agari Docs for more details.</li>
+        </ul>
+        <li><b>Note: </b></li>
+        <ul>
+          <li>List Messages action can be used to fetch the messages which are not linked with any
+            particular policy event.</li>
+          <li>If non-required parameters are kept empty, then the default behavior of the API would be considered.</li>
+        </ul>
+        <li><b>Examples:</b>
+          <ul>
+            <li> List the messages which do not have attachment and sorted based on ID in descending order. Remove
+              ‘from’ and ‘to’ fields from the response.
+              <ul style="list-style-type:none;">
+                <li> Search = has_attachment=false </li>
+                <li> Sort = id DESC </li>
+                <li> Rem Fields = from, to </li>
+              </ul>
+            </li>
+            <li> List the messages updated between 2021-04-21T09:58:30Z and 2021-04-21T12:23:27Z and sort them based on
+              ‘date’ as the primary sort(ASC) and ID as the secondary sort(DESC). The results should also be limited to
+              25.
+              <ul style="list-style-type:none;">
+                <li> Start Date = 2021-04-21T09:58:30Z </li>
+                <li> End Date = 2021-04-21T12:23:27Z </li>
+                <li> Sort = date ASC, id DESC </li>
+                <li> Max Results = 25 </li>
+              </ul>
+            </li>
+            <li> List the messages after 2021-04-20T07:21:33Z and offset as 10. The message timestamp should be less
+              than 1619074455000.
+              <ul style="list-style-type:none;">
+                <li> Offset = 10 </li>
+                <li> Start Date = 2021-04-20T07:21:33Z </li>
+                <li> Search = timestamp_ms&lt;1619074455000 </li>
+              </ul>
+            </li>
+            <b>Note: </b>The first 100 messages will only be fetched as the max results parameter value is not provided by
+            the user in this use case.
+            <li> List the messages which are not linked with any policy and domain tags are not added for the message.
+              Sort the results based on ID in ascending order.
+              <ul style="list-style-type:none;">
+                <li> Search = policy_ids is null and domain_tags is null </li>
+                <li> Sort = id ASC </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <h3>Get Message</h3>
+      Fetch a specific message from the Agari Platform for the provided ID.
+      <ul>
+        <li><b><u>Action Parameter:</u> ID</b></li>
+        <ul>
+          <li>The unique message ID. This ID can be fetched from the output of List Messages action[‘id’] or Get
+            Policy Event action[‘collector_message_id’].</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Rem Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to remove the fields from the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Add Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to add the optional fields to the default payload. It expects a comma-delimited
+            string as an input parameter.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the fields which are required to be fetched in the response. It
+            expects a comma-delimited string as an input parameter.</li>
+        </ul>
+        <li><b>Note: </b>If non-required parameters are kept empty, then the default behavior of the API would be considered.</li>
+        <li><b>Examples:</b>
+          <ul>
+            <li> Fetch the message with ID 0ef8f456-a2ff-11eb-8180-0242ac130004.
+              <ul style="list-style-type:none;">
+                <li> ID = 0ef8f456-a2ff-11eb-8180-0242ac130004 </li>
+              </ul>
+            </li>
+            <li> Fetch message with ID 0ef8f456-a2ff-11eb-8180-0242ac130004 and remove the ‘from_domain’ from the
+              default payload.
+              <ul style="list-style-type:none;">
+                <li> ID = 0ef8f456-a2ff-11eb-8180-0242ac130004 </li>
+                <li> Rem Fields = from_domain </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <h3>Remediate Message</h3>
+      Remediate the suspected message. The message can be moved or deleted from the inbox based on the remediation operation.
+      <ul>
+        <li><b><u>Action Parameter:</u> ID</b></li>
+        <ul>
+          <li>The unique message ID. This ID can be fetched from the output of List Messages action[‘id’] or Get
+            Policy Event action[‘collector_message_id’].</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Remediation Operation</b></li>
+        <ul>
+          <li>This parameter allows the user to move or delete the suspected message from the inbox. Valid values are: ‘move’, ‘delete’.</li>
+        </ul>
+        <li><b>Examples:</b>
+          <ul>
+            <li> Remediate the message with ID 0ef8f456-a2ff-11eb-8180-0242ac130004. The remediation operation should be
+              ‘move’.
+              <ul style="list-style-type:none;">
+                <li> ID = 0ef8f456-a2ff-11eb-8180-0242ac130004 </li>
+                <li> Remediation Operation = move </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>
+      <h3>On Poll</h3>
+      <ul>
+        <li>
+          <h4>What is On Poll</h4>
+          <ul>
+            <li> It will ingest the policy events and the message associated with them in the form of containers and
+              artifacts in Phantom. The On Poll action will create one container for the policy event and two artifacts in the
+              container [Policy Event Artifact and Message Artifact]. There are two approaches to polling which are
+              mentioned below.</li>
+            <ul>
+              <li>POLL NOW (Manual polling)</li>
+              <ul>
+                <li>
+                  It will fetch the data every time as per the corresponding asset configuration parameters. It doesn’t
+                  store the last run context of the fetched data.
+                </li>
+              </ul>
+              <li>Scheduled/Interval Polling</li>
+              <ul>
+                <li>The ingestion action can be triggered at a regular time interval.</li>
+                <li>It will fetch the data every time as per the corresponding asset configuration parameters based on
+                  the stored context from the previous ingestion run. It stores the last run context of the fetched data
+                  [last_ingested_policy_event_id and last_ingested_policy_event_date]. It starts fetching data based on
+                  the combination of the values of stored context for the previous ingestion run and the corresponding
+                  asset configuration parameters having higher priority.</li>
+              </ul>
+            </ul>
+          </ul>
+          <ul>
+            <li><b>Note: </b> On Poll action will skip the policy events and messages in case of intermittent error
+              while fetching the data from Agari or while processing the data. The logs associated with it, which includes the appropriate error details for skipping the policy event, will be logged in the <code>spawn.log</code> file.</li>
+          </ul>
+        </li>
+        <li>
+          <h4>Stored Context</h4>
+          <ul>
+            <li>
+              It is the concept of storing the context of the previous ingestion run. This concept will be used only for
+              scheduled/interval polling. It will use the state file to store the last run context. This state file will
+              be created for the asset of the application configured on the phantom platform.
+            </li>
+          </ul>
+        </li><br>
+        <li><b><u>Action Parameter:</u> Max results</b></li>
+        <ul>
+          <li>This parameter allows the user to limit the number of results. For scheduled or interval polling, this
+            parameter can be used to limit the data for each polling cycle. It expects a numeric value as an input. The
+            default value is 100 for which it will ingest only the first 100 events fetched.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Sort</b></li>
+        <ul>
+          <li>This parameter allows sorting the result data set based on the ‘created_at’ field. It can only take the
+            values 'oldest_first' or 'latest_first'.</li>
+          <b>Note: </b>It is preferable to use ‘oldest_first’ as the ingestion mechanism to prevent any data loss.
+        </ul>
+        <li><b><u>Action Parameter:</u> Add Fields</b></li>
+        <ul>
+          <li>This parameter allows the user to add the optional fields to the default message payload. It expects a
+            comma-delimited
+            string as an input parameter.</li>
+          <b>Note: </b>Add Fields will be applied to the ‘get message’ API call (Message Artifact) during polling.
+        </ul>
+        <li><b><u>Action Parameter:</u> Start date</b></li>
+        <ul>
+          <li>This parameter allows the user to specify the earliest date time the search should target while fetching
+            the policy events. This parameter will be taken into consideration for the first run of scheduled polling
+            and Poll Now. The datetime should be in ISO 8601 format. The default value for the start date is the last 14
+            days. The provided date cannot be greater than the last 14 days.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Filter</b></li>
+        <ul>
+          <li>This parameter allows filtering the policy events based on the search filters applied. It allows multiple
+            filters combined using and/or conjunctions. Refer to the <a
+              href='https://developers.agari.com/agari-platform/docs/filtering' target="_blank"><u>filtering</u></a> section in the Agari Docs for more details.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Name</b></li>
+        <ul>
+          <li>This parameter allows the user to find by the policy name while fetching the policy events.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Action</b></li>
+        <ul>
+          <li>This parameter allows the user to find the policy action while fetching the policy events. The valid
+            values for this parameter include: deliver, move, inbox, delete, none, all.
+            <br><b>Note: </b>When 'all' is selected, 'policy_action' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Exclude Alert Types</b></li>
+        <ul>
+          <li>This parameter allows the user to exclude the alert type while fetching the policy events. The valid
+            values for this parameter include: MessageAlert, SystemAlert, None.
+            <br><b>Note: </b>When 'None' is selected, 'exclude_alert_types' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Policy Enabled</b></li>
+        <ul>
+          <li>This parameter allows the user to find the policies enabled while fetching the policy events. The valid values for this parameter include: True, False, All.
+            <br><b>Note: </b>When 'All' is selected, 'policy_enabled' will not be passed in the API call while fetching the policy events. The default behavior of the API would be considered.</li>
+        </ul>
+        <li><b><u>Action Parameter:</u> CEF mapping</b></li>
+        <ul>
+          <li>This parameter is a JSON dictionary represented as a serialized JSON string. Each key in the dictionary is
+            a potential key name in an artifact that is to be renamed to the value. For example, if the 'cef_mapping' is
+            {"message_trust_score":"message_ts"}, your artifact will have a ‘message_ts’ CEF field instead of
+            ‘message_trust_score’ CEF field.
+          </li>
+        </ul>
+        <li><b><u>Action Parameter:</u> Max Workers for Polling</b></li>
+        <ul>
+          <li>This configuration parameter allows the user to configure the number of maximum workers while fetching the
+            results from the Agari server for On Poll action. The number of workers defined is directly proportional to
+            the number of threads created using ThreadPool Executor. ThreadPool Executor will provide a simple
+            abstraction to spin up multiple threads and will use those threads to perform tasks concurrently. For
+            example, if the number of workers is 10, the thread pool executor will essentially create 10 concurrent
+            threads to process any jobs that we submit to it. The threading concept will be majorly used for the 'get
+            policy event' and 'get message' API call while fetching the results for ingestion. Please note that
+            increasing the number of workers will elevate the performance of the On Poll action in the Agari app. The
+            only downside will be the increased utilization of resources on the Phantom platform, which may lead to
+            unexpected behavior on the Phantom platform. The default value is 1.
+            <br><b>Note: </b>Assign the number of workers depending on the system configuration of the platform and the resources available.
+          </li>
+        </ul>
+        <li><b>Note: </b>If non-required parameters are kept empty, then the default behavior of the API would be considered.</li>
+        <li><b>Examples:</b>
+          <ul>
+            <li> Ingest the policy events with the policy name ‘Untrusted Messages’, sorted in the latest first order.
+              <ul style="list-style-type:none;">
+                <li> Policy Name = Untrusted Messages </li>
+                <li> Sort = latest_first </li>
+              </ul>
+            </li>
+            <li> List the policy events updated after 2021-04-21T09:58:30Z. Rename the CEF mapping for ‘mail_from’ to
+              ‘from_mail’. The results should also be limited to 30.
+              <ul style="list-style-type:none;">
+                <li> Start Date = 2021-04-21T09:58:30Z </li>
+                <li> Max Results = 30 </li>
+                <li> CEF Mapping={“mail_from”: “from_mail”} </li>
+              </ul>
+            </li>
+            <b>Note: </b>Max Results value will be handled internally which will paginate through the policy events.
+
+          </ul>
+        </li>
+      </ul>
+    </li>
+    </p>
+</body>
+
+</html>

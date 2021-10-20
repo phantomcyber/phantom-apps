@@ -9,29 +9,60 @@
     "product_name": "AWS Identity Access Management",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2020 Splunk Inc.",
-    "app_version": "2.0.1",
-    "utctime_updated": "2020-12-22T12:31:35.000000Z",
+    "license": "Copyright (c) 2018-2021 Splunk Inc.",
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-09-08T22:33:16.000000Z",
     "package_name": "phantom_awsiam",
     "python_version": "3",
     "main_module": "awsiam_connector.py",
     "min_phantom_version": "4.9.39220",
     "latest_tested_versions": [
-        "Cloud, December 15 2020"
+        "Cloud, August 12, 2021"
     ],
     "app_wizard_version": "1.0.0",
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "boto3",
+                "input_file": "wheels/boto3-1.17.30-py2.py3-none-any.whl"
+            },
+            {
+                "module": "botocore",
+                "input_file": "wheels/botocore-1.20.30-py2.py3-none-any.whl"
+            },
+            {
+                "module": "docutils",
+                "input_file": "wheels/docutils-0.16-py2.py3-none-any.whl"
+            },
+            {
+                "module": "jmespath",
+                "input_file": "wheels/jmespath-0.10.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "s3transfer",
+                "input_file": "wheels/s3transfer-0.3.3-py2.py3-none-any.whl"
+            }
+        ]
+    },
     "configuration": {
         "access_key": {
             "description": "Access key ID",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "secret_key": {
             "description": "Secret access key",
             "data_type": "password",
-            "required": true,
             "order": 1
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "visibility": [
+                "onprem"
+            ],
+            "default": false,
+            "order": 2
         }
     },
     "actions": [
@@ -62,6 +93,15 @@
                         "aws iam user name"
                     ],
                     "order": 0
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 1
                 }
             },
             "output": [
@@ -192,6 +232,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -217,6 +267,15 @@
                         "aws iam group path"
                     ],
                     "order": 0
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 1
                 }
             },
             "output": [
@@ -327,6 +386,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -360,6 +429,15 @@
                         "aws iam group name"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -478,6 +556,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -492,7 +580,17 @@
             "description": "List roles available in AWS IAM",
             "type": "investigate",
             "read_only": true,
-            "parameters": {},
+            "parameters": {
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 0
+                }
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -617,6 +715,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -652,6 +760,15 @@
                         "aws iam group name"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -723,6 +840,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -758,6 +885,15 @@
                         "aws iam group name"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -829,6 +965,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -854,6 +1000,15 @@
                         "aws iam user name"
                     ],
                     "order": 0
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 1
                 }
             },
             "output": [
@@ -913,6 +1068,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -945,6 +1110,15 @@
                     "data_type": "boolean",
                     "default": true,
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -1014,6 +1188,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1052,6 +1236,15 @@
                     "data_type": "boolean",
                     "default": true,
                     "order": 2
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 3
                 }
             },
             "output": [
@@ -1154,6 +1347,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1199,6 +1402,15 @@
                         "aws iam role path"
                     ],
                     "order": 2
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 3
                 }
             },
             "output": [
@@ -1340,6 +1552,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1365,6 +1587,15 @@
                         "aws iam role name"
                     ],
                     "order": 0
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 1
                 }
             },
             "output": [
@@ -1423,6 +1654,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1457,6 +1698,15 @@
                         "aws iam policy arn"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -1527,6 +1777,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1561,6 +1821,15 @@
                         "aws iam policy arn"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -1631,6 +1900,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1666,6 +1945,15 @@
                         "aws iam policy arn"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -1737,6 +2025,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -1772,6 +2070,15 @@
                         "aws iam policy arn"
                     ],
                     "order": 1
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 2
                 }
             },
             "output": [
@@ -1842,6 +2149,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 }
             ],

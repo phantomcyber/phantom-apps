@@ -18,7 +18,7 @@
     <h2>Playbook Backward Compatibility</h2>
       <p>
         <ul>
-          <li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
+          <li>The existing action parameters have been modified in the actions given below. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks, or by providing appropriate values to these action parameters to ensure the correct functioning of the playbooks created on the earlier versions of the app.</li>
           <ul>
             <li>List Devices - The 'IP' option has been removed from the value list of the [input_type] action parameter in the app version 3.0.0 because there is no specific API currently available to support the filtering of devices based on the IP in the Defender ATP.</li>
             <li>List Devices - The new [query] parameter has been added to support the additional OData V4 filters.</li>
@@ -34,6 +34,14 @@
             <li>List Devices</li>
             <li>List Alerts</li>
             <li>List Sessions</li>
+            <li>List Indicators</li>
+            <li>Get Installed Software</li>
+            <li>Get Discovered Vulnerabilities</li>
+            <li>Get File Devices</li>
+            <li>Get User Devices</li>
+            <li>Get Domain Devices</li>
+            <li>Get Missing KBs</li>
+            <li>Run Query</li>
           </ul>
         </ul>
       </p>
@@ -44,7 +52,7 @@
           <li>Tenant ID - It is the Directory ID of the Microsoft Azure Active Directory on the Microsoft Azure portal.</li>
           <li>Client ID - It is the Application ID of an application configured in the Microsoft Azure Active Directory.</li>
           <li>Client Secret - It is the secret string used by the application to prove its identity when requesting a token. It can be generated for the configured application on the Microsoft Azure Active Directory.</li>
-          <li>Non Interactive Auth - It is used to determine the authentication method. If it is checked then non-interactive auth will be used otherwise interactive auth will be used. Whenever this checkbox is toggled then test-connectivity action must be run again.</li>
+          <li>Non Interactive Auth - It is used to determine the authentication method. If it is checked then non interactive auth will be used otherwise interactive auth will be used. Whenever this checkbox is toggled then the test connectivity action must be run again.</li>
         </ul>
       </p>
 
@@ -70,7 +78,7 @@
               <li>In the navigation pane, select Settings > APIs (section) > SIEM.</li>
               <li>Select 'Enable SIEM connector' (this activates the SIEM connector access details section with pre-populated values and an application is created under your Azure Active Directory (AAD) tenant).</li>
               <li>In the 'Choose the SIEM you want to configure and download details to file' section, select the 'Generic API' option.</li>
-              <li>Copy the individual pre-populated values displayed on the screen or click the 'Save details to file' button to download a file that contains all these values (these details are required to run the 'Test Connectivity' action).</li>
+              <li>Copy the individual pre-populated values displayed on the screen or click the 'Save details to file' button to download a file that contains all these values (these details are required to run the test connectivity action).</li>
               <li> After enabling the SIEM connector on the Microsoft Defender Security Center, the app 'WindowsDefenderATPSiemConnector' will be created on the Microsoft Azure portal.</li>
             </ol>
         </li>
@@ -102,8 +110,16 @@
                   <li>Machine.Scan</li>
                   <li>Machine.StopAndQuarantine</li>
                   <li>User.Read.All</li>
+                  <li>Software.Read.All</li>
+                  <li>URL.Read.All</li>
+                  <li>Ip.Read.All</li>
+                  <li>Ti.ReadWrite.All</li>
+                  <li>AdvancedQuery.Read.All</li>
+                  <li>Vulnerability.Read.All</li>
+                  <li>Score.Read.All</li>
+                  <li>Machine.LiveResponse</li>
                 </ul>
-              <li><b>Deligated Permissions</b></li>
+              <li><b>Delegated Permissions</b></li>
                 <ul>
                   <li>Alert.ReadWrite</li>
                   <li>File.Read.All</li>
@@ -115,6 +131,14 @@
                   <li>Machine.Scan</li>
                   <li>Machine.StopAndQuarantine</li>
                   <li>User.Read.All</li>
+                  <li>Software.Read</li>
+                  <li>URL.Read.All</li>
+                  <li>Ip.Read.All</li>
+                  <li>Ti.ReadWrite</li>
+                  <li>AdvancedQuery.Read</li>
+                  <li>Vulnerability.Read</li>
+                  <li>Score.Read</li>
+                  <li>Machine.LiveResponse</li>
                 </ul>
             </ul>
           </li>
@@ -124,7 +148,7 @@
           <li>Click on the 'Microsoft Graph' option.</li>
           <li>Provide the following Delegated permission to the app.
             <ul>
-              <li><b>Deligated Permission</b></li>
+              <li><b>Delegated Permission</b></li>
                 <ul>
                   <li>offline_access</li>
                 </ul>
@@ -183,7 +207,7 @@
           <li>Finally, close the browser tab and come back to the 'Test Connectivity' browser tab. The pop-up window should display a 'Test Connectivity Passed' message.</li>
         </ul>
       </p>
-      <h2>Non-interactive Method to run Test Connectivity</h2>
+      <h2>Non Interactive Method to run Test Connectivity</h2>
       <p>
         <ul>
           <li>Here make sure that the 'Non Interactive Auth' checkbox is checked in asset configuration.</li>
@@ -201,14 +225,14 @@
             <ul>
               <li>The first step is to get an application created in a specific tenant on the Microsoft Azure Active Directory. Generate the [client_secret] for the configured application. The detailed steps have been mentioned in the earlier section.</li>
               <li>Configure the Windows Defender ATP app's asset with appropriate values for [tenant_id], [client_id], and [client_secret] configuration parameters.</li>
-              <li>Run the Test Connectivity action for Interactive method.</li>
+              <li>Run the test connectivity action for Interactive method.</li>
               <ul>
                 <li>Internally, the connectivity creates a URL for hitting the /authorize endpoint for the generation of the authorization code and displays it on the connectivity pop-up window. The user is requested to hit this URL in a browser new tab and complete the authorization request successfully resulting in the generation of an authorization code.</li>
                 <li>The authorization code generated in the above step is used by the connectivity to make the next API call to generate the [access_token] and [refresh_token] pair. The generated authorization code, [access_token], and [refresh_token] are stored in the state file of the app on the Phantom server.</li>
-                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the Test Connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
+                <li>The authorization code can be used only once to generate the pair of [access_token] and [refresh_token]. If the [access_token] expires, then the [refresh_token] is used internally automatically by the application to re-generate the [access_token] by making the corresponding API call. This entire autonomous workflow will seamlessly work until the [refresh_token] does not get expired. Once the [refresh_token] expires, the user will have to run the test connectivity action once again to generate the authorization code followed by the generation of an entirely fresh pair of [access_token] and [refresh_token]. The default expiration time for the [access_token] is 1 hour and that of the [refresh_token] is 90 days. For more details visit <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-configurable-token-lifetimes" target="_blank">AD Configurable Token Lifetimes</a></li>
                 <li>The successful run of the Test Connectivity ensures that a valid pair of [access_token] and [refresh_token] has been generated and stored in the app's state file. These tokens will be used in all the actions' execution flow to authorize their API calls to the Defender ATP instance.</li>
               </ul>
-              <li>Run the Test Connectivity action for Non Interactive method.</li>
+              <li>Run the test connectivity action for Non Interactive method.</li>
               <ul>
                 <li>Internally, the application authenticates to Azure AD token issuance endpoint and requests an [access_token] then it will generate the [access_token].</li>
                 <li>The [access_token] generated in the above step is used by the test connectivity to make the next API call to verify the [access_token]. The generated [access_token] is stored in the state file of the app on the Phantom server.</li>
@@ -239,6 +263,56 @@
       <ul>
         <li>&lt;appid&gt; - The app ID will be available in the Redirect URI which gets populated in the field 'POST incoming for Windows Defender ATP to this location' when the Defender ATP Phantom app asset is configured e.g. https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_&lt;appid&gt;/&lt;asset_name&gt;/result</li>
         <li>&lt;asset_id&gt; - The asset ID will be available on the created asset's Phantom web URL e.g. https://&lt;phantom_host&gt;/apps/&lt;app_number&gt;/asset/&lt;asset_id&gt;/</li>
+      </ul>
+    </p>
+
+    <h2>get file (live response) action workflow</h2>
+    <p>
+      <ul> 
+        <li>There can be four different cases based on the provided parameters:</li>
+        <ul>
+          <li>Case 1:</li>
+          <ul>
+            <li>Only event_id is provided - In this case, the rest of the parameters will be ignored and the action will try to get the file based on the provided <b>event_id</b>. The action can get the file only if the status received from the <b>get_status</b> action for the given event_id is <b>Succeeded</b> (How the event_id is generated is mentioned in the next Case).</li>
+          </ul>
+          <li>Case 2:</li>
+          <ul>
+            <li>No event_id is provided and other parameters are provided - In this case, <b>device_id, file_path and comment</b> all the three parameters are required. If the timeout is not provided, the default timeout value is considered as 300 seconds. In the given timeout, the action will try to get the file and if action takes longer time than the given timeout, it will provide an <b>event_id</b> and <b>file_status</b>. The event_id can be used in the <b>get_status</b> action to receive the status and once the status is <b>Succeeded</b>, the same event_id can be used in this action to get the file into the vault (Case 1).</li>
+          </ul>
+          <li>Case 3:</li>
+          <ul>
+            <li>Both event_id and other parameters are provided - In this case, the event_id will get the higher priority and the action will try to get the file based on the <b>event_id</b> (Case 1). If the action fails to get the file using event_id, it will look into other parameters and it will work in the same way as mentioned in Case 2.</li>
+          </ul>
+          <li>Case 4:</li>
+          <ul>
+            <li>No parameters are provided - In this case the action will fail, because either <b>event_id</b> or <b>Other parameters (file_path, device_id, and comment)</b> are required in order to get the file.</li>
+          </ul>
+        </ul>
+      </ul>
+    </p>
+
+    <h2>run script (live response) action workflow</h2>
+    <p>
+      <ul> 
+        <li>There can be four different cases based on the provided parameters:</li>
+        <ul>
+          <li>Case 1:</li>
+          <ul>
+            <li>Only event_id is provided - In this case, the rest of the parameters will be ignored and the action will try to get the script output based on the provided <b>event_id</b>. The action can get the script output if the status received from the <b>get_status</b> action for the given event_id is <b>Succeeded</b> (How the event_id is generated is mentioned in the next Case.)</li>
+          </ul>
+          <li>Case 2:</li>
+          <ul>
+            <li>No event_id provided and other parameters are provided - In this case, <b>device_id, script_name and comment</b> all the three parameters are required. If the timeout is not provided, the default timeout value is  considered as 300 seconds. In the given timeout, the action will try to execute the script and provide the output and if the action takes longer time than the given timeout, it will provide an <b>event_id</b> and <b>script_status</b>. The event_id can be used in the <b>get_status</b> action to receive the status and once the status is <b>Succeeded</b>, the same event_id can be used in this action to get the script output (Case 1).</li>
+          </ul>
+          <li>Case 3:</li>
+          <ul>
+            <li>Both event_id and other parameters are provided - In this case the event_id will get the higher priority and the action will try to get the script output based on the <b>event_id</b> (Case 1). If the action fails to get the script output using event_id, it will look into other parameters and it will work in the same way as mentioned in Case 2.</li>
+          </ul>
+          <li>Case 4:</li>
+          <ul>
+            <li>No parameters are provided - In this case the action will fail, because either <b>event_id</b> or <b>Other parameters (script_name, device_id, and comment)</b> are required in order to get the script output.</li>
+          </ul>
+        </ul>
       </ul>
     </p>
 

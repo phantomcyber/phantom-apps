@@ -2944,6 +2944,8 @@ class ChronicleConnector(BaseConnector):
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR), message, cid(container_id)
         """
+        artifacts[-1]["run_automation"] = self._run_automation
+
         if cid:
             for artifact in artifacts:
                 artifact['container_id'] = cid
@@ -2979,10 +2981,6 @@ class ChronicleConnector(BaseConnector):
         # If not results return
         if not results:
             return
-
-        # mark the last artifact such that active playbooks get executed
-        if run_mode == self._run_mode[-1]:
-            results[-1]["run_automation"] = self._run_automation
 
         # Check for existing container only if it's a scheduled/interval poll and not first run
         if not (self._is_poll_now or self._is_first_run[run_mode]):
@@ -3156,8 +3154,10 @@ class ChronicleConnector(BaseConnector):
         Returns:
             :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
+        DEFAULT_ALL_MODE_LIST = [GC_RM_IOC_DOMAINS, GC_RM_ASSET_ALERTS, GC_RM_USER_ALERTS, GC_RM_ALERTING_DETECTIONS, GC_RM_NOT_ALERTING_DETECTIONS]
+
         # Fetch ingestion run mode
-        self._run_mode = GC_RM_ON_POLL_DICT[config.get("run_mode", "All")]
+        self._run_mode = GC_RM_ON_POLL_DICT.get(config.get("run_mode", "All"), DEFAULT_ALL_MODE_LIST)
 
         # Fetch run_automation flag
         self._run_automation = config.get("run_automation", False)

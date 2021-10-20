@@ -5,20 +5,21 @@
 
 import phantom.app as phantom
 import phantom.utils as util
+import ipaddress
 
 
 def _get_hash_type(hash_value):
 
     if util.is_md5(hash_value):
-        return (phantom.APP_SUCCESS, "md5")
+        return phantom.APP_SUCCESS, "md5"
 
     if util.is_sha1(hash_value):
-        return (phantom.APP_SUCCESS, "sha1")
+        return phantom.APP_SUCCESS, "sha1"
 
     if util.is_sha256(hash_value):
-        return (phantom.APP_SUCCESS, "sha256")
+        return phantom.APP_SUCCESS, "sha256"
 
-    return (phantom.APP_ERROR, None)
+    return phantom.APP_ERROR, None
 
 
 def get_ctx_result_ps(result):
@@ -52,15 +53,22 @@ def get_ctx_result_ps(result):
 def _get_ioc_type(ioc):
 
     if util.is_ip(ioc):
-        return (phantom.APP_SUCCESS, "ip")
+        return phantom.APP_SUCCESS, "ip"
+
+    try:
+        ipv6_type = ipaddress.IPv6Address(ioc)
+        if ipv6_type:
+            return phantom.APP_SUCCESS, "ip"
+    except:
+        pass
 
     if util.is_hash(ioc):
         return _get_hash_type(ioc)
 
     if util.is_domain(ioc):
-        return (phantom.APP_SUCCESS, "domain")
+        return phantom.APP_SUCCESS, "domain"
 
-    return (phantom.APP_ERROR, "Failed to detect the IOC type")
+    return phantom.APP_ERROR, "Failed to detect the IOC type"
 
 
 def _trim_results(data, key):
@@ -146,6 +154,31 @@ def get_ctx_result(result):
     return ctx_result
 
 
+def get_ctx_result_indicator(result):
+
+    ctx_result = {}
+
+    param = result.get_param()
+
+    if 'ioc' in param:
+        ioc = param.get('ioc')
+        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+
+    if 'indicator_value' in param:
+        ioc = param.get('indicator_value')
+        ret_val, param['ioc_type'] = _get_ioc_type(ioc)
+
+    ctx_result['param'] = param
+
+    data = result.get_data()
+    if not data:
+        return ctx_result
+
+    ctx_result['data'] = data
+
+    return ctx_result
+
+
 def _get_ctx_result(result, provides):
 
     ctx_result = {}
@@ -192,9 +225,6 @@ def display_view(provides, all_app_runs, context):
     if provides == 'create session':
         return 'crowdstrike_create_session.html'
 
-    if provides == 'get indicator':
-        return 'crowdstrike_get_indicator.html'
-
     if provides == 'list incidents':
         return 'crowdstrike_list_incidents.html'
 
@@ -206,12 +236,6 @@ def display_view(provides, all_app_runs, context):
 
     if provides == 'get user roles':
         return 'crowdstrike_get_user_roles.html'
-
-    if provides in ['upload indicator', 'delete indicator']:
-        return 'crowdstrike_upload_indicator.html'
-
-    if provides == 'update indicator':
-        return 'crowdstrike_update_indicator.html'
 
     if provides == 'file reputation':
         return 'crowdstrike_file_reputation.html'
@@ -239,6 +263,26 @@ def hunt_view(provides, all_app_runs, context):
 
     # print context
     return 'crowdstrike_hunt_view.html'
+
+
+def indicator_view(provides, all_app_runs, context):
+
+    context['results'] = results = []
+    for summary, action_results in all_app_runs:
+        for result in action_results:
+
+            ctx_result = get_ctx_result_indicator(result)
+            if not ctx_result:
+                continue
+            results.append(ctx_result)
+
+    if provides == 'update indicator':
+        return 'crowdstrike_update_indicator.html'
+
+    if provides == 'delete indicator':
+        return 'crowdstrike_delete_indicator.html'
+
+    return 'crowdstrike_get_indicator.html'
 
 
 def set_status_view(provides, all_app_runs, context):

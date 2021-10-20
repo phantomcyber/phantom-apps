@@ -10,13 +10,14 @@ import phantom.app as phantom
 import botocore.response as br
 import botocore.paginate as bp
 
-from boto3 import client
+from boto3 import client, Session
 from awscloudtrail_consts import *
 from botocore.config import Config
 from datetime import datetime
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 import six
+import ast
 
 
 class RetVal(tuple):
@@ -32,14 +33,34 @@ class AwsCloudtrailConnector(BaseConnector):
         self._state = None
         self._access_key = None
         self._secret_key = None
+        self._session_token = None
         self._region = None
         self._proxy = None
 
-    def _create_client(self, action_result):
+    def _handle_get_ec2_role(self):
+
+        session = Session(region_name=self._region)
+        credentials = session.get_credentials()
+        return credentials
+
+    def _create_client(self, action_result, param=None):
 
         boto_config = None
         if self._proxy:
             boto_config = Config(proxies=self._proxy)
+
+        # Try getting and using temporary assume role credentials from parameters
+        temp_credentials = dict()
+        if param and 'credentials' in param:
+            try:
+                temp_credentials = ast.literal_eval(param['credentials'])
+                self._access_key = temp_credentials.get('AccessKeyId', '')
+                self._secret_key = temp_credentials.get('SecretAccessKey', '')
+                self._session_token = temp_credentials.get('SessionToken', '')
+
+                self.save_progress("Using temporary assume role ceredentials for action")
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get temporary credentials:{0}".format(e))
 
         try:
             if self._access_key and self._secret_key:
@@ -49,6 +70,7 @@ class AwsCloudtrailConnector(BaseConnector):
                     region_name=self._region,
                     aws_access_key_id=self._access_key,
                     aws_secret_access_key=self._secret_key,
+                    aws_session_token=self._session_token,
                     config=boto_config)
             else:
                 self.debug_print("Creating boto3 client without API keys")
@@ -168,7 +190,7 @@ class AwsCloudtrailConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress("Querying AWS to validate credentials")
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp = self._make_boto_call(action_result, "describe_trails", includeShadowTrails=False)
@@ -191,7 +213,7 @@ class AwsCloudtrailConnector(BaseConnector):
         if include_shadow_trails == "true":
             include_shadow_trails = True
 
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         ret_val, resp_json = self._make_boto_call(action_result, "describe_trails", includeShadowTrails=include_shadow_trails)
@@ -223,7 +245,7 @@ class AwsCloudtrailConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, AWSCLOUDTRAIL_INVALID_LIMIT)
 
         # fail if we're not able to create a client
-        if not self._create_client(action_result):
+        if not self._create_client(action_result, param):
             return action_result.get_status()
 
         kwargs = {}           # define the kwargs to send to _make_boto_call
@@ -326,8 +348,6 @@ class AwsCloudtrailConnector(BaseConnector):
 
         # Load required configs
         self._region = AWS_CLOUDTRAIL_REGIONS.get(config['Region'])
-        self._access_key = config['Access Key']
-        self._secret_key = config['Secret Key']
 
         # handle proxies
         self._proxy = {}
@@ -336,6 +356,22 @@ class AwsCloudtrailConnector(BaseConnector):
             self._proxy['http'] = env_vars['HTTP_PROXY']['value']
         if 'HTTPS_PROXY' in env_vars:
             self._proxy['https'] = env_vars['HTTPS_PROXY']['value']
+
+        if config.get('use_role'):
+            credentials = self._handle_get_ec2_role()
+            if not credentials:
+                return self.set_status(phantom.APP_ERROR, "Failed to get EC2 role credentials")
+            self._access_key = credentials.access_key
+            self._secret_key = credentials.secret_key
+            self._session_token = credentials.token
+
+            return phantom.APP_SUCCESS
+
+        self._access_key = config.get('Access Key')
+        self._secret_key = config.get('Secret Key')
+
+        if not (self._access_key and self._secret_key):
+            return self.set_status(phantom.APP_ERROR, AWSCLOUDTRAIL_BAD_ASSET_CONFIG_MSG)
 
         return phantom.APP_SUCCESS
 

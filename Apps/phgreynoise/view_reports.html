@@ -156,340 +156,541 @@
 </style>
 <div class="greynoise" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px">
     {% for result in results %}
-    {% if not result.data %}
-    <h4 class="wf-h4-style">No lookup information found</h4>
-    {% elif result.data.ip and result.data.code_meaning %}
-    <h3 class="wf-h3-style">IP Lookup Results</h3>
-    <table class="wf-table-horizontal">
-        <tr>
-            <th>IP</th>
-            <th>Noise</th>
-            <th>GreyNoise Information</th>
-            <th>Visualizer</th>
-        </tr>
-        <tr>
-            <td>
-                {{result.data.ip}}
-            </td>
-            <td>
-                {{result.data.noise}}
-            </td>
-            <td>
-                {{result.data.code_meaning}}
-            </td>
-            <td>
-                <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
-            </td>
-        </tr>
-    </table>
-    {% elif result.param.ips %}
-    <h3 class="wf-h3-style">Multi IP Lookup Results</h3>
-    <table class="wf-table-horizontal">
-        <tr>
-            <th>IP</th>
-            <th>Noise</th>
-            <th>GreyNoise Information</th>
-            <th>Visualizer</th>
-        </tr>
-        {% for entry in result.data.lookup_ips %}
-        <tr>
-            <td>
-                {{entry.ip}}
-            </td>
-            <td>
-                {{entry.noise}}
-            </td>
-            <td>
-                {{entry.code_meaning}}
-            </td>
-            <td>
-                <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% elif result.data.seen or result.data.first_seen == "This IP has never been seen scanning the internet" and not result.param.query %}
-    {% if result.data.seen is True %}
-    <h3 class="wf-h3-style">IP Reputation Results</h3>
-    <table class="wf-table-vertical" style="width: 100%">
-        <tr>
-            <td>
+        {% if not result.data %}
+            <h4 class="wf-h4-style">No lookup information found</h4>
+        {% elif result.data.ip and result.data.code_meaning %}
+            <h3 class="wf-h3-style">IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>Noise</th>
+                    <th>GreyNoise Information</th>
+                    <th>Visualizer</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td>
+                        {{result.data.noise}}
+                    </td>
+                    <td>
+                        {{result.data.code_meaning}}
+                    </td>
+                    <td>
+                        <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
+                    </td>
+                </tr>
+            </table>
+        {% elif result.data.ip and result.data.classification and result.data.name %}
+            <h3 class="wf-h3-style">Community IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>Noise</th>
+                    <th>RIOT (Rule It OuT)</th>
+                    <th>Classification</th>
+                    <th>Name</th>
+                    <th>Visualizer</th>
+                    <th>Last Seen</th>
+                    <th>Message</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td>
+                        {{result.data.noise}}
+                    </td>
+                    <td>
+                        {{result.data.riot}}
+                    </td>
+                    <td>
+                        {{result.data.classification}}
+                    </td>
+                    <td>
+                        {{result.data.name}}
+                    </td>
+                    <td>
+                        <a target="_blank" rel="noopener noreferrer" href={{result.data.link}}>{{result.data.link}}</a>
+                    </td>
+                    <td>
+                        {{result.data.last_seen}}
+                    </td>
+                    <td>
+                        {{result.data.message}}
+                    </td>
+                </tr>
+            </table>
+        {% elif result.data.ip and result.data.community_not_found %}
+            <h3 class="wf-h3-style">Community IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>Noise</th>
+                    <th>RIOT (Rule It OuT)</th>
+                    <th>Message</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td>
+                        {{result.data.noise}}
+                    </td>
+                    <td>
+                        {{result.data.riot}}
+                    </td>
+                    <td>
+                        {{result.data.message}}
+                    </td>
+                </tr>
+            </table>
+        {% elif result.data.plan %}
+            <h3 class="wf-h3-style">Community IP Lookup Action Error</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>Plan</th>
+                    <th>Rate Limit</th>
+                    <th>Plan URL</th>
+                    <th>Message</th>
+                </tr>
+                <tr>
+                    <td>
+                        {{result.data.plan}}
+                    </td>
+                    <td>
+                        {{result.data.ratelimit}}
+                    </td>
+                    <td>
+                        <a target="_blank" rel="noopener noreferrer" href={{result.data.plan_url}}>{{result.data.plan_url}}</a>
+                    </td>
+                    <td>
+                        {{result.data.message}}
+                    </td>
+                </tr>
+            </table>
+        {% elif result.data.ip and result.data.trust_level and result.data.name %}
+            <h3 class="wf-h3-style">RIoT IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>RIOT (Rule It OuT)</th>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Explanation</th>
+                    <th>Last Updated</th>
+                    <th>Trust Level</th>
+                    <th>Reference</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td>
+                        {{result.data.riot}}
+                    </td>
+                    <td>
+                        {{result.data.category}}
+                    </td>
+                    <td>
+                        {{result.data.name}}
+                    </td>
+                    <td>
+                        {{result.data.description}}
+                    </td>
+                    <td>
+                        {{result.data.explanation}}
+                    </td>
+                    <td>
+                        {{result.data.last_updated}}
+                    </td>
+                    <td>
+                        {{result.data.trust_level}}
+                    </td>
+                    <td>
+                        <a target="_blank" rel="noopener noreferrer" href={{result.data.reference}}>{{result.data.reference}}</a>
+                    </td>
+                </tr>
+            </table>
+        {% elif result.data.ip and result.data.riot_unseen %}
+            <h3 class="wf-h3-style">RIoT IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>RIOT (Rule It OuT)</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ result.data.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{result.data.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                    </td>
+                    <td>
+                        {{result.data.riot}}
+                    </td>
+                </tr>
+            </table>
+        {% elif result.param.ips %}
+            <h3 class="wf-h3-style">Multi IP Lookup Results</h3>
+            <table class="wf-table-horizontal">
+                <tr>
+                    <th>IP</th>
+                    <th>Noise</th>
+                    <th>GreyNoise Information</th>
+                    <th>Visualizer</th>
+                </tr>
+                {% for entry in result.data.lookup_ips %}
+                    <tr>
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                            'value':'{{ entry.ip }}' }], 0,
+                            {{ container.id }}, null, false);">
+                                {{entry.ip}}
+                                &nbsp;
+                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a>
+                        </td>
+                        <td>
+                            {{entry.noise}}
+                        </td>
+                        <td>
+                            {{entry.code_meaning}}
+                        </td>
+                        <td>
+                            <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% elif result.data.seen or result.data.unseen_rep or result.data.first_seen == "This IP has never been seen scanning the internet" and not result.param.query %}
+            {% if result.data.seen is True %}
+                <h3 class="wf-h3-style">IP Reputation Results</h3>
                 <table class="wf-table-vertical" style="width: 100%">
                     <tr>
-                        <td style="width: 20%">
-                            IP
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.ip}}
+                        <td>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        IP
+                                    </td>
+                                    <td style="width: 80%">
+                                        <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                            'value':'{{ result.data.ip }}' }], 0,
+                                            {{ container.id }}, null, false);">
+                                                {{result.data.ip}}
+                                                &nbsp;
+                                            <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Classification
+                                    </td>
+                                    <td style="width: 80%">
+                                        {% if result.data.classification == "malicious" %}
+                                            <div class="MaliciousClassification">
+                                        {% else %}
+                                            <div class="BenignClassification">
+                                        {% endif %}
+                                                {{result.data.classification}}
+                                            </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        First Seen
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.first_seen}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Last Seen
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.last_seen}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Visualizer
+                                    </td>
+                                    <td style="width: 80%">
+                                        <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Actor
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.actor}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Organization
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.organization}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        ASN
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.asn}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Country
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.country}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        City
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.city}}
+                                    </td>
+                                </tr>
+                            </table>
+                            <table class="wf-table-vertical" style="width: 100%">
+                                <tr>
+                                    <td style="width: 20%">
+                                        Tags
+                                    </td>
+                                    <td style="width: 80%">
+                                        {{result.data.tags}}
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
-                <table class="wf-table-vertical" style="width: 100%">
+            {% else %}
+                <h3 class="wf-h3-style">IP Reputation Results</h3>
+                <table class="wf-table-horizontal">
                     <tr>
-                        <td style="width: 20%">
-                            Classification
-                        </td>
-                        <td style="width: 80%">
-                            {% if result.data.classification == "malicious" %}
-                            <div class="MaliciousClassification">
-                                {% else %}
-                                <div class="BenignClassification">
-                                    {% endif %}
-                                    {{result.data.classification}}
-                                </div>
-                        </td>
+                        <th>IP</th>
+                        <th>First Seen</th>
+                        <th>Last Seen</th>
                     </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
                     <tr>
-                        <td style="width: 20%">
-                            First Seen
+                        <td>
+                            <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                'value':'{{ result.data.ip }}' }], 0,
+                                {{ container.id }}, null, false);">
+                                    {{result.data.ip}}
+                                    &nbsp;
+                                <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a>
                         </td>
-                        <td style="width: 80%">
+                        <td>
                             {{result.data.first_seen}}
                         </td>
-                    </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            Last Seen
-                        </td>
-                        <td style="width: 80%">
+                        <td>
                             {{result.data.last_seen}}
                         </td>
                     </tr>
                 </table>
-                <table class="wf-table-vertical" style="width: 100%">
+            {% endif %}
+        {% elif result.param.query %}
+            {% if result.data.message == "no results" %}
+                <h3 class="wf-h3-style">GNQL Results</h3>
+                <table class="wf-table-horizontal">
                     <tr>
-                        <td style="width: 20%">
-                            Visualizer
+                        <th>Query</th>
+                        <th>Message</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{result.data.query}}
                         </td>
-                        <td style="width: 80%">
-                            <a target="_blank" rel="noopener noreferrer" href={{result.data.visualization}}>{{result.data.visualization}}</a>
+                        <td>
+                            {{result.data.message}}
                         </td>
                     </tr>
                 </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            Actor
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.actor}}
-                        </td>
-                    </tr>
+            {% else %}
+                <table class="datatable wf-table-vertical" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>Query Visualizer: <a target="_blank" rel="noopener noreferrer" href=https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}>https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}</a></th>
+                        </tr>
+                        <tr>
+                            <th>Results</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in result.data.gnql_query %}
+                            <tr>
+                                <td>
+                                    <table class="wf-table-vertical" style="width: 100%">
+                                        <tr>
+                                            <td style="width: 20%">
+                                                IP
+                                            </td>
+                                            <td style="width: 80%">
+                                                <a href="javascript:;" onclick="context_menu(this, [{'contains': ['ip'],
+                                                    'value':'{{ entry.ip }}' }], 0,
+                                                    {{ container.id }}, null, false);">
+                                                        {{entry.ip}}
+                                                        &nbsp;
+                                                    <span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Classification
+                                            </td>
+                                            <td style="width: 80%">
+                                                {% if entry.classification == "malicious" %}
+                                                    <div class="MaliciousClassification">
+                                                {% else %}
+                                                    <div class="BenignClassification">
+                                                {% endif %}
+                                                        {{entry.classification}}
+                                                    </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                First Seen
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.first_seen}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Last Seen
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.last_seen}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Visualizer
+                                            </td>
+                                            <td style="width: 80%">
+                                                <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Actor
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.actor}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Organization
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.organization}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                ASN
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.asn}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Country
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.country}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                City
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.city}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%">
+                                                Tags
+                                            </td>
+                                            <td style="width: 80%">
+                                                {{entry.tags}}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
                 </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            Organization
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.organization}}
-                        </td>
-                    </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            ASN
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.asn}}
-                        </td>
-                    </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            Country
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.country}}
-                        </td>
-                    </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            City
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.city}}
-                        </td>
-                    </tr>
-                </table>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            Tags
-                        </td>
-                        <td style="width: 80%">
-                            {{result.data.tags}}
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    {% else %}
-    <h3 class="wf-h3-style">IP Reputation Results</h3>
-    <table class="wf-table-horizontal">
-        <tr>
-            <th>IP</th>
-            <th>First Seen</th>
-            <th>Last Seen</th>
-        </tr>
-        <tr>
-            <td>
-                {{result.data.ip}}
-            </td>
-            <td>
-                {{result.data.first_seen}}
-            </td>
-            <td>
-                {{result.data.last_seen}}
-            </td>
-        </tr>
-    </table>
-    {% endif %}
-    {% elif result.param.query %}
-    {% if result.data.message == "no results" %}
-    <h3 class="wf-h3-style">GNQL Results</h3>
-    <table class="wf-table-horizontal">
-        <tr>
-            <th>Query</th>
-            <th>Message</th>
-        </tr>
-        <tr>
-            <td>
-                {{result.data.query}}
-            </td>
-            <td>
-                {{result.data.message}}
-            </td>
-        </tr>
-    </table>
-    {% else %}
-    <table class="datatable wf-table-vertical" style="width: 100%">
-        <thead>
-        <tr>
-            <th>Query Visualizer: <a target="_blank" rel="noopener noreferrer" href=https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}>https://viz.greynoise.io/query/?gnql={{result.param.query|urlencode}}</a></th>
-        </tr>
-        <tr>
-            <th>Results</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for entry in result.data.gnql_query %}
-        <tr>
-            <td>
-                <table class="wf-table-vertical" style="width: 100%">
-                    <tr>
-                        <td style="width: 20%">
-                            IP
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.ip}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Classification
-                        </td>
-                        <td style="width: 80%">
-                            {% if entry.classification == "malicious" %}
-                            <div class="MaliciousClassification">
-                                {% else %}
-                                <div class="BenignClassification">
-                                    {% endif %}
-                                    {{entry.classification}}
-                                </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            First Seen
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.first_seen}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Last Seen
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.last_seen}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Visualizer
-                        </td>
-                        <td style="width: 80%">
-                            <a target="_blank" rel="noopener noreferrer" href={{entry.visualization}}>{{entry.visualization}}</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Actor
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.actor}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Organization
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.organization}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            ASN
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.asn}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Country
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.country}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            City
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.city}}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 20%">
-                            Tags
-                        </td>
-                        <td style="width: 80%">
-                            {{entry.tags}}
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-</div>
-{% endif %}
-{% endfor %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 </div>
 
 

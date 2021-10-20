@@ -1,0 +1,523 @@
+{
+	"info": {
+		"_postman_id": "5d6b376d-5ce3-4457-89b7-73d76371b00f",
+		"name": "Jira",
+		"description": "# Postman Collection of Endpoints for Jira App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, Set this all fields before run the request.\n\n| Variable Name | Description |\n| - | - |\n| username  | Jira username for Basic auth (in collection variables) |\n| password  | Jira password for Basic auth (in collection variables) |\n| base_url | Jira server URL ( in collection variables ) |\n\n- ### Other Variables needed to run the actions \n\n| Variable Name | Description |\n| - | - |\n| jira_user | Username of user used in `add watcher` and `remove watcher` |\n| project | Key of project used in list tickets and `create ticket` |\n| sub_task_type | id of the \"sub task\" ticket type. Used in `create ticket` |\n| parent_ticket_id | Id of ticket used in `create ticket` and `link tickets` . `create ticket` will create a sub-task ticket under this ticket and `link tickets` will link this ticket to newly created ticket |\n| transition_id | Id of one of the status type |\n| ticket_id | Automatically set when create-ticket is run. Used by `add watcher`, `remove watcher`, `link tickets`, `set status`, `get ticket`, `add comment`, `update ticket` and `delete ticket` |\n\n> **_NOTE:_** Run create ticket to set ticket_id parameter which will be used by subsequent requests. Dependent requests will throw an error if ticket_id is not set\n\n> **_NOTE:_**  The body parameters for the requests have been mentioned in the above table. Please set them as per your requirements. Refer the documentation of individual requests.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "lookup users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/user/search?username={{jira_user}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"user",
+						"search"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{jira_user}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create ticket",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.response.code >= 200 &&  pm.response.code < 300) {",
+							"    let response = pm.response.json();",
+							"    var ticket_id = response['key']",
+							"    pm.collectionVariables.set(\"ticket_id\", ticket_id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"fields\": {\n        \"summary\": \"Issue from postman\",\n        \"parent\": {\n            \"key\": \"{{parent_ticket_id}}\"\n        },\n        \"project\": {\n            \"key\": \"{{project}}\"\n        },\n        \"issuetype\": {\n            \"id\": \"{{sub_task_type}}\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add watcher",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "\"{{jira_user}}\"",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}/watchers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}",
+						"watchers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "remove watcher",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}/watchers?username={{jira_user}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}",
+						"watchers"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{jira_user}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "link tickets",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"outwardIssue\": {\n        \"key\": \"{{parent_ticket_id}}\"\n    },\n    \"inwardIssue\": {\n        \"key\": \"{{ticket_id}}\"\n    },\n    \"type\": {\n        \"name\": \"Duplicate\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issueLink",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issueLink"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set status",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"transition\": {\n        \"id\": \"{{transition_id}}\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}/transitions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}",
+						"transitions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get ticket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list tickets",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/search?jql=project={{project}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"search"
+					],
+					"query": [
+						{
+							"key": "jql",
+							"value": "project={{project}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list projects",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/project",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"project"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "add comment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"body\": \"hello world\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}/comment",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}",
+						"comment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update ticket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"update\" : {\n       \"description\" : [{\"set\" : \"Description Postman\"}]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete ticket",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"if (!pm.collectionVariables.has(\"ticket_id\")){",
+							"    console.error(\"Run create ticket first\");",
+							"    throw new Error(\"Run create ticket first\");",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/issue/{{ticket_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"issue",
+						"{{ticket_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{username}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "api_version",
+			"value": "rest/api/2"
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "jira_user",
+			"value": ""
+		},
+		{
+			"key": "project",
+			"value": ""
+		},
+		{
+			"key": "sub_task_type",
+			"value": ""
+		},
+		{
+			"key": "parent_ticket_id",
+			"value": ""
+		},
+		{
+			"key": "transition_id",
+			"value": ""
+		},
+		{
+			"key": "ticket_id",
+			"value": ""
+		}
+	]
+}

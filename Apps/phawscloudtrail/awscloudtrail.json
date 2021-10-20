@@ -11,30 +11,28 @@
     "python_version": "3",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.1.0",
-    "utctime_updated": "2021-02-18T09:45:13.000000Z",
+    "app_version": "2.2.0",
+    "utctime_updated": "2021-09-20T18:20:28.000000Z",
     "package_name": "phantom_awscloudtrail",
     "main_module": "awscloudtrail_connector.py",
     "min_phantom_version": "4.9.39220",
     "app_wizard_version": "1.0.0",
     "latest_tested_versions": [
-        "Cloud tested on 10-02-2021"
+        "Cloud tested on July 29th, 2021"
     ],
     "configuration": {
         "Access Key": {
-            "description": "AWS Access Key",
+            "description": "Access Key",
             "data_type": "password",
-            "required": true,
             "order": 0
         },
         "Secret Key": {
-            "description": "AWS Secret Key",
+            "description": "Secret Key",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "Region": {
-            "description": "AWS Region",
+            "description": "Default Region",
             "data_type": "string",
             "required": true,
             "value_list": [
@@ -63,6 +61,15 @@
                 "South America (S\u00e3o Paulo)"
             ],
             "order": 2
+        },
+        "use_role": {
+            "description": "Use attached role when running Phantom in EC2",
+            "data_type": "boolean",
+            "visibility": [
+                "onprem"
+            ],
+            "default": false,
+            "order": 3
         }
     },
     "pip_dependencies": {
@@ -112,6 +119,15 @@
                     "data_type": "boolean",
                     "default": true,
                     "order": 0
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 1
                 }
             },
             "output": [
@@ -257,6 +273,16 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
+                    ]
                 }
             ],
             "render": {
@@ -306,6 +332,15 @@
                     "data_type": "numeric",
                     "default": 50,
                     "order": 4
+                },
+                "credentials": {
+                    "description": "Assumed role credentials",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "aws credentials"
+                    ],
+                    "order": 5
                 }
             },
             "output": [
@@ -1297,6 +1332,16 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.credentials",
+                    "data_type": "string",
+                    "example_values": [
+                        "{'AccessKeyId': 'ASIASJL6ZZZZZ3M7QC2J', 'Expiration': '2021-06-07 22:28:04', 'SecretAccessKey': 'ZZZZZAmvLPictcVBPvjJx0d7MRezOuxiLCMZZZZZ', 'SessionToken': 'ZZZZZXIvYXdzEN///////////wEaDFRU0s4AVrw0k0oYICK4ATAzOqzAkg9bHY29lYmP59UvVOHjLufOy4s7SnAzOxGqGIXnukLis4TWNhrJl5R5nYyimrm6K/9d0Cw2SW9gO0ZRjEJHWJ+yY5Qk2QpWctS2BGn4n+G8cD6zEweCCMj+ScI5p8n7YI4wOdvXvOsVMmjV6F09Ujqr1w+NwoKXlglznXGs/7Q1kNZOMiioEhGUyoiHbQb37GCKslDK+oqe0KNaUKQ96YCepaLgMbMquDgdAM8I0TTxUO0o5ILF/gUyLT04R7QlOfktkdh6Qt0atTS+xeKi1hirKRizpJ8jjnxGQIikPRToL2v3ZZZZZZ=='}"
+                    ],
+                    "contains": [
+                        "aws credentials"
                     ]
                 }
             ],

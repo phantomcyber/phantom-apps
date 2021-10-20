@@ -1,0 +1,212 @@
+{
+    "appid": "35b2d7ea-098e-4a0a-9b71-e93824865226",
+    "name": "Group IB Threat Intelligence and Attribution",
+    "description": "This app ingests incidents and IOCs from Group-IB Threat Intelligence and Attribution",
+    "type": "information",
+    "product_vendor": "Group-IB",
+    "logo": "groupibthreatintelligenceandattribution.svg",
+    "logo_dark": "groupibthreatintelligenceandattribution_dark.svg",
+    "product_name": "Threat Intelligence and Attribution",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Group-IB",
+    "contributors": [
+        {
+            "name": "Evgeniy Meteliza"
+        }
+    ],
+    "license": "Copyright (c) Group-IB, 2021",
+    "app_version": "1.0.1",
+    "pip_dependencies": {
+        "pypi": [
+            {
+                "module": "dateparser"
+            }
+        ],
+        "wheel": [
+            {
+                "module": "pytia",
+                "input_file": "wheels/pytia-0.5.1-py3-none-any.whl"
+            }
+        ]
+    },
+    "utctime_updated": "2021-08-27T10:30:26.000000Z",
+    "package_name": "phantom_groupibthreatintelligenceandattribution",
+    "main_module": "groupibthreatintelligenceandattribution_connector.py",
+    "min_phantom_version": "4.9.39220",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "username": {
+            "description": "Username",
+            "data_type": "string",
+            "required": true,
+            "order": 0
+        },
+        "api_key": {
+            "description": "API key",
+            "data_type": "password",
+            "required": true,
+            "order": 1
+        },
+        "base_url": {
+            "description": "Group-IB API URL",
+            "data_type": "string",
+            "required": true,
+            "default": "https://tap.group-ib.com/api/v2/",
+            "order": 2
+        },
+        "insecure": {
+            "description": "Verify server certificate",
+            "data_type": "boolean",
+            "default": false,
+            "order": 3
+        },
+        "compromised_account": {
+            "description": "Ingest incidents from compromised/account collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 4
+        },
+        "compromised_account_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 5
+        },
+        "compromised_breached": {
+            "description": "Ingest incidents from compromised/breached collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 6
+        },
+        "compromised_breached_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 7
+        },
+        "compromised_card": {
+            "description": "Ingest incidents from compromised/card collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 8
+        },
+        "compromised_card_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 9
+        },
+        "bp_phishing": {
+            "description": "Ingest incidents from bp/phishing collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 10
+        },
+        "bp_phishing_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 11
+        },
+        "bp_phishing_kit": {
+            "description": "Ingest incidents from bp/phishing_kit collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 12
+        },
+        "bp_phishing_kit_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 13
+        },
+        "osi_git_leak": {
+            "description": "Ingest incidents from osi/git_leak collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 14
+        },
+        "osi_git_leak_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 15
+        },
+        "osi_public_leak": {
+            "description": "Ingest incidents from osi/public_leak collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 16
+        },
+        "osi_public_leak_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 17
+        },
+        "malware_targeted_malware": {
+            "description": "Ingest incidents from malware/targeted_malware collection",
+            "data_type": "boolean",
+            "default": false,
+            "order": 18
+        },
+        "malware_targeted_malware_start": {
+            "description": "Date to start",
+            "data_type": "string",
+            "default": "3 days",
+            "order": 19
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "This action make a simple API request to Group-IB with provided credentials to validate them.",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "on poll",
+            "description": "Callback action for the on_poll ingest functionality",
+            "type": "ingest",
+            "identifier": "on_poll",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "data_type": "string",
+                    "order": 0,
+                    "description": "The parameter isn't used in this app"
+                },
+                "start_time": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "Start of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is past 10 days"
+                },
+                "end_time": {
+                    "data_type": "numeric",
+                    "order": 2,
+                    "description": "End of time range, in epoch time (milliseconds)",
+                    "verbose": "If not specified, the default is now"
+                },
+                "container_count": {
+                    "data_type": "numeric",
+                    "order": 3,
+                    "description": "Maximum number of container records to query for"
+                },
+                "artifact_count": {
+                    "data_type": "numeric",
+                    "order": 4,
+                    "description": "Maximum number of artifact records to query for"
+                }
+            },
+            "output": [],
+            "versions": "EQ(*)"
+        }
+    ]
+}

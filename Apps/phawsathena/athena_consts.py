@@ -5,3 +5,5 @@
 
 ATHENA_JSON_ACCESS_KEY = 'access_key'
 ATHENA_JSON_SECRET_KEY = 'secret_key'
+
+ATHENA_BAD_ASSET_CONFIG_MSG = "Please provide access keys or select assume role check box in asset configuration"

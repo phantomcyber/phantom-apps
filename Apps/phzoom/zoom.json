@@ -15,7 +15,7 @@
     "utctime_updated": "2020-04-03T06:33:59.068584Z",
     "package_name": "phantom_zoom",
     "main_module": "zoom_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "base_url": {
@@ -47,11 +47,11 @@
         "wheel": [
             {
                 "module": "PyJWT",
-                "input_file": "wheel/PyJWT-1.7.1-py2.py3-none-any.whl"
+                "input_file": "wheels/PyJWT-1.7.1-py2.py3-none-any.whl"
             },
             {
                 "module": "random-password-generator",
-                "input_file": "wheel/random_password_generator-2.1.0-py3-none-any.whl"
+                "input_file": "wheels/random_password_generator-2.1.0-py3-none-any.whl"
             }
         ]
     },
