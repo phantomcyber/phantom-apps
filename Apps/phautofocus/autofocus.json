@@ -2,19 +2,20 @@
     "appid": "d601fef6-f803-4fc9-8fe9-ae8910b03dd7",
     "name": "AutoFocus",
     "description": "This App supports hunting actions and report retrieval on Palo Alto Networks AutoFocus",
-    "publisher": "Phantom",
+    "publisher": "Splunk Community",
     "type": "threat intel",
     "main_module": "autofocus_connector.pyc",
-    "app_version": "1.0.25",
+    "app_version": "1.1.0",
     "utctime_updated": "2018-12-20T02:58:32.000000Z",
     "package_name": "phantom_autofocus",
     "product_vendor": "Palo Alto Networks",
     "product_name": "AutoFocus",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.284",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "2.7",
     "logo": "logo_paloaltonetworks.svg",
     "logo_dark": "logo_paloaltonetworks_dark.svg",
-    "license": "Copyright (c) 2021 Splunk Inc",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "configuration": {
         "api_key": {
             "data_type": "password",
@@ -62,8 +63,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -74,15 +74,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.hash",
                     "data_type": "string",
                     "contains": [
                         "md5",
-                        "hash",
+                        "sha256",
                         "sha1"
                     ]
                 },
@@ -118,12 +114,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_tags_matched",
-                    "data_type": "numeric"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -162,8 +166,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -173,10 +176,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.parameter.ip",
                     "data_type": "string",
@@ -216,12 +215,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_tags_matched",
-                    "data_type": "numeric"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -260,8 +267,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -271,10 +277,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.parameter.domain",
                     "data_type": "string",
@@ -314,12 +316,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_tags_matched",
-                    "data_type": "numeric"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -358,8 +368,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -369,10 +378,6 @@
                 "height": 5
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.parameter.scope",
                     "data_type": "string"
@@ -412,12 +417,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_tags_matched",
-                    "data_type": "numeric"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_tags_matched",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -456,10 +469,6 @@
                 "title": "Get Report"
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.parameter.tag",
                     "data_type": "string",
@@ -624,11 +633,19 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
                     "data_type": "string"
                 },
                 {
