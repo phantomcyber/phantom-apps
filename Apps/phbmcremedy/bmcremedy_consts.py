@@ -54,12 +54,14 @@ BMCREMEDY_DEFAULT_OFFSET = 0
 BMCREMEDY_ENCODE_TEMPLATE_FILE = """--{boundary}
 Content-Disposition: form-data; name="{name}"; filename="{filename}"
 Content-Type: {contenttype}
+Content-Transfer-Encoding: binary
 
 {value}
 """.replace('\n', '\r\n')
 BMCREMEDY_ENCODE_TEMPLATE = """--{boundary}
+Content-Transfer-Encoding: 8bit
+Content-Type: application/json; charset=UTF-8
 Content-Disposition: form-data; name="{name}"
-Content-Type: application/json
 
 {value}
 """.replace('\n', '\r\n')
@@ -72,7 +74,7 @@ BMCREMEDY_JSON_STATUS = "status"
 BMCREMEDY_BLANK_PARAM_ERROR_SUBSTRING = "records have been found for the Incident contact information you have provided"
 BMCREMEDY_CUSTOM_ERROR_MSG = "\nThis can happen if required parameters are not specified in the action.\n"
 BMCREMEDY_ADD_COMMENT_MESSAGE = "Comment added successfully"
-BMCREMEDY_SET_STATUS_MESSAGE = "Set status successful"
+BMCREMEDY_SET_STATUS_MESSAGE = "Set status successfull"
 BMCREMEDY_UPDATE_SUCCESSFUL_MSG = "Incident updated successfully"
 BMCREMEDY_GET_COMMENT_ERROR = "Error while getting comments for incident ID: {id}"
 BMCREMEDY_ERR_INVALID_FIELDS = "Please provide a valid value in the '{field}' parameter"
@@ -86,3 +88,5 @@ PARSE_ERR_MSG = "Unable to parse the error message. Please check the asset confi
 BMCREMEDY_VALID_INT_MSG = "Please provide a valid integer value in the '{param}' parameter"
 BMCREMEDY_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive integer value in '{param}' parameter"
 BMCREMEDY_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the '{param}' parameter"
+
+BMCREMEDY_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again"

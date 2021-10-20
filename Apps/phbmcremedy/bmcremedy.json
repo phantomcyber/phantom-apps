@@ -14,7 +14,8 @@
   "product_version_regex": ".*",
   "python_version": "3",
   "min_phantom_version": "4.9.39220",
-  "logo": "bmcremedy.png",
+  "logo": "logo_bmcremedy.svg",
+  "logo_dark": "logo_bmcremedy_dark.svg",
   "configuration": {
     "url": {
       "required": true,
@@ -127,6 +128,9 @@
         "vault_id": {
           "description": "Comma (,) separated vault ID (maximum 3)",
           "data_type": "string",
+          "contains": [
+            "vault id"
+          ],
           "order": 11
         }
       },
@@ -138,6 +142,93 @@
         "view": "bmcremedy_view.create_ticket"
       },
       "output": [
+        {
+          "data_path": "action_result.parameter.first_name",
+          "data_type": "string",
+          "contains": [
+            "bmcremedy first name"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.last_name",
+          "data_type": "string",
+          "contains": [
+            "bmcremedy last name"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.description",
+          "data_type": "string",
+          "example_values": [
+            "Description"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.impact",
+          "data_type": "string",
+          "example_values": [
+            "4-Minor/Localized"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.urgency",
+          "data_type": "string",
+          "example_values": [
+            "1-Critical"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.status",
+          "data_type": "string",
+          "example_values": [
+            "New"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.reported_source",
+          "data_type": "string",
+          "example_values": [
+            "Direct Input"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.work_info_type",
+          "data_type": "string",
+          "example_values": [
+            "General Information"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.status_reason",
+          "data_type": "string",
+          "example_values": [
+            "Status Reason"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.service_type",
+          "data_type": "string",
+          "example_values": [
+            "User Service Restoration"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.fields",
+          "data_type": "string",
+          "example_values": [
+            "{\"First_Name\": \"Customer First Name\", \"Last_Name\": \"Customer Last Name\", \"Description\": \"Incident Description\", \"Service_Type\": \"User Service Restoration\", \"Reported Source\": \"Direct Input\", \"Status\": \"Assigned\", \"Assignee Login ID\": \"Mary\", \"Assignee\": \"Mary Mann\"}<br>To add comment set <b>fields</b> parameter to {\"Work Log Type\": \"General Information\", \"Detailed Description\": \"Comment to add\"}"
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.vault_id",
+          "data_type": "string",
+          "contains": [
+            "vault id"
+          ],
+          "example_values": [
+            "d766846c37a473ce02fc71e4fa9d471c3a715727"
+          ]
+        },
         {
           "data_path": "action_result.data.*.values.Direct Contact Extension",
           "data_type": "string"
@@ -223,6 +314,14 @@
           "data_type": "string"
         },
         {
+          "data_path": "action_result.data.*.values.ApplyTemplate",
+          "data_type": "string"
+        },
+        {
+          "data_path": "action_result.data.*.values.Broker Vendor Name",
+          "data_type": "string"
+        },
+        {
           "data_path": "action_result.data.*.values.policy_name",
           "data_type": "string"
         },
@@ -284,7 +383,7 @@
         },
         {
           "data_path": "action_result.data.*.values.MaxRetries",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.values.z1D_SupportGroupID",
@@ -307,6 +406,9 @@
           "data_type": "string",
           "contains": [
             "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
           ]
         },
         {
@@ -504,7 +606,10 @@
         },
         {
           "data_path": "action_result.data.*.values.PortNumber",
-          "data_type": "numeric"
+          "data_type": "string",
+          "example_values": [
+            "30"
+          ]
         },
         {
           "data_path": "action_result.data.*.values.Product Name",
@@ -1105,67 +1210,17 @@
         },
         {
           "data_path": "action_result.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.first_name",
           "data_type": "string",
-          "contains": [
-            "bmcremedy first name"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.last_name",
-          "data_type": "string",
-          "contains": [
-            "bmcremedy last name"
-          ]
-        },
-        {
-          "data_path": "action_result.parameter.description",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.impact",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.urgency",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.status",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.reported_source",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.work_info_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.status_reason",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.service_type",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.fields",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.vault_id",
-          "data_type": "string",
-          "contains": [
-            "vault id"
+          "example_values": [
+            "Incident id: INC000000000137"
           ]
         },
         {
@@ -1173,15 +1228,24 @@
           "data_type": "string",
           "contains": [
             "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
           ]
         },
         {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -1217,6 +1281,9 @@
         "vault_id": {
           "description": "Comma (',') separated vault ID (maximum 3)",
           "data_type": "string",
+          "contains": [
+            "vault id"
+          ],
           "order": 3
         }
       },
@@ -1228,48 +1295,81 @@
       },
       "output": [
         {
-          "column_name": "Status",
-          "column_order": 1,
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "column_name": "Message",
-          "column_order": 2,
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
           "column_name": "Incident ID",
           "column_order": 0,
           "data_path": "action_result.parameter.id",
           "data_type": "string",
           "contains": [
             "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
           ]
         },
         {
           "data_path": "action_result.parameter.work_info_type",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "General Information"
+          ]
         },
         {
           "data_path": "action_result.parameter.fields",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "{\"First_Name\": \"Customer First Name\", \"Last_Name\": \"Customer Last Name\", \"Description\": \"Incident Description\", \"Service_Type\": \"User Service Restoration\", \"Reported Source\": \"Direct Input\", \"Status\": \"Assigned\", \"Assignee Login ID\": \"Mary\", \"Assignee\": \"Mary Mann\"}<br>To add comment set <b>fields</b> parameter to {\"Work Log Type\": \"General Information\", \"Detailed Description\": \"Comment to add\"}"
+          ]
         },
         {
           "data_path": "action_result.parameter.vault_id",
           "data_type": "string",
           "contains": [
             "vault id"
+          ],
+          "example_values":[
+            "d766846c37a473ce02fc71e4fa9d471c3a715727"
           ]
         },
         {
+          "data_path": "action_result.data",
+          "data_type": "string"
+        },
+        {
+          "column_name": "Status",
+          "column_order": 1,
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
+        },
+        {
+          "column_name": "Message",
+          "column_order": 2,
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Incident updated successfully"
+          ]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -1300,6 +1400,16 @@
         "view": "bmcremedy_view.display_ticket_details"
       },
       "output": [
+        {
+          "data_path": "action_result.parameter.id",
+          "data_type": "string",
+          "contains": [
+            "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
+          ]
+        },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Detailed Description",
           "data_type": "string"
@@ -1338,11 +1448,24 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Submit Date",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "2020-04-14T17:52:50.000+0000"
+          ]
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Submit Date",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "2020-04-14T17:52:50.000+0000"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.entries.*.values.Owner Group",
+          "data_type": "string",
+          "example_values": [
+            "Service Desk"
+          ]
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D_PrefixHolder",
@@ -1350,7 +1473,7 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Lastcount02",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Permission Group ID",
@@ -1362,7 +1485,10 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Submitter",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Admin"
+          ]
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Assigned Support Company",
@@ -1438,7 +1564,10 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Total Time Spent",
-          "data_type": "string"
+          "data_type": "numeric",
+          "example_values": [
+            100000
+          ]
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Last Date Duration Calc",
@@ -1538,7 +1667,7 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Number of URLs",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.View Access",
@@ -1574,7 +1703,7 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer03",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Work Log Type",
@@ -1626,11 +1755,11 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer04",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer02",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Incident Number",
@@ -1641,7 +1770,7 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D Integer01",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.HPD Attachment ID",
@@ -1665,7 +1794,7 @@
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.Number of Attachments",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.work_details.entries.*.values.z1D_WorkInfo_NotesLabel",
@@ -1821,7 +1950,10 @@
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Organization",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Information Technology"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Department",
@@ -1861,11 +1993,14 @@
         },
         {
           "data_path": "action_result.data.*.entries.*.values.PortNumber",
-          "data_type": "numeric"
+          "data_type": "string",
+          "example_values": [
+            "30"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.MaxRetries",
-          "data_type": "numeric"
+          "data_type": "string"
         },
         {
           "data_path": "action_result.data.*.entries.*.values.z1D Permission Group List",
@@ -2031,7 +2166,10 @@
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Vendor Organization",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Information Technology"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Direct Contact Last Name",
@@ -2595,6 +2733,108 @@
           "data_type": "string"
         },
         {
+          "data_path": "action_result.data.*.entries.*.values.Corporate ID",
+          "data_type": "string",
+          "example_value": ""
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Owner Group ID",
+            "data_type": "string",
+            "example_values": [
+              "SGP000000000011"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Status-History.New.user",
+            "data_type": "string",
+            "example_values": [
+              "Demo"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Status-History.New.timestamp",
+            "data_type": "string",
+            "example_values": [
+              "2021-10-19T06:33:28.000+0000"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Status-History.Assigned.user",
+            "data_type": "string",
+            "example_values": [
+              "Demo"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Status-History.Assigned.timestamp",
+            "data_type": "string",
+            "example_values": [
+              "2021-10-19T06:33:28.000+0000"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Broker Vendor Name",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Owner Support Company",
+            "data_type": "string",
+            "example_values": [
+              "Calbro Services"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Previous_HPD_CI_ReconID",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Owner Support Organization",
+            "data_type": "string",
+            "example_values": [
+              "IT Support"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.entries.*.values.Previous_ServiceCI_ReconID",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.Thumbnail 1",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.Thumbnail 2",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.Thumbnail 3",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log01",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log02",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.z2AF Work Log03",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.Broker Vendor Name",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.Shared With Vendor",
+            "data_type": "string"
+        },
+        {
+            "data_path": "action_result.data.*.work_details.entries.*.values.z1D_SkipIfSmartITInstalled",
+            "data_type": "string"
+        },
+        {
           "data_path": "action_result.data.*.entries.*._links.self.*.href",
           "data_type": "string"
         },
@@ -2604,30 +2844,40 @@
         },
         {
           "data_path": "action_result.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.id",
           "data_type": "string",
-          "contains": [
-            "bmcremedy incident id"
+          "example_values": [
+            "Ticket availability: True"
           ]
         },
         {
           "data_path": "action_result.summary.ticket_availability",
-          "data_type": "boolean"
+          "data_type": "boolean",
+          "example_values": [
+            false,
+            true
+          ]
         },
         {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -2635,7 +2885,7 @@
     {
       "action": "list tickets",
       "description": "Get list of incidents",
-      "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+in+the+advanced+search+bar\">Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\">Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+and+wildcard+symbols+in+a+search#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\">Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+the+advanced+search+bar\">Query Syntax link</a>.</p>.",
+      "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+in+the+advanced+search+bar\" target='_blank'>Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+and+wildcard+symbols+in+a+search#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\" target='_blank'>Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+the+advanced+search+bar\" target='_blank'>Query Syntax link</a>.</p>.",
       "type": "investigate",
       "identifier": "list_tickets",
       "read_only": true,
@@ -2666,15 +2916,42 @@
       },
       "output": [
         {
+          "data_path": "action_result.parameter.limit",
+          "data_type": "numeric",
+          "example_values": [
+            2
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.query",
+          "data_type": "string",
+          "example_values": [
+            "'Incident Number'=\"INC000000000001\""
+          ]
+        },
+        {
+          "data_path": "action_result.parameter.offset",
+          "data_type": "numeric",
+          "example_values": [
+            100
+          ]
+        },
+        {
           "data_path": "action_result.data.*.entries.*.values.Incident Number",
           "data_type": "string",
           "contains": [
             "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
           ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Priority",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Low"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Last Name",
@@ -2685,17 +2962,26 @@
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Assigned"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Assignee",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Alex Jan"
+          ]
         },
         {
           "data_path": "action_result.data.*.entries.*.values.First Name",
           "data_type": "string",
           "contains": [
             "bmcremedy first name"
+          ],
+          "example_values": [
+            "Alex"
           ]
         },
         {
@@ -2704,11 +2990,73 @@
         },
         {
           "data_path": "action_result.data.*.entries.*.values.Assigned Group",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Service Desk"
+          ]
+        },
+        {
+          "data_path": "action_result.data.*.values.Status",
+          "data_type": "string",
+          "example_values": [
+            "Assigned"
+          ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Assignee",
+            "data_type": "string",
+            "example_values": [
+              "Francie Stafford"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Priority",
+            "data_type": "string",
+            "example_values": [
+              "Low"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Last Name",
+            "data_type": "string",
+            "example_values": [
+              "Allbrook"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.First Name",
+            "data_type": "string",
+            "example_values": [
+              "Allen"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Description",
+            "data_type": "string",
+            "example_values": [
+              "q3123"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Assigned Group",
+            "data_type": "string",
+            "example_values": [
+              "Service Desk"
+            ]
+        },
+        {
+            "data_path": "action_result.data.*.values.Incident Number",
+            "data_type": "string",
+            "example_values": [
+              "INC000000000216"
+            ]
         },
         {
           "data_path": "action_result.data.*.entries.*._links.self.*.href",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "http://100.26.171.156:8008/api/arsys/v1/entry/HPD:IncidentInterface/INC0000000104%7CINC0000000104"
+          ]
         },
         {
           "data_path": "action_result.data.*._links.self.*.href",
@@ -2720,31 +3068,39 @@
         },
         {
           "data_path": "action_result.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
         },
         {
           "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
-          "data_path": "action_result.parameter.limit",
-          "data_type": "numeric"
-        },
-        {
-          "data_path": "action_result.parameter.query",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Total tickets: 5"
+          ]
         },
         {
           "data_path": "action_result.summary.total_tickets",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -2817,18 +3173,6 @@
       },
       "output": [
         {
-          "column_name": "Status",
-          "column_order": 1,
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "column_name": "Message",
-          "column_order": 2,
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
           "column_name": "Incident ID",
           "column_order": 0,
           "data_path": "action_result.parameter.id",
@@ -2839,43 +3183,100 @@
         },
         {
           "data_path": "action_result.parameter.status",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Assigned"
+          ]
         },
         {
           "data_path": "action_result.parameter.assignee_login_id",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Alex"
+          ]
         },
         {
           "data_path": "action_result.parameter.assignee",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Alex Jan"
+          ]
         },
         {
           "data_path": "action_result.parameter.assigned_support_company",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Support Inc"
+          ]
         },
         {
           "data_path": "action_result.parameter.assigned_support_organization",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Information Technology"
+          ]
         },
         {
           "data_path": "action_result.parameter.assigned_group",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Service Desk"
+          ]
         },
         {
           "data_path": "action_result.parameter.status_reason",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Status Reason"
+          ]
         },
         {
           "data_path": "action_result.parameter.resolution",
+          "data_type": "string",
+          "example_values": [
+            "Resolution Comment"
+          ]
+        },
+        {
+          "data_path": "action_result.data",
+          "data_type": "string"
+        },
+        {
+          "column_name": "Status",
+          "column_order": 1,
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
+        },
+        {
+          "column_name": "Message",
+          "column_order": 2,
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Set status successfully"
+          ]
+        },
+        {
+          "data_path": "action_result.summary",
           "data_type": "string"
         },
         {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
@@ -2928,49 +3329,83 @@
       },
       "output": [
         {
-          "column_name": "Status",
-          "column_order": 1,
-          "data_path": "action_result.status",
-          "data_type": "string"
-        },
-        {
-          "column_name": "Message",
-          "column_order": 2,
-          "data_path": "action_result.message",
-          "data_type": "string"
-        },
-        {
           "column_name": "Incident ID",
           "column_order": 0,
           "data_path": "action_result.parameter.id",
           "data_type": "string",
           "contains": [
             "bmcremedy incident id"
+          ],
+          "example_values": [
+            "INC000000000137"
           ]
         },
         {
           "data_path": "action_result.parameter.work_info_type",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "General Information"
+          ]
         },
         {
           "data_path": "action_result.parameter.comment",
-          "data_type": "string"
+          "data_type": "string",
+          "example_values": [
+            "Comment"
+          ]
         },
         {
           "data_path": "action_result.parameter.secure_work_log",
-          "data_type": "boolean"
+          "data_type": "boolean",
+          "example_values": [
+            false,
+            true
+          ]
         },
         {
           "data_path": "action_result.parameter.view_access",
           "data_type": "string"
         },
         {
+          "data_path": "action_result.data",
+          "data_type": "string"
+        },
+        {
+          "column_name": "Status",
+          "column_order": 1,
+          "data_path": "action_result.status",
+          "data_type": "string",
+          "example_values": [
+            "success",
+            "failed"
+          ]
+        },
+        {
+          "column_name": "Message",
+          "column_order": 2,
+          "data_path": "action_result.message",
+          "data_type": "string",
+          "example_values": [
+            "Incident updated successfully"
+          ]
+        },
+        {
+          "data_path": "action_result.summary",
+          "data_type": "string"
+        },
+        {
           "data_path": "summary.total_objects",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         },
         {
           "data_path": "summary.total_objects_successful",
-          "data_type": "numeric"
+          "data_type": "numeric",
+          "example_values": [
+            1
+          ]
         }
       ],
       "versions": "EQ(*)"
