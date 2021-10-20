@@ -5,13 +5,13 @@
     "publisher": "Splunk",
     "type": "endpoint",
     "main_module": "carbonblack_connector.py",
-    "app_version": "2.2.0",
-    "utctime_updated": "2021-10-04T13:45:29.000000Z",
+    "app_version": "2.3.0",
+    "utctime_updated": "2021-10-20T08:16:36.000000Z",
     "package_name": "phantom_carbonblack",
     "product_vendor": "Bit9",
     "product_name": "Carbon Black",
     "product_version_regex": "[5-7]\\.[0-9]\\.*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "On-prem, Version 6.1.0",
@@ -45,7 +45,7 @@
             "action": "test connectivity",
             "description": "Validate the asset configuration by attempting to connect. This action runs a quick query on the device to check the connection and credentials",
             "type": "test",
-            "identifier": "test_asset_connectivity",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -81,6 +81,8 @@
                     "contains": [
                         "carbon black query type"
                     ],
+                    "required": true,
+                    "default": "binary",
                     "primary": true
                 },
                 "range": {
@@ -1739,6 +1741,168 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "update alerts",
+            "description": "Update or resolve an alert",
+            "verbose": "Allows for update of one or more alerts by alert id(s) or by query.",
+            "type": "generic",
+            "identifier": "update_alerts",
+            "read_only": false,
+            "parameters": {
+                "query": {
+                    "description": "Query to run (Carbon Black Response search language). Parameter accepts the same data as the alert search box on the Triage Alerts page",
+                    "data_type": "string",
+                    "order": 0,
+                    "primary": true,
+                    "contains": [
+                        "carbon black query"
+                    ]
+                },
+                "alert_ids": {
+                    "description": "Unique ID of alert or comma-separated list of unique alert IDs to update",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "carbon black alert id"
+                    ]
+                },
+                "requested_status": {
+                    "description": "New status of the alert(s)",
+                    "data_type": "string",
+                    "value_list": [
+                        "Resolved",
+                        "Unresolved",
+                        "In Progress",
+                        "False Positive"
+                    ],
+                    "order": 2,
+                    "required": true
+                },
+                "set_ignored": {
+                    "description": "If set to true, modifies threat report so that any further hits on IOCs contained within that report will no longer trigger an alert",
+                    "data_type": "boolean",
+                    "order": 3,
+                    "default": false
+                },
+                "assigned_to": {
+                    "description": "Assign owner of alert",
+                    "data_type": "string",
+                    "order": 4
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Update Alert(s)"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Result: success, Total records updated: 4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.Total records updated",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4,
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "column_name": "Query",
+                    "column_order": 0,
+                    "contains": [
+                        "carbon black query"
+                    ],
+                    "example_values": [
+                        "\"c:\\windows\\syswow64\\windowspowershell\\v1.0\\powershell.exe\""
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.set_ignored",
+                    "data_type": "numeric",
+                    "column_name": "Set Ignored",
+                    "column_order": 3,
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.requested_status",
+                    "data_type": "string",
+                    "column_name": "Requested Status",
+                    "column_order": 4,
+                    "example_values": [
+                        "Resolved"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.alert_ids",
+                    "data_type": "string",
+                    "column_name": "Alert Id(s)",
+                    "column_order": 1,
+                    "contains": [
+                        "carbon black alert id"
+                    ],
+                    "example_values": [
+                        "a031cb9f-ad48-4391-9d09-eeb5def57484"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.assigned_to",
+                    "data_type": "string",
+                    "column_name": "Assigned To",
+                    "column_order": 2,
+                    "example_values": [
+                        "admin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "run query",
             "description": "Run a search query on the device",
             "verbose": "This action requires only a Carbon Black Response <b>api_token</b>. The Carbon Black Response user assigned to that token does not require any privileges (i.e. No Access).",
@@ -1762,6 +1926,7 @@
                     "order": 1,
                     "required": true,
                     "value_list": [
+                        "alert",
                         "binary",
                         "process"
                     ],
