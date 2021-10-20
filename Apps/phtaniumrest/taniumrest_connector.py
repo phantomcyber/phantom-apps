@@ -199,11 +199,6 @@ class TaniumRestConnector(BaseConnector):
         if not r.text:
             return self._process_empty_response(r, action_result)
 
-        # if 'Unauthorized' in r.text:
-        #     return RetVal(action_result.set_status(phantom.APP_ERROR,
-        #         "This error usually means the account you are using to interface to Tanium does not have sufficient permissions to perform this action. \
-        #         / See Tanium's documentation for more information on how to change your permissions."), None)
-
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
