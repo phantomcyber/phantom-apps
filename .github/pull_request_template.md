@@ -7,7 +7,7 @@ Please ensure your pull request (PR) adheres to the following guidelines:
 
 #### Please check if your PR fulfills the following requirements:
 - [ ] Testing of all the changes has been performed (for bug fixes / features)
-- [ ] The readme.html has been reviewed and added / updated if needed (for bug fixes / features)
+- [ ] The **readme.html** and **readme.md** have been reviewed and added / updated if needed (for bug fixes / features)
 - [ ] Use the following format for the PR description: `<App Name>: <PR Type> - <PR Description>`
 - [ ] Provide release notes as part of the PR submission which describe high level points about the changes for the upcoming GA release.
 - [ ] Verify all checks are passing.
