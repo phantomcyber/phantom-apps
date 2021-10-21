@@ -58,6 +58,7 @@ class GSuiteConnector(BaseConnector):
         self._python_version = None
         self._login_email = None
         self._dup_emails = 0
+        self._last_email_epoch = None
 
         # Call the BaseConnectors init first
         super(GSuiteConnector, self).__init__()
@@ -89,6 +90,8 @@ class GSuiteConnector(BaseConnector):
     def initialize(self):
         self._state = self.load_state()
         self._dup_emails = 0
+        if self._state:
+            self._last_email_epoch = self._state.get('last_email_epoch')
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
@@ -669,9 +672,8 @@ class GSuiteConnector(BaseConnector):
         using_latest = ingest_manner == GSMAIL_LATEST_INGEST_MANNER
 
         if use_ingest_limit:
-            if 'last_email_epoch' in self._state and using_oldest:
-                temp_state = self.load_state()
-                query.append('after:{}'.format(temp_state['last_email_epoch']))
+            if self._last_email_epoch and using_oldest:
+                query.append('after:{}'.format(self._last_email_epoch))
             elif 'last_ingested_epoch' in self._state and using_latest:
                 query.append('after:{}'.format(self._state['last_ingested_epoch']))
 
@@ -751,8 +753,6 @@ class GSuiteConnector(BaseConnector):
         total_ingested = 0
         ingest_manner = config.get('ingest_manner', GSMAIL_OLDEST_INGEST_MANNER)
         while True:
-            cycle = 1
-            tmp = 0
             self._dup_emails = 0
             if not email_id:
                 ret_val, email_ids = self._get_email_ids(action_result, config, service, max_emails, ingest_manner)
@@ -764,9 +764,6 @@ class GSuiteConnector(BaseConnector):
                     self._update_state()
 
             self._process_email_ids(action_result, config, service, email_ids)
-            #todo add a val check before proceeding further.
-            self.debug_print(f'sahil_ total ingested before {total_ingested}')
-            self.debug_print(f'sahil_ subtracted before {max_emails - self._dup_emails}')
             total_ingested += max_emails - self._dup_emails
 
             if ingest_manner == GSMAIL_LATEST_INGEST_MANNER or total_ingested >= run_limit or self.is_poll_now():
@@ -787,7 +784,6 @@ class GSuiteConnector(BaseConnector):
             timestamp = int(message['internalDate']) // 1000
             if not self.is_poll_now() and i == 0:
                 self._state['last_email_epoch'] = timestamp + 1
-                print('not updating now')
             # the api libraries return the base64 encoded message as a unicode string,
             # but base64 can be represented in ascii with no possible issues
             raw_decode = base64.urlsafe_b64decode(message['raw'].encode("utf-8")).decode("utf-8")
