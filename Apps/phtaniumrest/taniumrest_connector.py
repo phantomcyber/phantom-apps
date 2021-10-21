@@ -166,6 +166,9 @@ class TaniumRestConnector(BaseConnector):
             else:
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(
                         r.status_code, self._handle_py_ver_compat_for_input_str(r.text.replace('{', '{{').replace('}', '}}')))
+            if r.status_code == 404:
+                message += "\nThis error usually means the account you are using to interface to Tanium \
+                    does not have sufficient permissions to perform this action. See Tanium's documentation for more information on how to change your permissions."
         except Exception:
             message = "Error from server. Status Code: {0}. Please provide valid input".format(r.status_code)
 
@@ -684,7 +687,14 @@ class TaniumRestConnector(BaseConnector):
             else:
                 continue
 
+            # reformat response data to simplify data path
             if data.get("result_sets", [])[0].get("columns"):
+                rows = data.get("result_sets")[0].get("rows")
+                for i in range(len(rows)):
+                    formatted = []
+                    for item in rows[i].get("data"):
+                        formatted.append(item[0])
+                    response["data"]["result_sets"][0]["rows"][i]["data"] = formatted
                 return response
 
         else:
