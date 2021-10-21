@@ -1,0 +1,795 @@
+{
+	"info": {
+		"_postman_id": "d836a525-245e-4a4a-9205-59d0e68799aa",
+		"name": "Tanium Rest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);",
+							"pm.collectionVariables.set(\"session\", jsonData.data.session);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v2/session/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"session",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List saved Questions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/saved_questions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"saved_questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Questions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/questions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"questions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Process",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var group_name = pm.variables.get(\"group_name\")",
+							"var sensor_name = pm.variables.get(\"sensor_name\")",
+							"var base_url = pm.variables.get(\"base_url\")",
+							"var session = pm.variables.get(\"session\")",
+							"var expire_seconds = pm.variables.get(\"expire_seconds\")",
+							"var id_url = \"/api/v2/questions\"",
+							"if(group_name){",
+							"    ",
+							"        var groupurl = \"/api/v2/groups/by-name/\"",
+							"        const req = {",
+							"            url: base_url + groupurl + group_name,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"        pm.sendRequest(req, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"group_id\", response.data.id)",
+							"        });",
+							"    ",
+							"        setTimeout(function () { ",
+							"        const req2 = {",
+							"            url: base_url + id_url,",
+							"            method: \"post\",",
+							"            body: JSON.stringify(",
+							"                {",
+							"                    \"expire_seconds\": expire_seconds,",
+							"                    \"context_group\": {\"id\": pm.variables.get(\"group_id\")},",
+							"                    \"selects\": [",
+							"                        {",
+							"                            \"sensor\": {",
+							"                                \"name\": sensor_name",
+							"                            }",
+							"                        }",
+							"                    ]",
+							"                }",
+							"            ),",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"        ",
+							"        }",
+							"        pm.sendRequest(req2, function (err, response) {",
+							"            var response2 = response.json()",
+							"            pm.collectionVariables.set(\"id\", response2.data.id)",
+							"        });",
+							"        }, 2000);",
+							"}",
+							"else",
+							"{",
+							"    const req3 = {",
+							"        url: base_url + id_url,",
+							"        method: \"post\",",
+							"        body: JSON.stringify(",
+							"            {",
+							"                \"expire_seconds\": expire_seconds,",
+							"                \"selects\": [",
+							"                    {",
+							"                        \"sensor\": {",
+							"                            \"name\": sensor_name",
+							"                        }",
+							"                    }",
+							"                ]",
+							"            }",
+							"        ),",
+							"        header: {",
+							"            'Content-Type': 'application/json',",
+							"            'session': session,",
+							"        }",
+							"        ",
+							"    }",
+							"    pm.sendRequest(req3, function (err, response) {",
+							"        var response3 = response.json()",
+							"        pm.collectionVariables.set(\"id\", response3.data.id)",
+							"    });",
+							"}",
+							"setTimeout(function () { ",
+							"}, 5000);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/result_data/question/{{id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"result_data",
+						"question",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "parse quesion",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"{{parse_query_text}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v2/parse_question",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"parse_question"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get question results",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/result_data/question/{{qustion_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"result_data",
+						"question",
+						"{{qustion_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "execute action/terminate process",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var group_name = pm.variables.get(\"group_name\")",
+							"var base_url = pm.variables.get(\"base_url\")",
+							"var session = pm.variables.get(\"session\")",
+							"var expire_seconds = pm.variables.get(\"expire_seconds\")",
+							"var id_url = \"/api/v2/questions\"",
+							"var package_url = \"/api/v2/packages/by-name/\"",
+							"var action_group_url = \"/api/v2/action_groups/by-name/\"",
+							"var package_name = pm.collectionVariables.get(\"package_name\")",
+							"var action_group = pm.collectionVariables.get(\"action_group\")",
+							"var package_param_valid = pm.collectionVariables.get(\"package_param\")",
+							"var package_param_list = []",
+							"",
+							"if(package_param_valid)",
+							"{",
+							"    var package_param  = JSON.parse(pm.collectionVariables.get(\"package_param\"))",
+							"    Object.entries(package_param).forEach(([key, value]) => {",
+							"        var temp_obj = {}",
+							"        temp_obj[\"key\"] = key",
+							"        temp_obj[\"value\"] = value",
+							"        package_param_list.push(temp_obj)",
+							"    });",
+							"}",
+							"",
+							"const req2 = {",
+							"            url: base_url + package_url + package_name,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req2, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"package_id\", response.data.id)",
+							"        });",
+							"        ",
+							"const req3 = {",
+							"            url: base_url + action_group_url + action_group,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req3, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"action_group_id\", response.data.id)",
+							"        });",
+							"",
+							"if(group_name){",
+							"    ",
+							"        var groupurl = \"/api/v2/groups/by-name/\"",
+							"        const req = {",
+							"            url: base_url + groupurl + group_name,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"group_id\", response.data.id)",
+							"        });",
+							"    ",
+							"    setTimeout(function () { ",
+							"        ",
+							"        var body = {",
+							"            'target_group': {",
+							"                'source_id': pm.collectionVariables.get(\"group_id\"),",
+							"                'name': group_name",
+							"                },",
+							"            'action_group': {'id': pm.collectionVariables.get(\"action_group_id\")},",
+							"            'package_spec': {",
+							"                'source_id': pm.collectionVariables.get(\"package_id\")",
+							"                },",
+							"            'name': pm.collectionVariables.get(\"action_name\"),",
+							"            \"expire_seconds\": expire_seconds,",
+							"        }",
+							"        if(package_param_valid)",
+							"        {",
+							"            body.package_spec.parameters = package_param_list",
+							"        }",
+							"        var body_str = JSON.stringify(body);",
+							"        pm.collectionVariables.set('execute_action_body', body_str); ",
+							"        ",
+							"    }, 3000);",
+							"",
+							"    ",
+							"",
+							"}",
+							"else{",
+							"    setTimeout(function () { ",
+							"        var body = {",
+							"            'action_group': {'id': pm.collectionVariables.get(\"action_group_id\")},",
+							"            'package_spec': {",
+							"                'source_id': pm.collectionVariables.get(\"package_id\")",
+							"                },",
+							"            'name': pm.collectionVariables.get(\"action_name\"),",
+							"            \"expire_seconds\": expire_seconds,",
+							"        }",
+							"        if(package_param_valid)",
+							"        {",
+							"            body.package_spec.parameters = package_param_list",
+							"        }",
+							"        var body_str = JSON.stringify(body);",
+							"        pm.collectionVariables.set('execute_action_body', body_str); ",
+							"    }, 3000);",
+							"}",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{execute_action_body}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v2/saved_actions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"saved_actions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "run query saved question",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var base_url = pm.collectionVariables.get(\"base_url\")",
+							"var saved_question_name = pm.collectionVariables.get(\"saved_question_name\")",
+							"var session = pm.variables.get(\"session\")",
+							"var saved_question_url = \"/api/v2/saved_questions/by-name/\"",
+							"const req2 = {",
+							"            url: base_url + saved_question_url + saved_question_name,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req2, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"saved_question_id\", response.data.id)",
+							"        });",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/v2/result_data/saved_question/{{saved_question_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"result_data",
+						"saved_question",
+						"{{saved_question_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "run query not saved search",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var base_url = pm.collectionVariables.get(\"base_url\")",
+							"var not_saved_question_name = pm.collectionVariables.get(\"not_saved_question_name\")",
+							"var group_name = pm.variables.get(\"group_name\")",
+							"var session = pm.variables.get(\"session\")",
+							"var not_saved_question_url = \"/api/v2/questions\"",
+							"var parse_question_url = \"/api/v2/parse_question\"",
+							"",
+							"const req2 = {",
+							"            url: base_url + parse_question_url ,",
+							"            method: \"post\",",
+							"            body: JSON.stringify(",
+							"                {",
+							"                \"text\": not_saved_question_name",
+							"            }",
+							"            ),",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req2, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"not_saved_question_parse_data\", JSON.stringify(response.data[0]))",
+							"        });",
+							"",
+							"if(group_name){",
+							"        setTimeout(function () { ",
+							"        var groupurl = \"/api/v2/groups/by-name/\"",
+							"        const req = {",
+							"            url: base_url + groupurl + group_name,",
+							"            method: \"get\",",
+							"            header: {",
+							"                'Content-Type': 'application/json',",
+							"                'session': session,",
+							"            }",
+							"            ",
+							"        }",
+							"            pm.sendRequest(req, function (err, response) {",
+							"            var response = response.json()",
+							"            pm.collectionVariables.set(\"group_id\", response.data.id)",
+							"        });",
+							"        }, 1500);",
+							"        setTimeout(function () { ",
+							"            var json_body = JSON.parse(pm.collectionVariables.get(\"not_saved_question_parse_data\"))",
+							"            console.log(json_body)",
+							"            json_body.context_group = {\"id\": -1}",
+							"            console.log(json_body)",
+							"            json_body.context_group.id = pm.collectionVariables.get(\"group_id\")",
+							"            const req4 = {",
+							"                    url: base_url + not_saved_question_url ,",
+							"                    method: \"post\",",
+							"                    body: JSON.stringify(json_body),",
+							"                    header: {",
+							"                        'Content-Type': 'application/json',",
+							"                        'session': session,",
+							"                    }",
+							"                    ",
+							"                }",
+							"                    pm.sendRequest(req4, function (err, response) {",
+							"                    var response = response.json()",
+							"                    pm.collectionVariables.set(\"not_saved_question_id\", response.data.id)",
+							"                });",
+							"        }, 3000);",
+							"    ",
+							"",
+							"}",
+							"else{",
+							"    setTimeout(function () { ",
+							"        const req3 = {",
+							"                url: base_url + not_saved_question_url ,",
+							"                method: \"post\",",
+							"                body: pm.collectionVariables.get(\"not_saved_question_parse_data\"),",
+							"                header: {",
+							"                    'Content-Type': 'application/json',",
+							"                    'session': session,",
+							"                }",
+							"                ",
+							"            }",
+							"                pm.sendRequest(req3, function (err, response) {",
+							"                var response = response.json()",
+							"                pm.collectionVariables.set(\"not_saved_question_id\", response.data.id)",
+							"            });",
+							"        }, 2000);",
+							"        ",
+							"}",
+							"",
+							"setTimeout(function () { },8000);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "session",
+						"value": "{{session}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v2/result_data/question/{{not_saved_question_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"v2",
+						"result_data",
+						"question",
+						"{{not_saved_question_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var base_url = pm.variables.get(\"base_url\")",
+					"var username = pm.variables.get(\"username\")",
+					"var password = pm.variables.get(\"password\")",
+					"",
+					"if(!(username && password))  throw new Error(\"Please set username and password in collection variables\")",
+					"if(!base_url) throw new Error(\"Please set base_url varible from collections variables\")",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "session",
+			"value": ""
+		},
+		{
+			"key": "sensor_name",
+			"value": ""
+		},
+		{
+			"key": "expire_seconds",
+			"value": ""
+		},
+		{
+			"key": "group_name",
+			"value": ""
+		},
+		{
+			"key": "group_id",
+			"value": ""
+		},
+		{
+			"key": "request_body",
+			"value": ""
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "parse_query_text",
+			"value": ""
+		},
+		{
+			"key": "qustion_id",
+			"value": ""
+		},
+		{
+			"key": "package_name",
+			"value": ""
+		},
+		{
+			"key": "action_name",
+			"value": ""
+		},
+		{
+			"key": "action_group",
+			"value": ""
+		},
+		{
+			"key": "action_group_id",
+			"value": ""
+		},
+		{
+			"key": "package_id",
+			"value": ""
+		},
+		{
+			"key": "package_param",
+			"value": ""
+		},
+		{
+			"key": "execute_action_body",
+			"value": ""
+		},
+		{
+			"key": "saved_question_id",
+			"value": ""
+		},
+		{
+			"key": "saved_question_name",
+			"value": ""
+		},
+		{
+			"key": "not_saved_question_id",
+			"value": ""
+		},
+		{
+			"key": "not_saved_question_name",
+			"value": ""
+		},
+		{
+			"key": "not_saved_question_parse_data",
+			"value": ""
+		}
+	]
+}
