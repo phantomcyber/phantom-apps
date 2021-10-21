@@ -19,7 +19,8 @@ GSGMAIL_DELETE_EMAIL = 'https://mail.google.com/'
 GSMAIL_DEFAULT_FIRST_RUN_MAX_EMAIL = 1000
 GSMAIL_DEFAULT_MAX_CONTAINER = 100
 GSMAIL_MAX_RESULT = 10000
-GSMAIL_DEFAULT_INGEST_MANNER = 'oldest first'
+GSMAIL_OLDEST_INGEST_MANNER = 'oldest first'
+GSMAIL_LATEST_INGEST_MANNER = 'latest first'
 
 FAILED_CREATE_SERVICE = "Failed to create service object for API: {0}-{1}. {2} {3}"
 GSMAIL_USER_VALID_MESSAGE = "Please make sure the user '{0}' is valid and the service account has the proper scopes enabled."
