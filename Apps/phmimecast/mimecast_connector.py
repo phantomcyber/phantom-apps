@@ -116,7 +116,7 @@ class MimecastConnector(BaseConnector):
            'Content-Type': 'application/json'}
         return headers
 
-    def _process_empty_reponse(self, response, action_result):
+    def _process_empty_response(self, response, action_result):
 
         if response.status_code == 200:
             return RetVal(phantom.APP_SUCCESS, {})
@@ -181,7 +181,7 @@ class MimecastConnector(BaseConnector):
         if 'json' in r.headers.get('Content-Type', ''):
             return self._process_json_response(r, action_result)
 
-        # Process an HTML resonse, Do this no matter what the api talks.
+        # Process an HTML response, Do this no matter what the api talks.
         # There is a high chance of a PROXY in between phantom and the rest of
         # world, in case of errors, PROXY's return HTML, this function parses
         # the error and adds it to the action_result.
@@ -190,7 +190,7 @@ class MimecastConnector(BaseConnector):
 
         # it's not content-type that is to be parsed, handle an empty response
         if not r.text:
-            return self._process_empty_reponse(r, action_result)
+            return self._process_empty_response(r, action_result)
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
@@ -790,22 +790,22 @@ class MimecastConnector(BaseConnector):
         if search_type == 'email':
             search_type = 'emailAddress'
 
+        data = {
+            'meta': {
+                'pagination': {
+                    'pageToken': None,
+                    'pageSize': DEFAULT_MAX_RESULTS
+                }
+            },
+            'data': [
+                {
+                    'id': param['id']
+                }
+            ]
+        }
+
         # Mimecast API only returns a maximum of 100 results. Looping is needed for groups with 100+ members
         while True:
-
-            data = {
-                'meta': {
-                    'pagination': {
-                        'pageToken': None,
-                        'pageSize': DEFAULT_MAX_RESULTS
-                    }
-                },
-                'data': [
-                    {
-                        'id': param['id']
-                    }
-                ]
-            }
 
             ret_val, response = self._make_rest_call_helper(uri, action_result, headers=headers, method="post", data=data)
 
@@ -829,9 +829,9 @@ class MimecastConnector(BaseConnector):
             if nextToken is None:
                 summary = action_result.update_summary({})
                 summary['status'] = "Member does not exist"
-                return action_result.set_status(phantom.APP_ERROR)
+                return action_result.set_status(phantom.APP_SUCCESS)
             else:
-                param['page_token'] = nextToken
+                data['meta']['pagination']['pageToken'] = nextToken
 
     def _handle_run_query(self, param):
 
@@ -1097,16 +1097,16 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             print("Accessing the Login page")
-            login_url = BaseConnector._get_phantom_base_url() + 'login'
+            login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1116,14 +1116,14 @@ if __name__ == '__main__':
             data['csrfmiddlewaretoken'] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1134,7 +1134,7 @@ if __name__ == '__main__':
         connector = MimecastConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
