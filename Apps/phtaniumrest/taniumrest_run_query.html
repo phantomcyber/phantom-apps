@@ -116,25 +116,19 @@
                                             <td>
                                                 <ul>
                                                     {% if column.name|lower == "user name" %}
-                                                        {% for x in item %}
                                                             <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['user name'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
-                                                                {{ x.text }}
+                                                                {{ item.text }}
                                                                 &nbsp;
                                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                                             </a></li>
-                                                        {% endfor %}
                                                     {% elif column.name|lower == "hash" %}
-                                                        {% for x in item %}
                                                             <li><a class="no-word-wrap" href="javascript:;" onclick="context_menu(this, [{'contains': ['hash', 'sha256'], 'value':'{{ x.text }}' }], 0, {{ container.id }}, null, false);">
-                                                                {{ x.text }}
+                                                                {{ item.text }}
                                                                 &nbsp;
                                                                 <span class="fa fa-caret-down" style="font-size: smaller;"></span>
                                                             </a></li>
-                                                        {% endfor %}
                                                     {% else %}
-                                                        {% for x in item %}
-                                                            <li>{{ x.text }}</li>
-                                                        {% endfor %}
+                                                            <li>{{ item.text }}</li>
                                                     {% endif %}
                                                 </ul>
                                             </td>

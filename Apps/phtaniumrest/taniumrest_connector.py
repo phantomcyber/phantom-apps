@@ -687,7 +687,14 @@ class TaniumRestConnector(BaseConnector):
             else:
                 continue
 
+            # reformat response data to simplify data path 
             if data.get("result_sets", [])[0].get("columns"):
+                rows = data.get("result_sets")[0].get("rows")
+                for i in range(len(rows)):
+                    formatted = []
+                    for item in rows[i].get("data"):
+                        formatted.append(item[0])
+                    response["data"]["result_sets"][0]["rows"][i]["data"] = formatted
                 return response
 
         else:
