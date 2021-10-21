@@ -18,27 +18,27 @@
     "logo_dark": "logo_bmcremedy_dark.svg",
     "configuration": {
         "url": {
-            "required": true,
             "description": "Complete URL (e.g. http://mybmc.contoso.com:8008)",
             "data_type": "string",
+			"required": true,
             "order": 0
         },
         "verify_server_cert": {
-            "default": false,
-            "order": 1,
             "description": "Verify server certificate",
-            "data_type": "boolean"
+            "data_type": "boolean",
+			"default": false,
+            "order": 1
         },
         "username": {
-            "required": true,
             "description": "Username",
             "data_type": "string",
+			"required": true,
             "order": 2
         },
         "password": {
-            "required": true,
             "description": "Password",
             "data_type": "password",
+			"required": true,
             "order": 3
         }
     },
@@ -1259,12 +1259,12 @@
             "read_only": false,
             "parameters": {
                 "id": {
-                    "required": true,
                     "description": "Incident ID",
                     "data_type": "string",
                     "contains": [
                         "bmcremedy incident id"
                     ],
+					"required": true,
                     "primary": true,
                     "order": 0
                 },
@@ -1284,16 +1284,16 @@
                     "contains": [
                         "vault id"
                     ],
-                    "order": 3,
-                    "primary": true
+					"primary": true,
+                    "order": 3
                 }
             },
             "output": [
                 {
-                    "column_name": "Incident ID",
-                    "column_order": 0,
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+					"column_name": "Incident ID",
+                    "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
                     ],
@@ -1330,20 +1330,20 @@
                     "data_type": "string"
                 },
                 {
-                    "column_name": "Status",
-                    "column_order": 1,
                     "data_path": "action_result.status",
                     "data_type": "string",
+					"column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
                     ]
                 },
                 {
-                    "column_name": "Message",
-                    "column_order": 2,
                     "data_path": "action_result.message",
                     "data_type": "string",
+					"column_name": "Message",
+                    "column_order": 2,
                     "example_values": [
                         "Incident updated successfully"
                     ]
@@ -1383,14 +1383,14 @@
             "read_only": true,
             "parameters": {
                 "id": {
-                    "required": true,
                     "description": "Incident ID",
                     "data_type": "string",
                     "order": 0,
                     "contains": [
                         "bmcremedy incident id"
                     ],
-                    "primary": true
+                    "primary": true,
+					"required": true
                 }
             },
             "output": [
@@ -3167,10 +3167,10 @@
             },
             "output": [
                 {
-                    "column_name": "Incident ID",
-                    "column_order": 0,
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+					"column_name": "Incident ID",
+                    "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
                     ]
@@ -3236,10 +3236,10 @@
                     "data_type": "string"
                 },
                 {
-                    "column_name": "Status",
-                    "column_order": 1,
                     "data_path": "action_result.status",
                     "data_type": "string",
+					"column_name": "Status",
+                    "column_order": 1,
                     "example_values": [
                         "success",
                         "failed"
@@ -3290,19 +3290,19 @@
             "read_only": false,
             "parameters": {
                 "id": {
-                    "required": true,
-                    "primary": true,
                     "description": "Incident ID",
                     "data_type": "string",
                     "order": 0,
                     "contains": [
                         "bmcremedy incident id"
-                    ]
+                    ],
+					"required": true,
+                    "primary": true,
                 },
                 "work_info_type": {
-                    "required": true,
                     "description": "Work Info Type",
                     "data_type": "string",
+					"required": true,
                     "order": 1
                 },
                 "comment": {
@@ -3323,10 +3323,10 @@
             },
             "output": [
                 {
-                    "column_name": "Incident ID",
-                    "column_order": 0,
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
+					"column_name": "Incident ID",
+                    "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
                     ],
