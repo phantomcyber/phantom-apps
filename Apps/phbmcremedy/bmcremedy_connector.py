@@ -18,23 +18,6 @@ import phantom.rules as ph_rules
 # Local imports
 import bmcremedy_consts as consts
 
-# Dictionary that maps each error code with its corresponding message
-ERROR_RESPONSE_DICT = {
-    consts.BMCREMEDY_REST_RESP_BAD_REQUEST: consts.BMCREMEDY_REST_RESP_BAD_REQUEST_MSG,
-    consts.BMCREMEDY_REST_RESP_UNAUTHORIZED: consts.BMCREMEDY_REST_RESP_UNAUTHORIZED_MSG,
-    consts.BMCREMEDY_REST_RESP_FORBIDDEN: consts.BMCREMEDY_REST_RESP_FORBIDDEN_MSG,
-    consts.BMCREMEDY_REST_RESP_NOT_FOUND: consts.BMCREMEDY_REST_RESP_NOT_FOUND_MSG,
-    consts.BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED: consts.BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED_MSG,
-    consts.BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR: consts.BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR_MSG
-}
-
-# List containing http codes to be considered as success
-SUCCESS_RESPONSE_CODES = [consts.BMCREMEDY_REST_RESP_TOKEN_SUCCESS, consts.BMCREMEDY_REST_RESP_CREATE_SUCCESS,
-                          consts.BMCREMEDY_REST_RESP_NO_CONTENT]
-
-# List of parameters that will be considered for adding attachment to an incident
-add_attachment_params_list = ["Work Log Type", "View Access", "Secure Work Log", "Detailed Description"]
-
 
 class RetVal3(tuple):
     def __new__(cls, val1, val2=None, val3=None):
@@ -76,15 +59,14 @@ class BmcremedyConnector(BaseConnector):
 
         # Load any saved configurations
         self._state = self.load_state()
-
-        self._token = self._state.get('token')
-
         if not isinstance(self._state, dict):
             self.debug_print("Resetting the state file with the default format")
             self._state = {
                 "app_version": self.get_app_json().get('app_version')
             }
             return self.set_status(phantom.APP_ERROR, consts.BMCREMEDY_STATE_FILE_CORRUPT_ERR)
+
+        self._token = self._state.get('token')
 
         # Return response_status
         return phantom.APP_SUCCESS
@@ -256,21 +238,27 @@ class BmcremedyConnector(BaseConnector):
             self.debug_print(consts.BMCREMEDY_ATTACHMENT_LIMIT_EXCEED)
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_ATTACHMENT_LIMIT_EXCEED), None, None
 
-        # Searching for file with vault id in current container
-        _, _, files_array = (ph_rules.vault_info(container_id=self.get_container_id()))
-        for vault_id in attachment_list:
-            file_found = False
-            for file_data in files_array:
-                if file_data[consts.BMCREMEDY_JSON_VAULT_ID] == vault_id:
-                    # Getting filename to use
-                    filename.append(file_data['name'])
-                    # Reading binary data of file
-                    file_obj.append(open(file_data.get('path'), 'rb').read())
-                    file_found = True
-                    break
-            if not file_found:
-                self.debug_print("{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id))
-                return action_result.set_status(phantom.APP_ERROR, "{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id)), None, None
+        try:
+            # Searching for file with vault id in current container
+            _, _, files_array = (ph_rules.vault_info(container_id=self.get_container_id()))
+            files_array = list(files_array)
+            for vault_id in attachment_list:
+                file_found = False
+                for file_data in files_array:
+                    if file_data[consts.BMCREMEDY_JSON_VAULT_ID] == vault_id:
+                        # Getting filename to use
+                        filename.append(file_data['name'])
+                        # Reading binary data of file
+                        with open(file_data.get('path'), 'rb') as f:
+                            file_obj.append(f.read())
+                        file_found = True
+                        break
+                if not file_found:
+                    self.debug_print("{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id))
+                    return action_result.set_status(phantom.APP_ERROR, "{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id)), None, None
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg), None, None
 
         for index, value in enumerate(file_obj):
             add_attachment_params_dict['z2AF Work Log0{}'.format(index + 1)] = filename[index]
@@ -288,7 +276,6 @@ class BmcremedyConnector(BaseConnector):
 
         # If attachment is to be added, then details will be provided in 'entry' field
         files = []
-        accept_headers = None
         data_params = None
         if "entry" in attachment_data:
             for key, value in attachment_data.items():
@@ -299,12 +286,11 @@ class BmcremedyConnector(BaseConnector):
                 files.append(tup)
         else:
             data_params = json.dumps(attachment_data)
-            accept_headers = None
 
         # Create incident using given input parameters
         response_status, response_data = self._make_rest_call_abstract(consts.BMCREMEDY_COMMENT_ENDPOINT, action_result,
                                                                        data=data_params, method="post",
-                                                                       accept_headers=accept_headers, files=files)
+                                                                       files=files)
         if phantom.is_fail(response_status):
             return action_result.get_status(), None
 
@@ -453,9 +439,9 @@ class BmcremedyConnector(BaseConnector):
             response_message = self._parse_html_response(response)
             return RetVal3(action_result.set_status(phantom.APP_ERROR, response_message), response_data, response)
 
-        if response.status_code in ERROR_RESPONSE_DICT:
+        if response.status_code in consts.ERROR_RESPONSE_DICT:
             self.debug_print(consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code,
-                                                                     detail=ERROR_RESPONSE_DICT[response.status_code]))
+                                                                     detail=consts.ERROR_RESPONSE_DICT[response.status_code]))
 
             response_data = {"content": response.content, "headers": response.headers}
 
@@ -480,7 +466,7 @@ class BmcremedyConnector(BaseConnector):
 
             # Set the action_result status to error, the handler function will most probably return as is
             action_result_error_msg = "{}. {}".format(
-                consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code, detail=ERROR_RESPONSE_DICT[response.status_code]),
+                consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code, detail=consts.ERROR_RESPONSE_DICT[response.status_code]),
                 response_message
             )
             return RetVal3(action_result.set_status(phantom.APP_ERROR, action_result_error_msg), response_data, response)
@@ -499,7 +485,7 @@ class BmcremedyConnector(BaseConnector):
             # Set the action_result status to error, the handler function will most probably return as is
             return RetVal3(action_result.set_status(phantom.APP_ERROR, msg_string), response_data, response)
 
-        if response.status_code in SUCCESS_RESPONSE_CODES:
+        if response.status_code in consts.SUCCESS_RESPONSE_CODES:
             return RetVal3(action_result.set_status(phantom.APP_SUCCESS), response_data, response)
 
         # See if an error message is present
@@ -580,7 +566,7 @@ class BmcremedyConnector(BaseConnector):
         # fields_param may contain extra information apart from details of adding attachment. So getting information
         # about attachments and storing it in a separate dictionary, and removing corresponding details from
         # fields_param, so that fields_param can be used for creating incident.
-        for add_attachment_param in add_attachment_params_list:
+        for add_attachment_param in consts.ADD_ATTACHMENT_PARAMS_LIST:
             if add_attachment_param in fields_param:
                 add_attachment_details_param[add_attachment_param] = fields_param[add_attachment_param]
                 fields_param.pop(add_attachment_param)
@@ -696,7 +682,7 @@ class BmcremedyConnector(BaseConnector):
         # Getting parameters that are related to adding attachment
         # fields_param may contain extra information apart from details of adding attachment. So getting information
         # about attachments and removing corresponding details from fields_param
-        for add_attachment_param in add_attachment_params_list:
+        for add_attachment_param in consts.ADD_ATTACHMENT_PARAMS_LIST:
             if add_attachment_param in fields_param:
                 add_attachment_details_param[add_attachment_param] = fields_param[add_attachment_param]
                 fields_param.pop(add_attachment_param)
@@ -823,12 +809,11 @@ class BmcremedyConnector(BaseConnector):
         # All incidents will be sorted in descending order based on their Last Modified date
         action_params = {"sort": "Last Modified Date.desc"}
 
-        if limit:
-            # Validate if 'limit' is positive integer
-            ret_val, limit = self._validate_integer(action_result, limit, 'limit', allow_zero=True)
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-            action_params['limit'] = limit
+        # Validate if 'limit' is positive integer
+        ret_val, limit = self._validate_integer(action_result, limit, 'limit')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        action_params['limit'] = limit
 
         if query:
             action_params['q'] = query

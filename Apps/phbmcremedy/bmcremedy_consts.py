@@ -90,3 +90,20 @@ BMCREMEDY_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive i
 BMCREMEDY_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the '{param}' parameter"
 
 BMCREMEDY_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again"
+
+# Dictionary that maps each error code with its corresponding message
+ERROR_RESPONSE_DICT = {
+    BMCREMEDY_REST_RESP_BAD_REQUEST: BMCREMEDY_REST_RESP_BAD_REQUEST_MSG,
+    BMCREMEDY_REST_RESP_UNAUTHORIZED: BMCREMEDY_REST_RESP_UNAUTHORIZED_MSG,
+    BMCREMEDY_REST_RESP_FORBIDDEN: BMCREMEDY_REST_RESP_FORBIDDEN_MSG,
+    BMCREMEDY_REST_RESP_NOT_FOUND: BMCREMEDY_REST_RESP_NOT_FOUND_MSG,
+    BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED: BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED_MSG,
+    BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR: BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR_MSG
+}
+
+# List containing http codes to be considered as success
+SUCCESS_RESPONSE_CODES = [BMCREMEDY_REST_RESP_TOKEN_SUCCESS, BMCREMEDY_REST_RESP_CREATE_SUCCESS,
+                          BMCREMEDY_REST_RESP_NO_CONTENT]
+
+# List of parameters that will be considered for adding attachment to an incident
+ADD_ATTACHMENT_PARAMS_LIST = ["Work Log Type", "View Access", "Secure Work Log", "Detailed Description"]
