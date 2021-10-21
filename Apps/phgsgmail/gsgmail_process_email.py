@@ -945,17 +945,10 @@ class ProcessMail:
                     artifact['run_automation'] = True
 
                 ret_val, artifact_message, artifact_id = self._base_connector.save_artifact(artifact)
-                #self._base_connector.debug_print(PROC_EMAIL_SAVE_CONT_PASSED.format(ret_val, artifact_message, artifact_id))
+                self._base_connector.debug_print(PROC_EMAIL_SAVE_CONT_PASSED.format(ret_val, artifact_message, artifact_id))
 
-            final_message = message
-            if "Duplicate container found" in final_message and not self._base_connector.is_poll_now():
-                tmp = 0
-                self._base_connector.debug_print('sahil_ inside the duplicate container found {}'.format(message))
-                self._base_connector.debug_print('sahil_ inside the duplicate container found dup count {}'.format(self._base_connector._dup_emails))
+            if "Duplicate container found" in message and not self._base_connector.is_poll_now():
                 self._base_connector._dup_emails += 1
-                self._base_connector.debug_print('sahil_ inside the duplicate container found dup count after update {}'.format(self._base_connector._dup_emails))
-                # self._base_connector._state[f'inside save contaner {tmp}'] = self._base_connector._dup_emails
-                tmp += 1
 
         # delete any temp directories that were created by the email parsing function
         [shutil.rmtree(x['temp_directory'], ignore_errors=True) for x in results if x.get('temp_directory')]
