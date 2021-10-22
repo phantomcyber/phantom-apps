@@ -8,6 +8,9 @@ import phantom.app as phantom
 import phantom.rules as phantom_rules
 from phantom.app import BaseConnector
 from phantom.app import ActionResult
+from phantom.vault import Vault
+import uuid
+import os
 
 from threatgrid_consts import *
 
@@ -16,20 +19,12 @@ import json
 import requests
 from datetime import datetime, timedelta
 import time
+
 try:
     from cStringIO import StringIO
 except ModuleNotFoundError:
     from io import StringIO
 from traceback import format_exc
-
-SUBMIT_FILE = '{base_uri}/api/v2/samples'
-TEST_CONNECTIVITY_URL = '{base_uri}/api/v2/samples?api_key={api_key}&limit=1'
-RESULTS_URL = '{base_uri}/samples/{task_id}'
-STATUS_URL = '{base_uri}/api/v2/samples/{task_id}?api_key={api_key}'
-ANALYSIS_URL = '{base_uri}/api/v2/samples/{task_id}/analysis.json?api_key={api_key}'
-THREAT_URL = '{base_uri}/api/v2/samples/{task_id}/threat?api_key={api_key}'
-HASH_SEARCH_URL = '{base_uri}/api/v2/samples/search?api_key={api_key}&checksum={hash}'
-PLAYBOOKS_URL = '{base_uri}/api/v3/configuration/playbooks?api_key={api_key}'
 
 
 class threatgridConnector(BaseConnector):
@@ -39,6 +34,7 @@ class threatgridConnector(BaseConnector):
     ACTION_ID_GET_DETONATION_RESULTS = "get report"
     ACTION_ID_TEST_ASSET_CONNECTIVITY = 'test_asset_connectivity'
     ACTION_ID_LIST_PLAYBOOKS = "list_playbooks"
+    ACTION_ID_SEARCH_REPORT = "list submissions"
 
     def _mask_api_key_from_log(self, msg):
         """ This method is used to mask api in log for security purpose.
@@ -65,14 +61,13 @@ class threatgridConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_code = THREATGRID_ERROR_CODE_UNAVAILABLE
                     error_msg = e.args[0]
-        except:
+        except Exception:
             error_code = THREATGRID_ERROR_CODE_UNAVAILABLE
             error_msg = THREATGRID_ERROR_MESSAGE_UNAVAILABLE
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, self._mask_api_key_from_log(error_msg))
 
     def _test_asset_connectivity(self):
-
         error = None
         url = TEST_CONNECTIVITY_URL.format(
             base_uri=self.threatgrid_base_uri, api_key=self.threatgrid_api_key)
@@ -82,12 +77,8 @@ class threatgridConnector(BaseConnector):
         except Exception as e:
             self.save_progress(THREATGRID_TEST_CONNECTIVITY_FAILED)
             return self.threatgrid_action_result.set_status(phantom.APP_ERROR, "Error Connecting to server", self._get_error_message_from_exception(e))
-
         try:
-            if r:
-                obj = r.json()
-            else:
-                obj = None
+            obj = r.json()
         except Exception as e:
             self.save_progress(THREATGRID_TEST_CONNECTIVITY_FAILED)
             self.debug_print("Response from server: {0}".format(r.text))
@@ -95,21 +86,15 @@ class threatgridConnector(BaseConnector):
                                                             self._get_error_message_from_exception(e))
 
         if obj and obj.get(RESPONSE_ERROR_KEY):
-            try:
-                error = obj[RESPONSE_ERROR_KEY].get(
-                    RESPONSE_ERRORS_KEY, THREATGRID_UNSPECIFIED_ERROR)
-                error = error[0] if len(error) > 0 else {}
-                error = "Code: {0}, Message: {1}".format(
-                    error.get('code', 'Not returned'), error.get('message', 'Unspecified'))
-            except Exception:
-                self.save_progress(THREATGRID_TEST_CONNECTIVITY_FAILED)
-                self.debug_print("Response from server: {0}".format(obj))
-                self.debug_print(format_exc())
-                error = 'Error parsing result from server.'
+            error = obj[RESPONSE_ERROR_KEY].get(
+                RESPONSE_ERRORS_KEY, THREATGRID_UNSPECIFIED_ERROR)
+            error = error[0] if len(error) > 0 else {}
+            error = "Code: {0}, Message: {1}".format(
+                error.get('code', 'Not returned'), error.get('message', 'Unspecified'))
         elif r.status_code != requests.codes.ok:  # pylint: disable=E1101
             error = 'Received http error code {}'.format(r.status_code)
 
-        if (error):
+        if error:
             self.debug_print("connect failed", error)
             self.save_progress(THREATGRID_TEST_CONNECTIVITY_FAILED)
             return self.threatgrid_action_result.set_status(phantom.APP_ERROR, error)
@@ -117,7 +102,71 @@ class threatgridConnector(BaseConnector):
         self.save_progress(THREATGRID_TEST_CONNECTIVITY_PASSED)
         return self.threatgrid_action_result.set_status(phantom.APP_SUCCESS)
 
-    def _lookup_and_parse_results(self, task_id):
+    def _get_html_report(self, action_result, html_report_url, task_id):
+        r = requests.get(html_report_url, verify=self.verify)
+        if not r.ok:  # pylint: disable=E1101
+            error = 'Received http error code {}'.format(r.status_code)
+            return action_result.set_status(phantom.APP_ERROR, error)
+        html_data = r.text
+        file_name = "{0}_report.html".format(task_id)
+
+        is_download = False
+        if hasattr(Vault, "create_attachment"):
+            vault_ret = Vault.create_attachment(html_data, self.get_container_id(), file_name=file_name)
+
+            if vault_ret.get('succeeded'):
+                action_result.set_status(phantom.APP_SUCCESS, "Downloaded report")
+                _, _, vault_meta_info = phantom_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_ret[phantom.APP_JSON_HASH])
+                if not vault_meta_info:
+                    return action_result.set_status(phantom.APP_ERROR, THREATGRID_VAULT_ERROR)
+
+                vault_path = list(vault_meta_info)[0]['path']
+                summary = {
+                    phantom.APP_JSON_VAULT_ID: vault_ret[phantom.APP_JSON_HASH],
+                    phantom.APP_JSON_NAME: file_name,
+                    'vault_file_path': vault_path
+                }
+                action_result.update_summary(summary)
+                return phantom.APP_SUCCESS
+            else:
+                is_download = False
+
+        if not is_download:
+            if hasattr(phantom_rules, 'get_vault_tmp_dir'):
+                temp_dir = phantom_rules.get_vault_tmp_dir()
+            else:
+                temp_dir = '/opt/phantom/vault/tmp'
+            temp_dir = "{0}{1}".format(temp_dir, '/{}'.format(uuid.uuid4()))
+            os.makedirs(temp_dir)
+            file_path = os.path.join(temp_dir, file_name)
+
+            try:
+                with open(file_path, 'w') as f:
+                    f.write(html_data)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
+
+            success, message, vault_id = phantom_rules.vault_add(container=self.get_container_id(), file_location=file_path, file_name=file_name)
+
+            if success:
+                action_result.set_status(phantom.APP_SUCCESS, "Downloaded report")
+                _, _, vault_meta_info = phantom_rules.vault_info(container_id=self.get_container_id(), vault_id=vault_id)
+                if not vault_meta_info:
+                    return action_result.set_status(phantom.APP_ERROR, THREATGRID_VAULT_ERROR)
+
+                vault_path = list(vault_meta_info)[0]['path']
+                summary = {
+                    phantom.APP_JSON_VAULT_ID: vault_id,
+                    phantom.APP_JSON_NAME: file_name,
+                    'vault_file_path': vault_path
+                }
+
+                action_result.update_summary(summary)
+                return action_result.set_status(phantom.APP_SUCCESS)
+            else:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while saving file to vault: {}".format(message))
+
+    def _lookup_and_parse_results(self, task_id, is_download_report=False):
         self.send_progress(
             'Polling for analysis results ({})...', datetime.utcnow())
         start_time = datetime.utcnow()
@@ -127,6 +176,7 @@ class threatgridConnector(BaseConnector):
         result_data = {}
         self.threatgrid_action_result.add_data(result_data)
         count = 1
+        message = ''
 
         while True:
             error = None
@@ -147,8 +197,7 @@ class threatgridConnector(BaseConnector):
 
             if error:
                 if datetime.utcnow() > time_limit:
-                    self.threatgrid_action_result.set_status(
-                        phantom.APP_ERROR, error)
+                    self.threatgrid_action_result.set_status(phantom.APP_ERROR, error)
                     return
                 count += 1
                 time.sleep(POLL_SLEEP_SECS)
@@ -159,8 +208,7 @@ class threatgridConnector(BaseConnector):
                 error = 'Failed to parse task view response for task_id {!r} ({!r})'.format(task_id,
                                                                                             self._get_error_message_from_exception(e))
                 self.debug_print('Parse task view failed', r.text)
-                self.threatgrid_action_result.set_status(
-                    phantom.APP_ERROR, error)
+                self.threatgrid_action_result.set_status(phantom.APP_ERROR, error)
                 break
 
             status = task_json.get(RESPONSE_STATE_KEY)
@@ -179,6 +227,7 @@ class threatgridConnector(BaseConnector):
                 report_url = ANALYSIS_URL.format(
                     base_uri=self.threatgrid_base_uri, task_id=task_id, api_key=self.threatgrid_api_key)
                 r2 = requests.get(report_url, verify=self.verify)
+
                 if r2.status_code != requests.codes.ok:  # pylint: disable=E1101
                     error = self._mask_api_key_from_log(
                         'Query for report {!r} failed with status code {!d}'.format(report_url, r2.status_code))
@@ -231,88 +280,78 @@ class threatgridConnector(BaseConnector):
                         except Exception:
                             self.debug_print(
                                 'error parsing target', format_exc())
-                        self.threatgrid_action_result.set_status(phantom.APP_SUCCESS,
-                                                                 'Successfully retrieved analysis results')
+                        message += 'Successfully retrieved analysis results'
+                        self.threatgrid_action_result.set_status(phantom.APP_SUCCESS, message)
                         self.threatgrid_action_result.update_summary({
                             TARGET_KEY: target,
                             TASK_ID_KEY: task_id,
                         })
+
+                # for html report
+                if is_download_report:
+                    html_report_url = HTML_REPORT_URL.format(base_uri=self.threatgrid_base_uri, task_id=task_id, api_key=self.threatgrid_api_key)
+                    ret_val = self._get_html_report(self.threatgrid_action_result, html_report_url, task_id)
+                    if phantom.is_fail(ret_val):
+                        if not message:
+                            return self.threatgrid_action_result.get_status()
+                        else:
+                            message += ' but failed to download report into vault, {}'.format(self.threatgrid_action_result.get_message())
+                            return self.threatgrid_action_result.set_status(phantom.APP_SUCCESS, message)
+
+                    message += ' and downloaded report to vault'
+                    self.threatgrid_action_result.set_status(phantom.APP_SUCCESS, message)
+
                 break
 
     def _queue_analysis(self, data, files, key):
-        self.save_progress('Query threatgrid. data: {}', files)
-        self.send_progress('Sending query to threatgrid for %r' % key)
-
         url = SUBMIT_FILE.format(base_uri=self.threatgrid_base_uri)
-
         try:
             r = requests.post(url, data=data, files=files, verify=self.verify)
+            r_json = r.json()
         except Exception as e:
             return self.threatgrid_action_result.set_status(phantom.APP_ERROR,
                                                             THREATGRID_REST_CALL_ERROR.format(self._get_error_message_from_exception(e)))
 
-        self.send_progress('Query returned {}.', r.status_code)
-
-        response = r.json().get(RESPONSE_DATA_KEY, {})
-        error = r.json().get(RESPONSE_ERROR_KEY)
-        task_id = response.get('id')
+        task_id = r_json.get(RESPONSE_DATA_KEY, {}).get('id')
+        error = r_json.get(RESPONSE_ERROR_KEY)
         if r.status_code != requests.codes.ok or error or not task_id:  # pylint: disable=E1101
-            self.save_progress('Analysis failed to post.')
-            if error:
-                error_code = error[RESPONSE_ERROR_CODE_KEY]
-                message = error[RESPONSE_ERROR_MSG_KEY]
-            else:
-                error_code = '{} (response {})'.format(
-                    THREATGRID_UNSPECIFIED_ERROR, r.status_code)
-                message = 'threatgrid Error: ' + error_code
-            self.threatgrid_action_result.set_status(
-                phantom.APP_ERROR, message)
+            self._response_status(error)
         else:
-            self.save_progress('Analysis queued.', files)
             results_url = RESULTS_URL.format(
                 base_uri=self.threatgrid_base_uri, task_id=task_id)
-            self.threatgrid_action_result.set_status(phantom.APP_SUCCESS,
-                                                     'Successfully queued analysis. Result at {}',
-                                                     None, results_url)
             self._lookup_and_parse_results(task_id)
             self.threatgrid_action_result.update_summary({
                 TARGET_KEY: key,
                 TASK_ID_KEY: task_id,
-                RESULTS_URL_KEY: results_url,
+                RESULTS_URL_KEY: results_url
             })
 
     def _check_existing(self, hash):
-        self.save_progress('Checking for existing report: {}', hash)
-
         url = HASH_SEARCH_URL.format(base_uri=self.threatgrid_base_uri,
                                      api_key=self.threatgrid_api_key,
                                      hash=hash)
-
         try:
             r = requests.get(url, verify=self.verify)
+            obj = r.json()
         except Exception as e:
             return self.threatgrid_action_result.set_status(phantom.APP_ERROR,
                                                             THREATGRID_REST_CALL_ERROR.format(self._get_error_message_from_exception(e)))
         self.send_progress('Query returned {}.', r.status_code)
-        try:
-            obj = r.json()
-            for item in obj.get('data', {}).get('items', []):
-                task_id = item.get('sample')
-                if task_id:
-                    return task_id
+        for item in obj.get('data', {}).get('items', []):
+            task_id = item.get('sample')
+            if task_id:
+                return task_id
 
-        except Exception:
-            self.debug_print('error searching..', format_exc())
         return False
 
-    def _get_detonation_results(self, task_id):
+    def _get_detonation_results(self, task_id, is_download_report=False):
         results_url = RESULTS_URL.format(
             base_uri=self.threatgrid_base_uri, task_id=task_id)
+        self._lookup_and_parse_results(task_id, is_download_report)
         self.threatgrid_action_result.update_summary({
             TASK_ID_KEY: task_id,
             RESULTS_URL_KEY: results_url
         })
-        self._lookup_and_parse_results(task_id)
 
     def _query_url(self, param):
         sio = StringIO("[InternetShortcut]\nURL={}".format(param['url']))
@@ -342,10 +381,8 @@ class threatgridConnector(BaseConnector):
             task_id = self._check_existing(vault_id)
             if task_id:
                 return self._get_detonation_results(task_id)
-
         filename = param.get('file_name')
-        if not filename:
-            filename = vault_id
+        filename = filename if filename is not None else vault_id
 
         try:
             _, _, file_info = phantom_rules.vault_info(vault_id=vault_id)
@@ -355,7 +392,7 @@ class threatgridConnector(BaseConnector):
                 return
             file_path = list(file_info)[0].get('path')
             payload = open(file_path, 'rb')
-        except:
+        except Exception:
             self.threatgrid_action_result.set_status(
                 phantom.APP_ERROR, THREATGRID_FILE_NOT_FOUND_ERROR.format(vault_id))
             return
@@ -378,28 +415,18 @@ class threatgridConnector(BaseConnector):
 
         self._queue_analysis(data, files, filename)
 
-    def _list_playbooks(self, param):
+    def _list_playbooks(self):
         try:
             url = PLAYBOOKS_URL.format(base_uri=self.threatgrid_base_uri,
                                        api_key=self.threatgrid_api_key)
             r = requests.get(url, verify=self.verify)
-            self.send_progress('List playbooks returned {}.', r.status_code)
             response = r.json().get(RESPONSE_DATA_KEY, {})
             error = r.json().get(RESPONSE_ERROR_KEY)
         except Exception as e:
             return self.threatgrid_action_result.set_status(phantom.APP_ERROR,
                                                             THREATGRID_REST_CALL_ERROR.format(self._get_error_message_from_exception(e)))
         if r.status_code != requests.codes.ok or error:  # pylint: disable=E1101
-            self.save_progress('Request failed to process')
-            if error:
-                error_code = error[RESPONSE_ERROR_CODE_KEY]
-                message = error[RESPONSE_ERROR_MSG_KEY]
-            else:
-                error_code = '{} (response {})'.format(
-                    THREATGRID_UNSPECIFIED_ERROR, r.status_code)
-                message = 'threatgrid Error: ' + error_code
-            self.threatgrid_action_result.set_status(
-                phantom.APP_ERROR, message)
+            self._response_status(error)
         else:
             for each_playbook in response['playbooks']:
                 self.threatgrid_action_result.add_data(each_playbook)
@@ -407,6 +434,69 @@ class threatgridConnector(BaseConnector):
                                                      'Successfully retrieved playbooks')
             self.threatgrid_action_result.update_summary({
                 "Total Playbooks": len(response['playbooks'])
+            })
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        try:
+            if not float(parameter).is_integer():
+                action_result.set_status(phantom.APP_ERROR, INVALID_INT.format(param=key))
+                return None
+
+            parameter = int(parameter)
+        except Exception:
+            action_result.set_status(phantom.APP_ERROR, INVALID_INT.format(param=key))
+            return None
+
+        if parameter < 0:
+            action_result.set_status(phantom.APP_ERROR, ERR_NEGATIVE_INT_PARAM.format(param=key))
+            return None
+
+        if not allow_zero and parameter == 0:
+            action_result.set_status(phantom.APP_ERROR, NON_ZERO_ERROR.format(param=key))
+            return None
+
+        return parameter
+
+    def _response_status(self, error):
+        if error:
+            message = error[RESPONSE_ERROR_MSG_KEY]
+            message = message.capitalize()
+        else:
+            error_code = '{} (response {})'.format(
+                THREATGRID_UNSPECIFIED_ERROR, r.status_code)
+            message = 'Threatgrid Error: ' + error_code
+        self.threatgrid_action_result.set_status(
+            phantom.APP_ERROR, message)
+
+    def _search_submissions(self, param):
+        query = param.get('query')
+        limit = self._validate_integer(self.threatgrid_action_result, param.get('limit', DEFAULT_LIMIT), "limit", allow_zero=False)
+        if limit is None:
+            return self.threatgrid_action_result.get_status()
+
+        search_report_url = SEARCH_REPORT_URL.format(base_uri=self.threatgrid_base_uri, api_key=self.threatgrid_api_key, limit=limit)
+        if query:
+            search_report_url += '&q={query}'.format(query=query)
+        try:
+            r = requests.get(search_report_url, verify=self.verify)
+            r_json = r.json()
+            response = r_json.get(RESPONSE_DATA_KEY, {})
+            error = r_json.get(RESPONSE_ERROR_KEY)
+        except Exception as e:
+            return self.threatgrid_action_result.set_status(phantom.APP_ERROR,
+                                                            THREATGRID_REST_CALL_ERROR.format(self._get_error_message_from_exception(e)))
+
+        if r.status_code != requests.codes.ok or error:  # pylint: disable=E1101
+            self._response_status(error)
+        else:
+            items = response.get('items', [])
+            items_size = len(items)
+            for each_data in items:
+                self.threatgrid_action_result.add_data(each_data)
+
+            self.threatgrid_action_result.set_status(phantom.APP_SUCCESS, THREATGRID_SUCC_RET_REPORT.format(items_size))
+            self.threatgrid_action_result.update_summary({
+                "search_report": items_size
             })
 
     def handle_action(self, param):
@@ -421,16 +511,18 @@ class threatgridConnector(BaseConnector):
         self.verify = config[phantom.APP_JSON_VERIFY]
 
         try:
-            if (action == self.ACTION_ID_QUERY_FILE):
+            if action == self.ACTION_ID_QUERY_FILE:
                 self._query_file(param)
-            elif (action == self.ACTION_ID_QUERY_URL):
+            elif action == self.ACTION_ID_QUERY_URL:
                 self._query_url(param)
-            elif (action == self.ACTION_ID_GET_DETONATION_RESULTS):
-                self._get_detonation_results(param[TASK_ID_KEY])
-            elif (action == self.ACTION_ID_TEST_ASSET_CONNECTIVITY):
+            elif action == self.ACTION_ID_GET_DETONATION_RESULTS:
+                self._get_detonation_results(param[TASK_ID_KEY], param.get('download_report', False))
+            elif action == self.ACTION_ID_TEST_ASSET_CONNECTIVITY:
                 self._test_asset_connectivity()
-            elif (action == self.ACTION_ID_LIST_PLAYBOOKS):
-                self._list_playbooks(param)
+            elif action == self.ACTION_ID_LIST_PLAYBOOKS:
+                self._list_playbooks()
+            elif action == self.ACTION_ID_SEARCH_REPORT:
+                self._search_submissions(param)
             else:
                 raise ValueError('action %r is not supported' % action)
         except Exception as e:
@@ -460,13 +552,13 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
-
+    if username is not None and password is None:
         # User specified a username but not a password, so ask
         import getpass
+
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             print("Accessing the Login page")
             login_url = BaseConnector._get_phantom_base_url() + "login"
@@ -490,7 +582,7 @@ if __name__ == '__main__':
             print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
-    if (len(sys.argv) < 2):
+    if len(sys.argv) < 2:
         print("No test json specified as input")
         exit(0)
 
@@ -502,7 +594,7 @@ if __name__ == '__main__':
         connector = threatgridConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
