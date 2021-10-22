@@ -174,9 +174,17 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         artifacts_count = 0
         flag = 0
 
+        if not self._collections:
+            message = 'No configuration has been done for on_poll action. ' \
+                      'Please select the proper configuration parameter'
+            self.debug_print(message)
+            self.save_progress(message)
+            return action_result.set_status(phantom.APP_SUCCESS)
+
         for collection_name, date_start in self._collections.items():
-            self.debug_print('Starting polling process for {0} collection'.format(collection_name))
-            self.save_progress('Starting polling process for {0} collection'.format(collection_name))
+            message = 'Starting polling process for {0} collection'.format(collection_name)
+            self.debug_print(message)
+            self.save_progress(message)
 
             last_fetch = self._state.get(collection_name)
             if collection_name == "compromised/breached":
@@ -283,8 +291,9 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                     if flag:
                         break
 
-                self.debug_print('Polling process for {0} collection has finished'.format(collection_name))
-                self.save_progress('Polling process for {0} collection has finished'.format(collection_name))
+                message = 'Polling process for {0} collection has finished'.format(collection_name)
+                self.debug_print(message)
+                self.save_progress(message)
                 if not is_manual_poll:
                     if collection_name == "compromised/breached":
                         date_start = (
@@ -300,15 +309,10 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
             except Exception as e:
                 err_msg = self._get_error_message_from_exception(e)
                 return action_result.set_status(phantom.APP_ERROR, err_msg)
-        else:
-            self.debug_print('No collections have been configured for on_poll action.'
-                             'Please set up the proper configuration parameters')
-            self.save_progress('No collections have been configured for on_poll action.'
-                               'Please set up the proper configuration parameters')
-            return action_result.set_status(phantom.APP_SUCCESS)
 
-        self.debug_print('Polling process for all collections has finished')
-        self.save_progress('Polling process for all collections has finished')
+        message = 'Polling process for all collections has finished'
+        self.debug_print(message)
+        self.save_progress(message)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
