@@ -2,50 +2,10 @@
 	"info": {
 		"_postman_id": "d836a525-245e-4a4a-9205-59d0e68799aa",
 		"name": "Tanium Rest",
+		"description": "# Postman Collection of Endpoints for Tanium Rest App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, Set this all fields before run the request.\n\n| Variable Name | Description |\n| ------ | ------ |\n| username  | Tanium Rest instance username (in environment variables ) |\n| password  | Tanium Rest instance password (in environment variables ) |\n| base_url | Tanium Rest instance URL (in environment variables ) |\n\n\n\n\n\n\n> **_NOTE:_**  The body parameters for the requests have been mentioned in the above table. Please set them as per your requirements. Refer the documentation of individual requests.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
-		{
-			"name": "Login",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"pm.collectionVariables.set(\"session\", jsonData.data.session);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"{{username}}\",\n    \"password\": \"{{password}}\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{base_url}}/api/v2/session/login",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"api",
-						"v2",
-						"session",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
 		{
 			"name": "List saved Questions",
 			"request": {
@@ -115,7 +75,7 @@
 						"exec": [
 							"var group_name = pm.variables.get(\"group_name\")",
 							"var sensor_name = pm.variables.get(\"sensor_name\")",
-							"var base_url = pm.variables.get(\"base_url\")",
+							"var base_url = pm.environment.get(\"base_url\")",
 							"var session = pm.variables.get(\"session\")",
 							"var expire_seconds = pm.variables.get(\"expire_seconds\")",
 							"var id_url = \"/api/v2/questions\"",
@@ -226,7 +186,8 @@
 						"question",
 						"{{id}}"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| group_name(optional) | centos-computers |\n| sensor_name  | CPU Details |\n| expire_seconds  | 600 |"
 			},
 			"response": []
 		},
@@ -265,7 +226,8 @@
 						"v2",
 						"parse_question"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| parse_query_text  | Computer |"
 			},
 			"response": []
 		},
@@ -297,7 +259,8 @@
 						"question",
 						"{{qustion_id}}"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| qustion_id  | 272799 |"
 			},
 			"response": []
 		},
@@ -309,7 +272,7 @@
 					"script": {
 						"exec": [
 							"var group_name = pm.variables.get(\"group_name\")",
-							"var base_url = pm.variables.get(\"base_url\")",
+							"var base_url = pm.environment.get(\"base_url\")",
 							"var session = pm.variables.get(\"session\")",
 							"var expire_seconds = pm.variables.get(\"expire_seconds\")",
 							"var id_url = \"/api/v2/questions\"",
@@ -460,7 +423,8 @@
 						"v2",
 						"saved_actions"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| group_name(optional)  | centos-computers |\n| package_name  | Live Response - Linux |\n| action_group  | Default |\n| action_name  | Splunk Live Response Test |\n| package_param(optional)  | {\"$1\":\"Standard_Collection\", \"$2\":\"SCP\"} |\n| expire_seconds  | 600 |"
 			},
 			"response": []
 		},
@@ -471,7 +435,7 @@
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"var base_url = pm.collectionVariables.get(\"base_url\")",
+							"var base_url = pm.environment.get(\"base_url\")",
 							"var saved_question_name = pm.collectionVariables.get(\"saved_question_name\")",
 							"var session = pm.variables.get(\"session\")",
 							"var saved_question_url = \"/api/v2/saved_questions/by-name/\"",
@@ -520,24 +484,27 @@
 						"saved_question",
 						"{{saved_question_id}}"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| saved_qustion_name  | Computer Name |"
 			},
 			"response": []
 		},
 		{
-			"name": "run query not saved search",
+			"name": "run query not saved question",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
 						"exec": [
-							"var base_url = pm.collectionVariables.get(\"base_url\")",
+							"var base_url = pm.environment.get(\"base_url\")",
 							"var not_saved_question_name = pm.collectionVariables.get(\"not_saved_question_name\")",
 							"var group_name = pm.variables.get(\"group_name\")",
 							"var session = pm.variables.get(\"session\")",
+							"var expire_seconds = pm.variables.get(\"expire_seconds\")",
 							"var not_saved_question_url = \"/api/v2/questions\"",
 							"var parse_question_url = \"/api/v2/parse_question\"",
 							"",
+							"setTimeout(function () { ",
 							"const req2 = {",
 							"            url: base_url + parse_question_url ,",
 							"            method: \"post\",",
@@ -556,7 +523,7 @@
 							"            var response = response.json()",
 							"            pm.collectionVariables.set(\"not_saved_question_parse_data\", JSON.stringify(response.data[0]))",
 							"        });",
-							"",
+							"}, 1500);",
 							"if(group_name){",
 							"        setTimeout(function () { ",
 							"        var groupurl = \"/api/v2/groups/by-name/\"",
@@ -573,12 +540,11 @@
 							"            var response = response.json()",
 							"            pm.collectionVariables.set(\"group_id\", response.data.id)",
 							"        });",
-							"        }, 1500);",
+							"        }, 4000);",
 							"        setTimeout(function () { ",
 							"            var json_body = JSON.parse(pm.collectionVariables.get(\"not_saved_question_parse_data\"))",
-							"            console.log(json_body)",
+							"            json_body.expire_seconds = expire_seconds",
 							"            json_body.context_group = {\"id\": -1}",
-							"            console.log(json_body)",
 							"            json_body.context_group.id = pm.collectionVariables.get(\"group_id\")",
 							"            const req4 = {",
 							"                    url: base_url + not_saved_question_url ,",
@@ -594,16 +560,18 @@
 							"                    var response = response.json()",
 							"                    pm.collectionVariables.set(\"not_saved_question_id\", response.data.id)",
 							"                });",
-							"        }, 3000);",
+							"        }, 5500);",
 							"    ",
 							"",
 							"}",
 							"else{",
 							"    setTimeout(function () { ",
+							"        var json_body = JSON.parse(pm.collectionVariables.get(\"not_saved_question_parse_data\"))",
+							"        json_body.expire_seconds = expire_seconds",
 							"        const req3 = {",
 							"                url: base_url + not_saved_question_url ,",
 							"                method: \"post\",",
-							"                body: pm.collectionVariables.get(\"not_saved_question_parse_data\"),",
+							"                body: JSON.stringify(json_body),",
 							"                header: {",
 							"                    'Content-Type': 'application/json',",
 							"                    'session': session,",
@@ -614,11 +582,11 @@
 							"                var response = response.json()",
 							"                pm.collectionVariables.set(\"not_saved_question_id\", response.data.id)",
 							"            });",
-							"        }, 2000);",
+							"        }, 3000);",
 							"        ",
 							"}",
 							"",
-							"setTimeout(function () { },8000);",
+							"setTimeout(function () { },11000);",
 							""
 						],
 						"type": "text/javascript"
@@ -663,7 +631,8 @@
 						"question",
 						"{{not_saved_question_id}}"
 					]
-				}
+				},
+				"description": "The variables and their example values for the action are mentioned below.\n\n| **Variable Name** | **Example Value** |\n| ------ | ------ |\n| group_name(optional)  | tanium-client-01 |\n| not_saved_question_name  | Computer |\n| expire_seconds  | 600 |"
 			},
 			"response": []
 		}
@@ -674,13 +643,30 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"var base_url = pm.variables.get(\"base_url\")",
-					"var username = pm.variables.get(\"username\")",
-					"var password = pm.variables.get(\"password\")",
+					"var base_url = pm.environment.get(\"base_url\")",
+					"var username = pm.environment.get(\"username\")",
+					"var password = pm.environment.get(\"password\")",
+					"var login_url = \"/api/v2/session/login\"",
+					"console.log",
+					"if(!(username && password))  throw new Error(\"Please set username and password in environment variables\")",
+					"if(!base_url) throw new Error(\"Please set base_url varible from environment variables\")",
 					"",
-					"if(!(username && password))  throw new Error(\"Please set username and password in collection variables\")",
-					"if(!base_url) throw new Error(\"Please set base_url varible from collections variables\")",
-					""
+					"const req = {",
+					"            url: base_url + login_url,",
+					"            method: \"post\",",
+					"            body: JSON.stringify(",
+					"                {",
+					"                    \"username\": username,",
+					"                    \"password\": password,",
+					"                    ",
+					"                }",
+					"            )",
+					"            ",
+					"        }",
+					"        pm.sendRequest(req, function (err, response) {",
+					"            var response = response.json()",
+					"            pm.collectionVariables.set(\"session\", response.data.session)",
+					"        });"
 				]
 			}
 		},
@@ -695,18 +681,6 @@
 		}
 	],
 	"variable": [
-		{
-			"key": "base_url",
-			"value": ""
-		},
-		{
-			"key": "username",
-			"value": ""
-		},
-		{
-			"key": "password",
-			"value": ""
-		},
 		{
 			"key": "session",
 			"value": ""
