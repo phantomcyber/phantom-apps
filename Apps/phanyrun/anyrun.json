@@ -302,6 +302,30 @@
                         "root"
                     ],
                     "order": 8
+                },
+                "obj_ext_cmd": {
+                    "description": "Optional command line",
+                    "verbose": "Size range: 2..256",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 9
+                },
+                "obj_ext_elevateprompt": {
+                    "description": "Encounter UAC prompts",
+                    "verbose": "Default value: true",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 10
+                },
+                "obj_ext_extension": {
+                    "description": "Change extension to valid",
+                    "verbose": "Default value: true",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 11
                 }
             },
             "output": [
@@ -390,6 +414,26 @@
                         "temp",
                         "windows",
                         "root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_cmd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_elevateprompt",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_extension",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
