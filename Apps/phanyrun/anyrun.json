@@ -193,6 +193,60 @@
                         "vault id"
                     ],
                     "order": 0
+                },
+                "env_os": {
+                    "description": "Operation System",
+                    "verbose": "Allowed values: windows",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "windows",
+                    "value_list": [
+                        "windows"
+                    ],
+                    "order": 1
+                },
+                "env_bitness": {
+                    "description": "Bitness of Operation System",
+                    "verbose": "Allowed values: 32, 64",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "default": "32",
+                    "value_list": [
+                        "32",
+                        "64"
+                    ],
+                    "order": 2
+                },
+                "env_version": {
+                    "description": "Version of OS",
+                    "verbose": "Allowed values: vista, 7, 8.1, 10",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "7",
+                    "value_list": [
+                        "vista",
+                        "7",
+                        ".8.1",
+                        "10"
+                    ],
+                    "order": 3
+                },
+                "env_type": {
+                    "description": "Environment preset type",
+                    "verbose": "Allowed values: clean, office, complete",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "default": "complete",
+                    "value_list": [
+                        "clean",
+                        "office",
+                        "complete"
+                    ],
+                    "order": 4
                 }
             },
             "output": [
@@ -204,6 +258,38 @@
                     ],
                     "column_name": "Vault ID",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.env_os",
+                    "data_type": "string",
+                    "example_values": ["windows"]
+                },
+                {
+                    "data_path": "action_result.parameter.env_bitness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32,
+                        64
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.env_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "vista",
+                        "7",
+                        "8.1",
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.env_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "clean",
+                        "office",
+                        "complete"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.taskid",
