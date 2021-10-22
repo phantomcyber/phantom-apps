@@ -196,11 +196,10 @@
                 },
                 "env_os": {
                     "description": "Operation System",
-                    "verbose": "Allowed values: windows",
+                    "verbose": "Allowed values: windows (default)",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "default": "windows",
                     "value_list": [
                         "windows"
                     ],
@@ -208,11 +207,10 @@
                 },
                 "env_bitness": {
                     "description": "Bitness of Operation System",
-                    "verbose": "Allowed values: 32, 64",
+                    "verbose": "Allowed values: 32 (default), 64",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
-                    "default": "32",
                     "value_list": [
                         "32",
                         "64"
@@ -221,11 +219,10 @@
                 },
                 "env_version": {
                     "description": "Version of OS",
-                    "verbose": "Allowed values: vista, 7, 8.1, 10",
+                    "verbose": "Allowed values: vista, 7 (default), 8.1, 10",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "default": "7",
                     "value_list": [
                         "vista",
                         "7",
@@ -236,17 +233,75 @@
                 },
                 "env_type": {
                     "description": "Environment preset type",
-                    "verbose": "Allowed values: clean, office, complete",
+                    "verbose": "Allowed values: clean, office, complete (default)",
                     "data_type": "string",
                     "required": false,
                     "primary": false,
-                    "default": "complete",
                     "value_list": [
                         "clean",
                         "office",
                         "complete"
                     ],
                     "order": 4
+                },
+                "opt_network_geo": {
+                    "description": "Geo location option",
+                    "verbose": "Allowed values: fastest (default), AU, BR, DE, CH, FR, KR, US, RU, GB, IT",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "fastest",
+                        "AU",
+                        "BR",
+                        "DE",
+                        "CH",
+                        "FR",
+                        "KR",
+                        "US",
+                        "RU",
+                        "GB",
+                        "IT"
+                    ],
+                    "order": 5
+                },
+                "opt_timeout": {
+                    "description": "Timeout option (seconds)",
+                    "verbose": "Size range: 10-660. Default value: 60",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 6
+                },
+                "opt_privacy_type": {
+                    "description": "Privacy settings",
+                    "verbose": "Allowed values: public, bylink (default), owner",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "bylink",
+                        "public",
+                        "owner"
+                    ],
+                    "order": 7
+                },
+                "obj_ext_startfolder": {
+                    "description": "Start object from",
+                    "verbose": "Allowed values: desktop, home, downloads, appdata, temp (default), windows, root",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "desktop",
+                        "home",
+                        "downloads",
+                        "appdata",
+                        "temp",
+                        "windows",
+                        "root"
+                    ],
+                    "order": 8
                 }
             },
             "output": [
@@ -289,6 +344,52 @@
                         "clean",
                         "office",
                         "complete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_network_geo",
+                    "data_type": "string",
+                    "example_values": [
+                        "fastest",
+                        "AU",
+                        "BR",
+                        "DE",
+                        "CH",
+                        "FR",
+                        "KR",
+                        "US",
+                        "RU",
+                        "GB",
+                        "IT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        60
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_privacy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "public",
+                        "bylink",
+                        "owner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_startfolder",
+                    "data_type": "string",
+                    "example_values": [
+                        "desktop",
+                        "home",
+                        "downloads",
+                        "appdata",
+                        "temp",
+                        "windows",
+                        "root"
                     ]
                 },
                 {
