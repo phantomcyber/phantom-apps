@@ -15,11 +15,11 @@
         }
     ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.4.0",
+    "app_version": "3.4.1",
     "latest_tested_versions": [
         "Cloud, API api.crowdstrike.com, October 14 2021, API version: v1, v2"
     ],
-    "utctime_updated": "2021-10-15T05:46:15.000000Z",
+    "utctime_updated": "2021-10-22T09:28:19.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
@@ -9492,7 +9492,7 @@
                     "primary": true,
                     "order": 0
                 },
-                "resource_id" : {
+                "resource_id": {
                     "description": "The resource id of the indicator",
                     "data_type": "string",
                     "order": 1,
