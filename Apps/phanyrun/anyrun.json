@@ -180,9 +180,9 @@
         {
             "action": "detonate file",
             "description": "Run the file in the sandbox and returns the ID of created task",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "detonate_file",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "vault_id": {
                     "description": "Vault ID of the file to detonate",
@@ -453,6 +453,391 @@
                     "data_type": "string",
                     "column_name": "Status",
                     "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "detonate url",
+            "description": "Load a URL for analysis and returns the ID of created task",
+            "type": "investigate",
+            "identifier": "detonate_url",
+            "read_only": true,
+            "parameters": {
+                "obj_url": {
+                    "description": "URL to detonate",
+                    "verbose": "Size range: 5..512",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "url"
+                    ],
+                    "order": 0
+                },
+                "obj_type": {
+                    "description": "Type of new task: url (default) or download",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "default": "url",
+                    "value_list": [
+                        "url",
+                        "download"
+                    ],
+                    "order": 1
+                },
+                "env_os": {
+                    "description": "Operation System",
+                    "verbose": "Allowed values: windows (default)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "windows"
+                    ],
+                    "order": 2
+                },
+                "env_bitness": {
+                    "description": "Bitness of Operation System",
+                    "verbose": "Allowed values: 32 (default), 64",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "32",
+                        "64"
+                    ],
+                    "order": 3
+                },
+                "env_version": {
+                    "description": "Version of OS",
+                    "verbose": "Allowed values: vista, 7 (default), 8.1, 10",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "vista",
+                        "7",
+                        ".8.1",
+                        "10"
+                    ],
+                    "order": 4
+                },
+                "env_type": {
+                    "description": "Environment preset type",
+                    "verbose": "Allowed values: clean, office, complete (default)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "clean",
+                        "office",
+                        "complete"
+                    ],
+                    "order": 5
+                },
+                "opt_network_geo": {
+                    "description": "Geo location option",
+                    "verbose": "Allowed values: fastest (default), AU, BR, DE, CH, FR, KR, US, RU, GB, IT",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "fastest",
+                        "AU",
+                        "BR",
+                        "DE",
+                        "CH",
+                        "FR",
+                        "KR",
+                        "US",
+                        "RU",
+                        "GB",
+                        "IT"
+                    ],
+                    "order": 6
+                },
+                "opt_timeout": {
+                    "description": "Timeout option (seconds)",
+                    "verbose": "Size range: 10-660. Default value: 60",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "order": 7
+                },
+                "opt_privacy_type": {
+                    "description": "Privacy settings",
+                    "verbose": "Allowed values: public, bylink (default), owner",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "bylink",
+                        "public",
+                        "owner"
+                    ],
+                    "order": 8
+                },
+                "obj_ext_startfolder": {
+                    "description": "Start object from",
+                    "verbose": "Allowed values: desktop, home, downloads, appdata, temp (default), windows, root",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list": [
+                        "desktop",
+                        "home",
+                        "downloads",
+                        "appdata",
+                        "temp",
+                        "windows",
+                        "root"
+                    ],
+                    "order": 9
+                },
+                "obj_ext_cmd": {
+                    "description": "Optional command line",
+                    "verbose": "Size range: 2..256",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 10
+                },
+                "obj_ext_browser": {
+                    "description": "Browser name",
+                    "verbose": "Allowed values: Google Chrome, Mozilla Firefox, Opera, Internet Explorer (default)",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "value_list":[
+                        "Google Chrome",
+                        "Mozilla Firefox",
+                        "Opera",
+                        "Internet Explorer"],
+                    "order": 11
+                },
+                "obj_ext_useragent": {
+                    "description": "User agent",
+                    "verbose": "Size range: 2..256",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "order": 12
+                },
+                "obj_ext_elevateprompt": {
+                    "description": "Encounter UAC prompts",
+                    "verbose": "Default value: true",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 13
+                },
+                "obj_ext_extension": {
+                    "description": "Change extension to valid",
+                    "verbose": "Default value: true",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 14
+                },
+                "opt_privacy_hidesource": {
+                    "description": "Option for hiding of source URL",
+                    "verbose": "Default value: false",
+                    "data_type": "boolean",
+                    "required": false,
+                    "primary": false,
+                    "order": 15
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.obj_url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ],
+                    "column_name": "URL",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.obj_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "url",
+                        "download"
+                    ],
+                    "column_name": "type",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.env_os",
+                    "data_type": "string",
+                    "example_values": [
+                        "windows"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.env_bitness",
+                    "data_type": "numeric",
+                    "example_values": [
+                        32,
+                        64
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.env_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "vista",
+                        "7",
+                        "8.1",
+                        "10"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.env_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "clean",
+                        "office",
+                        "complete"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_network_geo",
+                    "data_type": "string",
+                    "example_values": [
+                        "fastest",
+                        "AU",
+                        "BR",
+                        "DE",
+                        "CH",
+                        "FR",
+                        "KR",
+                        "US",
+                        "RU",
+                        "GB",
+                        "IT"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_timeout",
+                    "data_type": "numeric",
+                    "example_values": [
+                        60
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_privacy_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "public",
+                        "bylink",
+                        "owner"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_startfolder",
+                    "data_type": "string",
+                    "example_values": [
+                        "desktop",
+                        "home",
+                        "downloads",
+                        "appdata",
+                        "temp",
+                        "windows",
+                        "root"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_cmd",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_browser",
+                    "data_type": "string",
+                    "example_values": [
+                        "Google Chrome",
+                        "Mozilla Firefox",
+                        "Opera",
+                        "Internet Explorer"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_useragent",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_elevateprompt",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.obj_ext_extension",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.opt_privacy_hidesource",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.taskid",
+                    "data_type": "string",
+                    "contains": [
+                        "anyrun task id"
+                    ],
+                    "column_name": "Task ID",
+                    "column_order": 2,
+                    "example_values": [
+                        "0cf223f2-530e-4a50-b68f-563045268648"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 3,
                     "example_values": [
                         "success",
                         "failed"

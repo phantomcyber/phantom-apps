@@ -278,15 +278,13 @@ class AnyrunConnector(BaseConnector):
         self.save_progress("Detonating file {}".format(file_path))
 
         data = {k: v for k, v in param.items() if k not in ["context", "vault_id"]}
-        # self.save_progress("Printing out current data: {}".format(data))
-
         files = [
             ('file', open(file_path, 'rb'))
         ]
 
         # make rest call
         ret_val, response = self._make_rest_call(
-            ANYRUN_DETONATE_FILE_ENDPOINT, action_result, method="post", data=data, files=files, headers=self._headers
+            ANYRUN_DETONATE_ENDPOINT, action_result, method="post", data=data, files=files, headers=self._headers
         )
 
         if phantom.is_fail(ret_val):
@@ -301,6 +299,37 @@ class AnyrunConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated file")
+
+    def _handle_detonate_url(self, param):
+        self.save_progress("In action handler for: {0}".format(
+            self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        obj_type = param["obj_type"]
+        # Validating input params
+        if obj_type not in ["url", "download"]:
+            return action_result.set_status(phantom.APP_ERROR, ANYRUN_ERR_INVALID_PARAM.format(name="obj_type"))
+
+        data = {k: v for k, v in param.items() if k not in ["context"]}
+
+        self.save_progress("Detonating URL ({})".format(obj_type))
+        # make rest call
+        ret_val, response = self._make_rest_call(
+            ANYRUN_DETONATE_ENDPOINT, action_result, method="post", data=data, files=[], headers=self._headers
+        )
+
+        if phantom.is_fail(ret_val):
+            # the call to the 3rd party device or service failed, action result should contain all the error details
+            return action_result.get_status()
+
+        self.save_progress("Successfully detonated URL ({})".format(obj_type))
+        try:
+            action_result.add_data(response['data'])
+        except Exception as e:
+            err = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while processing response from server. {}".format(err))
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully detonated URL ({})".format(obj_type))
 
     def handle_action(self, param):
         ret_val = phantom.APP_SUCCESS
@@ -318,6 +347,9 @@ class AnyrunConnector(BaseConnector):
 
         elif action_id == 'detonate_file':
             ret_val = self._handle_detonate_file(param)
+
+        elif action_id == 'detonate_url':
+            ret_val = self._handle_detonate_url(param)
 
         return ret_val
 
