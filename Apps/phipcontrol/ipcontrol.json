@@ -51,7 +51,7 @@
         {
             "action": "get block type",
             "identifier": "get_block_type",
-            "description": "returns block type for endpoint using IP or Hostname",
+            "description": "Returns block type for endpoint using IP or Hostname",
             "verbose": "Returns the block type for an endpoint using the IP Address or the Hostname.",
             "type": "investigate",
             "read_only": false,
