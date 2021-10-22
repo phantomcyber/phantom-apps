@@ -13,9 +13,10 @@ from phantom.action_result import ActionResult
 
 from groupibthreatintelligenceandattribution_consts import *
 import requests
-from pytia import TIAPoller
-from dateparser import parse
 import json
+from datetime import datetime, timedelta
+from dateparser import parse
+from pytia import TIAPoller
 
 
 class RetVal(tuple):
@@ -67,10 +68,11 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
         self._gib_tia_connector.set_keys(collection_name, keys)
 
         if collection_name == "compromised/breached":
-            if not last_fetch:
-                last_fetch = date_start
+            if last_fetch:
+                date_start = last_fetch.get("date_start")
+                date_end = last_fetch.get("date_end")
             generator = self._gib_tia_connector.create_search_generator(collection_name=collection_name,
-                                                                        date_from=last_fetch,
+                                                                        date_from=date_start,
                                                                         date_to=date_end)
         else:
             generator = self._gib_tia_connector.create_update_generator(collection_name=collection_name,
@@ -177,6 +179,12 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
             self.save_progress('Starting polling process for {0} collection'.format(collection_name))
 
             last_fetch = self._state.get(collection_name)
+            if collection_name == "compromised/breached":
+                if not (last_fetch and isinstance(last_fetch, dict)):
+                    date_end = datetime.now().strftime(GIB_DATE_FORMAT)
+                    last_fetch = {"date_start": date_start,
+                                  "starting_date_end": date_end,
+                                  "date_end": date_end}
             try:
                 if is_manual_poll:
                     start_time = parse(
@@ -198,7 +206,11 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
                         severity = self._transform_severity(feed)
                         feed["severity"] = severity
 
-                        last_fetch = feed.pop("last_fetch")
+                        if collection_name == "compromised/breached":
+                            date_end = (parse(feed.pop("last_fetch")) - timedelta(seconds=1)).strftime(GIB_DATE_FORMAT)
+                            last_fetch.update({"date_end": date_end})
+                        else:
+                            last_fetch = feed.pop("last_fetch")
                         if feed.get('start_time'):
                             feed['start_time'] = parse(feed.get('start_time')).strftime(SPLUNK_DATE_FORMAT)
                         if feed.get('end_time'):
@@ -273,6 +285,16 @@ class GroupIbThreatIntelligenceAndAttributionConnector(BaseConnector):
 
                 self.debug_print('Polling process for {0} collection has finished'.format(collection_name))
                 self.save_progress('Polling process for {0} collection has finished'.format(collection_name))
+                if not is_manual_poll:
+                    if collection_name == "compromised/breached":
+                        date_start = (
+                                parse(last_fetch.get("starting_date_end")) + timedelta(seconds=1)
+                        ).strftime(GIB_DATE_FORMAT)
+                        starting_date_end = datetime.now().strftime(GIB_DATE_FORMAT)
+                        self._state[collection_name] = {"date_start": date_start,
+                                                        "date_end": starting_date_end,
+                                                        "starting_date_end": starting_date_end}
+
                 if flag:
                     break
             except Exception as e:
