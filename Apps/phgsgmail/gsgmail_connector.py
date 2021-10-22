@@ -89,7 +89,6 @@ class GSuiteConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
-        self._dup_emails = 0
         if self._state:
             self._last_email_epoch = self._state.get('last_email_epoch')
         # Fetching the Python major version
@@ -671,7 +670,7 @@ class GSuiteConnector(BaseConnector):
         using_oldest = ingest_manner == GSMAIL_OLDEST_INGEST_MANNER
         using_latest = ingest_manner == GSMAIL_LATEST_INGEST_MANNER
 
-        if use_ingest_limit:
+        if use_ingest_limit and not self.is_poll_now():
             if self._last_email_epoch and using_oldest:
                 query.append('after:{}'.format(self._last_email_epoch))
             elif 'last_ingested_epoch' in self._state and using_latest:
