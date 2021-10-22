@@ -1,6 +1,7 @@
-# -----------------------------------------
-# Phantom sample App Connector python file
-# -----------------------------------------
+# File: ipcontrol_connector.py
+# Copyright (c) 2021 Splunk Inc.
+#
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Phantom App imports
 import phantom.app as phantom
@@ -12,6 +13,7 @@ from phantom.action_result import ActionResult
 import requests
 import json
 from bs4 import BeautifulSoup
+from ipcontrol_consts import *
 
 
 class RetVal(tuple):
@@ -118,7 +120,7 @@ class IpControlConnector(BaseConnector):
         # except AttributeError:
         #     return "False"
 
-        auth_endpoint = "/login"
+        auth_endpoint = IPCONTROL_ENDPOINT_LOGIN
         # api = "/inc-rest/api/v1"
 
         auth_username = config.get('username', '')
@@ -130,28 +132,10 @@ class IpControlConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call(auth_endpoint, action_result, method="post", data=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return None
-
-
-        # try:
-        #     access_token = auth_func(
-        #         auth_url,
-        #         verify=config.get('verify_server_cert', False),
-        #         data=data
-        #
-        #     )
-        #
-        # except Exception:
-        #     return "False"
-
-        # if (phantom.is_fail(access_token.status_code)):
-        #     # the call to the 3rd party device or service failed, action result should contain all the error details
-        #     # for now the return is commented out, but after implementation, return from here
-        #     self.save_progress("Obtaining auth token failed.")
-        #     return "False"
 
         auth_token = response["access_token"]
         return auth_token
@@ -168,13 +152,10 @@ class IpControlConnector(BaseConnector):
         except AttributeError:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
 
-        api = "/inc-rest/api/v1"
-        # auth_token = self._get_auth_token()
+        api = IPCONTROL_ENDPOINT
+
         # Create a URL to connect to
         url = self._base_url + api + endpoint
-        # headers = {'Accept': 'application/json',
-        # 'Authorization': 'Bearer '+auth_token,
-        # 'Content-Type': 'application/json'}
 
         try:
             r = request_func(
@@ -201,10 +182,11 @@ class IpControlConnector(BaseConnector):
 
         auth_token = self._get_auth_token(action_result)
         if not auth_token:
+            self.save_progress(IPCONTROL_ERR_TEST_CONNECTIVITY)
             return action_result.get_message()
 
         # Return success
-        self.save_progress("Test Connectivity Passed")
+        self.save_progress(IPCONTROL_SUCC_TEST_CONNECTIVITY)
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_block_type(self, param):
@@ -246,9 +228,9 @@ class IpControlConnector(BaseConnector):
         }
 
         # make rest call
-        ret_val, response = self._make_rest_call('/Exports/initExportChildBlock', action_result, method="post", headers=headers, data=data)
+        ret_val, response = self._make_rest_call(IPCONTROL_ENDPOINT_GET_BLOCK_TYPE, action_result, method="post", headers=headers, data=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return phantom.APP_ERROR
@@ -260,7 +242,7 @@ class IpControlConnector(BaseConnector):
         if response:
             action_result.add_data(response)
         else:
-            action_result.add_data({'result': 'No data found for parameter'})
+            action_result.add_data({'result': IPCONTROL_ERR_NO_DATA_FOUND})
         # action_result.add_data(response[0]['childBlock'])
 
         # Add a dictionary that is made up of the most important values from data into the summary
@@ -295,9 +277,9 @@ class IpControlConnector(BaseConnector):
         # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # make rest call
-        ret_val, response = self._make_rest_call('/Gets/getDeviceByHostname?hostname=' + hostname, action_result, method="get", headers=headers, params=None)
+        ret_val, response = self._make_rest_call(IPCONTROL_ENDPOINT_GET_IP_ADDRESS + hostname, action_result, method="get", headers=headers, params=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return phantom.APP_ERROR
@@ -308,7 +290,7 @@ class IpControlConnector(BaseConnector):
         if response:
             action_result.add_data(response)
         else:
-            action_result.add_data({'result': 'No data found for parameter'})
+            action_result.add_data({'result': IPCONTROL_ERR_NO_DATA_FOUND})
 
         # Add a dictionary that is made up of the most important values from data into the summary
         # summary = action_result.update_summary({})
@@ -342,9 +324,9 @@ class IpControlConnector(BaseConnector):
         # optional_parameter = param.get('optional_parameter', 'default_value')
 
         # make rest call
-        ret_val, response = self._make_rest_call('/Gets/getDeviceByIPAddr?ipAddress=' + ip_address, action_result, method="get", headers=headers, params=None)
+        ret_val, response = self._make_rest_call(IPCONTROL_ENDPOINT_GET_HOSTNAME + ip_address, action_result, method="get", headers=headers, params=None)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return phantom.APP_ERROR
@@ -355,7 +337,7 @@ class IpControlConnector(BaseConnector):
         if response:
             action_result.add_data(response)
         else:
-            action_result.add_data({'result': 'No data found for parameter'})
+            action_result.add_data({'result': IPCONTROL_ERR_NO_DATA_FOUND})
 
         # Add a dictionary that is made up of the most important values from data into the summary
         # summary = action_result.update_summary({})
@@ -386,7 +368,10 @@ class IpControlConnector(BaseConnector):
         if not auth_token:
             return action_result.get_message()
 
-        query = '{"query": "name=\'%s\' and block=\'%s\' and blockType=\'%s\' and container=\'%s\' and createDate=\'%s\' and lastUpdate=\'%s\' and parentContainer=\'%s\' and status=\'%s\' and ipVersion=\'%s\' and udf=\'%s\'", "pageSize": 0, "includeFreeBlocks": True, "firstResultPos": 0}' % (str(name), block, blockType, container, createDate, lastUpdate, parentContainer, status, ipVersion, udf)
+        query = '{"query": "name=\'%s\' and block=\'%s\' and blockType=\'%s\' and container=\'%s\' and createDate=\'%s\'' \
+                ' and lastUpdate=\'%s\' and parentContainer=\'%s\' and status=\'%s\' and ipVersion=\'%s\' and udf=\'%s\'", ' \
+                '"pageSize": 0, "includeFreeBlocks": True, "firstResultPos": 0}'\
+                % (str(name), block, blockType, container, createDate, lastUpdate, parentContainer, status, ipVersion, udf)
 
         if name == '':
             query = query.replace('name=\'\' and', '')
@@ -419,10 +404,8 @@ class IpControlConnector(BaseConnector):
             query = query.replace('and udf=\'\'', '')
             query = re.sub(' +', ' ', query)
 
-        # query = re.sub(' +', ' ', query)
         data = query
-        # with open('/tmp/myData.txt', 'wb') as f:
-        #    f.write(str(data))
+
         headers = {
             "Accept": "application/json",
             "Authorization": "Bearer " + auth_token,
@@ -430,10 +413,10 @@ class IpControlConnector(BaseConnector):
         }
 
         # make rest call
-        ret_val, response = self._make_rest_call('/Exports/initExportChildBlock', action_result, method="post",
+        ret_val, response = self._make_rest_call(IPCONTROL_ENDPOINT_GET_CHILD_BLOCK, action_result, method="post",
                                                  headers=headers, data=data)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.debug_print(action_result.get_message())
             self.set_status(phantom.APP_ERROR, action_result.get_message())
             return phantom.APP_ERROR
@@ -441,7 +424,7 @@ class IpControlConnector(BaseConnector):
         if response:
             action_result.add_data(response)
         else:
-            action_result.add_data({'result': 'No data found for parameter'})
+            action_result.add_data({'result': IPCONTROL_ERR_NO_DATA_FOUND})
 
         # Add a dictionary that is made up of the most important values from data into the summary
         # summary = action_result.update_summary({})
@@ -526,17 +509,17 @@ if __name__ == '__main__':
     username = args.username
     password = args.password
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             login_url = IpControlConnector._get_phantom_base_url() + '/login'
 
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -549,11 +532,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -564,11 +547,11 @@ if __name__ == '__main__':
         connector = IpControlConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

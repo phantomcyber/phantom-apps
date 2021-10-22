@@ -4,33 +4,30 @@
     "description": "Provides access to IP Control API's",
     "type": "network security",
     "product_vendor": "BT Diamond",
-    "logo": "ipcontrol.png",
-    "logo_dark": "ipcontrol_dark.png",
+    "logo": "logo_btdiamond.svg",
+    "logo_dark": "logo_btdiamond_dark.svg",
     "product_name": "IP Control",
     "product_version_regex": ".*",
-    "publisher": "Phantom",
-    "license": "Copyright (c) Phantom, 2019",
-    "app_version": "1.1.2",
+    "publisher": "Splunk Community",
+    "license": "Copyright (c) 2021 Splunk Inc.",
+    "app_version": "1.0.0",
     "utctime_updated": "2019-03-15T04:25:21.350087Z",
     "package_name": "phantom_ipcontrol",
-    "main_module": "ipcontrol_connector.pyc",
-    "min_phantom_version": "4.0.0000",
+    "main_module": "ipcontrol_connector.py",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
+    "python_version": "3",
     "configuration": {
         "base_url": {
             "description": "IP or Hostname for IP Control",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 0
         },
         "username": {
             "description": "Username for IP Control",
             "data_type": "string",
             "required": true,
-            "value_list": [],
-            "default": "",
             "order": 1
         },
         "password": {
@@ -45,44 +42,52 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
             "type": "test",
             "read_only": true,
             "parameters": {},
             "output": [],
             "versions": "EQ(*)"
         },
-
         {
             "action": "get block type",
             "identifier": "get_block_type",
             "description": "returns block type for endpoint using IP or Hostname",
-            "verbose": "Returns the block type for an endpoint using the IP Address or the Hostname",
+            "verbose": "Returns the block type for an endpoint using the IP Address or the Hostname.",
             "type": "investigate",
             "read_only": false,
             "parameters": {
                 "ip_address": {
                     "description": "IP Address",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": ["ip"],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0,
+                    "primary": true
                 },
                 "hostname": {
                     "description": "Hostname",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 1
                 }
             },
             "output": [
+                {
+                    "column_order": 3,
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "column_order": 1,
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "column_name": "Hostname"
+                },
                 {
                     "contains": [
                         "ip"
@@ -90,24 +95,9 @@
                     "column_order": 0,
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
-                    "column_name": "ip_address",
+                    "column_name": "IP Address",
                     "example_values": [
                         "172.18.100.166"
-                    ]
-                },
-                {
-                    "column_order": 1,
-                    "data_path": "action_result.parameter.hostname",
-                    "data_type": "string",
-                    "column_name": "hostname"
-                },
-                {
-                    "column_order": 3,
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "example_values": [
-                        "success"
                     ]
                 },
                 {
@@ -115,74 +105,17 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data.*.*.childBlock.SWIPname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.blockAddr",
                     "data_type": "string",
                     "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.subnetPolicy.cascadePrimaryDhcpServer",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.primarySubnet",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.createReverseDomains",
-                    "data_type": "string",
-                    "example_values": [
-                        "true"
+                        "172.16.0.0"
                     ],
                     "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.container",
-                    "data_type": "string",
-                    "example_values": [
-                        "/InControl/Americas"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.domainType",
-                    "data_type": "string",
-                    "example_values": [
-                        "Asia"
-                    ],
-                    "contains": [
-                        "domain"
+                        "ip"
                     ]
                 },
                 {
@@ -200,56 +133,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.createDate",
-                    "data_type": "string",
-                    "example_values": [
-                        "2011-10-19 14:26:30"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.excludeFromDiscovery",
-                    "data_type": "string",
-                    "example_values": [
-                        "false"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.lastUpdateDate",
-                    "data_type": "string",
-                    "example_values": [
-                        "2011-10-19 14:26:30"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.blockAddr",
-                    "data_type": "string",
-                    "example_values": [
-                        "172.16.0.0"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.*.childBlock.blockStatus",
                     "data_type": "string",
                     "example_values": [
                         "Aggregate"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.ipv6",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.SWIPname",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
                     ]
                 },
                 {
@@ -262,12 +149,32 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.nonBroadcast",
-                    "data_type": "boolean",
+                    "data_path": "action_result.data.*.*.childBlock.container",
+                    "data_type": "string",
                     "example_values": [
-                        true,
-                        false
+                        "/InControl/Americas"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.createDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-10-19 14:26:30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.createReverseDomains",
+                    "data_type": "string",
+                    "example_values": [
+                        "true"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.description",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.*.childBlock.discoveryAgent",
@@ -277,17 +184,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.vrfName",
+                    "data_path": "action_result.data.*.*.childBlock.domainType",
                     "data_type": "string",
                     "example_values": [
-                        "management"
+                        "Asia"
+                    ],
+                    "contains": [
+                        "domain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.interfaceName",
+                    "data_path": "action_result.data.*.*.childBlock.excludeFromDiscovery",
                     "data_type": "string",
                     "example_values": [
-                        "mgmt0"
+                        "false"
                     ]
                 },
                 {
@@ -299,62 +209,67 @@
                     "contains": [
                         "ip"
                     ]
-                }
-            ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-
-
-        {
-            "action": "get ip address",
-            "identifier": "get_ip_address",
-            "description": "Gets Hostname associated with known IP Address",
-            "verbose": "Gets Hostname associated with known IP Address",
-            "type": "investigate",
-            "read_only": false,
-            "parameters": {
-                "hostname": {
-                    "description": "Hostname",
-                    "data_type": "string",
-                    "required": true,
-                    "primary": false,
-                    "contains": ["hostname"],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
-                }
-            },
-            "output": [
+                },
                 {
-                    "data_path": "action_result.parameter.hostname",
+                    "data_path": "action_result.data.*.*.childBlock.interfaceName",
                     "data_type": "string",
-                    "contains": [
-                        "host name"
-                    ],
-                    "column_name": "hostname",
-                    "column_order": 0,
                     "example_values": [
-                        "thisisaphantomtest"
+                        "mgmt0"
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2,
+                    "data_path": "action_result.data.*.*.childBlock.ipv6",
+                    "data_type": "boolean",
                     "example_values": [
-                        "success"
+                        true,
+                        false
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.lastUpdateDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2011-10-19 14:26:30"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.nonBroadcast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.primarySubnet",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.vrfName",
+                    "data_type": "string",
+                    "example_values": [
+                        "management"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.subnetPolicy.cascadePrimaryDhcpServer",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -368,6 +283,54 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get ip address",
+            "identifier": "get_ip_address",
+            "description": "Gets Hostname associated with known IP Address",
+            "verbose": "Gets Hostname associated with known IP Address.",
+            "type": "investigate",
+            "read_only": false,
+            "parameters": {
+                "hostname": {
+                    "description": "Hostname",
+                    "data_type": "string",
+                    "required": true,
+                    "contains": [
+                        "hostname"
+                    ],
+                    "order": 0,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "hostname"
+                    ],
+                    "column_name": "Hostname",
+                    "column_order": 0,
+                    "example_values": [
+                        "thisisaphantomtest"
                     ]
                 },
                 {
@@ -386,70 +349,17 @@
                 },
                 {
                     "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deviceType",
                     "data_type": "string",
                     "example_values": [
-                        ""
+                        "Printer"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.duid",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.container",
-                    "data_type": "string",
-                    "example_values": [
-                        "/InControl/Americas/U.S./Exton/Exton-Nexus"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Default"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.sequence",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.relayAgentCircuitId",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.virtual",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.ipAddress",
-                    "data_type": "string",
-                    "example_values": [
-                        "172.18.100.1"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        6252
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.relayAgentRemoteId",
                     "data_type": "string"
                 },
                 {
@@ -463,10 +373,64 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deviceType",
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6250
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.container",
                     "data_type": "string",
                     "example_values": [
-                        "Printer"
+                        "/InControl/Americas/U.S./Exton/Exton-Nexus"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6252
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.ipAddress",
+                    "data_type": "string",
+                    "example_values": [
+                        "172.18.100.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Default"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.relayAgentCircuitId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.relayAgentRemoteId",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.sequence",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.virtual",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -482,10 +446,25 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.id",
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        6250
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
@@ -498,109 +477,59 @@
             "action": "get child block",
             "identifier": "get_child_block",
             "description": "Gets Child Block",
-            "verbose": "Gets the Child block",
+            "verbose": "Gets the Child block.",
             "type": "investigate",
             "read_only": false,
             "parameters": {
                 "name": {
                     "description": "The name of the block to export. Ex. name='My Block'",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 0
                 },
                 "block": {
-                "description":  "The CIDR notation of the block to export. The accepted format for CIDR notation is 'block_address/block_size'. Ex. block='10.0.0.0/24'",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 1
+                    "description": "The CIDR notation of the block to export. The accepted format for CIDR notation is 'block_address/block_size'. Ex. block='10.0.0.0/24'",
+                    "data_type": "string",
+                    "order": 1
                 },
                 "blockType": {
-                "description":  "The block type name of the block(s) to export. Ex. blocktype='private'",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 2
+                    "description": "The block type name of the block(s) to export. Ex. blocktype='private'",
+                    "data_type": "string",
+                    "order": 2
                 },
                 "container": {
-                "description":  "The container name of the block(s) to be exported. Ex. container='Exton'",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 3
+                    "description": "The container name of the block(s) to be exported. Ex. container='Exton'",
+                    "data_type": "string",
+                    "order": 3
                 },
                 "createDate": {
                     "description": "The GMT date and time the block was created",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 4
                 },
                 "lastUpdate": {
-                "description":  "The GMT date and time the block was last updated",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 5
+                    "description": "The GMT date and time the block was last updated",
+                    "data_type": "string",
+                    "order": 5
                 },
                 "parentContainer": {
-                "description":  "Only applied when parentBlock is supplied. Specifies the name of the parent block's container. Useful in order to eliminate ambiguity by specifying the container name, fully qualified or not.",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 6
+                    "description": "Only applied when parentBlock is supplied. Specifies the name of the parent block's container. Useful in order to eliminate ambiguity by specifying the container name, fully qualified or not",
+                    "data_type": "string",
+                    "order": 6
                 },
                 "status": {
-                "description":  "The status of the block(s) to be exported. Valid options are: free, aggregate, reserved, subnet, fullyassigned.",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 7
+                    "description": "The status of the block(s) to be exported. Valid options are: free, aggregate, reserved, subnet, fullyassigned",
+                    "data_type": "string",
+                    "order": 7
                 },
                 "ipVersion": {
-                    "description": "The IP Version of the block(s) to be exported. Valid options are: v4 and v6.",
+                    "description": "The IP Version of the block(s) to be exported. Valid options are: v4 and v6",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
-                    "contains": [],
-                    "value_list": [],
-                    "default": "",
                     "order": 8
                 },
                 "udf": {
-                "description":  "The name and value of a UDF attached to the block(s) to be exported.",
-                "data_type":  "string",
-                "required": false,
-                "primary":  false,
-                "contains":  [],
-                "value_list":  [],
-                "default":  "",
-                "order": 9
+                    "description": "The name and value of a UDF attached to the block(s) to be exported",
+                    "data_type": "string",
+                    "order": 9
                 }
             },
             "output": [
@@ -608,47 +537,72 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.subnetPolicy.cascadePrimaryDhcpServer",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
+                    "data_path": "action_result.parameter.block",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.primarySubnet",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.createReverseDomains",
+                    "data_path": "action_result.parameter.blockType",
                     "data_type": "string",
                     "example_values": [
-                        "false"
+                        "Any"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.createDate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.ipVersion",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.lastUpdate",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.parentContainer",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.udf",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.SWIPname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.allocationReason",
+                    "data_type": "string",
+                    "example_values": [
+                        "Base Allocation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.blockAddr",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.168.64.0"
                     ],
                     "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.container",
-                    "data_type": "string",
-                    "example_values": [
-                        "/InControl/Americas"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.description",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
+                        "ip"
                     ]
                 },
                 {
@@ -666,49 +620,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.createDate",
-                    "data_type": "string",
-                    "example_values": [
-                        "2007-05-08 18:58:33"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.excludeFromDiscovery",
-                    "data_type": "string",
-                    "example_values": [
-                        "false"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.lastUpdateDate",
-                    "data_type": "string",
-                    "example_values": [
-                        "2007-05-08 18:58:33"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.blockAddr",
-                    "data_type": "string",
-                    "example_values": [
-                        "192.168.64.0"
-                    ],
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.*.childBlock.blockStatus",
                     "data_type": "string",
                     "example_values": [
                         "Free"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.*.childBlock.ipv6",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
                     ]
                 },
                 {
@@ -719,12 +634,32 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.nonBroadcast",
-                    "data_type": "boolean",
+                    "data_path": "action_result.data.*.*.childBlock.container",
+                    "data_type": "string",
                     "example_values": [
-                        true,
-                        false
+                        "/InControl/Americas"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.createDate",
+                    "data_type": "string",
+                    "example_values": [
+                        "2007-05-08 18:58:33"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.createReverseDomains",
+                    "data_type": "string",
+                    "example_values": [
+                        "false"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.description",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.*.childBlock.discoveryAgent",
@@ -734,17 +669,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.allocationReason",
+                    "data_path": "action_result.data.*.*.childBlock.domainType",
                     "data_type": "string",
                     "example_values": [
-                        "Base Allocation"
+                        "Asia"
+                    ],
+                    "contains": [
+                        "domain"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.subnetPolicy.networkLink",
+                    "data_path": "action_result.data.*.*.childBlock.excludeFromDiscovery",
                     "data_type": "string",
                     "example_values": [
-                        "extonhub-BVI100"
+                        "false"
                     ]
                 },
                 {
@@ -765,20 +703,49 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.domainType",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.*.childBlock.ipv6",
+                    "data_type": "boolean",
                     "example_values": [
-                        "Asia"
-                    ],
-                    "contains": [
-                        "domain"
+                        true,
+                        false
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.SWIPname",
+                    "data_path": "action_result.data.*.*.childBlock.lastUpdateDate",
                     "data_type": "string",
                     "example_values": [
-                        ""
+                        "2007-05-08 18:58:33"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.nonBroadcast",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.primarySubnet",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.childBlock.vrfName",
+                    "data_type": "string",
+                    "example_values": [
+                        "management"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.*.subnetPolicy.cascadePrimaryDhcpServer",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -796,25 +763,19 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.*.childBlock.vrfName",
+                    "data_path": "action_result.data.*.*.subnetPolicy.networkLink",
                     "data_type": "string",
                     "example_values": [
-                        "management"
+                        "extonhub-BVI100"
                     ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.blockType",
-                    "data_type": "string",
-                    "example_values": [
-                        "Any"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -832,16 +793,15 @@
                 }
             ],
             "render": {
-                    "type": "table"
-                },
-                "versions": "EQ(*)"
+                "type": "table"
             },
-
+            "versions": "EQ(*)"
+        },
         {
             "action": "get hostname",
             "identifier": "get_hostname",
             "description": "Gets the hostname from the known IP Address",
-            "verbose": "Gets the Hostname related to a known IP Address",
+            "verbose": "Gets the Hostname related to a known IP Address.",
             "type": "investigate",
             "read_only": false,
             "parameters": {
@@ -849,14 +809,24 @@
                     "description": "IP Address",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
-                    "contains": ["ip"],
-                    "value_list": [],
-                    "default": "",
-                    "order": 0
+                    "contains": [
+                        "ip"
+                    ],
+                    "order": 0,
+                    "primary": true
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
@@ -867,36 +837,6 @@
                     "column_order": 0,
                     "example_values": [
                         "172.18.100.1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "status",
-                    "column_order": 2,
-                    "example_values": [
-                        "success"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
-                    ]
-                },
-                {
-                    "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -915,16 +855,36 @@
                 },
                 {
                     "data_path": "action_result.data.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.deviceType",
                     "data_type": "string",
                     "example_values": [
-                        ""
+                        "Printer"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.duid",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.hostname",
                     "data_type": "string",
+                    "column_name": "Hostname",
+                    "column_order": 1,
                     "example_values": [
-                        ""
+                        "thisisaphantomtest"
+                    ],
+                    "contains": [
+                        "host name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6250
                     ]
                 },
                 {
@@ -935,29 +895,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.interfaces.*.name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Default"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.sequence",
+                    "data_path": "action_result.data.*.interfaces.*.id",
                     "data_type": "numeric",
                     "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.relayAgentCircuitId",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.interfaces.*.virtual",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
+                        6252
                     ]
                 },
                 {
@@ -971,33 +912,33 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.interfaces.*.id",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.interfaces.*.name",
+                    "data_type": "string",
                     "example_values": [
-                        6252
+                        "Default"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.interfaces.*.relayAgentCircuitId",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.interfaces.*.relayAgentRemoteId",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.hostname",
-                    "data_type": "string",
-                    "column_name": "HostName",
-                    "column_order": 1,
+                    "data_path": "action_result.data.*.interfaces.*.sequence",
+                    "data_type": "numeric",
                     "example_values": [
-                        "thisisaphantomtest"
-                    ],
-                    "contains": [
-                        "host name"
+                        0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.deviceType",
-                    "data_type": "string",
+                    "data_path": "action_result.data.*.interfaces.*.virtual",
+                    "data_type": "boolean",
                     "example_values": [
-                        "Printer"
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1011,10 +952,25 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.id",
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
-                        6250
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],
