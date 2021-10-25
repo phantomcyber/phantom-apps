@@ -422,8 +422,8 @@ class BmcremedyConnector(BaseConnector):
                                         verify=self._verify_server_cert)
         except requests.exceptions.ConnectionError as e:
             self.debug_print(self._get_error_message_from_exception(e))
-            error_message = "Error connecting to server. Connection refused from server for {}".format('{}{}'.format(self._base_url, endpoint))
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, error_message), response_data, response)
+            error_msg = "Error connecting to server. Connection refused from server for {}".format('{}{}'.format(self._base_url, endpoint))
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, error_msg), response_data, response)
         except Exception as error:
             error_msg = self._get_error_message_from_exception(error)
             self.debug_print(consts.BMCREMEDY_REST_CALL_ERROR.format(error=error_msg))
