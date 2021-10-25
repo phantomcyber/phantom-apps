@@ -1,23 +1,24 @@
 {
     "appid": "d601fef6-f803-4fc9-8fe9-ae8910b03dd7",
     "name": "AutoFocus",
-    "description": "This app implements <b>hunting</b> and <b>reporting</b> actions on the AutoFocus threat intelligence service.",
-    "publisher": "Phantom",
+    "description": "This App supports hunting actions and report retrieval on Palo Alto Networks AutoFocus",
+    "publisher": "Splunk Community",
     "type": "threat intel",
-    "main_module": "autofocus_connector.pyc",
-    "app_version": "1.0.21",
-    "utctime_updated": "2018-01-26T00:47:21.000000Z",
+    "main_module": "autofocus_connector.py",
+    "app_version": "1.1.2",
+    "utctime_updated": "2021-10-25T06:38:03.000000Z",
     "package_name": "phantom_autofocus",
     "product_vendor": "Palo Alto Networks",
     "product_name": "AutoFocus",
     "product_version_regex": ".*",
-    "min_phantom_version": "2.1.478",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "2.7",
     "logo": "logo_paloaltonetworks.svg",
     "logo_dark": "logo_paloaltonetworks_dark.svg",
-    "license": "Copyright (c) 2021 Splunk Inc",
+    "license": "Copyright (c) 2021 Splunk Inc.",
     "configuration": {
         "api_key": {
-            "data_type": "string",
+            "data_type": "password",
             "order": 0,
             "description": "AutoFocus API Key",
             "required": true
@@ -62,8 +63,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -73,6 +73,31 @@
                 "height": 5
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "md5",
+                        "sha256",
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
                 {
                     "data_path": "action_result.data.*.public_tag_name",
                     "data_type": "string",
@@ -89,45 +114,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.count",
-                    "data_type": "numeric",
-                    "column_name": "Count",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 3
-                },
-                {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "md5",
-                        "hash",
-                        "sha1"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.scope",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_tags_matched",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.id",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -166,8 +166,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -177,6 +176,29 @@
                 "height": 5
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
                 {
                     "data_path": "action_result.data.*.public_tag_name",
                     "data_type": "string",
@@ -193,43 +215,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.count",
-                    "data_type": "numeric",
-                    "column_name": "Count",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 3
-                },
-                {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.ip",
-                    "data_type": "string",
-                    "contains": [
-                        "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.scope",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_tags_matched",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.id",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -268,8 +267,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -279,6 +277,29 @@
                 "height": 5
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.domain",
+                    "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
                 {
                     "data_path": "action_result.data.*.public_tag_name",
                     "data_type": "string",
@@ -295,43 +316,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.count",
-                    "data_type": "numeric",
-                    "column_name": "Count",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 3
-                },
-                {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.domain",
-                    "data_type": "string",
-                    "contains": [
-                        "domain"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.scope",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_tags_matched",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.id",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -370,8 +368,7 @@
                         "My Samples",
                         "Public Samples"
                     ],
-                    "description": "Scope of search (Default: All Samples)",
-                    "required": false
+                    "description": "Scope of search (Default: All Samples)"
                 }
             },
             "render": {
@@ -381,6 +378,29 @@
                 "height": 5
             },
             "output": [
+                {
+                    "data_path": "action_result.parameter.scope",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.count",
+                    "data_type": "numeric",
+                    "column_name": "Count",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "column_name": "Description",
+                    "column_order": 3
+                },
                 {
                     "data_path": "action_result.data.*.public_tag_name",
                     "data_type": "string",
@@ -397,43 +417,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.count",
-                    "data_type": "numeric",
-                    "column_name": "Count",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.description",
-                    "data_type": "string",
-                    "column_name": "Description",
-                    "column_order": 3
-                },
-                {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.scope",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_tags_matched",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.id",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -473,55 +470,38 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.id",
+                    "data_path": "action_result.parameter.tag",
+                    "data_type": "string",
+                    "contains": [
+                        "autofocus tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.daily_bucket_start",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.refs",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.count",
+                    "data_path": "action_result.data.*.bucket_info.daily_points",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.lasthit",
+                    "data_path": "action_result.data.*.bucket_info.daily_points_remaining",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.minute_bucket_start",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.comments.*.email",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.bucket_info.minute_points",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.bucket_info.minute_points_remaining",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.tag.comments.*.comment",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.user_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.customer",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.last_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.first_name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.support_id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.visibility",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.comments.*.submit_time",
                     "data_type": "string"
                 },
                 {
@@ -529,35 +509,51 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.comments.*.tag_comment_id",
-                    "data_type": "numeric"
+                    "data_path": "action_result.data.*.tag.comments.*.customer",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.tag.comments.*.customer_industry",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.tag.comments.*.email",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.first_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.last_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.submit_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.support_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.comments.*.tag_comment_id",
+                    "data_type": "numeric"
+                },
+                {
                     "data_path": "action_result.data.*.tag.comments.*.tag_report_status_id",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.reported",
-                    "data_type": "boolean"
+                    "data_path": "action_result.data.*.tag.comments.*.user_id",
+                    "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.tag_name",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.tag.comments.*.visibility",
+                    "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.tag_class",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.tag.tag_class_id",
+                    "data_path": "action_result.data.*.tag.count",
                     "data_type": "numeric"
                 },
                 {
@@ -565,15 +561,35 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.tag.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.lasthit",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.tag.public_tag_name",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.tag_definition_scope",
+                    "data_path": "action_result.data.*.tag.refs",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag.tag_definition_status",
+                    "data_path": "action_result.data.*.tag.reported",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_class",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_class_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.tag.tag_definition_scope",
                     "data_type": "string"
                 },
                 {
@@ -581,32 +597,16 @@
                     "data_type": "numeric"
                 },
                 {
+                    "data_path": "action_result.data.*.tag.tag_definition_status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.tag.tag_definition_status_id",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.bucket_info.daily_points",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.bucket_info.minute_points",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.bucket_info.daily_bucket_start",
+                    "data_path": "action_result.data.*.tag.tag_name",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.bucket_info.minute_bucket_start",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.bucket_info.daily_points_remaining",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.bucket_info.minute_points_remaining",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.tag_searches.*.count",
@@ -621,10 +621,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.tag_searches.*.ui_search_definition",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.tag_searches.*.tag_definition_search_status",
                     "data_type": "string"
                 },
@@ -633,19 +629,24 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.tag_searches.*.ui_search_definition",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.tag",
-                    "data_type": "string",
-                    "contains": [
-                        "autofocus tag"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",

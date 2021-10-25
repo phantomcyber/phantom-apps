@@ -2,7 +2,6 @@
 # Copyright (c) 2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
 import ast
 
 
@@ -99,6 +98,7 @@ def _convert_dict_to_results(input_results):
         action_results.append(r)
 
     return action_results
+
 
 if __name__ == '__main__':
     import sys

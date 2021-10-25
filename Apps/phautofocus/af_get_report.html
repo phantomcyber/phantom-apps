@@ -9,7 +9,7 @@
 
 {% block widget_content %} <!-- Main Start Block -->
 
-<!--
+<!-- 
 File: ./af_get_report.html
 Copyright (c) 2021 Splunk Inc.
 
@@ -82,7 +82,9 @@ a:hover {
   <br>
   <h3 class="wf-h3-style">AutoFocus Get Report</h3>
   {% if result.message %} <!------------------- Message ---------------------->
-    <p>{% autoescape off %}{{ result.message }}{% endautoescape %}</p>
+    <p>{{ result.message }}</p>
+  {% elif not result.data %}
+    <h4 class="wf-h4-style">No data found</h4>
   {% else %}
     <br>
     <h3 class="wf-h3-style">{{ result.data.tag.tag_name}}</h3>
@@ -122,7 +124,7 @@ a:hover {
           <td>{{ tag_search.tag_definition_search_status }}</td>
           <td>{{ tag_search.count }}</td>
           <td>{{ tag_search.lasthit }}</td>
-          <td>{% autoescape off %}{{ tag_search.ui_search_string }}{% endautoescape %}</td>
+          <td>{{ tag_search.ui_search_string }}</td>
         </tr>
     {% endfor %}
     </table>
