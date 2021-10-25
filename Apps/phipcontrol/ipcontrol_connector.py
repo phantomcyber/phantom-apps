@@ -354,13 +354,13 @@ class IpControlConnector(BaseConnector):
 
         name = param.get('name', '')
         block = param.get('block', '')
-        blockType = param.get('blockType', '')
+        blockType = param.get('block_type', '')
         container = param.get('container', '')
-        createDate = param.get('createDate', '')
-        lastUpdate = param.get('lastUpdate', '')
-        parentContainer = param.get('parentContainer', '')
+        createDate = param.get('create_date', '')
+        lastUpdate = param.get('last_update', '')
+        parentContainer = param.get('parent_container', '')
         status = param.get('status', '')
-        ipVersion = param.get('ipVersion', '')
+        ipVersion = param.get('ip_version', '')
         udf = param.get('udf', '')
         # query = {'name': name, 'block': block, 'blockType': blockType, 'container': container}
 

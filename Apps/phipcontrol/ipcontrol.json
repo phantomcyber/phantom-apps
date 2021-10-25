@@ -491,7 +491,7 @@
                     "data_type": "string",
                     "order": 1
                 },
-                "blockType": {
+                "block_type": {
                     "description": "The block type name of the block(s) to export. Ex. blocktype='private'",
                     "data_type": "string",
                     "order": 2
@@ -501,17 +501,17 @@
                     "data_type": "string",
                     "order": 3
                 },
-                "createDate": {
+                "create_date": {
                     "description": "The GMT date and time the block was created",
                     "data_type": "string",
                     "order": 4
                 },
-                "lastUpdate": {
+                "last_update": {
                     "description": "The GMT date and time the block was last updated",
                     "data_type": "string",
                     "order": 5
                 },
-                "parentContainer": {
+                "parent_container": {
                     "description": "Only applied when parentBlock is supplied. Specifies the name of the parent block's container. Useful in order to eliminate ambiguity by specifying the container name, fully qualified or not",
                     "data_type": "string",
                     "order": 6
@@ -521,7 +521,7 @@
                     "data_type": "string",
                     "order": 7
                 },
-                "ipVersion": {
+                "ip_version": {
                     "description": "The IP Version of the block(s) to be exported. Valid options are: v4 and v6",
                     "data_type": "string",
                     "order": 8
@@ -546,7 +546,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.blockType",
+                    "data_path": "action_result.parameter.block_type",
                     "data_type": "string",
                     "example_values": [
                         "Any"
@@ -557,15 +557,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.createDate",
+                    "data_path": "action_result.parameter.create_date",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.ipVersion",
+                    "data_path": "action_result.parameter.ip_version",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.lastUpdate",
+                    "data_path": "action_result.parameter.last_update",
                     "data_type": "string"
                 },
                 {
@@ -573,7 +573,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.parentContainer",
+                    "data_path": "action_result.parameter.parent_container",
                     "data_type": "string"
                 },
                 {
