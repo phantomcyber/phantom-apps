@@ -219,7 +219,7 @@ class IpControlConnector(BaseConnector):
         if ip_address != "":
             query = '{"query": "ipAddress=%s","pageSize": 0,"includeFreeBlocks": True,"firstResultPos": 0}' % (ip_address)
         elif hostname != "":
-            query = {"query": "hostname=thisisaphantomtest", "pageSize": 0, "includeFreeBlocks": True, "firstResultPos": 0}
+            query = '{"query": "hostname=%s", "pageSize": 0, "includeFreeBlocks": True, "firstResultPos": 0}' % (hostname)
 
         data = query
         headers = {

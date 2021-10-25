@@ -54,7 +54,7 @@
             "description": "Returns block type for endpoint using IP or Hostname",
             "verbose": "Returns the block type for an endpoint using the IP Address or the Hostname.",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "ip_address": {
                     "description": "IP Address",
@@ -297,7 +297,7 @@
             "description": "Gets Hostname associated with known IP Address",
             "verbose": "Gets Hostname associated with known IP Address.",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "hostname": {
                     "description": "Hostname",
@@ -479,7 +479,7 @@
             "description": "Gets Child Block",
             "verbose": "Gets the Child block.",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "name": {
                     "description": "The name of the block to export. Ex. name='My Block'",
@@ -803,7 +803,7 @@
             "description": "Gets the hostname from the known IP Address",
             "verbose": "Gets the Hostname related to a known IP Address.",
             "type": "investigate",
-            "read_only": false,
+            "read_only": true,
             "parameters": {
                 "ip_address": {
                     "description": "IP Address",
