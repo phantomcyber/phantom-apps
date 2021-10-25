@@ -1,14 +1,24 @@
+# File: taniumdetect_connector.py
+#
 # Copyright (c) 2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
+#
+#
 # Originally Created by Thomas (Phantom)
 # 11-11-2019
-#   Added action on_poll to ingest alerts.
-#   Added comments for all actions and made the code easier to follow by adding new lines.
-#   Added default fields in the tanium_detect_consts.py
-
+# Added action on_poll to ingest alerts.
+# Added comments for all actions and made the code easier to follow by adding new lines.
+# Added default fields in the tanium_detect_consts.py
 import requests
 import json
 from bs4 import BeautifulSoup

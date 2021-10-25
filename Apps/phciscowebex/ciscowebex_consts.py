@@ -2,10 +2,16 @@
 #
 # Copyright (c) 2021 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# --
-
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
 SCOPE = 'spark-admin%3Abroadworks_subscribers_write%20meeting%3Arecordings_read%20meeting%3Aadmin_preferences_write%20spark%3Aall%20meeting%3Aadmin_preferences_read%20meeting' \
         '%3Aparticipants_read%20analytics%3Aread_all%20meeting%3Aadmin_participants_read%20meeting%3Apreferences_write%20meeting%3Aadmin_recordings_read%20meeting' \
         '%3Atranscripts_read%20meeting%3Aschedules_write%20meeting%3Acontrols_read%20spark-admin%3Ahybrid_clusters_read%20spark-admin%3Abroadworks_enterprises_write%20meeting' \
