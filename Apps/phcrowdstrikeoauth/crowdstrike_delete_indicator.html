@@ -10,10 +10,10 @@
 {% block widget_content %} <!-- Main Start Block -->
 
 <!-- 
-File: crowdstrike_set_status_view.html
+File: crowdstrike_delete_indicator.html
 Copyright (c) 2019-2021 Splunk Inc.
 
-  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 -->
 
 <style>
@@ -75,17 +75,35 @@ a:hover {
 <br>
 
 <!------------------- For each Result ---------------------->
-{% if result.param.id %}
+{% if not result.param.ioc and not result.param.resource_id %}
+<h4 class="wf-h4-style">No data found </h4>
+{% else %}
 <table class="ph-table-horizontal">
-  <tr><th>Detection ID</th><th>Message</th></tr>
   <tr>
-    <td>
-    <a href="javascript:;" onclick="context_menu(this, [{'contains': [ 'falcon detection id' ], 'value': '{{ result.param.id }}' }], 0, {{ container.id }}, null, false);">
-    {{ result.param.id }}
+    {% if result.param.ioc %}
+    <th>IOC</th>
+    {% endif %}
+    {% if result.param.resource_id %}
+    <th>Resource ID</th>
+    {% endif %}
+  </tr>
+  <tr>
+  {% if result.param.ioc %}
+  <td>
+    <a href="javascript:;" onclick="context_menu(this, [{'contains': [ 'ip', 'ipv6', 'sha256', 'md5', 'domain' ], 'value': '{{ result.param.ioc }}' }], 0, {{ container.id }}, null, false);">
+    {{ result.param.ioc }}
     &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
     </a>
-    </td>
-    <td>{{ result.message }}</td>
+  </td>
+  {% endif %}
+  {% if result.param.resource_id %}
+  <td>
+    <a href="javascript:;" onclick="context_menu(this, [{'contains': [ 'crowdstrike indicator id' ], 'value': '{{ result.param.resource_id }}' }], 0, {{ container.id }}, null, false);">
+    {{ result.param.resource_id }}
+    &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+    </a>
+  </td>
+  {% endif %}
   </tr>
 </table>
 {% endif %}
