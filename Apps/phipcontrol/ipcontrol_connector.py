@@ -12,6 +12,7 @@ from phantom.action_result import ActionResult
 # from ipcontrol_consts import *
 import requests
 import json
+import re
 from bs4 import BeautifulSoup
 from ipcontrol_consts import *
 
@@ -348,7 +349,6 @@ class IpControlConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_child_block(self, param):
-        import re
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
