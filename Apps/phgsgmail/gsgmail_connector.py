@@ -26,6 +26,7 @@ from google.oauth2 import service_account
 from googleapiclient import errors
 from datetime import datetime
 from gsgmail_process_email import ProcessMail
+from copy import deepcopy
 
 init_path = '{}/dependencies/google/__init__.py'.format(  # noqa
     os.path.dirname(os.path.abspath(__file__))  # noqa
@@ -56,6 +57,8 @@ class GSuiteConnector(BaseConnector):
         self._state = {}
         self._python_version = None
         self._login_email = None
+        self._dup_emails = 0
+        self._last_email_epoch = None
 
         # Call the BaseConnectors init first
         super(GSuiteConnector, self).__init__()
@@ -86,6 +89,8 @@ class GSuiteConnector(BaseConnector):
 
     def initialize(self):
         self._state = self.load_state()
+        if self._state:
+            self._last_email_epoch = self._state.get('last_email_epoch')
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
@@ -662,12 +667,12 @@ class GSuiteConnector(BaseConnector):
         if not include_sent:
             query.append('-in:sent')
 
-        using_oldest = ingest_manner == "oldest first"
-        using_latest = ingest_manner == "latest first"
+        using_oldest = ingest_manner == GSMAIL_OLDEST_INGEST_MANNER
+        using_latest = ingest_manner == GSMAIL_LATEST_INGEST_MANNER
 
-        if use_ingest_limit:
-            if 'last_email_epoch' in self._state and using_oldest:
-                query.append('after:{}'.format(self._state['last_email_epoch']))
+        if use_ingest_limit and not self.is_poll_now():
+            if self._last_email_epoch and using_oldest:
+                query.append('after:{}'.format(self._last_email_epoch))
             elif 'last_ingested_epoch' in self._state and using_latest:
                 query.append('after:{}'.format(self._state['last_ingested_epoch']))
 
@@ -740,34 +745,34 @@ class GSuiteConnector(BaseConnector):
             else:
                 max_emails = max_containers
 
+        run_limit = deepcopy(max_emails)
         action_result = self.add_action_result(ActionResult(dict(param)))
-
         email_id = param.get(phantom.APP_JSON_CONTAINER_ID, False)
         email_ids = [email_id]
-        if not email_id:
-            ingest_manner = config.get('ingest_manner', GSMAIL_DEFAULT_INGEST_MANNER)
-            self.save_progress("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
-            self.debug_print("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
-            labels = []
-            if "label" in config:
-                labels_val = config['label']
-                labels = [x.strip() for x in labels_val.split(',')]
-                labels = list(filter(None, labels))
-            ret_val, email_ids = self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner, labels=labels,
-                                                                use_ingest_limit=True, include_sent=True)
+        total_ingested = 0
+        ingest_manner = config.get('ingest_manner', GSMAIL_OLDEST_INGEST_MANNER)
+        while True:
+            self._dup_emails = 0
+            if not email_id:
+                ret_val, email_ids = self._get_email_ids(action_result, config, service, max_emails, ingest_manner)
+                if phantom.is_fail(ret_val):
+                    return action_result.get_status()
+                if not email_ids:
+                    return action_result.set_status(phantom.APP_SUCCESS)
+                if not self.is_poll_now():
+                    self._update_state()
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+            self._process_email_ids(action_result, config, service, email_ids)
+            total_ingested += max_emails - self._dup_emails
 
-            if not self.is_poll_now():
-                utc_now = datetime.utcnow()
-                epoch = datetime.utcfromtimestamp(0)
-                self._state['last_ingested_epoch'] = str(int((utc_now - epoch).total_seconds()))
+            if ingest_manner == GSMAIL_LATEST_INGEST_MANNER or total_ingested >= run_limit or self.is_poll_now():
+                break
 
-            if not email_ids:
-                return action_result.set_status(phantom.APP_SUCCESS)
+            max_emails = max_emails + min(self._dup_emails, run_limit)
 
-        # process email_ids
+        return phantom.APP_SUCCESS
+
+    def _process_email_ids(self, action_result, config, service, email_ids):
         for i, emid in enumerate(email_ids):
             self.send_progress("Parsing email id: {0}".format(emid))
             try:
@@ -775,16 +780,30 @@ class GSuiteConnector(BaseConnector):
             except errors.HttpError as error:
                 return action_result.set_status(phantom.APP_ERROR, error)
 
-            timestamp = int(message['internalDate']) / 1000
+            timestamp = int(message['internalDate']) // 1000
             if not self.is_poll_now() and i == 0:
                 self._state['last_email_epoch'] = timestamp + 1
             # the api libraries return the base64 encoded message as a unicode string,
             # but base64 can be represented in ascii with no possible issues
             raw_decode = base64.urlsafe_b64decode(message['raw'].encode("utf-8")).decode("utf-8")
-
             process_email = ProcessMail(self, config)
             process_email.process_email(raw_decode, emid, timestamp)
-        return phantom.APP_SUCCESS
+
+    def _update_state(self):
+        utc_now = datetime.utcnow()
+        epoch = datetime.utcfromtimestamp(0)
+        self._state['last_ingested_epoch'] = str(int((utc_now - epoch).total_seconds()))
+
+    def _get_email_ids(self, action_result, config, service, max_emails, ingest_manner):
+
+        self.save_progress("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
+        self.debug_print("Getting {0} '{1}' email ids".format(max_emails, ingest_manner))
+        labels = []
+        if "label" in config:
+            labels_val = config['label']
+            labels = [x.strip() for x in labels_val.split(',')]
+            labels = list(filter(None, labels))
+        return self._get_email_ids_to_process(service, action_result, max_emails, ingest_manner=ingest_manner, labels=labels, use_ingest_limit=True, include_sent=True)
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
