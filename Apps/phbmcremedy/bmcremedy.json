@@ -2885,7 +2885,7 @@
         {
             "action": "list tickets",
             "description": "Get list of incidents",
-            "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+in+the+advanced+search+bar\" target='_blank'>Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+fields+in+the+advanced+search+bar#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+relational+operators+and+wildcard+symbols+in+a+search#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\" target='_blank'>Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/display/public/ars81/Using+the+advanced+search+bar\" target='_blank'>Query Syntax link</a>.</p>.",
+            "verbose": "<p>The action supports limiting the number of incidents returned using the <b>limit</b> parameter. The input should be a positive integer. The results are always sorted in descending order based on their last modified date to place the latest modified incidents at the top. For example to get the latest 10 incidents that matched the filter, specify the limit as 10. If <b>limit</b> is zero or not specified, then all incidents will be returned.</p><p>To define a set of criteria to filter incidents, query must be provided in <b>query</b> parameter.<br>Query must contain field label enclosed in single quotation marks(''), and non-numeric values in double quotation marks(\"\").<br>Eg: <b>'Incident Number'=\"INC000000000001\", 'Submit Date'=\"February 20, 2017\"</b><br>If a field name contains single quotation mark, add another single quotation mark next to it.<br>Eg: If field name is <b>Submitter's Phone Number</b>, query must contain field label as <b>'Submitter''s Phone Number'</b><br>More information about using fields in <b>query</b> parameter can be found on <a href=\"https://docs.bmc.com/docs/ars2008/using-fields-in-the-advanced-search-bar-928611932.html#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Fields in query</a>.<br>Query can accept various operators such as:<br><ol><li><b>Relational and Logical Operators</b>:<ul><li>Relational and Logical operators are useful especially in non-text fields (such as date and time fields) when you want to search for a value within a numerical range.</li><li>Some of the examples are as follows:<br><b>('Submitter'=\"admin\") AND (NOT 'Incident Number'=\"INC000000000001\")</b><br><b>'Impact'=\"1-Extensive/Widespread\" OR 'Urgency'=\"1-Critical\"</b><br><b>'Incident Number' = \"INC000000000001\"</b><br><b>'Status' != \"Closed\"</b><br><b>'Submit Date' > \"February 28, 2017\"</b></li><li>More information about relational and logical operators can be found at <a href=\"https://docs.bmc.com/docs/ars2008/using-relational-operators-in-the-advanced-search-bar-928611933.html\" target='_blank'>Relational and logical Operators link</a>.</li></ul></li><li><b>Keywords in query</b>:<ul><li>Keywords can be used anywhere where character values are accepted.</li><li>Most commonly used keywords are: <b>$DATE$</b>, <b>$NULL$</b>, <b>$TIME$</b>, <b>$TIMESTAMP$</b>, <b>$USER$</b>, and <b>$WEEKDAY$</b>.</li><li>Some of the examples are as follows:<br><b>'Assignee' = $NULL$</b><br><b>'Create date' < ($TIMESTAMP$ - 24*60*60)</b></li><li>More information about Keywords can be found at <a href=\"https://docs.bmc.com/docs/ars2008/using-fields-in-the-advanced-search-bar-928611932.html#Usingfieldsintheadvancedsearchbar-4Usingvaluesintheadvancedsearchbar\" target='_blank'>Keywords link</a>.</li></ul></li><li><b>Wildcard symbols</b>:<ul><li>Wildcard symbols can be used to indicate one or more characters.</li><li>Wildcard symbols that can be used in query are: <b>%</b>, <b>_</b>, <b>-</b>, <b>[]</b>, <b>[^]</b></li><li>Some of the examples are as follows:<br><b>'Submitter' LIKE \"*Bob%ton*\"</b><br><b>'Phone Number' LIKE \"_ 212 5555454 (66)\"</b></li><li>More information about wildcard symbols can be found at <a href=\"https://docs.bmc.com/docs/ars2008/using-relational-operators-and-wildcard-symbols-in-a-search-928611919.html#Usingrelationaloperatorsandwildcardsymbolsinasearch-281729\" target='_blank'>Wildcard symbols link</a>.</li></ul></li></ol>More information about BMC Remedy Query Syntax can be found at <a href=\"https://docs.bmc.com/docs/ars2008/using-the-advanced-search-bar-928611931.html\" target='_blank'>Query Syntax link</a>.</p>.",
             "type": "investigate",
             "identifier": "list_tickets",
             "read_only": true,
@@ -2930,7 +2930,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.values.Incident Number",
+                    "data_path": "action_result.data.*.values.Incident Number",
                     "data_type": "string",
                     "contains": [
                         "bmcremedy incident id"
@@ -2940,52 +2940,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.values.Priority",
+                    "data_path": "action_result.data.*.values.Priority",
                     "data_type": "string",
                     "example_values": [
                         "Low"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.values.Last Name",
+                    "data_path": "action_result.data.*.values.Last Name",
                     "data_type": "string",
                     "contains": [
                         "bmcremedy last name"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.values.Status",
-                    "data_type": "string",
-                    "example_values": [
-                        "Assigned"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.values.Assignee",
-                    "data_type": "string",
-                    "example_values": [
-                        "Alex Jan"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.values.First Name",
-                    "data_type": "string",
-                    "contains": [
-                        "bmcremedy first name"
-                    ],
-                    "example_values": [
-                        "Alex"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.values.Description",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.values.Assigned Group",
-                    "data_type": "string",
-                    "example_values": [
-                        "Service Desk"
                     ]
                 },
                 {
@@ -2999,35 +2964,17 @@
                     "data_path": "action_result.data.*.values.Assignee",
                     "data_type": "string",
                     "example_values": [
-                        "Francie Stafford"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.values.Priority",
-                    "data_type": "string",
-                    "example_values": [
-                        "Low"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.values.Last Name",
-                    "data_type": "string",
-                    "example_values": [
-                        "Allbrook"
+                        "Alex Jan"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.values.First Name",
                     "data_type": "string",
+                    "contains": [
+                        "bmcremedy first name"
+                    ],
                     "example_values": [
-                        "Allen"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.values.Description",
-                    "data_type": "string",
-                    "example_values": [
-                        "q3123"
+                        "Alex"
                     ]
                 },
                 {
@@ -3038,22 +2985,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.values.Incident Number",
+                    "data_path": "action_result.data.*.values.Description",
                     "data_type": "string",
                     "example_values": [
-                        "INC000000000216"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*._links.self.*.href",
-                    "data_type": "string",
-                    "example_values": [
-                        "http://100.26.171.156:8008/api/arsys/v1/entry/HPD:IncidentInterface/INC0000000104%7CINC0000000104"
+                        "q3123"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*._links.self.*.href",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "http://100.26.171.156:8008/api/arsys/v1/entry/HPD:IncidentInterface/INC0000000104%7CINC0000000104"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*._links.next.*.href",

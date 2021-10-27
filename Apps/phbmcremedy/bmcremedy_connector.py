@@ -810,7 +810,7 @@ class BmcremedyConnector(BaseConnector):
         action_params = {"sort": "Last Modified Date.desc"}
 
         # Validate if 'limit' is positive integer
-        ret_val, limit = self._validate_integer(action_result, limit, 'limit')
+        ret_val, limit = self._validate_integer(action_result, limit, 'limit', allow_zero=True)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         action_params['limit'] = limit
