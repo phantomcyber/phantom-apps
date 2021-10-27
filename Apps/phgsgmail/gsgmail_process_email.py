@@ -944,8 +944,11 @@ class ProcessMail:
                     # mark it such that active playbooks get executed
                     artifact['run_automation'] = True
 
-                ret_val, status_string, artifact_id = self._base_connector.save_artifact(artifact)
-                self._base_connector.debug_print(PROC_EMAIL_SAVE_CONT_PASSED.format(ret_val, status_string, artifact_id))
+                ret_val, artifact_message, artifact_id = self._base_connector.save_artifact(artifact)
+                self._base_connector.debug_print(PROC_EMAIL_SAVE_CONT_PASSED.format(ret_val, artifact_message, artifact_id))
+
+            if "Duplicate container found" in message and not self._base_connector.is_poll_now():
+                self._base_connector._dup_emails += 1
 
         # delete any temp directories that were created by the email parsing function
         [shutil.rmtree(x['temp_directory'], ignore_errors=True) for x in results if x.get('temp_directory')]

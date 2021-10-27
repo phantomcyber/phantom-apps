@@ -4,13 +4,13 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the Threat Grid sandbox",
     "type": "sandbox",
     "main_module": "threatgrid_connector.py",
-    "app_version": "2.0.19",
-    "utctime_updated": "2021-01-26T13:38:19.000000Z",
+    "app_version": "2.1.9",
+    "utctime_updated": "2021-10-12T17:10:33.000000Z",
     "package_name": "phantom_threatgrid",
     "product_vendor": "Threat Grid",
     "product_name": "Threat Grid",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud, API panacea.threatgrid.com"
@@ -2217,6 +2217,12 @@
                     ],
                     "required": true,
                     "primary": true
+                },
+                "download_report": {
+                    "default": false,
+                    "description": "Download HTML report to the phantom vault",
+                    "data_type": "boolean",
+                    "order": 1
                 }
             },
             "output": [
@@ -2226,6 +2232,14 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.download_report",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -4259,6 +4273,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "3be5f2df1394f6ac1d4c0a2700b570fe_report.html"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.results_url",
                     "data_type": "string",
                     "contains": [
@@ -4278,6 +4299,20 @@
                     ],
                     "example_values": [
                         "Test_ThreatGrid_1.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_file_path",
+                    "data_type": "string",
+                    "example_values": [
+                        "/opt/phantom/vault/fa/3c/fa3c4c435d8f736d3ca95b2678b769e93a8ce263"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3be5f2df1394f6ac1d4c0a2700b570fe"
                     ]
                 },
                 {
@@ -6394,7 +6429,7 @@
         },
         {
             "action": "list playbooks",
-            "description": "List the playbooks available in the connected ThreatGrid envrionment",
+            "description": "List the playbooks available in the connected ThreatGrid environment",
             "type": "investigate",
             "identifier": "list_playbooks",
             "read_only": true,
@@ -6473,6 +6508,416 @@
                 "width": 12,
                 "height": 5,
                 "title": "List Playbooks"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list submissions",
+            "description": "List the submissions present on ThreatGrid based on the query provided",
+            "type": "investigate",
+            "identifier": "list submissions",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {
+                "query": {
+                    "description": "Query text to search in the submissions",
+                    "data_type": "string",
+                    "order": 0
+                },
+                "limit": {
+                    "description": "Limit for number of records to fetch (default: 100)",
+                    "data_type": "numeric",
+                    "order": 1
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string",
+                    "example_values": [
+                        "b76543da7da96deda6afb6543ad8b7654abaaca5f228f8520f53467f9ecb0e7f",
+                        "test.com",
+                        "sample test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.behaviors",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample.url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.magic",
+                    "data_type": "string",
+                    "example_values": [
+                        "MS Windows 95 Internet shortcut text (URL=<www.malwaremightbe.com/here>), ASCII text"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "baef8e944588d49853d3ecb90ba99fe8"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "e86be1c72ece47af5cff4c8a9867b3eff76315c3"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "b95685da7da07deda5afb9157ad8b1439abaaca5f228f8520f53467f9ecb0e7f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.analyzed_file.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.general_details.report_created",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-08T05:10:58Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.general_details.sandbox_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.general_details.sandbox_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "pilot-d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.malware_desc",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.analysis_end",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-08T05:10:58Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.analysis_start",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-08T05:04:19Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.controlsubject",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.current_os",
+                    "data_type": "string",
+                    "example_values": [
+                        "10586.212.amd64fre.th2_release_sec.160328-1908"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows 10 (Modern Browser)"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.run_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.sample_executed",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1631077518
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.sandcastle",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.vm",
+                    "data_type": "string",
+                    "example_values": [
+                        "win10-x64-browser"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.sandcastle_env.vm_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d14b2ba29fffce278529209095a50bd7"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample.url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.magic",
+                    "data_type": "string",
+                    "example_values": [
+                        "MS Windows 95 Internet shortcut text (URL=<www.malwaremightbe.com/here>), ASCII text"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "baef8e944588d49853d3ecb90ba99fe8"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "e86be1c72ece47af5cff4c8a9867b3eff76315c3"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "b95685da7da07deda5afb9157ad8b1439abaaca5f228f8520f53467f9ecb0e7f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.metadata.submitted_file.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.analysis.threat_score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        56
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "sample.url"
+                    ],
+                    "column_name": "File Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.item.login",
+                    "data_type": "string",
+                    "example_values": [
+                        "ryrussell"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "baef8e944588d49853d3ecb90ba99fe8"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3478
+                    ],
+                    "column_name": "Organization ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.item.private",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.sample",
+                    "data_type": "string",
+                    "example_values": [
+                        "d14b2ba29fffce278529209095a50bd7"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.sha1",
+                    "data_type": "string",
+                    "example_values": [
+                        "e86be1c72ece47af5cff4c8a9867b3eff76315c3"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.sha256",
+                    "data_type": "string",
+                    "example_values": [
+                        "b95685da7da07deda5afb9157ad8b1439abaaca5f228f8520f53467f9ecb0e7f"
+                    ],
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "SHA256",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.item.state",
+                    "data_type": "string",
+                    "column_name": "State",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.item.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "job_done"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.item.submitted_at",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-08T05:04:19Z"
+                    ],
+                    "column_name": "Submitted Time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.item.vm_runtime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        300
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.score",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1000000
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.search_report",
+                    "data_type": "numeric",
+                    "example_values": [
+                        100
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Number of results retrieved: 100"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "search submissions"
             },
             "versions": "EQ(*)"
         }
