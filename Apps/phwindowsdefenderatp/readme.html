@@ -34,6 +34,14 @@
             <li>List Devices</li>
             <li>List Alerts</li>
             <li>List Sessions</li>
+            <li>List Indicators</li>
+            <li>Get Installed Software</li>
+            <li>Get Discovered Vulnerabilities</li>
+            <li>Get File Devices</li>
+            <li>Get User Devices</li>
+            <li>Get Domain Devices</li>
+            <li>Get Missing KBs</li>
+            <li>Run Query</li>
           </ul>
         </ul>
       </p>
@@ -102,6 +110,14 @@
                   <li>Machine.Scan</li>
                   <li>Machine.StopAndQuarantine</li>
                   <li>User.Read.All</li>
+                  <li>Software.Read.All</li>
+                  <li>URL.Read.All</li>
+                  <li>Ip.Read.All</li>
+                  <li>Ti.ReadWrite.All</li>
+                  <li>AdvancedQuery.Read.All</li>
+                  <li>Vulnerability.Read.All</li>
+                  <li>Score.Read.All</li>
+                  <li>Machine.LiveResponse</li>
                 </ul>
               <li><b>Delegated Permissions</b></li>
                 <ul>
@@ -115,6 +131,14 @@
                   <li>Machine.Scan</li>
                   <li>Machine.StopAndQuarantine</li>
                   <li>User.Read.All</li>
+                  <li>Software.Read</li>
+                  <li>URL.Read.All</li>
+                  <li>Ip.Read.All</li>
+                  <li>Ti.ReadWrite</li>
+                  <li>AdvancedQuery.Read</li>
+                  <li>Vulnerability.Read</li>
+                  <li>Score.Read</li>
+                  <li>Machine.LiveResponse</li>
                 </ul>
             </ul>
           </li>
@@ -239,6 +263,56 @@
       <ul>
         <li>&lt;appid&gt; - The app ID will be available in the Redirect URI which gets populated in the field 'POST incoming for Windows Defender ATP to this location' when the Defender ATP Phantom app asset is configured e.g. https://&lt;phantom_host&gt;/rest/handler/windowsdefenderatp_&lt;appid&gt;/&lt;asset_name&gt;/result</li>
         <li>&lt;asset_id&gt; - The asset ID will be available on the created asset's Phantom web URL e.g. https://&lt;phantom_host&gt;/apps/&lt;app_number&gt;/asset/&lt;asset_id&gt;/</li>
+      </ul>
+    </p>
+
+    <h2>get file (live response) action workflow</h2>
+    <p>
+      <ul> 
+        <li>There can be four different cases based on the provided parameters:</li>
+        <ul>
+          <li>Case 1:</li>
+          <ul>
+            <li>Only event_id is provided - In this case, the rest of the parameters will be ignored and the action will try to get the file based on the provided <b>event_id</b>. The action can get the file only if the status received from the <b>get_status</b> action for the given event_id is <b>Succeeded</b> (How the event_id is generated is mentioned in the next Case).</li>
+          </ul>
+          <li>Case 2:</li>
+          <ul>
+            <li>No event_id is provided and other parameters are provided - In this case, <b>device_id, file_path and comment</b> all the three parameters are required. If the timeout is not provided, the default timeout value is considered as 300 seconds. In the given timeout, the action will try to get the file and if action takes longer time than the given timeout, it will provide an <b>event_id</b> and <b>file_status</b>. The event_id can be used in the <b>get_status</b> action to receive the status and once the status is <b>Succeeded</b>, the same event_id can be used in this action to get the file into the vault (Case 1).</li>
+          </ul>
+          <li>Case 3:</li>
+          <ul>
+            <li>Both event_id and other parameters are provided - In this case, the event_id will get the higher priority and the action will try to get the file based on the <b>event_id</b> (Case 1). If the action fails to get the file using event_id, it will look into other parameters and it will work in the same way as mentioned in Case 2.</li>
+          </ul>
+          <li>Case 4:</li>
+          <ul>
+            <li>No parameters are provided - In this case the action will fail, because either <b>event_id</b> or <b>Other parameters (file_path, device_id, and comment)</b> are required in order to get the file.</li>
+          </ul>
+        </ul>
+      </ul>
+    </p>
+
+    <h2>run script (live response) action workflow</h2>
+    <p>
+      <ul> 
+        <li>There can be four different cases based on the provided parameters:</li>
+        <ul>
+          <li>Case 1:</li>
+          <ul>
+            <li>Only event_id is provided - In this case, the rest of the parameters will be ignored and the action will try to get the script output based on the provided <b>event_id</b>. The action can get the script output if the status received from the <b>get_status</b> action for the given event_id is <b>Succeeded</b> (How the event_id is generated is mentioned in the next Case.)</li>
+          </ul>
+          <li>Case 2:</li>
+          <ul>
+            <li>No event_id provided and other parameters are provided - In this case, <b>device_id, script_name and comment</b> all the three parameters are required. If the timeout is not provided, the default timeout value is  considered as 300 seconds. In the given timeout, the action will try to execute the script and provide the output and if the action takes longer time than the given timeout, it will provide an <b>event_id</b> and <b>script_status</b>. The event_id can be used in the <b>get_status</b> action to receive the status and once the status is <b>Succeeded</b>, the same event_id can be used in this action to get the script output (Case 1).</li>
+          </ul>
+          <li>Case 3:</li>
+          <ul>
+            <li>Both event_id and other parameters are provided - In this case the event_id will get the higher priority and the action will try to get the script output based on the <b>event_id</b> (Case 1). If the action fails to get the script output using event_id, it will look into other parameters and it will work in the same way as mentioned in Case 2.</li>
+          </ul>
+          <li>Case 4:</li>
+          <ul>
+            <li>No parameters are provided - In this case the action will fail, because either <b>event_id</b> or <b>Other parameters (script_name, device_id, and comment)</b> are required in order to get the script output.</li>
+          </ul>
+        </ul>
       </ul>
     </p>
 
