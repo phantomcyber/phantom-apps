@@ -15,14 +15,17 @@
         },
         {
             "name": "Daniel Federschmidt"
+        },
+        {
+            "name": "Brandan Neises"
         }
     ],
     "license": "Copyright (c) 2018-2021 Splunk Inc.",
-    "app_version": "2.0.0",
-    "utctime_updated": "2020-10-15T20:49:54.000000Z",
+    "app_version": "2.1.0",
+    "utctime_updated": "2021-10-26T15:10:12.000000Z",
     "package_name": "phantom_fireeyehx",
     "main_module": "fireeyehx_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -440,7 +443,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Important data: value",
                         "Primary ip: 10.1.1.1, Hostname: random_565_4"
                     ]
                 },
@@ -462,13 +464,6 @@
                     ],
                     "contains": [
                         "ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
                     ]
                 },
                 {
@@ -549,17 +544,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.message",
@@ -733,17 +718,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -824,17 +803,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.message",
@@ -913,11 +882,17 @@
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "render": {
@@ -1124,10 +1099,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1735,17 +1707,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1809,7 +1775,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*._id",
+                    "data_path": "action_result.data.*.data.entries.*._id",
                     "data_type": "string",
                     "contains": [
                         "fireeyehx agentid"
@@ -1821,14 +1787,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.agent_version",
+                    "data_path": "action_result.data.*.data.entries.*.agent_version",
                     "data_type": "string",
                     "example_values": [
                         "1.0.1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_missing_software",
+                    "data_path": "action_result.data.*.data.entries.*.containment_missing_software",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1836,7 +1802,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_queued",
+                    "data_path": "action_result.data.*.data.entries.*.containment_queued",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1844,14 +1810,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.containment_state",
+                    "data_path": "action_result.data.*.data.entries.*.containment_state",
                     "data_type": "string",
                     "example_values": [
                         "normal"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.domain",
+                    "data_path": "action_result.data.*.data.entries.*.domain",
                     "data_type": "string",
                     "column_name": "Domain",
                     "column_order": 3,
@@ -1863,7 +1829,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.excluded_from_containment",
+                    "data_path": "action_result.data.*.data.entries.*.excluded_from_containment",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1871,14 +1837,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.gmt_offset_seconds",
+                    "data_path": "action_result.data.*.data.entries.*.gmt_offset_seconds",
                     "data_type": "numeric",
                     "example_values": [
                         -28800
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.hostname",
+                    "data_path": "action_result.data.*.data.entries.*.hostname",
                     "data_type": "string",
                     "column_name": "Hostname",
                     "column_order": 1,
@@ -1890,59 +1856,59 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last _exploit_block",
+                    "data_path": "action_result.data.*.data.entries.*.last_alert",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_alert",
+                    "data_path": "action_result.data.*.data.entries.*.last_alert_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_alert_timestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.last_audit_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_audit_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2015-07-30T04:12:23.000Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_exploit_block_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_exploit_block",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_poll_ip",
+                    "data_path": "action_result.data.*.data.entries.*.last_exploit_block_timestamp",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.last_poll_timestamp",
+                    "data_path": "action_result.data.*.data.entries.*.last_poll_ip",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.bitness",
+                    "data_path": "action_result.data.*.data.entries.*.last_poll_timestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.os.bitness",
                     "data_type": "string",
                     "example_values": [
                         "32-bit"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.patch_level",
+                    "data_path": "action_result.data.*.data.entries.*.os.patch_level",
                     "data_type": "string",
                     "example_values": [
                         "Service Pack 3"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.os.product_name",
+                    "data_path": "action_result.data.*.data.entries.*.os.product_name",
                     "data_type": "string",
                     "example_values": [
                         "Windows XP SP1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.primary_ip_address",
+                    "data_path": "action_result.data.*.data.entries.*.primary_ip_address",
                     "data_type": "string",
                     "column_name": "Primary IP",
                     "column_order": 2,
@@ -1954,14 +1920,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.primary_mac",
+                    "data_path": "action_result.data.*.data.entries.*.primary_mac",
                     "data_type": "string",
                     "example_values": [
                         "a2-ac-75-70-ec-ae"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.reported_clone",
+                    "data_path": "action_result.data.*.data.entries.*.reported_clone",
                     "data_type": "boolean",
                     "example_values": [
                         true,
@@ -1969,24 +1935,87 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.acqs",
+                    "data_path": "action_result.data.*.data.entries.*.stats.acqs",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.alerting_conditions",
+                    "data_path": "action_result.data.*.data.entries.*.stats.alerting_conditions",
                     "data_type": "numeric",
                     "example_values": [
                         0
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.entries.*.stats.alerts",
+                    "data_path": "action_result.data.*.data.entries.*.stats.alerts",
                     "data_type": "numeric",
                     "example_values": [
                         0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.stats.exploit_blocks",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.sysinfo.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58/sysinfo"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "Pacific Standard Time"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.entries.*.url",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts/3805951439869103977B58"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        50
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.offset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.route",
+                    "data_type": "string",
+                    "example_values": [
+                        "/hx/api/v3/hosts"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.data.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        5
                     ]
                 },
                 {
@@ -1994,69 +2023,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.stats.exploit_blocks",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.sysinfo.url",
-                    "data_type": "string",
-                    "example_values": [
-                        "/hx/api/v3/hosts/3805951439869103977B58/sysinfo"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.timezone",
-                    "data_type": "string",
-                    "example_values": [
-                        "Pacific Standard Time"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.entries.*.url",
-                    "data_type": "string",
-                    "example_values": [
-                        "/hx/api/v3/hosts/3805951439869103977B58"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        50
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "OK"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.offset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.route",
-                    "data_type": "string",
-                    "example_values": [
-                        "/hx/api/v3/hosts"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.total",
-                    "data_type": "numeric",
-                    "example_values": [
-                        5
                     ]
                 },
                 {
@@ -2073,14 +2039,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Important data: value"
+                        "Matched endpoints: 1"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.matched_endpoints",
+                    "data_type": "numeric",
                     "example_values": [
-                        "value"
+                        1
                     ]
                 },
                 {
@@ -2317,17 +2283,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2629,17 +2589,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2761,17 +2715,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -2840,21 +2788,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.indicator",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.indicator._id",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.indicator.url",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.event_id",
                     "data_type": "string"
                 },
@@ -2870,11 +2803,26 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.source",
+                    "data_path": "action_result.data.*.indicator",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.indicator._id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.indicator.url",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.md5values",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string"
                 },
                 {
@@ -2889,17 +2837,11 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Important data: value"
-                    ]
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.important_data",
-                    "data_type": "string",
-                    "example_values": [
-                        "value"
-                    ]
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
