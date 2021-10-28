@@ -15,15 +15,15 @@
         }
     ],
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "3.3.0",
+    "app_version": "3.4.1",
     "latest_tested_versions": [
-        "Cloud, API api.crowdstrike.com, July 19 2021, API version: v1, v2"
+        "Cloud, API api.crowdstrike.com, October 14 2021, API version: v1, v2"
     ],
-    "utctime_updated": "2021-08-10T23:46:20.000000Z",
+    "utctime_updated": "2021-10-22T09:28:19.000000Z",
     "package_name": "phantom_crowdstrikeoauthapi",
     "main_module": "crowdstrikeoauthapi_connector.py",
     "app_config_render": "default",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -5448,25 +5448,50 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.name",
+                    "data_path": "action_result.data.*.container",
                     "data_type": "string",
                     "example_values": [
-                        "test.7z"
+                        "test_crowdstrike"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.path",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2840
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.task",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.user",
+                    "data_path": "action_result.data.*.create_time",
                     "data_type": "string",
                     "example_values": [
-                        "admin"
+                        "0 minutes ago"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_via",
+                    "data_type": "string",
+                    "example_values": [
+                        "automation"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "example_values": [
+                        "30c5e524e975816fbce1d958150e394efc219772"
+                    ],
+                    "contains": [
+                        "sha1"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -5498,17 +5523,32 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.create_time",
+                    "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "example_values": [
-                        "0 minutes ago"
+                        "test.7z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.container_id",
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "example_values": [
-                        2840
+                        5122
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
                     ]
                 },
                 {
@@ -5516,46 +5556,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         556
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.container",
-                    "data_type": "string",
-                    "example_values": [
-                        "test_crowdstrike"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.created_via",
-                    "data_type": "string",
-                    "example_values": [
-                        "automation"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.hash",
-                    "data_type": "string",
-                    "example_values": [
-                        "30c5e524e975816fbce1d958150e394efc219772"
-                    ],
-                    "contains": [
-                        "sha1"
-                    ],
-                    "column_name": "Hash",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        2
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.size",
-                    "data_type": "numeric",
-                    "example_values": [
-                        5122
                     ]
                 },
                 {
@@ -6982,6 +6982,7 @@
         {
             "action": "get indicator",
             "description": "Get the full definition of one or more indicators that are being watched",
+            "verbose": "In this action, either 'indicator_value' and 'indicator_type' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If all the parameters are provided then the indicator will be fetched based on the 'resource_id'.",
             "type": "investigate",
             "identifier": "get_indicator",
             "read_only": true,
@@ -6989,20 +6990,20 @@
                 "indicator_value": {
                     "data_type": "string",
                     "description": "String representation of the indicator",
-                    "required": true,
                     "primary": true,
                     "order": 0,
                     "contains": [
                         "domain",
                         "md5",
                         "sha256",
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 "indicator_type": {
                     "data_type": "string",
                     "description": "The type of the indicator",
-                    "required": true,
+                    "primary": true,
                     "order": 1,
                     "value_list": [
                         "sha256",
@@ -7010,6 +7011,18 @@
                         "domain",
                         "ipv4",
                         "ipv6"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                "resource_id": {
+                    "data_type": "string",
+                    "description": "The resource id of the indicator",
+                    "order": 2,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator id"
                     ]
                 }
             },
@@ -7027,6 +7040,9 @@
                     "data_type": "string",
                     "example_values": [
                         "domain"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
                     ]
                 },
                 {
@@ -7039,98 +7055,238 @@
                         "domain",
                         "md5",
                         "sha256",
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.meta.query_time",
-                    "data_type": "numeric",
-                    "example_values": [
-                        0.002269266
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.meta.trace_id",
+                    "data_path": "action_result.parameter.resource_id",
                     "data_type": "string",
                     "example_values": [
-                        "6a4b970e-93a9-4151-bac4-e721ff3925a8"
+                        "feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_by",
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "none"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
                     "data_type": "string",
                     "example_values": [
                         "C16JJOUVVY125J3O50FF"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.created_timestamp",
+                    "data_path": "action_result.data.*.created_on",
                     "data_type": "string",
                     "example_values": [
-                        "2018-08-17T15:19:31Z"
+                        "2021-09-09T08:51:04.131068458Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.description",
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
                     "data_type": "string",
                     "example_values": [
                         "test description"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.expiration_timestamp",
+                    "data_path": "action_result.data.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2022-09-09T08:51:03Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_by",
+                    "data_path": "action_result.data.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_groups.*",
                     "data_type": "string",
                     "example_values": [
-                        "C16JJOUVVY125J3O50FF"
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.modified_timestamp",
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "99cd3772bf570aebea6e58059532ac902798583d6e75e6817364da70a062673a"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae2000074e144336ea1de4de9dc1bd39"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-09T08:51:04.131068458Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
                     "data_type": "string",
                     "example_values": [
                         "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.policy",
+                    "data_path": "action_result.data.*.platforms.*",
                     "data_type": "string",
                     "example_values": [
-                        "none"
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.share_level",
+                    "data_path": "action_result.data.*.severity",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "medium"
+                    ],
+                    "contains": [
+                        "severity"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.source",
+                    "data_path": "action_result.data.*.source",
                     "data_type": "string",
                     "example_values": [
                         "test source"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.type",
+                    "data_path": "action_result.data.*.tags",
                     "data_type": "string",
                     "example_values": [
-                        "domain"
+                        "tag1"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.resources.*.value",
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
                     "data_type": "string",
                     "example_values": [
                         "xyz"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "md5",
+                        "sha256",
+                        "domain"
                     ]
                 },
                 {
@@ -7165,7 +7321,7 @@
                 "title": "IOC Details",
                 "type": "custom",
                 "height": 5,
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             }
         },
         {
@@ -7181,9 +7337,8 @@
                     "primary": true,
                     "order": 0,
                     "contains": [
-                        "hash",
                         "ip",
-                        "sha1",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
@@ -7198,49 +7353,82 @@
                         "hash",
                         "ipv4",
                         "ipv6",
-                        "sha1",
                         "md5",
                         "sha256",
                         "domain"
+                    ],
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator type"
                     ]
                 },
-                "policy": {
+                "action": {
                     "description": "Enforcement policy",
                     "data_type": "string",
                     "value_list": [
-                        "all",
-                        "detect",
-                        "none"
+                        "no_action",
+                        "allow",
+                        "prevent_no_ui",
+                        "prevent",
+                        "detect"
+                    ],
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator action"
                     ],
                     "order": 2
-                },
-                "share_level": {
-                    "description": "Indicator share level",
-                    "data_type": "string",
-                    "value_list": [
-                        "all",
-                        "red"
-                    ],
-                    "order": 3
                 },
                 "source": {
                     "description": "The source of indicators",
                     "data_type": "string",
-                    "order": 4
+                    "order": 3
                 },
                 "ph": {
                     "data_type": "ph",
-                    "order": 5
+                    "order": 4
                 },
                 "from_expiration": {
                     "description": "The earliest indicator expiration date (RFC3339)",
                     "data_type": "string",
-                    "order": 6
+                    "primary": true,
+                    "contains": [
+                        "date"
+                    ],
+                    "order": 5
                 },
                 "to_expiration": {
                     "description": "The latest indicator expiration date (RFC3339)",
                     "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "date"
+                    ],
+                    "order": 6
+                },
+                "limit": {
+                    "description": "The limit of indicator to be fetched (defaults to 100)",
+                    "default": 100,
+                    "data_type": "numeric",
                     "order": 7
+                },
+                "sort": {
+                    "description": "Property to sort by",
+                    "data_type": "string",
+                    "value_list": [
+                        "indicator_type.asc",
+                        "indicator_value.asc",
+                        "action.asc",
+                        "severity.asc",
+                        "date_added.asc",
+                        "last_modified.asc",
+                        "indicator_type.desc",
+                        "indicator_value.desc",
+                        "action.desc",
+                        "severity.desc",
+                        "date_added.desc",
+                        "last_modified.desc"
+                    ],
+                    "order": 8
                 }
             },
             "output": [
@@ -7257,6 +7445,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2020-10-17T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -7264,15 +7455,17 @@
                     "data_type": "string",
                     "example_values": [
                         "domain"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.indicator_value",
                     "data_type": "string",
                     "contains": [
-                        "hash",
                         "ip",
-                        "sha1",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
@@ -7282,21 +7475,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        200
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ph",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.policy",
+                    "data_path": "action_result.parameter.action",
                     "data_type": "string",
                     "example_values": [
                         "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.share_level",
+                    "data_path": "action_result.parameter.sort",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "indicator_type"
                     ]
                 },
                 {
@@ -7311,6 +7514,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2020-10-17T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
                     ]
                 },
                 {
@@ -7321,33 +7527,1054 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.ip",
+                    "data_path": "action_result.data.*.domain.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.domain"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4",
                     "data_type": "string",
                     "contains": [
                         "ip"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.md5",
+                    "data_path": "action_result.data.*.ipv4.*.action",
                     "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
                     "contains": [
-                        "hash",
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
                         "md5"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.sha1",
+                    "data_path": "action_result.data.*.ipv4.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ipv4"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6",
                     "data_type": "string",
                     "contains": [
-                        "hash",
-                        "sha1"
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ipv6"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "2001:db8:3333::6666:7777:8888"
+                    ],
+                    "contains": [
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "md5"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.md5.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "098f6bcd4621d373cade4e832627b4f6"
+                    ],
+                    "contains": [
+                        "md5"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.sha256",
                     "data_type": "string",
                     "contains": [
-                        "hash",
+                        "sha256"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "sha256"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.sha256.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+                    ],
+                    "contains": [
                         "sha256"
                     ]
                 },
@@ -7360,15 +8587,15 @@
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.summary.total_ip",
+                    "data_path": "action_result.summary.total_ipv4",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.total_ipv6",
                     "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary.total_md5",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.total_sha1",
                     "data_type": "numeric"
                 },
                 {
@@ -7791,8 +9018,8 @@
         },
         {
             "action": "upload indicator",
-            "description": "Upload one or more indicators that you want CrowdStrike to watch",
-            "verbose": "Valid values for the <b>policy</b> parameter are:<ul><li>detect<br>Send a notification when the particular indicator has been detected on a host</li><li>none<br>Take no action when the particular indicator has been detected on a host. This is equivalent to turning the indicator off.</li></ul><br>As of this writing, the only valid value for the <b>share_level</b> parameter is <b>red</b>.<br>The <b>expiration</b> parameter is only valid for IP and Domains. As of this writing, if not specified, the Falcon API defaults to 30 days. If the indicator with the same type and value is created again, the action will pass successfully and the indicator will be overwritten.",
+            "description": "Upload indicator that you want CrowdStrike to watch",
+            "verbose": "Valid values for the <b>action</b> parameter are:<ul><li>no_action<br> Save the indicator for future use, but take no action. No severity required.</li><li>allow<br> Applies to hashes only. Allow the indicator and do not detect it. Severity does not apply and should not be provided.</li><li>prevent_no_ui<br> Applies to hashes only. Block and detect the indicator, but hide it from <b>Activity &gt; Detections</b>. Has a default severity value.</li><li>prevent<br> Applies to hashes only. Block the indicator and show it as a detection at the selected severity.</li><li>detect<br> Enable detections for the indicator at the selected severity.</li></ul>Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>Leave it blank for all the host groups</li></ul>The <b>platforms</b> parameter is the list of platforms that the indicator applies to. You can enter multiple platform names, separated by commas. Valid values are: <b>mac, windows, and linux</b>.<br>The CrowdStrike API accepts the standard timestamp format in the <b>expiration</b> parameter. In this action, the number of days provided in the <b>expiration</b> parameter is internally converted into the timestamp format to match the API format.<br>If the indicator with the same type and value is created again, the action will fail as duplicate type-value combination is not allowed.",
             "type": "contain",
             "identifier": "upload_iocs",
             "read_only": false,
@@ -7802,55 +9029,99 @@
                     "description": "Input domain, ip, or hash ioc",
                     "data_type": "string",
                     "contains": [
-                        "hash",
                         "sha256",
-                        "sha1",
                         "md5",
                         "domain",
-                        "ip"
+                        "ip",
+                        "ipv6"
                     ],
                     "primary": true,
                     "required": true,
                     "order": 0
                 },
-                "policy": {
-                    "description": "Enforcement Policy (in case of detection)",
+                "action": {
+                    "description": "Action to take when a host observes the custom IOC",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
                     "value_list": [
-                        "detect",
-                        "none"
+                        "no_action",
+                        "allow",
+                        "prevent_no_ui",
+                        "prevent",
+                        "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
                     ],
                     "order": 1
                 },
-                "share_level": {
-                    "description": "Indicator share level",
+                "platforms": {
+                    "description": "Comma separated list of platforms",
                     "data_type": "string",
-                    "value_list": [
-                        "red"
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator platforms"
                     ],
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (Valid for domains and ips only)",
+                    "description": "Alert lifetime in days",
                     "data_type": "numeric",
                     "order": 3
                 },
                 "source": {
-                    "description": "Indicator Originating source",
+                    "description": "Indicator originating source",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "default": "IOC uploaded via Splunk Phantom"
                 },
                 "description": {
                     "description": "Indicator description",
                     "data_type": "string",
                     "order": 5
+                },
+                "tags": {
+                    "description": "Comma separated list of tags",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "severity": {
+                    "description": "Severity level",
+                    "data_type": "string",
+                    "primary": true,
+                    "value_list": [
+                        "informational",
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                    ],
+                    "contains": [
+                        "severity"
+                    ],
+                    "order": 7
+                },
+                "host_groups": {
+                    "description": "Comma separated list of host group IDs",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike host group id"
+                    ],
+                    "order": 8
+                },
+                "filename": {
+                    "description": "Metadata filename",
+                    "data_type": "string",
+                    "order": 9
                 }
             },
             "render": {
                 "title": "Upload Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -7859,6 +9130,16 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
                     ]
                 },
                 {
@@ -7876,32 +9157,54 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f0d05b7b2fd4ddfb34069ab6e99db34"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
-                        "hash",
+                        "ipv6",
                         "sha256",
-                        "sha1",
                         "md5",
                         "domain",
                         "ip"
                     ],
                     "example_values": [
-                        "test"
+                        "8.8.8.8"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.policy",
+                    "data_path": "action_result.parameter.platforms",
                     "data_type": "string",
                     "example_values": [
-                        "detect"
+                        "linux"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.share_level",
+                    "data_path": "action_result.parameter.severity",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "low"
+                    ],
+                    "contains": [
+                        "severity"
                     ]
                 },
                 {
@@ -7912,8 +9215,233 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "no_action"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.applied_globally",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.created_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deleted",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test description"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expiration",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-25T09:52:27Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expiration_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-09-16T00:00:00Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.expired",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from_parent",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.host_groups.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "0491ecd214614b5ab3bca1037a15390b"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "example_values": [
+                        "010114a181ac68f8712b28c288fc210e26c3d25029f3d1edeeb6b37c67293abb"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.av_hits",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_file_name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.signed",
+                    "data_type": "boolean",
+                    "example_values": [
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_by",
+                    "data_type": "string",
+                    "example_values": [
+                        "ae1690074e144356ae2de5de8dc1bd93"
+                    ],
+                    "contains": [
+                        "md5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_on",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-09-15T09:52:27.651770437Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.modified_timestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2018-08-17T15:19:31Z"
+                    ],
+                    "contains": [
+                        "date"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.platforms.*",
+                    "data_type": "string",
+                    "example_values": [
+                        "mac"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ],
+                    "contains": [
+                        "severity"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.source",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ipv4"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator type"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "8.8.8.8"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6",
+                        "md5",
+                        "sha256",
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -7923,7 +9451,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "IOC Uploaded to create alert"
+                        "Indicator uploaded successfully"
                     ]
                 },
                 {
@@ -7945,6 +9473,7 @@
         {
             "action": "delete indicator",
             "description": "Delete an indicator that is being watched",
+            "verbose": "In this action, either 'ioc' or 'resource_id' should be provided. The priority of 'resource_id' is higher. If both the parameters are provided then the indicator will be deleted based on the 'resource_id'. The CrowdStrike API returns success for the 'resource_id' of the already deleted indicator.",
             "type": "correct",
             "identifier": "delete_iocs",
             "read_only": false,
@@ -7955,20 +9484,28 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
                     ],
                     "primary": true,
-                    "required": true,
                     "order": 0
+                },
+                "resource_id": {
+                    "description": "The resource id of the indicator",
+                    "data_type": "string",
+                    "order": 1,
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator id"
+                    ]
                 }
             },
             "render": {
                 "title": "Delete Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -7984,13 +9521,23 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
+                        "ipv6",
                         "md5",
                         "sha256",
                         "domain"
                     ],
                     "example_values": [
                         "test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.resource_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "feaefb786fc648861779b9f906b1426b3d670ffe4c22ec7b7ff3d3e03e88dc43"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator id"
                     ]
                 },
                 {
@@ -8005,7 +9552,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully deleted alert"
+                        "Indicator deleted successfully"
                     ]
                 },
                 {
@@ -8027,7 +9574,7 @@
         {
             "action": "update indicator",
             "description": "Update an indicator that has been uploaded",
-            "verbose": "If no parameters are provided as input, the action would pass successfully.",
+            "verbose": "Valid values for the <b>host groups</b> parameter are:<ul><li>Comma separated host group IDs for specific groups</li><li>The value '<b>all</b>' for all the host groups</li><li>Leave it blank if there is no change</li></ul>If no parameters are provided as input, the action would pass successfully.",
             "type": "generic",
             "identifier": "update_iocs",
             "read_only": false,
@@ -8038,7 +9585,6 @@
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
                         "md5",
                         "sha256",
                         "domain"
@@ -8047,43 +9593,87 @@
                     "required": true,
                     "order": 0
                 },
-                "policy": {
-                    "description": "Enforcement policy (in case of detection)",
+                "action": {
+                    "description": "Action to take when a host observes the custom IOC",
                     "data_type": "string",
                     "value_list": [
-                        "detect",
-                        "none"
+                        "no_action",
+                        "allow",
+                        "prevent_no_ui",
+                        "prevent",
+                        "detect"
+                    ],
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator action"
                     ],
                     "order": 1
                 },
-                "share_level": {
-                    "description": "Indicator share level",
+                "platforms": {
+                    "description": "Comma separated list of platforms",
                     "data_type": "string",
-                    "value_list": [
-                        "red"
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike indicator platforms"
                     ],
                     "order": 2
                 },
                 "expiration": {
-                    "description": "Alert lifetime in days (Valid for domains and ips only)",
+                    "description": "Alert lifetime in days",
                     "data_type": "numeric",
                     "order": 3
                 },
                 "source": {
                     "description": "Indicator originating source",
                     "data_type": "string",
-                    "order": 4
+                    "order": 4,
+                    "default": "IOC updated via Splunk Phantom"
                 },
                 "description": {
                     "description": "Indicator description",
                     "data_type": "string",
                     "order": 5
+                },
+                "tags": {
+                    "description": "Comma separated list of tags",
+                    "data_type": "string",
+                    "order": 6
+                },
+                "severity": {
+                    "description": "Severity level",
+                    "data_type": "string",
+                    "value_list": [
+                        "informational",
+                        "low",
+                        "medium",
+                        "high",
+                        "critical"
+                    ],
+                    "primary": true,
+                    "contains": [
+                        "severity"
+                    ],
+                    "order": 7
+                },
+                "host_groups": {
+                    "description": "Comma separated list of host group IDs",
+                    "data_type": "string",
+                    "primary": true,
+                    "contains": [
+                        "crowdstrike host group id"
+                    ],
+                    "order": 8
+                },
+                "filename": {
+                    "description": "Metadata filename",
+                    "data_type": "string",
+                    "order": 9
                 }
             },
             "render": {
                 "title": "Update Indicator",
                 "type": "custom",
-                "view": "crowdstrike_view.display_view"
+                "view": "crowdstrike_view.indicator_view"
             },
             "output": [
                 {
@@ -8092,6 +9682,16 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "detect"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator action"
                     ]
                 },
                 {
@@ -8109,31 +9709,53 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.filename",
+                    "data_type": "string",
+                    "example_values": [
+                        "filename"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.host_groups",
+                    "data_type": "string",
+                    "example_values": [
+                        "7f0d05b7b2fd4ddfb34069ab6e99db34"
+                    ],
+                    "contains": [
+                        "crowdstrike host group id"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.ioc",
                     "data_type": "string",
                     "contains": [
                         "ip",
-                        "sha1",
                         "md5",
                         "sha256",
                         "domain"
                     ],
                     "example_values": [
-                        "test"
+                        "8.8.8.8"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.policy",
+                    "data_path": "action_result.parameter.platforms",
                     "data_type": "string",
                     "example_values": [
-                        "detect"
+                        "linux"
+                    ],
+                    "contains": [
+                        "crowdstrike indicator platforms"
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.share_level",
+                    "data_path": "action_result.parameter.severity",
                     "data_type": "string",
                     "example_values": [
-                        "red"
+                        "low"
+                    ],
+                    "contains": [
+                        "severity"
                     ]
                 },
                 {
@@ -8141,6 +9763,13 @@
                     "data_type": "string",
                     "example_values": [
                         "test source"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "test_tag"
                     ]
                 },
                 {
@@ -8155,7 +9784,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully updated alert"
+                        "Indicator updated successfully"
                     ]
                 },
                 {
@@ -13051,6 +14680,153 @@
             "render": {
                 "width": 12,
                 "title": "Check Status",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
+            "action": "get device scroll",
+            "description": "Search for hosts in your environment by platform, hostname, IP, and other criteria with continuous pagination capability (based on offset pointer which expires after 2 minutes with no maximum limit)",
+            "verbose": "More info can be found at <a href='https://assets.falcon.crowdstrike.com/support/api/swagger.html#/hosts/QueryDevicesByFilterScroll' target='_blank'>here</a>.",
+            "type": "investigate",
+            "identifier": "get_device_scroll",
+            "read_only": true,
+            "parameters": {
+                "offset": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 0,
+                    "value_list": []
+                },
+                "limit": {
+                    "data_type": "numeric",
+                    "description": "The maximum records to return. [1-5000]",
+                    "order": 1
+                },
+                "sort": {
+                    "data_type": "string",
+                    "description": "The property to sort by (e.g. status.desc or hostname.asc)",
+                    "order": 2
+                },
+                "filter": {
+                    "data_type": "string",
+                    "description": "The offset to page from, for the next result set",
+                    "order": 3,
+                    "value_list": []
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.resources",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.code",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.id",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.errors.*.message",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.offset",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.limit",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.meta.pagination.expires_at",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1632462683095273200
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Device scroll fetched successfully"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.filter",
+                    "data_type": "string",
+                    "example_values": [
+                        "platform_name:'windows'"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        120,
+                        7
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sort",
+                    "data_type": "string",
+                    "example_values": [
+                        "status.desc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.offset",
+                    "data_type": "string",
+                    "example_values": []
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Device scrolls",
                 "type": "table",
                 "height": 5
             }

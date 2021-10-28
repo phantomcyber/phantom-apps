@@ -42,6 +42,15 @@ class SsmachineConnector(BaseConnector):
         self._api_key = config.get("ssmachine_key")
         self._api_phrase = config.get("ssmachine_hash")
         self._rest_url = "{0}".format(SSMACHINE_JSON_DOMAIN)
+        cache_limit = config.get("cache_limit", DEFAULT_CACHE_LIMIT)
+        try:
+            if DEFAULT_CACHE_LIMIT <= float(cache_limit) <= MAX_CACHE_LIMIT:
+                self.cache_limit = float(cache_limit)
+            else:
+                return self.set_status(phantom.APP_ERROR, VALID_CACHE_LIMIT_MSG)
+        except:
+            return self.set_status(phantom.APP_ERROR, VALID_CACHE_LIMIT_MSG)
+
         return phantom.APP_SUCCESS
 
     def _get_error_message_from_exception(self, e):
@@ -108,8 +117,8 @@ class SsmachineConnector(BaseConnector):
             result.add_debug_data({'r_text': r.text })
             result.add_debug_data({'r_headers': r.headers})
 
-        if "X-Screenshotmachine-Response" in list(r.headers.keys()):
-            return RetVal(result.set_status(phantom.APP_ERROR, "Screenshot Machine Returned an error: {0}".format(r.headers["X-Screenshotmachine-Response"])), None)
+        if "x-screenshotmachine-response" in list(r.headers.keys()):
+            return RetVal(result.set_status(phantom.APP_ERROR, "Screenshot Machine Returned an error: {0}".format(r.headers["x-screenshotmachine-response"])), None)
 
         if 'html' in r.headers.get('Content-Type', ''):
             return self._process_html_response(r, result)
@@ -179,7 +188,7 @@ class SsmachineConnector(BaseConnector):
         else:
             params['hash'] = str(hashlib.md5((params['url'] + self._api_phrase).encode('utf-8')).hexdigest())
 
-        params['cacheLimit'] = '0'
+        params['cacheLimit'] = self.cache_limit
         ret_val, resp_data = self._make_rest_call('', action_result, params, method='post', stream=True)
 
         if phantom.is_fail(ret_val):
@@ -217,7 +226,7 @@ class SsmachineConnector(BaseConnector):
         else:
             params['hash'] = str(hashlib.md5((params['url'] + self._api_phrase).encode('utf-8')).hexdigest())
 
-        params['cacheLimit'] = '0'
+        params['cacheLimit'] = self.cache_limit
         params['format'] = 'JPG'
         params['timeout'] = '200'
 

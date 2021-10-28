@@ -13,11 +13,17 @@ from phantom.action_result import ActionResult
 # Local imports
 from autofocus_consts import *
 
+from bs4 import UnicodeDammit
+import sys
 import simplejson as json
 import requests
+try:
+    from urllib.parse import unquote
+except:
+    from urllib import unquote
 import os
 os.sys.path.insert(0, '{}/pan-python/lib'.format(os.path.dirname(os.path.abspath(__file__))))  # noqa
-import pan.afapi  # pylint: disable=E0611,E0401
+import pan.afapi  # noqa
 
 
 # There is an error with python and requests. The pan API puts all the data into a dictionary,
@@ -56,18 +62,102 @@ class AutoFocusConnector(BaseConnector):
 
     def __init__(self):
         super(AutoFocusConnector, self).__init__()
-        return
+
+        self._afapi = None
 
     def initialize(self):
+        # Fetching the Python major version
+        self._state = self.load_state()
+
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, STATE_FILE_CORRUPT_ERR)
+
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version")
+
         patch_requests()
         return phantom.APP_SUCCESS
+
+    def finalize(self):
+        """
+        Perform some final operations or clean up operations.
+
+        This function gets called once all the param dictionary elements are looped over and no more handle_action
+        calls are left to be made. It gives the AppConnector a chance to loop through all the results that were
+        accumulated by multiple handle_action function calls and create any summary if required. Another usage is
+        cleanup, disconnect from remote devices etc.
+
+        :return: status (success/failure)
+        """
+        # Save the state, this data is saved across actions and app upgrades
+        self.save_state(self._state)
+        return phantom.APP_SUCCESS
+
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error messages from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = ERR_CODE_MSG
+                    error_msg = e.args[0]
+            else:
+                error_code = ERR_CODE_MSG
+                error_msg = ERR_MSG_UNAVAILABLE
+        except:
+            error_code = ERR_CODE_MSG
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = TYPE_ERR_MSG
+        except:
+            error_msg = ERR_MSG_UNAVAILABLE
+
+        try:
+            if error_code in ERR_CODE_MSG:
+                error_text = "Error Message: {0}".format(error_msg)
+            else:
+                error_text = "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        except:
+            self.debug_print(PARSE_ERR_MSG)
+            error_text = PARSE_ERR_MSG
+
+        return error_text
 
     def _validate_api_call(self, response, action_result):
         """ Validate that an api call was successful """
         try:
             response.raise_for_status()
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, str(e))
+            return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
         return phantom.APP_SUCCESS
 
     def _init_api(self, action_result):
@@ -75,7 +165,7 @@ class AutoFocusConnector(BaseConnector):
         try:
             self._afapi = pan.afapi.PanAFapi(panrc_tag="autofocus", api_key=api_key)  # pylint: disable=E1101
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, str(e))
+            return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
         return phantom.APP_SUCCESS
 
     def _construct_body(self, value, field, start, size, scope="global"):
@@ -97,54 +187,57 @@ class AutoFocusConnector(BaseConnector):
             # Truthfully I'm not sure what could cause either of these first two loops to iterate more than once
             # But they return lists so it must be possible somehow
             for r in self._afapi.samples_search_results(data=body):
-                for i in r.json['hits']:
-                    if 'tag' in i['_source']:
-                        for tag in i['_source']['tag']:
+                for i in r.json.get('hits', []):
+                    if 'tag' in i.get('_source'):
+                        for tag in i.get('_source', {}).get('tag', []):
                             tag_set.add(tag)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, str(e))
 
-        for tag in tag_set:
-            r = self._afapi.tag(tagname=tag)
-            if not self._validate_api_call(r, action_result):
-                # Something wrong is going on if it reaches here
-                continue
-            tag_data = {}
-            tag_data['description'] = r.json['tag']['description']
-            tag_data['tag_name'] = r.json['tag']['tag_name']
-            tag_data['public_tag_name'] = r.json['tag']['public_tag_name']
-            tag_data['count'] = r.json['tag']['count']
-            action_result.add_data(tag_data)
+            for tag in tag_set:
+                r = self._afapi.tag(tagname=tag)
+                if not self._validate_api_call(r, action_result):
+                    # Something wrong is going on if it reaches here
+                    continue
+                tag_data = {}
+                tag_data['description'] = r.json.get('tag', {}).get('description')
+                tag_data['tag_name'] = r.json.get('tag', {}).get('tag_name')
+                tag_data['public_tag_name'] = r.json.get('tag', {}).get('public_tag_name')
+                tag_data['count'] = r.json.get('tag', {}).get('count')
+                action_result.add_data(tag_data)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
 
         action_result.update_summary({'total_tags_matched': action_result.get_data_size()})
 
         return phantom.APP_SUCCESS
 
-    def _test_connectivity(self):
-        action_result = ActionResult()
+    def _test_connectivity(self, param):
+        action_result = self.add_action_result(ActionResult(param))
 
         self.save_progress("Starting connectivity test")
         ret_val = self._init_api(action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return self.set_status_save_progress(phantom.APP_ERROR, "Connectivity test failed")
 
         # Now we need to send a command to test if creds are valid
         self.save_progress("Making a request to PAN AutoFocus")
-        r = self._afapi.export()
-        ret_val = self._validate_api_call(r, action_result)
-        if (phantom.is_fail(ret_val)):
+        try:
+            r = self._afapi.export()
+            ret_val = self._validate_api_call(r, action_result)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, self._get_error_message_from_exception(e))
+        if phantom.is_fail(ret_val):
             self.save_progress(action_result.get_message())
-            self.save_progress("Test Connectivity failed")
-            return self.set_status(phantom.APP_ERROR)
+            self.save_progress("Connectivity test failed")
+            return action_result.set_status(phantom.APP_ERROR)
         j = r.json['bucket_info']
         self.save_progress("{}/{} daily points remaining".format(j['daily_points_remaining'], j['daily_points']))
-        return self.set_status_save_progress(phantom.APP_SUCCESS, "Connectivity test passed")
+        return action_result.set_status(phantom.APP_SUCCESS, "Connectivity test passed")
 
     def _hunt_action(self, field, value_type, param):
         action_result = self.add_action_result(ActionResult(param))
 
         ret_val = self._init_api(action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         scope = param.get(AF_JSON_SCOPE, 'All Samples').lower()
@@ -169,7 +262,7 @@ class AutoFocusConnector(BaseConnector):
 
         self.save_progress("Querying AutoFocus")
         ret_val = self._samples_search_tag(body, action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -190,14 +283,17 @@ class AutoFocusConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(param))
 
         ret_val = self._init_api(action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         tag = param[AF_JSON_TAG]
 
-        r = self._afapi.tag(tagname=tag)
+        try:
+            r = self._afapi.tag(tagname=tag)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, unquote(self._get_error_message_from_exception(e)))
         ret_val = self._validate_api_call(r, action_result)
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(r.json)
@@ -207,24 +303,23 @@ class AutoFocusConnector(BaseConnector):
         action = self.get_action_identifier()
         ret_val = phantom.APP_SUCCESS
 
-        if (action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY):
-            ret_val = self._test_connectivity()
-        elif (action == self.ACTION_ID_HUNT_FILE):
+        if action == phantom.ACTION_ID_TEST_ASSET_CONNECTIVITY:
+            ret_val = self._test_connectivity(param)
+        elif action == self.ACTION_ID_HUNT_FILE:
             ret_val = self._hunt_file(param)
-        elif (action == self.ACTION_ID_HUNT_IP):
+        elif action == self.ACTION_ID_HUNT_IP:
             ret_val = self._hunt_ip(param)
-        elif (action == self.ACTION_ID_HUNT_DOMAIN):
+        elif action == self.ACTION_ID_HUNT_DOMAIN:
             ret_val = self._hunt_domain(param)
-        elif (action == self.ACTION_ID_HUNT_URL):
+        elif action == self.ACTION_ID_HUNT_URL:
             ret_val = self._hunt_url(param)
-        elif (action == self.ACTION_ID_GET_REPORT):
+        elif action == self.ACTION_ID_GET_REPORT:
             ret_val = self._get_report(param)
 
         return ret_val
 
 
 if __name__ == '__main__':
-    import sys
     import pudb
     pudb.set_trace()
     with open(sys.argv[1]) as f:
@@ -234,5 +329,5 @@ if __name__ == '__main__':
         connector = AutoFocusConnector()
         connector.print_progress_message = True
         r_val = connector._handle_action(json.dumps(in_json), None)
-        print r_val
+        print(r_val)
     exit(0)
