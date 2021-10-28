@@ -94,8 +94,12 @@ class DossierConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Connecting to endpoint")
-        # make rest call
-        _, status_code = self._make_rest_call("/targets")
+        try:
+            # make rest call
+            _, status_code = self._make_rest_call("/targets")
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         if status_code == 200:
             self.save_progress("Successfully connected and authenticated")
@@ -116,8 +120,12 @@ class DossierConnector(BaseConnector):
         # format our url
         url = "/indicator/host?value={}&source=atp&wait=true".format(domain)
 
-        # make rest call
-        response, status_code = self._make_rest_call(url)
+        try:
+            # make rest call
+            response, status_code = self._make_rest_call(url)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         if status_code == 200:
             # Add the response into the data section
@@ -159,8 +167,13 @@ class DossierConnector(BaseConnector):
 
         # format our url
         url = "/indicator/hash?value={}&source=malware_analysis&wait=true".format(hash)
-        # make rest call
-        response, status_code = self._make_rest_call(url)
+
+        try:
+            # make rest call
+            response, status_code = self._make_rest_call(url)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         if status_code == 200:
             # Add the response into the data section
@@ -196,8 +209,12 @@ class DossierConnector(BaseConnector):
         # format our url
         url = "/indicator/url?value={}&source=atp&wait=true".format(submitted_url)
 
-        # make rest call
-        response, status_code = self._make_rest_call(url)
+        try:
+            # make rest call
+            response, status_code = self._make_rest_call(url)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
 
         if status_code == 200:
             # Add the response into the data section
@@ -229,8 +246,12 @@ class DossierConnector(BaseConnector):
         # format our url
         url = "/indicator/ip?value={}&source=atp&wait=true".format(ip)
 
-        # make rest call
-        response, status_code = self._make_rest_call(url)
+        try:
+            # make rest call
+            response, status_code = self._make_rest_call(url)
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg)
         if status_code == 200:
             # Add the response into the data section
             action_result.add_data(response.get("results"))
