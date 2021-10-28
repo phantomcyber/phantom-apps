@@ -20,7 +20,7 @@
     "uber_view": "threatgrid_view.all_results",
     "logo": "logo_threatgrid.svg",
     "logo_dark": "logo_threatgrid_dark.svg",
-    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "license": "Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt).",
     "configuration": {
         "base_uri": {
             "data_type": "string",
@@ -129,6 +129,11 @@
                         "threatgrid playbook name"
                     ],
                     "primary": true
+                },
+                "file_password": {
+                    "description": "Password used to open the submitted file",
+                    "data_type": "string",
+                    "order": 6
                 }
             },
             "output": [
@@ -148,6 +153,13 @@
                     ],
                     "example_values": [
                         "Test_ThreatGrid_1.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.file_password",
+                    "data_type": "string",
+                    "contains": [
+                        "password"
                     ]
                 },
                 {

@@ -1,7 +1,5 @@
 # File: threatgrid_connector.py
-# Copyright (c) 2016-2021 Splunk Inc.
-#
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt).
 
 # Phantom imports
 import phantom.app as phantom
@@ -408,7 +406,8 @@ class threatgridConnector(BaseConnector):
             'osver': '',
             'source': '',
             'vm': param.get('vm', ''),
-            'playbook': param.get('playbook', 'default')
+            'playbook': param.get('playbook', 'default'),
+            'sample_password': param.get('file_password')
         }
         if param.get('private'):
             data['private'] = True
