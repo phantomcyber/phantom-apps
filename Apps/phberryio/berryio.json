@@ -1,0 +1,296 @@
+{
+    "appid": "0e82c388-baf7-4fdd-b734-dbbcec0a4de7",
+    "name": "BerryIO",
+    "versions": "EQ(*)",
+    "description": "This app supports actions for APIs on the BerryIO project for the Raspberry Pi, such as GPIO status, get and set",
+    "type": "information",
+    "publisher": "Splunk",
+    "main_module": "berryio_connector.py",
+    "app_version": "2.0.0",
+    "utctime_updated": "2019-01-24T23:26:10.000000Z",
+    "package_name": "phantom_berryio",
+    "product_vendor": "Daniel Bull",
+    "product_name": "BerryIO",
+    "product_version_regex": ".*",
+    "min_phantom_version": "4.10.0.40961",
+    "python_version": "3",
+    "latest_tested_versions": [
+        "BerryIO v2.1.2"
+    ],
+    "logo": "logo_berryio.svg",
+    "logo_dark": "logo_berryio_dark.svg",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
+    "configuration": {
+        "base_url": {
+            "data_type": "string",
+            "order": 0,
+            "description": "Base URL",
+            "default": "http://localhost:80/"
+        },
+        "username": {
+            "data_type": "string",
+            "order": 1,
+            "description": "Username",
+            "required": true
+        },
+        "password": {
+            "data_type": "password",
+            "order": 2,
+            "description": "Password",
+            "required": true
+        },
+        "verify_server_cert": {
+            "data_type": "boolean",
+            "description": "Verify server certificate",
+            "order": 3,
+            "default": false
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity. This action logs into the device to check the connection and credentials",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "lock": {
+                "enabled": false
+            },
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set mode",
+            "description": "Set GPIO Mode",
+            "type": "generic",
+            "identifier": "set_mode",
+            "read_only": false,
+            "parameters": {
+                "mode": {
+                    "data_type": "string",
+                    "order": 1,
+                    "description": "GPIO Mode (in/out/not_exported)",
+                    "required": true,
+                    "value_list": [
+                        "in",
+                        "out",
+                        "not_exported"
+                    ],
+                    "contains": [
+                        "gpio mode"
+                    ],
+                    "primary": true
+                },
+                "pin": {
+                    "data_type": "numeric",
+                    "order": 0,
+                    "description": "GPIO Pin",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "gpio pin"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.pin",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "gpio pin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "not_exported"
+                    ],
+                    "contains": [
+                        "gpio mode"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Set GPIO Mode",
+                "type": "json",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "set value",
+            "description": "Set GPIO Value",
+            "type": "generic",
+            "identifier": "set_value",
+            "read_only": false,
+            "parameters": {
+                "value": {
+                    "data_type": "numeric",
+                    "order": 1,
+                    "description": "GPIO Value (0/1)",
+                    "required": true,
+                    "value_list": [
+                        0,
+                        1
+                    ],
+                    "contains": [
+                        "gpio value"
+                    ],
+                    "primary": true
+                },
+                "pin": {
+                    "data_type": "numeric",
+                    "order": 0,
+                    "description": "GPIO Pin",
+                    "primary": true,
+                    "required": true,
+                    "contains": [
+                        "gpio pin"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.pin",
+                    "data_type": "string",
+                    "example_values": [
+                        "1"
+                    ],
+                    "contains": [
+                        "gpio pin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.value",
+                    "data_type": "string",
+                    "contains": [
+                        "gpio value"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Set GPIO Value",
+                "type": "json",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get status",
+            "description": "Get GPIO status",
+            "type": "generic",
+            "identifier": "get_status",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.raw",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.gpio.*.pin",
+                    "data_type": "string",
+                    "contains": [
+                        "gpio pin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.gpio.*.mode",
+                    "data_type": "string",
+                    "contains": [
+                        "gpio mode"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.gpio.*.value",
+                    "data_type": "string",
+                    "contains": [
+                        "gpio value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Get Gpio Status",
+                "type": "json",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
