@@ -4,7 +4,7 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the Threat Grid sandbox",
     "type": "sandbox",
     "main_module": "threatgrid_connector.py",
-    "app_version": "2.1.9",
+    "app_version": "2.2.0",
     "utctime_updated": "2021-10-12T17:10:33.000000Z",
     "package_name": "phantom_threatgrid",
     "product_vendor": "Threat Grid",
@@ -20,7 +20,7 @@
     "uber_view": "threatgrid_view.all_results",
     "logo": "logo_threatgrid.svg",
     "logo_dark": "logo_threatgrid_dark.svg",
-    "license": "Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt).",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "configuration": {
         "base_uri": {
             "data_type": "string",
