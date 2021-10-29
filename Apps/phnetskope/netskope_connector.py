@@ -1675,11 +1675,10 @@ class NetskopeConnector(BaseConnector):
             try:
                 input_dict_str = json.dumps(input_dict, sort_keys=True)
             except Exception as e:
-                print str(e)
                 self.debug_print('Handled exception in _create_dict_hash', e)
                 return
 
-            return hashlib.md5(input_dict_str).hexdigest()
+            return hashlib.sha256(input_dict_str).hexdigest()
 
     def _handle_update_url_list(self, param):
         """ This function is used to list files.
@@ -2084,7 +2083,7 @@ if __name__ == '__main__':
     if username and password:
         login_url = BaseConnector._get_phantom_base_url() + 'login'
         try:
-            print 'Accessing the Login page'
+            print('Accessing the Login page')
             response = requests.get(login_url, verify=False)
             csrftoken = response.cookies['csrftoken']
             data = dict()
@@ -2094,22 +2093,22 @@ if __name__ == '__main__':
             headers = dict()
             headers['Cookie'] = ('csrftoken={}').format(csrftoken)
             headers['Referer'] = login_url
-            print 'Logging into Platform to get the session id'
+            print('Logging into Platform to get the session id')
             response2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = response2.cookies['sessionid']
         except Exception as e:
-            print ('Unable to get session id from the platform. Error: {}').format(str(e))
+            print('Unable to get session id from the platform. Error: {}').format(str(e))
             exit(1)
 
     with open(args.input_test_json) as (f):
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = NetskopeConnector()
         connector.print_progress_message = True
         if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print(json.dumps(json.loads(ret_val), indent=4))
     exit(0)
