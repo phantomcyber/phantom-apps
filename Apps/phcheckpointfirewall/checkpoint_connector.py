@@ -23,6 +23,7 @@ import re
 class CheckpointConnector(BaseConnector):
 
     # The actions supported by this connector
+    ACTION_ID_LIST_HOSTS = "list_hosts"
     ACTION_ID_BLOCK_IP = "block_ip"
     ACTION_ID_UNBLOCK_IP = "unblock_ip"
     ACTION_ID_LIST_LAYERS = "list_layers"
@@ -486,6 +487,28 @@ class CheckpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully unblocked {0}".format('subnet' if length != '32' else 'IP'))
 
+    def _list_hosts(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(self._login(action_result)):
+            return action_result.get_status()
+
+        endpoint = 'show-hosts'
+
+        ret_val, resp_json = self._make_rest_call(endpoint, {}, action_result)
+
+        if ((not ret_val) and (not resp_json)):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        total_num_hosts = resp_json.get('total')
+        action_result.update_summary({'Total number of hosts': total_num_hosts})
+
+        self._logout(self)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Successfully displayed {} hosts".format(total_num_hosts))
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -504,6 +527,8 @@ class CheckpointConnector(BaseConnector):
             result = self._list_layers(param)
         elif (action_id == self.ACTION_ID_LIST_POLICIES):
             result = self._list_policies(param)
+        elif (action_id == self.ACTION_ID_LIST_HOSTS):
+            result = self._list_hosts(param)
 
         return result
 
