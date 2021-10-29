@@ -14,16 +14,133 @@
     "utctime_updated": "2021-09-13T05:21:54.000000Z",
     "package_name": "phantom_axoniuscybersecurityassetmanagement",
     "main_module": "axoniuscybersecurityassetmanagement_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "python_version": "3",
     "latest_tested_versions": [
         "Cloud API, February 3, 2020"
     ],
     "app_wizard_version": "1.0.0",
     "pip3_dependencies": {
-        "pypi": [
+        "wheel": [
             {
-                "module": "axonius_api_client"
+                "module": "PySocks",
+                "input_file": "wheels/PySocks-1.7.1-py3-none-any.whl"
+            },
+            {
+                "module": "XlsxWriter",
+                "input_file": "wheels/XlsxWriter-3.0.1-py3-none-any.whl"
+            },
+            {
+                "module": "axonius_api_client",
+                "input_file": "wheels/axonius_api_client-4.10.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-4.2.4-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cffi",
+                "input_file": "wheels/cffi-1.15.0-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-4.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "click",
+                "input_file": "wheels/click-8.0.3-py3-none-any.whl"
+            },
+            {
+                "module": "cryptography",
+                "input_file": "wheels/cryptography-35.0.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "dataclasses",
+                "input_file": "wheels/dataclasses-0.8-py3-none-any.whl"
+            },
+            {
+                "module": "dataclasses_json",
+                "input_file": "wheels/dataclasses_json-0.5.6-py3-none-any.whl"
+            },
+            {
+                "module": "fuzzyfinder",
+                "input_file": "wheels/fuzzyfinder-2.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "importlib_metadata",
+                "input_file": "wheels/importlib_metadata-4.8.1-py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow",
+                "input_file": "wheels/marshmallow-3.14.0-py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow_enum",
+                "input_file": "wheels/marshmallow_enum-1.5.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow_jsonapi",
+                "input_file": "wheels/marshmallow_jsonapi-0.24.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "mypy_extensions",
+                "input_file": "wheels/mypy_extensions-0.4.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyOpenSSL",
+                "input_file": "wheels/pyOpenSSL-21.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pycparser",
+                "input_file": "wheels/pycparser-2.20-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "wheels/python_dateutil-2.8.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dotenv",
+                "input_file": "wheels/python_dotenv-0.19.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "tabulate",
+                "input_file": "wheels/tabulate-0.8.9-py3-none-any.whl"
+            },
+            {
+                "module": "typing_extensions",
+                "input_file": "wheels/typing_extensions-3.10.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "typing_inspect",
+                "input_file": "wheels/typing_inspect-0.7.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "xmltodict",
+                "input_file": "wheels/xmltodict-0.12.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "zipp",
+                "input_file": "wheels/zipp-3.6.0-py3-none-any.whl"
             }
         ]
     },
@@ -903,5 +1020,129 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "PySocks",
+                "input_file": "wheels/PySocks-1.7.1-py3-none-any.whl"
+            },
+            {
+                "module": "XlsxWriter",
+                "input_file": "wheels/XlsxWriter-3.0.1-py3-none-any.whl"
+            },
+            {
+                "module": "axonius_api_client",
+                "input_file": "wheels/axonius_api_client-4.10.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-4.2.4-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "cffi",
+                "input_file": "wheels/cffi-1.15.0-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-4.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "click",
+                "input_file": "wheels/click-8.0.3-py3-none-any.whl"
+            },
+            {
+                "module": "cryptography",
+                "input_file": "wheels/cryptography-35.0.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "dataclasses",
+                "input_file": "wheels/dataclasses-0.8-py3-none-any.whl"
+            },
+            {
+                "module": "dataclasses_json",
+                "input_file": "wheels/dataclasses_json-0.5.6-py3-none-any.whl"
+            },
+            {
+                "module": "fuzzyfinder",
+                "input_file": "wheels/fuzzyfinder-2.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "importlib_metadata",
+                "input_file": "wheels/importlib_metadata-4.8.1-py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow",
+                "input_file": "wheels/marshmallow-3.14.0-py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow_enum",
+                "input_file": "wheels/marshmallow_enum-1.5.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "marshmallow_jsonapi",
+                "input_file": "wheels/marshmallow_jsonapi-0.24.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "mypy_extensions",
+                "input_file": "wheels/mypy_extensions-0.4.3-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyOpenSSL",
+                "input_file": "wheels/pyOpenSSL-21.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pycparser",
+                "input_file": "wheels/pycparser-2.20-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dateutil",
+                "input_file": "wheels/python_dateutil-2.8.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "python_dotenv",
+                "input_file": "wheels/python_dotenv-0.19.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "tabulate",
+                "input_file": "wheels/tabulate-0.8.9-py3-none-any.whl"
+            },
+            {
+                "module": "typing_extensions",
+                "input_file": "wheels/typing_extensions-3.10.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "typing_inspect",
+                "input_file": "wheels/typing_inspect-0.7.1-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "xmltodict",
+                "input_file": "wheels/xmltodict-0.12.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "zipp",
+                "input_file": "wheels/zipp-3.6.0-py3-none-any.whl"
+            }
+        ]
+    }
 }
