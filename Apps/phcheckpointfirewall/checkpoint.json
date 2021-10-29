@@ -740,7 +740,7 @@
                     "description": "Object/host name (must be unique in the domain)",
                     "data_type": "string",
                     "primary": true,
-                    "required": false,
+                    "required": true,
                     "order": 0
                 },
                 "ip": {
