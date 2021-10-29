@@ -1,9 +1,5 @@
 [comment]: # " File: readme.md"
 [comment]: # "  Copyright (c) 2018-2021 Splunk Inc."
-[comment]: # ""
-[comment]: # "  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part"
-[comment]: # "  without a valid written license from Splunk Inc. is PROHIBITED."
-[comment]: # ""
 ## Asset Configuration
 
 There are two ways to configure an AWS WAF asset. The first is to configure the **access_key** ,
