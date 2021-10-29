@@ -23,6 +23,7 @@ import re
 class CheckpointConnector(BaseConnector):
 
     # The actions supported by this connector
+    ACTION_ID_DELETE_HOST = "delete_host"
     ACTION_ID_BLOCK_IP = "block_ip"
     ACTION_ID_UNBLOCK_IP = "unblock_ip"
     ACTION_ID_LIST_LAYERS = "list_layers"
@@ -486,6 +487,38 @@ class CheckpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully unblocked {0}".format('subnet' if length != '32' else 'IP'))
 
+    def _delete_host(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(self._login(action_result)):
+            return action_result.get_status()
+
+        name = param.get('name', None)
+        uid = param.get('uid', None)
+
+        endpoint = 'delete-host'
+
+        if uid:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'uid': uid}, action_result)
+        elif name:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name}, action_result)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "You must specify the host name or unique identifier")
+
+        if ((not ret_val) and (not resp_json)):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        if (not self._publish_and_wait(action_result)):
+            return action_result.set_status(phantom.APP_ERROR, "Could not publish session after changes")
+
+        message = "Successfully deleted host"
+
+        self._logout(self)
+
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -504,6 +537,8 @@ class CheckpointConnector(BaseConnector):
             result = self._list_layers(param)
         elif (action_id == self.ACTION_ID_LIST_POLICIES):
             result = self._list_policies(param)
+        elif (action_id == self.ACTION_ID_DELETE_HOST):
+            result = self._delete_host(param)
 
         return result
 
