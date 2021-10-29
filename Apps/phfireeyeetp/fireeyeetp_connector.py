@@ -1325,7 +1325,7 @@ class FireeyeEtpConnector(BaseConnector):
             self.debug_print('Handled exception in _create_dict_hash', err)
             return None
 
-        return hashlib.md5(input_dict_str).hexdigest()
+        return hashlib.sha256(input_dict_str).hexdigest()
 
     def flatten_json(self, y):
         """ This function is used to generate a new JSON dictionary so the data flattened to the top most values. Helps with readability of the artifacts in the GUI.
