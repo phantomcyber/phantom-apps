@@ -23,6 +23,7 @@ import re
 class CheckpointConnector(BaseConnector):
 
     # The actions supported by this connector
+    ACTION_ID_ADD_HOST = "add_host"
     ACTION_ID_BLOCK_IP = "block_ip"
     ACTION_ID_UNBLOCK_IP = "unblock_ip"
     ACTION_ID_LIST_LAYERS = "list_layers"
@@ -486,6 +487,45 @@ class CheckpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, "Successfully unblocked {0}".format('subnet' if length != '32' else 'IP'))
 
+    def _add_host(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(self._login(action_result)):
+            return action_result.get_status()
+
+        ip = param.get(phantom.APP_JSON_IP, None)
+        ipv4 = param.get('ipv4', None)
+        ipv6 = param.get('ipv6', None)
+        name = param.get('name', None)
+
+        endpoint = 'add-host'
+
+        if ip:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ip-address': ip}, action_result)
+        elif ipv4 and ipv6:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv4-address': ipv4, 'ipv6-address': ipv6}, action_result)
+        elif ipv4:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv4-address': ipv4}, action_result)
+        elif ipv6:
+            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv6-address': ipv6}, action_result)
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "You must specify an ip address")
+
+        if ((not ret_val) and (not resp_json)):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        if (not self._publish_and_wait(action_result)):
+            return action_result.set_status(phantom.APP_ERROR, "Could not publish session after changes")
+
+        message = "Successfully added host"
+
+        self._logout(self)
+
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -504,6 +544,8 @@ class CheckpointConnector(BaseConnector):
             result = self._list_layers(param)
         elif (action_id == self.ACTION_ID_LIST_POLICIES):
             result = self._list_policies(param)
+        elif (action_id == self.ACTION_ID_ADD_HOST):
+            result = self._add_host(param)
 
         return result
 
