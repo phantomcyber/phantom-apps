@@ -90,6 +90,10 @@ BMCREMEDY_NON_NEG_NON_ZERO_INT_MSG = "Please provide a valid non-zero positive i
 BMCREMEDY_NON_NEG_INT_MSG = "Please provide a valid non-negative integer value in the '{param}' parameter"
 
 BMCREMEDY_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. Resetting the state file with the default format. Please try again"
+BMCREMEDY_FIELDS_PARAM_ERR_MSG = ("Please provide acceptable format in 'field' action parameter "
+                                  "e.g :{\"First_Name\": \"Customer First Name\", \"Last_Name\": \"Customer Last Name\", \"Description\": \"Incident Description\", ",
+                                  "\"Service_Type\": \"User Service Restoration\", \"Reported Source\": \"Direct Input\", \"Status\": \"Assigned\", ",
+                                  "\"Assignee Login ID\": \"Mary\", \"Assignee\": \"Mary Mann\"}")
 
 # Dictionary that maps each error code with its corresponding message
 ERROR_RESPONSE_DICT = {

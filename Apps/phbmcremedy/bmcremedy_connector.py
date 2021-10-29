@@ -540,8 +540,7 @@ class BmcremedyConnector(BaseConnector):
         try:
             fields_param = json.loads(fields_param)
             if isinstance(fields_param, list):
-                error_msg = "Please provide a 'fields' action parameter in valid format"
-                return action_result.set_status(phantom.APP_ERROR, error_msg)
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_FIELDS_PARAM_ERR_MSG)
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             self.debug_print(consts.BMCREMEDY_JSON_LOADS_ERROR.format(error_msg))
@@ -648,6 +647,8 @@ class BmcremedyConnector(BaseConnector):
 
         try:
             fields_param = json.loads(param.get(consts.BMCREMEDY_JSON_FIELDS, '{}'))
+            if isinstance(fields_param, list):
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_FIELDS_PARAM_ERR_MSG)
         except Exception as e:
             self.debug_print(consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
