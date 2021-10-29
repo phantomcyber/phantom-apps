@@ -93,7 +93,7 @@ BMCREMEDY_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file 
 BMCREMEDY_FIELDS_PARAM_ERR_MSG = ("Please provide JSON formatted dictionary in the 'fields' action parameter "
                                   "e.g: {\"First_Name\": \"Customer First Name\", \"Last_Name\": \"Customer Last Name\", \"Description\": \"Incident Description\", "
                                   "\"Service_Type\": \"User Service Restoration\", \"Reported Source\": \"Direct Input\", \"Status\": \"Assigned\", "
-                                  "\"Assignee Login ID\": \"John\", \"Assignee\": \"John Doe\"}")
+                                  "\"Assignee Login ID\": \"User\", \"Assignee\": \"User Name\"}")
 
 # Dictionary that maps each error code with its corresponding message
 ERROR_RESPONSE_DICT = {
