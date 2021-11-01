@@ -53,7 +53,7 @@ class TaniumDetectConnector(BaseConnector):
             error_text = 'Cannot parse error details'
 
         message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code, error_text)
-        message = message.replace(u'{', '{{').replace(u'}', '}}')
+        message = message.replace('{', '{{').replace('}', '}}')
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -66,7 +66,7 @@ class TaniumDetectConnector(BaseConnector):
             if 200 <= r.status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        message = ('Error from server. Status Code: {0} Data from server: {1}').format(r.status_code, r.text.replace(u'{', '{{').replace(u'}', '}}'))
+        message = ('Error from server. Status Code: {0} Data from server: {1}').format(r.status_code, r.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -988,14 +988,14 @@ class TaniumDetectConnector(BaseConnector):
 
         # Process the details section.
         details = json.loads(alert['details'])
-        for detail in details['match']['properties'].items():
+        for detail in list(details['match']['properties'].items()):
             if detail[0] in transforms:
                 cef[transforms[detail[0]]] = detail[1]
             else:
                 cef[detail[0]] = detail[1]
 
         # Process the rest of the alert
-        for artifact_name, artifact_value in alert.items():
+        for artifact_name, artifact_value in list(alert.items()):
             if artifact_name in transforms:
                 cef[transforms[artifact_name]] = artifact_value
             else:
@@ -1044,8 +1044,8 @@ class TaniumDetectConnector(BaseConnector):
         first_param = True
         if len(params) > 0:
             endpoint += "?"
-            for param, value in params.items():
-                if isinstance(value, basestring):
+            for param, value in list(params.items()):
+                if isinstance(value, str):
                     value = UnicodeDammit(value).unicode_markup.encode("utf-8")
                 if first_param:
                     endpoint += "{}={}".format(param, value)
@@ -1102,7 +1102,7 @@ class TaniumDetectConnector(BaseConnector):
         action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        if action in action_mapping.keys():
+        if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
             action_execution_status = action_function(param)
         return action_execution_status
@@ -1142,7 +1142,7 @@ if __name__ == '__main__':
     if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             response = requests.get(login_url, verify=False)
             csrftoken = response.cookies['csrftoken']
 
@@ -1155,17 +1155,19 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             response2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = response2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: {}".format(str(e)))
+            err_msg = "Unable to get session id from the platform. Error: {}".format(str(e))
+            print(err_msg)
             exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print(json.dumps(in_json, indent=4))
+        json_str = json.dumps(in_json, indent=4)
+        print(json_str)
 
         connector = TaniumDetectConnector()
         connector.print_progress_message = True
@@ -1175,6 +1177,7 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        ret_json = json.dumps(json.loads(ret_val), indent=4)
+        print(ret_json)
 
     exit(0)
