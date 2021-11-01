@@ -110,7 +110,7 @@ class FireeyeHxConnector(BaseConnector):
 
     def _process_empty_response(self, response, action_result):
 
-        if response.status_code == 200:
+        if response.ok:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(
@@ -667,9 +667,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_triage(self, param):
@@ -803,7 +800,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response)
 
-        # action_result.add_data({})
         summary = action_result.update_summary({})
         sum_message = response.get('message')
         summary['message'] = sum_message
@@ -845,9 +841,6 @@ class FireeyeHxConnector(BaseConnector):
 
         action_result.add_data(response.get('data'))
 
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_unquarantine_device(self, param):
@@ -885,9 +878,6 @@ class FireeyeHxConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['important_data'] = "value"
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -927,8 +917,6 @@ class FireeyeHxConnector(BaseConnector):
             return action_result.get_status()
 
         action_result.add_data(response)
-
-        # action_result.add_data({})
 
         summary = action_result.update_summary({})
         sum_message = response['message']
@@ -1158,7 +1146,7 @@ class FireeyeHxConnector(BaseConnector):
 
     def finalize(self):
 
-        # Save the state, this data is saved accross actions and app upgrades
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
 
