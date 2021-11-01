@@ -23,6 +23,7 @@ import re
 class CheckpointConnector(BaseConnector):
 
     # The actions supported by this connector
+    ACTION_ID_LOGOUT_SESSION = "logout_session"
     ACTION_ID_BLOCK_IP = "block_ip"
     ACTION_ID_UNBLOCK_IP = "unblock_ip"
     ACTION_ID_LIST_LAYERS = "list_layers"
@@ -196,11 +197,32 @@ class CheckpointConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress("Failed to logout: {}".format(action_result.get_status_message()))
-            return action_result.get_status()
+            return action_result.get_status(), action_result.get_status_message()
 
         self._sid = None
 
-        return phantom.APP_SUCCESS
+        return phantom.APP_SUCCESS, "Successfully logged out of session"
+
+    def _logout_session(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(self._login(action_result)):
+            return action_result.get_status()
+
+        sid_exisitng_session = param.get('session_id')
+        sid_auth = self._sid
+
+        self._headers['X-chkp-sid'] = sid_exisitng_session
+
+        ret_val, msg = self._logout(self)
+
+        self._sid = sid_auth
+        self._headers['X-chkp-sid'] = sid_auth
+
+        self._logout(self)
+
+        return action_result.set_status(phantom.APP_SUCCESS if ret_val else phantom.APP_ERROR, msg)
 
     def _publish_and_wait(self, action_result):
 
@@ -504,7 +526,8 @@ class CheckpointConnector(BaseConnector):
             result = self._list_layers(param)
         elif (action_id == self.ACTION_ID_LIST_POLICIES):
             result = self._list_policies(param)
-
+        elif (action_id == self.ACTION_ID_LOGOUT_SESSION):
+            result = self._logout_session(param)
         return result
 
 

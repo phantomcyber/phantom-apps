@@ -726,6 +726,73 @@
                 }
             ],
             "versions": "EQ(*)"
+        },
+        {
+            "action": "logout session",
+            "description": "Logout of an exisiting session",
+            "verbose": "This action logs out of an existing session. For all other actions, logging out occurs automatically.",
+            "type": "correct",
+            "identifier": "logout_session",
+            "read_only": false,
+            "parameters": {
+                "session_id": {
+                    "description": "Session id to log out from",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Logout Session"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully logged out of session",
+                        "Could not connect to Check Point:\nWrong session id. Session may be expired. Please check session id and resend the request."
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.session_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Us2qnsKc5SGKglzjVqXGfUKIjNOOcZxl7HYINyq0Lz8",
+                        "TMRsvIBQFDIFwpWQRLskhHD7XCP5pbgHzkmvlHORoOY"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        0
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
         }
     ]
 }
