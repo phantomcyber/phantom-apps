@@ -1,13 +1,8 @@
-# Copyright (c) 2020 Splunk Inc.
+# Copyright (c) 2020-2021 Splunk Inc.
 #
 # Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 #
 
-# Originally Created by Thomas (Phantom)
-# 11-11-2019
-#   Added action on_poll to ingest alerts.
-#   Added comments for all actions and made the code easier to follow by adding new lines.
-#   Added default fields in the tanium_detect_consts.py
 
 import requests
 import json
@@ -1036,7 +1031,7 @@ class TaniumDetectConnector(BaseConnector):
             self.debug_print('Handled exception in _create_dict_hash', e)
             return None
 
-        return hashlib.md5(input_dict_str).hexdigest()
+        return hashlib.sha256(input_dict_str).hexdigest()
 
     def _process_parameters(self, endpoint, params):
         """ This function is used process the parameters and creates a valid endpoint URL.
