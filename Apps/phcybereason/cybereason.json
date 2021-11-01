@@ -1333,6 +1333,10 @@
                     "description": "The IP of a machine",
                     "data_type": "string",
                     "required": true,
+                    "primary": true,
+                    "contains": [
+                        "ip"
+                    ],
                     "order": 0
                 }
             },
@@ -1340,6 +1344,9 @@
                 {
                     "data_path": "action_result.parameter.machine_ip",
                     "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "Machine IP",
                     "column_order": 5
                 },
@@ -1810,7 +1817,7 @@
                 {
                     "data_path": "action_result.data.*.dns_query",
                     "data_type": "string",
-                    "column_name": "DNS Query",
+                    "column_name": "Dns Query",
                     "column_order": 10
                 },
                 {
@@ -1854,26 +1861,21 @@
         {
             "action": "upgrade sensor",
             "description": "Upgrade a sensor",
-            "verbose": "Upgrade a sensor using the Cybereason sensor pylum id provided as an input",
+            "verbose": "Upgrade a sensor using the Cybereason sensor pylum id provided as an input.",
             "type": "generic",
             "identifier": "upgrade_sensor",
             "read_only": false,
             "parameters": {
                 "pylumid": {
+                    "description": "The Cybereason sensor pylum ID targeted for upgrade",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "cybereason sensor pylum id"
                     ],
-                    "data_type": "string",
-                    "order": 0,
-                    "description": "The Cybereason sensor pylum ID targeted for upgrade",
-                    "required": true,
-                    "primary": true,
-                    "default": "",
-                    "value_list": []
+                    "order": 0
                 }
-            },
-            "render": {
-                "type": "table"
             },
             "output": [
                 {
@@ -1882,7 +1884,7 @@
                     "contains": [
                         "cybereason sensor pylum id"
                     ],
-                    "column_name": "pylumid",
+                    "column_name": "Pylumid",
                     "column_order": 0
                 },
                 {
@@ -1895,7 +1897,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1910,31 +1916,29 @@
                     "column_order": 4
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
             "action": "restart sensor",
             "description": "Restart a sensor",
-            "verbose": "Restart a sensor using the Cybereason sensor pylum id provided as an input",
+            "verbose": "Restart a sensor using the Cybereason sensor pylum id provided as an input.",
             "type": "generic",
             "identifier": "restart_sensor",
             "read_only": false,
             "parameters": {
                 "pylumid": {
+                    "description": "The Cybereason sensor pylum id targeted for restart",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
                     "contains": [
                         "cybereason sensor pylum id"
                     ],
-                    "data_type": "string",
-                    "order": 0,
-                    "description": "The Cybereason sensor pylum id targeted for restart",
-                    "required": true,
-                    "primary": true,
-                    "default": "",
-                    "value_list": []
+                    "order": 0
                 }
-            },
-            "render": {
-                "type": "table"
             },
             "output": [
                 {
@@ -1943,7 +1947,7 @@
                     "contains": [
                         "cybereason sensor pylum id"
                     ],
-                    "column_name": "pylumid",
+                    "column_name": "Pylumid",
                     "column_order": 0
                 },
                 {
@@ -1956,7 +1960,11 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary",
@@ -1971,6 +1979,9 @@
                     "column_order": 4
                 }
             ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         }
     ]

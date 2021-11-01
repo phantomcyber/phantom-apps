@@ -230,7 +230,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        malop_id = self._get_string_param(param.get('malop_id'))
+        malop_id = self._get_string_param(param['malop_id'])
 
         try:
             # Set up a session by logging in to the Cybereason console.
@@ -301,7 +301,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        malop_id = self._get_string_param(param.get('malop_id'))
+        malop_id = self._get_string_param(param['malop_id'])
         self.save_progress("MALOP ID  :{0}".format(malop_id))
 
         comment = param.get('comment', "")
@@ -335,9 +335,9 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        malop_id = self._get_string_param(param.get('malop_id'))
+        malop_id = self._get_string_param(param['malop_id'])
 
-        phantom_status = param.get('status')
+        phantom_status = param['status']
         cybereason_status = PHANTOM_TO_CYBEREASON_STATUS.get(phantom_status)
         if not cybereason_status:
             self.save_progress("Invalid status selected")
@@ -367,7 +367,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        malop_id = self._get_string_param(param.get('malop_id'))
+        malop_id = self._get_string_param(param['malop_id'])
         ret_val, sensor_ids = self._get_malop_sensor_ids(malop_id, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -397,7 +397,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        malop_id = self._get_string_param(param.get('malop_id'))
+        malop_id = self._get_string_param(param['malop_id'])
         ret_val, sensor_ids = self._get_malop_sensor_ids(malop_id, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -436,7 +436,7 @@ class CybereasonConnector(BaseConnector):
         # Add an action result object to self (BaseConnector) to represent the action for this param
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        machine_name_or_ip = self._get_string_param(param.get('machine_name_or_ip'))
+        machine_name_or_ip = self._get_string_param(param['machine_name_or_ip'])
         ret_val, sensor_ids = self._get_machine_sensor_ids(machine_name_or_ip, action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -699,7 +699,7 @@ class CybereasonConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(err)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), [])
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
@@ -736,7 +736,7 @@ class CybereasonConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(err)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), [])
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
@@ -774,7 +774,7 @@ class CybereasonConnector(BaseConnector):
         except Exception as e:
             err = self._get_error_message_from_exception(e)
             self.save_progress(err)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error occurred. {}".format(err)), [])
 
         return RetVal(action_result.set_status(phantom.APP_SUCCESS), sensor_ids)
 
@@ -786,7 +786,7 @@ class CybereasonConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Get the parameters
-        pylum_id = self._get_string_param(param.get('pylumid'))
+        pylum_id = self._get_string_param(param['pylumid'])
 
         try:
             # Create a session to call the rest APIs
@@ -798,6 +798,7 @@ class CybereasonConnector(BaseConnector):
             # Look for the multiple sensor ids
             if "," in pylum_id:
                 filter_arr = pylum_id.strip().split(",")
+                filter_arr = [each_id.strip() for each_id in filter_arr]
                 pylum_ids.extend(filter_arr)
             else:
                 pylum_ids.append(pylum_id)
@@ -837,7 +838,7 @@ class CybereasonConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         # Get the parameters
-        pylum_id = self._get_string_param(param.get('pylumid'))
+        pylum_id = self._get_string_param(param['pylumid'])
 
         try:
             # Create a session to call the rest APIs
@@ -849,6 +850,7 @@ class CybereasonConnector(BaseConnector):
             pylum_ids = []
             if "," in pylum_id:
                 filter_arr = pylum_id.strip().split(",")
+                filter_arr = [each_id.strip() for each_id in filter_arr]
                 pylum_ids.extend(filter_arr)
             else:
                 pylum_ids.append(pylum_id)
