@@ -399,13 +399,13 @@
 		"type": "basic",
 		"basic": [
 			{
-				"key": "username",
-				"value": "ryan@phantom.us",
+				"key": "password",
+				"value": "{{password}}",
 				"type": "string"
 			},
 			{
-				"key": "password",
-				"value": "19819bb099f97c779280dcb8dc3c09c5cde6f742fd91ab91ef0d1ef62e3f41bf",
+				"key": "username",
+				"value": "{{username}}",
 				"type": "string"
 			}
 		]
@@ -461,6 +461,14 @@
 		},
 		{
 			"key": "get_host_pairs_direction",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
 			"value": ""
 		}
 	]
