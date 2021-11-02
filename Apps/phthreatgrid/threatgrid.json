@@ -130,10 +130,13 @@
                     ],
                     "primary": true
                 },
-                "file_password": {
+                "sample_password": {
                     "description": "Password used to open the submitted file",
                     "data_type": "string",
-                    "order": 6
+                    "order": 6,
+                    "contains": [
+                        "password"
+                    ]
                 }
             },
             "output": [
@@ -156,7 +159,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.file_password",
+                    "data_path": "action_result.parameter.sample_password",
                     "data_type": "string",
                     "contains": [
                         "password"
