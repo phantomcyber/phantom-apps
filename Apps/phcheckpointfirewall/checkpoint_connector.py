@@ -318,7 +318,6 @@ class CheckpointConnector(BaseConnector):
 
         if (phantom.is_fail(status)):
             self.append_to_message(CHECKPOINT_ERR_CONNECTIVITY_TEST)
-            self._logout(self)
             return self.get_status()
 
         self._logout(self)
