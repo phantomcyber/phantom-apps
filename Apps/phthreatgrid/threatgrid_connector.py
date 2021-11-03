@@ -409,7 +409,7 @@ class threatgridConnector(BaseConnector):
             'source': '',
             'vm': param.get('vm', ''),
             'playbook': param.get('playbook', 'default'),
-            'sample_password': param.get('file_password')
+            'sample_password': param.get('sample_password')
         }
         if param.get('private'):
             data['private'] = True
