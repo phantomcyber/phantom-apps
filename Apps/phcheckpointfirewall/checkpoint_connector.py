@@ -494,25 +494,30 @@ class CheckpointConnector(BaseConnector):
         if not(self._login(action_result)):
             return action_result.get_status()
 
-        ip = param.get(phantom.APP_JSON_IP, None)
-        ipv4 = param.get('ipv4', None)
-        ipv6 = param.get('ipv6', None)
-        name = param.get('name', None)
+        ip = param.get(phantom.APP_JSON_IP)
+        ipv4 = param.get('ipv4')
+        ipv6 = param.get('ipv6')
+        name = param.get('name')
 
         endpoint = 'add-host'
 
+        body = {'name': name}
+
         if ip:
-            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ip-address': ip}, action_result)
+            body['ip-address'] = ip
         elif ipv4 and ipv6:
-            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv4-address': ipv4, 'ipv6-address': ipv6}, action_result)
+            body['ipv4-address'] = ipv4
+            body['ipv6-address'] = ipv6
         elif ipv4:
-            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv4-address': ipv4}, action_result)
+            body['ipv4-address'] = ipv4
         elif ipv6:
-            ret_val, resp_json = self._make_rest_call(endpoint, {'name': name, 'ipv6-address': ipv6}, action_result)
+            body['ipv6-address'] = ipv6
         else:
             return action_result.set_status(phantom.APP_ERROR, "You must specify an ip address")
 
-        if ((not ret_val) and (not resp_json)):
+        ret_val, resp_json = self._make_rest_call(endpoint, body, action_result)
+
+        if (not ret_val) and (not resp_json):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
