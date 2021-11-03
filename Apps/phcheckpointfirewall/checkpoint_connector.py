@@ -210,10 +210,10 @@ class CheckpointConnector(BaseConnector):
         if not(self._login(action_result)):
             return action_result.get_status()
 
-        sid_exisitng_session = param.get('session_id')
+        sid_existing_session = param['session_id']
         sid_auth = self._sid
 
-        self._headers['X-chkp-sid'] = sid_exisitng_session
+        self._headers['X-chkp-sid'] = sid_existing_session
 
         ret_val, msg = self._logout(self)
 
