@@ -17,12 +17,18 @@
     "logo_dark": "logo_digital_shadows_dark.svg",
     "license": "Copyright (c) 2020-2021 Digital Shadows Ltd.",
     "pip_dependencies": {
-        "pypi": [
+        "wheel": [
             {
-                "module": "httplib2"
+                "module": "Unidecode",
+                "input_file": "wheels/Unidecode-1.3.2-py3-none-any.whl"
             },
             {
-                "module": "unidecode"
+                "module": "ca_certs_locater",
+                "input_file": "wheels/ca_certs_locater-1.0-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.5.30-py2.py3-none-any.whl"
             }
         ]
     },
