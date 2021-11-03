@@ -489,7 +489,7 @@ class CheckpointConnector(BaseConnector):
 
     def _list_hosts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-        
+
         if not(self._login(action_result)):
             return action_result.get_status()
 
