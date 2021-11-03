@@ -497,7 +497,7 @@ class CheckpointConnector(BaseConnector):
         ip = param.get(phantom.APP_JSON_IP)
         ipv4 = param.get('ipv4')
         ipv6 = param.get('ipv6')
-        name = param.get('name')
+        name = param['name']
 
         endpoint = 'add-host'
 
