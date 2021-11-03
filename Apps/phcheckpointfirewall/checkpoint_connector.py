@@ -493,8 +493,8 @@ class CheckpointConnector(BaseConnector):
         if not(self._login(action_result)):
             return action_result.get_status()
 
-        name = param.get('name', None)
-        uid = param.get('uid', None)
+        name = param.get('name')
+        uid = param.get('uid')
 
         endpoint = 'delete-host'
 
@@ -505,7 +505,7 @@ class CheckpointConnector(BaseConnector):
         else:
             return action_result.set_status(phantom.APP_ERROR, "You must specify the host name or unique identifier")
 
-        if ((not ret_val) and (not resp_json)):
+        if (not ret_val) and (not resp_json):
             return action_result.get_status()
 
         action_result.add_data(resp_json)
