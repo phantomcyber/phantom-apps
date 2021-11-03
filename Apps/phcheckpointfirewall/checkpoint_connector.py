@@ -489,7 +489,7 @@ class CheckpointConnector(BaseConnector):
 
     def _list_hosts(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
-
+        
         if not(self._login(action_result)):
             return action_result.get_status()
 
@@ -502,12 +502,18 @@ class CheckpointConnector(BaseConnector):
 
         action_result.add_data(resp_json)
 
-        total_num_hosts = resp_json.get('total')
-        action_result.update_summary({'Total number of hosts': total_num_hosts})
+        total_num_hosts = 0
+
+        if resp_json.get('total'):
+            total_num_hosts = resp_json.get('total')
+            action_result.update_summary({'Total number of hosts': total_num_hosts})
+            message = "Succesfully found {0} host{1}".format(total_num_hosts, '' if total_num_hosts == 1 else 's')
+        else:
+            message = "Found no hosts"
 
         self._logout(self)
 
-        return action_result.set_status(phantom.APP_SUCCESS, "Successfully displayed {} hosts".format(total_num_hosts))
+        return action_result.set_status(phantom.APP_SUCCESS, message)
 
     def handle_action(self, param):
 
