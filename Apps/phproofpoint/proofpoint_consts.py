@@ -14,6 +14,7 @@ PP_API_PATH_ALL = "/v2/siem/all"
 PP_API_PATH_CAMPAIGN = "/v2/campaign/{}"
 PP_API_PATH_FORENSICS = "/v2/forensics"
 PP_API_PATH_DECODE = "/v2/url/decode"
+PP_API_FORMAT_JSON = "json"
 
 # Constants relating to 'get_error_message_from_exception'
 ERR_CODE_MSG = "Error code unavailable"

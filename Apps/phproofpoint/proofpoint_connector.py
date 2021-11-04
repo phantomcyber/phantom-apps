@@ -416,7 +416,8 @@ class ProofpointConnector(BaseConnector):
             self._state['last_poll'] = start_at
 
         params = {
-            'sinceTime': self._state['last_poll']
+            'sinceTime': self._state['last_poll'],
+            'format': PP_API_FORMAT_JSON
         }
 
         # Connect to the server
@@ -455,7 +456,8 @@ class ProofpointConnector(BaseConnector):
                     .replace(microsecond=0).isoformat() + 'Z')
 
         params = {
-            'sinceTime': start_at
+            'sinceTime': start_at,
+            'format': PP_API_FORMAT_JSON
         }
 
         # Connect to the server
