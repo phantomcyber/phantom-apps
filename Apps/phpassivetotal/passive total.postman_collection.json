@@ -1,0 +1,475 @@
+{
+	"info": {
+		"_postman_id": "7b1e04d6-2dec-4eaa-8a40-54b67dbedaa1",
+		"name": "passive total",
+		"description": "# Postman Collection of Endpoints for Passive total App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, make sure that all these fields are set before running the request.\n\n| **Variable Name** | **Description** |\n| ------ | ------ |\n| username  |  Username ( in environment variables) |\n| password  | Password ( in environment variables) |",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Whois_domain",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/whois?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"whois"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. ip_address - ex (277.277.277.277)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_enrichment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/enrichment?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"enrichment"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_dns_unique",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/dns/passive/unique?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"dns",
+						"passive",
+						"unique"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_dns",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/dns/passive?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"dns",
+						"passive"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_classification",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/actions/classification?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"actions",
+						"classification"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_tags",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/actions/tags?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"actions",
+						"tags"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_sinkhole",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/actions/sinkhole?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"actions",
+						"sinkhole"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "domain_reputation_compromised",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/actions/ever-compromised?query={{domain_name}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"actions",
+						"ever-compromised"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)"
+			},
+			"response": []
+		},
+		{
+			"name": "ip_reputation_history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ssl-certificate/history/?query={{ip_address}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ssl-certificate",
+						"history",
+						""
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{ip_address}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. ip_address - ex (277.277.277.277)"
+			},
+			"response": []
+		},
+		{
+			"name": "Whois_ip",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/whois?query={{ip_address}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"whois"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{ip_address}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. ip_address - ex (277.277.277.277)"
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup_certificate_hash",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ssl-certificate?query={{certificate_hash}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ssl-certificate"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{certificate_hash}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. certificate_hash - ex (345345DFGert3452)"
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup_certificate_hash_history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ssl-certificate/history?query={{certificate_hash}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ssl-certificate",
+						"history"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{certificate_hash}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. certificate_hash - ex (345345DFGert3452)"
+			},
+			"response": []
+		},
+		{
+			"name": "Lookup_certificate",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ssl-certificate/search?query={{lookup_query}}&field={{lookup_field}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ssl-certificate",
+						"search"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{lookup_query}}"
+						},
+						{
+							"key": "field",
+							"value": "{{lookup_field}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. lookup_query - ex (certificate)\n2. lookup_field - ex (IssuerCommonName)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get_host_component",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/host-attributes/components?query={{domain_name}}&page={{get_host_page}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"host-attributes",
+						"components"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						},
+						{
+							"key": "page",
+							"value": "{{get_host_page}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)\n2. get_host_page - ex (0)"
+			},
+			"response": []
+		},
+		{
+			"name": "Get_host_components_pairs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/host-attributes/pairs?query={{domain_name}}&page={{get_host_page}}&direction={{get_host_pairs_direction}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"host-attributes",
+						"pairs"
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "{{domain_name}}"
+						},
+						{
+							"key": "page",
+							"value": "{{get_host_page}}"
+						},
+						{
+							"key": "direction",
+							"value": "{{get_host_pairs_direction}}"
+						}
+					]
+				},
+				"description": "The variables for the action are mentioned below.\n\n1. domain_name - ex (test.com)\n2. get_host_page - ex (0)\n3. get_host_direction - ex (parents/child)"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "{{password}}",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "{{username}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "ip_address",
+			"value": ""
+		},
+		{
+			"key": "domain_name",
+			"value": ""
+		},
+		{
+			"key": "certificate_hash",
+			"value": ""
+		},
+		{
+			"key": "lookup_query",
+			"value": ""
+		},
+		{
+			"key": "lookup_field",
+			"value": ""
+		},
+		{
+			"key": "get_host_page",
+			"value": ""
+		},
+		{
+			"key": "get_host_pairs_direction",
+			"value": ""
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		}
+	]
+}

@@ -24,6 +24,7 @@ class CheckpointConnector(BaseConnector):
 
     # The actions supported by this connector
     ACTION_ID_LIST_HOSTS = "list_hosts"
+    ACTION_ID_ADD_HOST = "add_host"
     ACTION_ID_BLOCK_IP = "block_ip"
     ACTION_ID_UNBLOCK_IP = "unblock_ip"
     ACTION_ID_LIST_LAYERS = "list_layers"
@@ -515,6 +516,50 @@ class CheckpointConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, message)
 
+    def _add_host(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(self._login(action_result)):
+            return action_result.get_status()
+
+        ip = param.get(phantom.APP_JSON_IP)
+        ipv4 = param.get('ipv4')
+        ipv6 = param.get('ipv6')
+        name = param['name']
+
+        endpoint = 'add-host'
+
+        body = {'name': name}
+
+        if ip:
+            body['ip-address'] = ip
+        elif ipv4 and ipv6:
+            body['ipv4-address'] = ipv4
+            body['ipv6-address'] = ipv6
+        elif ipv4:
+            body['ipv4-address'] = ipv4
+        elif ipv6:
+            body['ipv6-address'] = ipv6
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "You must specify an ip address")
+
+        ret_val, resp_json = self._make_rest_call(endpoint, body, action_result)
+
+        if (not ret_val) and (not resp_json):
+            return action_result.get_status()
+
+        action_result.add_data(resp_json)
+
+        if (not self._publish_and_wait(action_result)):
+            return action_result.set_status(phantom.APP_ERROR, "Could not publish session after changes")
+
+        message = "Successfully added host"
+
+        self._logout(self)
+
+        return action_result.set_status(phantom.APP_SUCCESS, message)
+
     def handle_action(self, param):
 
         # Get the action that we are supposed to execute for this App Run
@@ -535,6 +580,8 @@ class CheckpointConnector(BaseConnector):
             result = self._list_policies(param)
         elif (action_id == self.ACTION_ID_LIST_HOSTS):
             result = self._list_hosts(param)
+        elif (action_id == self.ACTION_ID_ADD_HOST):
+            result = self._add_host(param)
 
         return result
 
