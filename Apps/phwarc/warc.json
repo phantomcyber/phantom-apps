@@ -20,12 +20,37 @@
             "name": "Daniel Federschmidt"
         }
     ],
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
-        "pypi": [
+        "wheel": [
             {
-                "module": "warcio"
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-4.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "warcio",
+                "input_file": "wheels/warcio-1.7.4-py2.py3-none-any.whl"
             }
         ]
     },

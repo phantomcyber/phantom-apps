@@ -1,1 +1,46 @@
-<p>Incidents are typically categorized among following types:<ul><li><b>User Service Restoration</b><ul><li>Typical ITIL (Information Technology Infrastructure Library) of incident.</li></ul></li><li><b>User Service Request</b><ul><li>Used to identify incidents that are not related to ITIL definition.</li></ul></li><li><b>Infrastructure Restoration</b><ul><li>ITIL definition, but more focused on CI (Configuration Item) restoration.</li></ul></li><li><b>Infrastructure Event</b><ul><li>Used for integration for system management tools.</li></ul></li></ul></p>
+<!--
+    File: readme.html
+    Copyright (c) 2017-2021 Splunk Inc.
+    
+    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
+-->
+
+<p>Incidents are typically categorized among following types:
+    <ul>
+        <li><b>User Service Restoration</b>
+            <ul>
+                <li>Typical ITIL (Information Technology Infrastructure Library) of incident.</li>
+            </ul>
+        </li>
+        <li><b>User Service Request</b>
+            <ul>
+                <li>Used to identify incidents that are not related to ITIL definition.</li>
+            </ul>
+        </li>
+        <li><b>Infrastructure Restoration</b>
+            <ul>
+                <li>ITIL definition, but more focused on CI (Configuration Item) restoration.</li>
+            </ul>
+        </li>
+        <li><b>Infrastructure Event</b>
+            <ul>
+                <li>Used for integration for system management tools.</li>
+            </ul>
+        </li>
+    </ul>
+</p>
+
+<h2>Playbook Backward Compatibility</h2>
+<p>
+    <ul>
+        <li>A new action parameter has been added in the existing action. Hence, it is requested to the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding action blocks.</li>
+        <ul>
+            <li>A 'offset' action parameter has been added in the 'list tickets' action</li>
+        </ul>
+        <li>
+            The existing output data paths have been modified for the 'list tickets' action. Hence, it is requested to
+            the end-user to please update their existing playbooks by re-inserting | modifying | deleting the corresponding
+            action blocks to ensure the correct functioning of the playbooks created on the earlier versions of the app.
+        </li>
+    </ul>
+</p>

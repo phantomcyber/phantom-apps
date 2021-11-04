@@ -6,69 +6,22 @@
 # Standard library imports
 import json
 import re
-import mimetools
-import mimetypes
 import requests
+from bs4 import BeautifulSoup
 
 # Phantom imports
 import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
-from phantom.vault import Vault
+import phantom.rules as ph_rules
 
 # Local imports
 import bmcremedy_consts as consts
-
-# Dictionary that maps each error code with its corresponding message
-ERROR_RESPONSE_DICT = {
-    consts.BMCREMEDY_REST_RESP_BAD_REQUEST: consts.BMCREMEDY_REST_RESP_BAD_REQUEST_MSG,
-    consts.BMCREMEDY_REST_RESP_UNAUTHORIZED: consts.BMCREMEDY_REST_RESP_UNAUTHORIZED_MSG,
-    consts.BMCREMEDY_REST_RESP_FORBIDDEN: consts.BMCREMEDY_REST_RESP_FORBIDDEN_MSG,
-    consts.BMCREMEDY_REST_RESP_NOT_FOUND: consts.BMCREMEDY_REST_RESP_NOT_FOUND_MSG,
-    consts.BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED: consts.BMCREMEDY_REST_RESP_METHOD_NOT_ALLOWED_MSG,
-    consts.BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR: consts.BMCREMEDY_REST_RESP_INTERNAL_SERVER_ERROR_MSG
-}
-
-# List containing http codes to be considered as success
-SUCCESS_RESPONSE_CODES = [consts.BMCREMEDY_REST_RESP_TOKEN_SUCCESS, consts.BMCREMEDY_REST_RESP_CREATE_SUCCESS,
-                          consts.BMCREMEDY_REST_RESP_NO_CONTENT]
-
-# List of parameters that will be considered for adding attachment to an incident
-add_attachment_params_list = ["Work Log Type", "View Access", "Secure Work Log", "Detailed Description"]
 
 
 class RetVal3(tuple):
     def __new__(cls, val1, val2=None, val3=None):
         return tuple.__new__(RetVal3, (val1, val2, val3))
-
-
-def encode_multipart_form_data(fields):
-    """ Helper function used to encode multipart data with given request fields dictionary.
-
-    :param fields: request fields dictionary
-    :return: encoded request body and content type
-    """
-
-    boundary = '--{}'.format(mimetools.choose_boundary())
-
-    body = ''
-
-    for key, value in fields.iteritems():
-        if isinstance(value, tuple):
-            filename = value[0]
-            content = value[1]
-            body = "{}{}".format(body, consts.BMCREMEDY_ENCODE_TEMPLATE_FILE.format(
-                boundary=boundary, name=str(key), value=str(content), filename=str(filename.encode('utf-8')),
-                contenttype=str(mimetypes.guess_type(filename)[0] or 'application/octet-stream')
-            ))
-        else:
-            body = "{}{}".format(body, consts.BMCREMEDY_ENCODE_TEMPLATE.format(boundary=boundary, name=str(key),
-                                                                               value=json.dumps(value, indent=4)))
-
-    body = "{}{}".format(body, '--{}--\n\r'.format(boundary))
-    content_type = 'multipart/form-data; boundary={}'.format(boundary)
-
-    return body, content_type
 
 
 class BmcremedyConnector(BaseConnector):
@@ -106,6 +59,12 @@ class BmcremedyConnector(BaseConnector):
 
         # Load any saved configurations
         self._state = self.load_state()
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, consts.BMCREMEDY_STATE_FILE_CORRUPT_ERR)
 
         self._token = self._state.get('token')
 
@@ -114,27 +73,108 @@ class BmcremedyConnector(BaseConnector):
 
     def _check_login_status(self, action_result, response):
 
-        if (not hasattr(response, 'headers')):
+        if not hasattr(response, 'headers'):
             return action_result.set_status(phantom.APP_ERROR, "Response missing headers, cannot determine success")
 
         x_ar_messages = response.headers.get('x-ar-messages')
-        if (not x_ar_messages):
+        if not x_ar_messages:
             return phantom.APP_SUCCESS
 
         # will need to parse the messages
         try:
             x_ar_messages = json.loads(x_ar_messages)
         except:
-            return action_result.set_status(phantom.APP_ERROR, "Unable to process X-AR-Me")
+            return action_result.set_status(phantom.APP_ERROR, "Unable to process X-AR-Messages")
 
         for curr_msg_dict in x_ar_messages:
             message_text = curr_msg_dict.get('messageText')
-            if (not message_text):
+            if not message_text:
                 continue
-            if ('login failed' in message_text.lower()):
+            if 'login failed' in message_text.lower():
                 return action_result.set_status(phantom.APP_ERROR, "Login failed, please check your credentials")
 
-        return (phantom.APP_SUCCESS)
+        return phantom.APP_SUCCESS
+
+    def _get_error_message_from_exception(self, e):
+        """
+        Get appropriate error message from the exception.
+
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = consts.ERR_CODE_MSG
+        error_msg = consts.ERR_MSG_UNAVAILABLE
+
+        try:
+            if hasattr(e, "args"):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = consts.ERR_CODE_MSG
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        try:
+            if error_code in consts.ERR_CODE_MSG:
+                error_text = "Error Message: {}".format(error_msg)
+            else:
+                error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
+        except:
+            self.debug_print(consts.PARSE_ERR_MSG)
+            error_text = consts.PARSE_ERR_MSG
+
+        return error_text
+
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        """
+        Validate an integer.
+
+        :param action_result: Action result or BaseConnector object
+        :param parameter: input parameter
+        :param key: input parameter message key
+        :allow_zero: whether zero should be considered as valid value or not
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS, integer value of the parameter or None in case of failure
+        """
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_VALID_INT_MSG.format(param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_VALID_INT_MSG.format(param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_NON_NEG_INT_MSG.format(param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_NON_NEG_NON_ZERO_INT_MSG.format(param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _parse_html_response(self, response):
+
+        # An html response, treat it like an error
+        status_code = response.status_code
+
+        try:
+            soup = BeautifulSoup(response.text, "html.parser")
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+               element.extract()
+            error_text = soup.text
+            split_lines = error_text.split('\n')
+            split_lines = [x.strip() for x in split_lines if x.strip()]
+            error_text = '\n'.join(split_lines)
+        except:
+            error_text = "Cannot parse error details"
+
+        if not error_text:
+            error_text = "Empty response and no information received"
+        message = "Status Code: {}. Error Details: {}".format(status_code, error_text)
+        message = message.replace('{', '{{').replace('}', '}}')
+        return message
 
     def _generate_api_token(self, action_result):
         """ Generate new token based on the credentials provided. Token generated is valid for 60 minutes.
@@ -169,7 +209,7 @@ class BmcremedyConnector(BaseConnector):
             return action_result.get_status()
 
         # Saving the token to be used in subsequent actions
-        self._state['token'] = self._token = response_dict["content"]
+        self._state['token'] = self._token = response_dict["content"].decode("utf-8")
 
         return phantom.APP_SUCCESS
 
@@ -188,30 +228,37 @@ class BmcremedyConnector(BaseConnector):
         attachment_data = dict()
         add_attachment_params_dict = dict()
 
-        attachment_list = attachment_list.split(',')
+        attachment_list = [value.strip() for value in attachment_list.split(',') if value.strip()]
+        if not attachment_list:
+            self.debug_print(consts.BMCREMEDY_ERR_INVALID_FIELDS.format(field='vault_id'))
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_ERR_INVALID_FIELDS.format(field='vault_id')), None, None
 
         # At most, three attachments should be provided
         if len(attachment_list) > 3:
             self.debug_print(consts.BMCREMEDY_ATTACHMENT_LIMIT_EXCEED)
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_ATTACHMENT_LIMIT_EXCEED), None, None
 
-        # Searching for file with vault id in current container
-        files_array = (Vault.get_file_info(container_id=self.get_container_id()))
-        for vault_id in attachment_list:
-            file_found = False
-            vault_id = vault_id.strip()
-            for file_data in files_array:
-                if file_data[consts.BMCREMEDY_JSON_VAULT_ID] == vault_id:
-                    # Getting filename to use
-                    filename.append(file_data['name'].encode('utf-8'))
-                    # Reading binary data of file
-                    file_obj.append(open(Vault.get_file_path(vault_id), 'rb').read())
-                    file_found = True
-                    break
-            if not file_found:
-                self.debug_print(consts.BMCREMEDY_UNKNOWN_VAULT_ID)
-
-                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_UNKNOWN_VAULT_ID), None, None
+        try:
+            # Searching for file with vault id in current container
+            _, _, files_array = (ph_rules.vault_info(container_id=self.get_container_id()))
+            files_array = list(files_array)
+            for vault_id in attachment_list:
+                file_found = False
+                for file_data in files_array:
+                    if file_data[consts.BMCREMEDY_JSON_VAULT_ID] == vault_id:
+                        # Getting filename to use
+                        filename.append(file_data['name'])
+                        # Reading binary data of file
+                        with open(file_data.get('path'), 'rb') as f:
+                            file_obj.append(f.read())
+                        file_found = True
+                        break
+                if not file_found:
+                    self.debug_print("{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id))
+                    return action_result.set_status(phantom.APP_ERROR, "{}: {}".format(consts.BMCREMEDY_UNKNOWN_VAULT_ID, vault_id)), None, None
+        except Exception as e:
+            err_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, err_msg), None, None
 
         for index, value in enumerate(file_obj):
             add_attachment_params_dict['z2AF Work Log0{}'.format(index + 1)] = filename[index]
@@ -228,35 +275,33 @@ class BmcremedyConnector(BaseConnector):
         """
 
         # If attachment is to be added, then details will be provided in 'entry' field
+        files = []
+        data_params = None
         if "entry" in attachment_data:
-            # Encoding multipart data
-            body, content_type = encode_multipart_form_data(attachment_data)
-            data_params = 'Content-Type: {}\r\n'.format(content_type)
-            data_params = "{}{}".format(data_params, "Content-Length: {}\r\n\r\n".format(str(len(body))))
-            data_params = "{}{}".format(data_params, body)
-            accept_headers = {'Content-Type': content_type}
+            for key, value in attachment_data.items():
+                if key == "entry":
+                    tup = (key, (None, json.dumps(value).encode(), 'text/json'))
+                else:
+                    tup = (key, (value[0], value[1]))
+                files.append(tup)
         else:
             data_params = json.dumps(attachment_data)
-            accept_headers = None
 
         # Create incident using given input parameters
         response_status, response_data = self._make_rest_call_abstract(consts.BMCREMEDY_COMMENT_ENDPOINT, action_result,
                                                                        data=data_params, method="post",
-                                                                       accept_headers=accept_headers)
-
+                                                                       files=files)
         if phantom.is_fail(response_status):
             return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, response_data
 
-    def _get_url(self, incident_number):
+    def _get_url(self, action_result, incident_number):
         """ Helper function returns the url for the set status and update ticket action.
 
         :param incident_number: ID of incident
         :return: status phantom.APP_SUCCESS/phantom.APP_ERROR (along with appropriate message) and url to be used
         """
-
-        action_result = ActionResult()
 
         params = {'q': "'Incident Number'=\"{}\"".format(incident_number)}
 
@@ -282,7 +327,7 @@ class BmcremedyConnector(BaseConnector):
         return phantom.APP_SUCCESS, url
 
     def _make_rest_call_abstract(self, endpoint, action_result, data=None, params=None, method="post",
-                                 accept_headers=None):
+                                 accept_headers=None, files=None):
         """ This method generates a new token if it is not available or if the existing token has expired
         and makes the call using _make_rest_call method.
 
@@ -307,7 +352,10 @@ class BmcremedyConnector(BaseConnector):
                 return action_result.get_status(), response_data
 
         # Prepare request headers
-        headers = {'Content-Type': 'application/json', "Authorization": "AR-JWT {}".format(self._token)}
+        if files:
+            headers = {"Authorization": f"AR-JWT {self._token}"}
+        else:
+            headers = {'Content-Type': 'application/json', "Authorization": f"AR-JWT {self._token}"}
 
         # Updating headers if Content-Type is 'multipart/formdata'
         if accept_headers:
@@ -315,7 +363,7 @@ class BmcremedyConnector(BaseConnector):
 
         # Make call
         rest_ret_code, response_data, response = self._make_rest_call(endpoint, intermediate_action_result, headers=headers,
-                                                       params=params, data=data, method=method)
+                                                       params=params, data=data, method=method, files=files)
 
         # If token is invalid in case of API call, generate new token and retry
         if str(consts.BMCREMEDY_REST_RESP_UNAUTHORIZED) in str(intermediate_action_result.get_message()):
@@ -336,7 +384,7 @@ class BmcremedyConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, response_data
 
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="post"):
+    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="post", files=None):
         """ Function that makes the REST call to the device. It's a generic function that can be called from various
         action handlers.
 
@@ -351,29 +399,49 @@ class BmcremedyConnector(BaseConnector):
         """
 
         response_data = None
+        response = None
 
         try:
             request_func = getattr(requests, method)
         except AttributeError:
             self.debug_print(consts.BMCREMEDY_ERR_API_UNSUPPORTED_METHOD.format(method=method))
             # Set the action_result status to error, the handler function will most probably return as is
-            return RetVal3(action_result.set_status(phantom.APP_ERROR), response_data)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR), response_data, response)
         except Exception as e:
-            self.debug_print(consts.BMCREMEDY_EXCEPTION_OCCURRED)
+            error_msg = "{}. {}".format(consts.BMCREMEDY_EXCEPTION_OCCURRED, self._get_error_message_from_exception(e))
+            self.debug_print(error_msg)
             # Set the action_result status to error, the handler function will most probably return as is
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_EXCEPTION_OCCURRED, e), response_data)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, error_msg), response_data, response)
 
         try:
-            response = request_func('{}{}'.format(self._base_url, endpoint), headers=headers, data=data, params=params,
+            if files:
+                response = request_func('{}{}'.format(self._base_url, endpoint), headers=headers, files=files,
                                     verify=self._verify_server_cert)
+            else:
+                response = request_func('{}{}'.format(self._base_url, endpoint), headers=headers, data=data, params=params,
+                                        verify=self._verify_server_cert)
+        except requests.exceptions.ConnectionError as e:
+            self.debug_print(self._get_error_message_from_exception(e))
+            error_msg = "Error connecting to server. Connection refused from server for {}".format('{}{}'.format(self._base_url, endpoint))
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, error_msg), response_data, response)
         except Exception as error:
-            self.debug_print(consts.BMCREMEDY_REST_CALL_ERROR.format(error=str(error)))
+            error_msg = self._get_error_message_from_exception(error)
+            self.debug_print(consts.BMCREMEDY_REST_CALL_ERROR.format(error=error_msg))
             # Set the action_result status to error, the handler function will most probably return as is
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_ERR_SERVER_CONNECTION, error.message), response_data)
+            action_result_error_msg = "{}. {}".format(consts.BMCREMEDY_ERR_SERVER_CONNECTION, error_msg)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, action_result_error_msg), response_data, response)
 
-        if response.status_code in ERROR_RESPONSE_DICT:
+        # Process an HTML response, Do this no matter what the api talks.
+        # There is a high chance of a PROXY in between phantom and the rest of
+        # world, in case of errors, PROXY's return HTML, this function parses
+        # the error and adds it to the action_result.
+        if 'html' in response.headers.get('content-type', ''):
+            response_message = self._parse_html_response(response)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, response_message), response_data, response)
+
+        if response.status_code in consts.ERROR_RESPONSE_DICT:
             self.debug_print(consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code,
-                                                                     detail=ERROR_RESPONSE_DICT[response.status_code]))
+                                                                     detail=consts.ERROR_RESPONSE_DICT[response.status_code]))
 
             response_data = {"content": response.content, "headers": response.headers}
 
@@ -384,17 +452,24 @@ class BmcremedyConnector(BaseConnector):
                     content_dict = json.loads(response_data.get("content"))[0]
                     if consts.BMCREMEDY_BLANK_PARAM_ERROR_SUBSTRING in content_dict.get('messageAppendedText'):
                         custom_error_message = consts.BMCREMEDY_CUSTOM_ERROR_MSG
-                    response_message = 'messageText: {0}\nmessageAppendedText: {1}'. \
-                        format(content_dict['messageText'], custom_error_message + content_dict['messageAppendedText'])
+
+                    message_text = content_dict.get('messageText')
+                    message_appended_text = content_dict.get('messageAppendedText')
+                    if custom_error_message:
+                        message_appended_text = "{}{}".format(custom_error_message, message_appended_text)
+                    response_message = 'Message Text: {}. Message Appended Text: {}'.format(
+                        message_text, message_appended_text
+                    )
                 except:
-                    msg_string = consts.BMCREMEDY_ERR_JSON_PARSE.format(raw_text=response.text)
-                    self.debug_print(msg_string)
+                    response_message = consts.BMCREMEDY_ERR_JSON_PARSE.format(raw_text=response.text)
+                    self.debug_print(response_message)
 
             # Set the action_result status to error, the handler function will most probably return as is
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, '{0}\n{1}'.format(consts.BMCREMEDY_ERR_FROM_SERVER,
-                                                                                 response_message),
-                                            status=response.status_code,
-                                            detail=ERROR_RESPONSE_DICT[response.status_code]), response_data)
+            action_result_error_msg = "{}. {}".format(
+                consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code, detail=consts.ERROR_RESPONSE_DICT[response.status_code]),
+                response_message
+            )
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, action_result_error_msg), response_data, response)
 
         # Try parsing response, even in the case of an HTTP error the data might contain a json of details 'message'
         try:
@@ -403,22 +478,23 @@ class BmcremedyConnector(BaseConnector):
                 response_data = response.json()
             else:
                 response_data = {"content": response.content, "headers": response.headers}
-        except Exception as e:
+        except:
             # response.text is guaranteed to be NON None, it will be empty, but not None
             msg_string = consts.BMCREMEDY_ERR_JSON_PARSE.format(raw_text=response.text)
             self.debug_print(msg_string)
             # Set the action_result status to error, the handler function will most probably return as is
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, msg_string, e), response_data)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, msg_string), response_data, response)
 
-        if response.status_code in SUCCESS_RESPONSE_CODES:
-            return RetVal3(phantom.APP_SUCCESS, response_data, response)
+        if response.status_code in consts.SUCCESS_RESPONSE_CODES:
+            return RetVal3(action_result.set_status(phantom.APP_SUCCESS), response_data, response)
 
         # See if an error message is present
-        message = str(response_data.get('message', consts.BMCREMEDY_REST_RESP_OTHER_ERROR_MSG))
-        self.debug_print(consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code, detail=message))
+        message = response_data.get('message', consts.BMCREMEDY_REST_RESP_OTHER_ERROR_MSG)
+        error_message = consts.BMCREMEDY_ERR_FROM_SERVER.format(status=response.status_code, detail=message)
+        self.debug_print(error_message)
 
         # Set the action_result status to error, the handler function will most probably return as is
-        return RetVal3(action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_ERR_FROM_SERVER, status=response.status_code, detail=message), response_data)
+        return RetVal3(action_result.set_status(phantom.APP_ERROR, error_message), response_data, response)
 
     def _test_asset_connectivity(self, param):
         """ This function tests the connectivity of an asset with given credentials.
@@ -427,20 +503,18 @@ class BmcremedyConnector(BaseConnector):
         :return: status phantom.APP_SUCCESS/phantom.APP_ERROR (along with appropriate message)
         """
 
-        action_result = ActionResult()
+        action_result = self.add_action_result(ActionResult(dict(param)))
         self.save_progress(consts.BMCREMEDY_TEST_CONNECTIVITY_MSG)
         self.save_progress("Configured URL: {}".format(self._base_url))
 
         response_status = self._generate_api_token(action_result)
 
         if phantom.is_fail(response_status):
-            self.save_progress(action_result.get_message())
-            self.set_status(phantom.APP_ERROR, consts.BMCREMEDY_TEST_CONNECTIVITY_FAIL)
+            self.save_progress(consts.BMCREMEDY_TEST_CONNECTIVITY_FAIL)
             return action_result.get_status()
 
-        self.set_status_save_progress(phantom.APP_SUCCESS, consts.BMCREMEDY_TEST_CONNECTIVITY_PASS)
-
-        return action_result.get_status()
+        self.save_progress(consts.BMCREMEDY_TEST_CONNECTIVITY_PASS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_ticket(self, param):
         """ This function is used to create an incident.
@@ -465,9 +539,12 @@ class BmcremedyConnector(BaseConnector):
 
         try:
             fields_param = json.loads(fields_param)
+            if isinstance(fields_param, list):
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_FIELDS_PARAM_ERR_MSG)
         except Exception as e:
-            self.debug_print(consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
-            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(consts.BMCREMEDY_JSON_LOADS_ERROR.format(error_msg))
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_JSON_LOADS_ERROR.format(error_msg))
 
         attachment_list = param.get(consts.BMCREMEDY_JSON_VAULT_ID, '')
 
@@ -488,7 +565,7 @@ class BmcremedyConnector(BaseConnector):
         # fields_param may contain extra information apart from details of adding attachment. So getting information
         # about attachments and storing it in a separate dictionary, and removing corresponding details from
         # fields_param, so that fields_param can be used for creating incident.
-        for add_attachment_param in add_attachment_params_list:
+        for add_attachment_param in consts.ADD_ATTACHMENT_PARAMS_LIST:
             if add_attachment_param in fields_param:
                 add_attachment_details_param[add_attachment_param] = fields_param[add_attachment_param]
                 fields_param.pop(add_attachment_param)
@@ -510,11 +587,11 @@ class BmcremedyConnector(BaseConnector):
         if phantom.is_fail(response_status):
             return action_result.get_status()
 
-        if not response_data["headers"].get("Location"):
+        if not response_data.get("headers", {}).get("Location"):
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_LOCATION_NOT_FOUND)
 
         # Fetch url to get details of newly created incident
-        get_incident_data = re.findall("(?:/api).*", response_data["headers"].get("Location"))[0]
+        get_incident_data = re.findall("(?:/api).*", response_data.get("headers", {}).get("Location"))[0]
 
         # Get details of newly created incident
         response_status, incident_response_data = self._make_rest_call_abstract(get_incident_data, action_result,
@@ -524,13 +601,14 @@ class BmcremedyConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            if not incident_response_data.get("values").get("Incident Number"):
+            if not incident_response_data.get("values", {}).get("Incident Number"):
                 return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
 
-            summary_data["incident_id"] = incident_response_data["values"].get("Incident Number")
+            summary_data["incident_id"] = incident_response_data.get("values", {})["Incident Number"]
 
         except Exception as e:
-            self.debug_print("Error while summarizing data: {}".format(str(e)))
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print("Error while summarizing data: {}".format(error_msg))
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_SUMMARY_ERROR.format(
                 action_name="create_ticket"))
 
@@ -569,6 +647,8 @@ class BmcremedyConnector(BaseConnector):
 
         try:
             fields_param = json.loads(param.get(consts.BMCREMEDY_JSON_FIELDS, '{}'))
+            if isinstance(fields_param, list):
+                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_FIELDS_PARAM_ERR_MSG)
         except Exception as e:
             self.debug_print(consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_JSON_LOADS_ERROR.format(e))
@@ -590,26 +670,25 @@ class BmcremedyConnector(BaseConnector):
         if work_log_type:
             add_attachment_details_param["Work Log Type"] = work_log_type
 
+        # Getting update link for incident
+        return_status, update_link = self._get_url(action_result, incident_number)
+
+        if phantom.is_fail(return_status):
+            self.debug_print(consts.BMCREMEDY_URL_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_URL_NOT_FOUND)
+
+        if not update_link:
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
+
         # Getting parameters that are related to adding attachment
         # fields_param may contain extra information apart from details of adding attachment. So getting information
         # about attachments and removing corresponding details from fields_param
-        for add_attachment_param in add_attachment_params_list:
+        for add_attachment_param in consts.ADD_ATTACHMENT_PARAMS_LIST:
             if add_attachment_param in fields_param:
                 add_attachment_details_param[add_attachment_param] = fields_param[add_attachment_param]
                 fields_param.pop(add_attachment_param)
 
-        # If incident details are to be updated apart from adding attachment, then update API will be called
         if fields_param:
-            # Getting update link for incident
-            return_status, update_link = self._get_url(incident_number)
-
-            if phantom.is_fail(return_status):
-                self.debug_print(consts.BMCREMEDY_URL_NOT_FOUND)
-                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_URL_NOT_FOUND)
-
-            if not update_link:
-                return action_result.set_status(phantom.APP_SUCCESS, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
-
             data = json.dumps({"values": fields_param})
 
             # Updating incident based on field parameters given by user
@@ -674,6 +753,44 @@ class BmcremedyConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _paginator(self, action_result, params, endpoint, key, offset, max_results):
+        """
+        Fetch all the results using pagination logic.
+
+        :param action_result: object of ActionResult class
+        :param params: params to be passed while calling the API
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param key: response key that needs to fetched
+        :param offset: starting index of the results to be fetched
+        :param max_results: maximum number of results to be fetched
+        :return: status phantom.APP_ERROR/phantom.APP_SUCCESS, successfully fetched results or None in case of failure
+        """
+        items_list = list()
+
+        params['offset'] = offset
+        params['limit'] = consts.BMCREMEDY_DEFAULT_PAGE_LIMIT
+
+        while True:
+            ret_val, items = self._make_rest_call_abstract(endpoint, action_result, params=params, method='get')
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status(), None
+
+            items_list.extend(items.get(key, []))
+
+            # Max results fetched. Hence, exit the paginator.
+            if max_results and len(items_list) >= max_results:
+                return phantom.APP_SUCCESS, items_list[:max_results]
+
+            # 1. Items fetched is less than the default page limit, which means there is no more data to be processed
+            # 2. Next page link is not available in the response, which means there is no more data to be fetched from the server
+            if (len(items.get(key, [])) < consts.BMCREMEDY_DEFAULT_PAGE_LIMIT) or (not items.get('_links', {}).get('next')):
+                break
+
+            params['offset'] += consts.BMCREMEDY_DEFAULT_PAGE_LIMIT
+
+        return phantom.APP_SUCCESS, items_list
+
     def _list_tickets(self, param):
         """ Get list of incidents.
 
@@ -687,31 +804,41 @@ class BmcremedyConnector(BaseConnector):
         # Getting optional parameters
         limit = param.get(consts.BMCREMEDY_JSON_LIMIT)
         query = param.get(consts.BMCREMEDY_JSON_QUERY)
+        offset = param.get(consts.BMCREMEDY_JSON_OFFSET, consts.BMCREMEDY_DEFAULT_OFFSET)
 
         # Prepare request parameters
         # All incidents will be sorted in descending order based on their Last Modified date
         action_params = {"sort": "Last Modified Date.desc"}
 
-        if limit:
-            # Validate if limit is positive integer
-            if str(limit).isdigit() and int(limit) != 0:
-                action_params['limit'] = limit
-            else:
-                self.debug_print(consts.BMCREMEDY_JSON_LIMIT_PARAM_ERROR)
-                return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_JSON_LIMIT_PARAM_ERROR)
+        # Validate if 'limit' is positive integer
+        ret_val, limit = self._validate_integer(action_result, limit, 'limit', allow_zero=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        action_params['limit'] = limit
 
         if query:
             action_params['q'] = query
 
-        response_status, response_data = self._make_rest_call_abstract(consts.BMCREMEDY_LIST_TICKETS, action_result,
-                                                                       params=action_params, method='get')
+        # Integer validation for 'offset' parameter
+        ret_val, offset = self._validate_integer(action_result, offset, 'offset', allow_zero=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        action_params['offset'] = offset
+
+        # make rest call
+        response_status, response_data = self._paginator(
+            action_result, action_params, consts.BMCREMEDY_LIST_TICKETS,
+            'entries', offset, limit
+        )
 
         # Something went wrong while executing request
         if phantom.is_fail(response_status):
             return action_result.get_status()
 
-        summary_data['total_tickets'] = len(response_data.get('entries'))
-        action_result.add_data(response_data)
+        for data in response_data:
+            action_result.add_data(data)
+
+        summary_data['total_tickets'] = len(response_data)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -733,10 +860,10 @@ class BmcremedyConnector(BaseConnector):
 
         # Getting optional parameter
         if param.get("assignee_login_id"):
-            fields_param["Assignee Login ID"] = param["assignee_login_id"]
+            fields_param["Assignee Login ID"] = param.get("assignee_login_id")
 
         if param.get("status_reason"):
-            fields_param["Status_Reason"] = param["status_reason"]
+            fields_param["Status_Reason"] = param.get("status_reason")
 
         optional_parameter_list = ["assigned_support_company", "assigned_support_organization", "assigned_group",
                                    "assignee", "resolution"]
@@ -750,14 +877,14 @@ class BmcremedyConnector(BaseConnector):
         fields_param = {"values": fields_param}
 
         # Getting update link for incident
-        return_status, url = self._get_url(incident_number)
+        return_status, url = self._get_url(action_result, incident_number)
 
         if phantom.is_fail(return_status):
             self.debug_print(consts.BMCREMEDY_URL_NOT_FOUND)
             return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_URL_NOT_FOUND)
 
         if not url:
-            return action_result.set_status(phantom.APP_SUCCESS, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
 
         response_status, response_data = self._make_rest_call_abstract(str(url), action_result,
                                                                        data=json.dumps(fields_param), method='put')
@@ -777,38 +904,34 @@ class BmcremedyConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         add_attachment_details_param = dict()
         attachment_data = dict()
+        incident_number = param[consts.BMCREMEDY_INCIDENT_NUMBER]
 
         # List of optional parameters
         optional_parameters = {"comment": "Detailed Description", "view_access": "View Access",
                                "secure_work_log": "Secure Work Log"}
 
-        # Get optional parameters
-        attachment_list = param.get(consts.BMCREMEDY_JSON_VAULT_ID, '')
-
-        if attachment_list:
-            # Getting attachment related information
-            vault_details_status, add_attachment_details_param, attachment_data = \
-                self._provide_attachment_details(attachment_list, action_result)
-
-            # Something went wrong while executing request
-            if phantom.is_fail(vault_details_status):
-                return action_result.get_status()
-
         # Adding mandatory parameters
         add_attachment_details_param.update({
-            "Incident Number": param[consts.BMCREMEDY_INCIDENT_NUMBER],
+            "Incident Number": incident_number,
             "Work Log Type": param[consts.BMCREMEDY_COMMENT_ACTIVITY_TYPE]
         })
 
+        # Getting update link for incident
+        return_status, url = self._get_url(action_result, incident_number)
+
+        if phantom.is_fail(return_status):
+            self.debug_print(consts.BMCREMEDY_URL_NOT_FOUND)
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_URL_NOT_FOUND)
+
+        if not url:
+            return action_result.set_status(phantom.APP_ERROR, consts.BMCREMEDY_INCIDENT_NUMBER_NOT_FOUND)
+
         # Adding optional parameters in 'fields'
-        for key_param, api_key in optional_parameters.iteritems():
+        for key_param, api_key in optional_parameters.items():
             if param.get(key_param) and api_key not in add_attachment_details_param:
                 add_attachment_details_param[str(api_key)] = str(param.get(key_param))
 
-        if attachment_list:
-            attachment_data["entry"] = {"values": add_attachment_details_param}
-        else:
-            attachment_data["values"] = add_attachment_details_param
+        attachment_data["values"] = add_attachment_details_param
 
         add_attachment_status, add_attachment_response_data = self._add_attachment(attachment_data, action_result)
 
@@ -864,14 +987,14 @@ if __name__ == '__main__':
 
     pudb.set_trace()
     if len(sys.argv) < 2:
-        print 'No test json specified as input'
+        print('No test json specified as input')
         exit(0)
     with open(sys.argv[1]) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
-        print json.dumps(in_json, indent=4)
+        print(json.dumps(in_json, indent=4))
         connector = BmcremedyConnector()
         connector.print_progress_message = True
         return_value = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(return_value), indent=4)
+        print(json.dumps(json.loads(return_value), indent=4))
     exit(0)
