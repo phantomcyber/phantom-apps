@@ -1948,6 +1948,9 @@
                     "data_type": "string",
                     "column_name": "Email Address",
                     "column_order": 0,
+                    "contains": [
+                        "email"
+                    ],
                     "example_values": [
                         "test@testxyz.com"
                     ]
@@ -2174,6 +2177,9 @@
                 {
                     "data_path": "action_result.data.*.domain",
                     "data_type": "string",
+                    "contains": [
+                        "domain"
+                    ],
                     "example_values": [
                         "testxyz.com"
                     ]
@@ -2181,6 +2187,9 @@
                 {
                     "data_path": "action_result.data.*.emailAddress",
                     "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
                     "example_values": [
                         "test@testxyz.com"
                     ]
