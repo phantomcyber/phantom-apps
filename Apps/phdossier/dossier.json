@@ -19,6 +19,7 @@
     "utctime_updated": "2019-09-24T13:19:33.963396Z",
     "package_name": "phantom_dossier",
     "main_module": "dossier_connector.py",
+    "python_version": "2.7",
     "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "configuration": {
@@ -308,7 +309,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.data.threat.*.ip",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.*.data.threat.*.origin",
@@ -700,7 +707,10 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.data.threat.*.url",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.*.params.source",
@@ -3313,7 +3323,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.data.threat.*.ip",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "1.1.1.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.*.data.threat.*.origin",

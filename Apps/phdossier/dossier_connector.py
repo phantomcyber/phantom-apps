@@ -27,11 +27,6 @@ class DossierConnector(BaseConnector):
 
         self._state = None
 
-        # Variable to hold a base_url in case the app makes REST calls
-        # Do note that the app json defines the asset config, so please
-        # modify this as you deem fit.
-        self._base_url = None
-
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
         This method returns the encoded|original string based on the Python version.
@@ -154,7 +149,7 @@ class DossierConnector(BaseConnector):
             # Return success, no need to set the message, only the status
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
+            return action_result.set_status(phantom.APP_ERROR, ERR_FETCHING_DATA)
 
     def _handle_lookup_hash(self, param):
 
@@ -194,7 +189,7 @@ class DossierConnector(BaseConnector):
             # Return success, no need to set the message, only the status
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
+            return action_result.set_status(phantom.APP_ERROR, ERR_FETCHING_DATA)
 
     def _handle_lookup_url(self, param):
 
@@ -232,7 +227,7 @@ class DossierConnector(BaseConnector):
             # Return success, no need to set the message, only the status
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
+            return action_result.set_status(phantom.APP_ERROR, ERR_FETCHING_DATA)
 
     def _handle_lookup_ip(self, param):
 
@@ -271,7 +266,7 @@ class DossierConnector(BaseConnector):
             # Return success, no need to set the message, only the status
             return action_result.set_status(phantom.APP_SUCCESS)
         else:
-            return action_result.set_status(phantom.APP_ERROR, "Error fetching data")
+            return action_result.set_status(phantom.APP_ERROR, ERR_FETCHING_DATA)
 
     def handle_action(self, param):
 
@@ -305,10 +300,12 @@ class DossierConnector(BaseConnector):
         # that needs to be accessed across actions
         self._state = self.load_state()
 
-        # get the asset config
-        config = self.get_config()
-
-        self._base_url = config.get('base_url')
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, STATE_FILE_CORRUPT_ERR)
 
         return phantom.APP_SUCCESS
 
