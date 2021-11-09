@@ -9,13 +9,13 @@
     "product_name": "Chronicle",
     "python_version": "3",
     "product_version_regex": ".*",
-    "publisher": "Google",
-    "license": "Copyright (c) 2020-2021 Google LLC.",
-    "app_version": "2.1.0",
+    "publisher": "Splunk",
+    "license": "Copyright (c) 2020-2021 Splunk Inc.",
+    "app_version": "3.0.0",
     "utctime_updated": "2021-09-13T11:23:37.000000Z",
     "package_name": "phantom_chronicle",
     "main_module": "chronicle_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "latest_tested_versions": [
         "v1.7.1"
     ],
@@ -1029,6 +1029,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.events.*.metadata.ingestedTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-11-02T08:47:42.040912Z"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.events.*.metadata.collectedTimestamp",
                     "data_type": "string",
                     "example_values": [
@@ -1753,14 +1760,14 @@
                     "data_path": "action_result.data.*.alerts.*.alertInfos.*.udmEvent.metadata.productName",
                     "data_type": "string",
                     "example_values": [
-                        "Zscaler NSS"
+                        "Example product"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.alerts.*.alertInfos.*.udmEvent.metadata.vendorName",
                     "data_type": "string",
                     "example_values": [
-                        "Zscaler"
+                        "Example vendor"
                     ]
                 },
                 {
@@ -2023,7 +2030,7 @@
                     "data_path": "action_result.data.*.userAlerts.*.alertInfos.*.sourceProduct",
                     "data_type": "string",
                     "example_values": [
-                        "Office 365"
+                        "Example product"
                     ]
                 },
                 {
@@ -2065,14 +2072,14 @@
                     "data_path": "action_result.data.*.userAlerts.*.alertInfos.*.udmEvent.metadata.productName",
                     "data_type": "string",
                     "example_values": [
-                        "Office 365"
+                        "Example product"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.userAlerts.*.alertInfos.*.udmEvent.metadata.vendorName",
                     "data_type": "string",
                     "example_values": [
-                        "Microsoft"
+                        "Example vendor"
                     ]
                 },
                 {
@@ -2121,7 +2128,7 @@
                     "data_path": "action_result.data.*.userAlerts.*.alertInfos.*.udmEvent.target.application",
                     "data_type": "string",
                     "example_values": [
-                        "Exchange"
+                        "Example application"
                     ]
                 },
                 {
@@ -2846,6 +2853,81 @@
                     "example_values": [
                         "ru_746bd6d6-6b84-4007-b74c-ec90c7306a71"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.detection.*.ruleLabels.*.key",
+                    "data_type": "string",
+                    "example_values": [ 
+                        "author"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.detection.*.ruleLabels.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "rule1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.target.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "dhcp_server"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "ACK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.chaddr",
+                    "data_type": "string",
+                    "example_values": [
+                        "0d:60:ff:08:2c:ea"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.giaddr",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.5.64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.opcode",
+                    "data_type": "string",
+                    "example_values": [
+                        "BOOTREPLY"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.yiaddr",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.5.64"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.clientHostname",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.clientIdentifier",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.network.dhcp.leaseTimeSeconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        14410
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.detections.*.collectionElements.*.references.*.event.principal.asset.hostname",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_detections",

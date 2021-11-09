@@ -1,21 +1,8 @@
 # --
 # File: chronicle_consts.py
+# Copyright (c) 2020-2021 Splunk Inc.
 #
-# Copyright (c) 2020-2021 Google LLC.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# --
+# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 # Chronicle search endpoints
 GC_LIST_IOC_DETAILS_ENDPOINT = '/v1/artifact/listiocdetails'
@@ -112,7 +99,7 @@ GC_TECHNICAL_ERROR = 'Technical Error while making an API call to Chronicle. Emp
 GC_RESPONSE_ERROR = 'Retrieved unknown response while making an API call to Chronicle. Unknown response received'
 
 GC_UNABLE_CREATE_CLIENT_ERR = "Unable to create Chronicle API client"
-GC_PARSE_TIME_PARAM_ERROR = "Error occured while parsing time parameters"
+GC_PARSE_TIME_PARAM_ERROR = "Error occurred while parsing time parameters"
 GC_INTERNAL_SERVER_ERROR = 'Internal server error occurred, please try again later'
 GC_INVALID_RESPONSE_FORMAT = 'Invalid response format while making an API call to Chronicle. Response not in JSON format.'
 GC_RATE_LIMIT_EXCEEDED = 'API rate limit exceeded. Please try after sometime.'

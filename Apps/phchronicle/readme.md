@@ -1,18 +1,8 @@
 [comment]: # " File: readme.md"
 [comment]: # ""
-[comment]: # "    Copyright (c) 2020-2021 Google LLC."
+[comment]: # "    Copyright (c) 2020-2021 Splunk Inc."
 [comment]: # "    "
-[comment]: # "    Licensed under the Apache License, Version 2.0 (the 'License');"
-[comment]: # "    you may not use this file except in compliance with the License."
-[comment]: # "    You may obtain a copy of the License at"
-[comment]: # "    "
-[comment]: # "        http://www.apache.org/licenses/LICENSE-2.0"
-[comment]: # "    "
-[comment]: # "    Unless required by applicable law or agreed to in writing, software"
-[comment]: # "    distributed under the License is distributed on an 'AS IS' BASIS,"
-[comment]: # "    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied."
-[comment]: # "    See the License for the specific language governing permissions and"
-[comment]: # "    limitations under the License."
+[comment]: # "    Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
 ## SDK and SDK Licensing details for the app
 
@@ -737,20 +727,20 @@ configuration parameter.
             datapath. The partially fetched detections will be displayed in the action output.
 
     -   **Example:**
-        -   Get a list of 200 detections of ALERTIING type for the ruleId,
+        -   Get a list of 200 detections of ALERTING type for the ruleId,
             ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d, discovered within the enterprise for the last
             three days.
             -   Rule IDs= ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d
             -   Alert State= ALERTING
             -   Time Range= 3d
             -   Limit= 200
-        -   Get a list of 100 detections of NOT_ALERTIING type for the ruleIds,
+        -   Get a list of 100 detections of NOT_ALERTING type for the ruleIds,
             ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d and
             ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d@v_1605892822_687503000, discovered within a
             specified Start Time and End Time.
             -   Rule IDs= ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d,
                 ru_1f54ab4b-e523-48f7-ae25-271b5ea8337d@v_1605892822_687503000
-            -   Alert State= NOT_ALERTIING
+            -   Alert State= NOT_ALERTING
             -   Start Time= 2019-11-01T20:37:00Z
             -   End Time= 2021-02-01T20:37:00Z
             -   Limit= 100
