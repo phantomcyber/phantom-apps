@@ -12,7 +12,7 @@
     "product_vendor": "Check Point Software Technologies",
     "product_name": "Check Point Firewall",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "logo": "logo_checkpoint.svg",
     "logo_dark": "logo_checkpoint_dark.svg",
     "python_version": "3",
@@ -723,6 +723,594 @@
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list hosts",
+            "description": "List hosts",
+            "type": "correct",
+            "identifier": "list_hosts",
+            "read_only": false,
+            "parameters": {},
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "List Hosts"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.to",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.from",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.total",
+                    "data_type": "numeric",
+                    "example_values": [
+                        4
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.uid",
+                    "data_type": "string",
+                    "column_name": "Host UID",
+                    "column_order": 0,
+                    "example_values": [
+                        "3e8a6f97-1755-43f4-8057-870e8a25ddf9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.name",
+                    "data_type": "string",
+                    "column_name": "Host Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "Host_127.0.0.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.domain.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "41e821a0-3720-11e3-aa6e-0800200c9fde"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.domain.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SMC User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.domain.domain-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.ipv4-address",
+                    "data_type": "string",
+                    "column_name": "IPV4",
+                    "column_order": 2,
+                    "example_values": [
+                        "127.0.0.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.objects.*.ipv6-address",
+                    "data_type": "string",
+                    "column_name": "IPV6",
+                    "column_order": 3,
+                    "example_values": [
+                        "2002:7f00::"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully displayed hosts"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add host",
+            "description": "Add host ",
+            "verbose": "The <b>ip</b> parameter supports the following formats:<ul><li>IPv4: For example 123.123.123.123</li><li>IPv6: For example 2001:0db8:0000:0000:0000:ff00:0042:7879</li></ul>This action will always prioritize using the <b>ip</b> parameter unless <b>ipv4</b> and/or <b>ipv6</b> parameters are specified. If both ipv4 and ipv6 addresses are required, use the corresponding parameters explicitly.",
+            "type": "correct",
+            "identifier": "add_host",
+            "undo": "delete host",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Object/host name (must be unique in the domain)",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                },
+                "ip": {
+                    "description": "IPv4 or IPv6 address to add (if both addresses are required use ipv4 and ipv6 fields explicitly)",
+                    "data_type": "string",
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "required": false,
+                    "order": 1
+                },
+                "ipv4": {
+                    "description": "IPv4 address to add",
+                    "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
+                    "primary": true,
+                    "required": false,
+                    "order": 2
+                },
+                "ipv6": {
+                    "description": "IPv6 address to add",
+                    "data_type": "string",
+                    "contains": [
+                        "ipv6"
+                    ],
+                    "primary": true,
+                    "required": false,
+                    "order": 3
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Add Host"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "e1485577-3f1d-4ec2-89fc-a98747146d75",
+                        "b87fa85f-856d-4709-b3cf-05507f5511e7",
+                        "28c38771-4bf2-46fe-a402-f7dc29707d34"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.icon",
+                    "data_type": "string",
+                    "example_values": [
+                        "Objects/host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Host name",
+                    "column_order": 0,
+                    "example_values": [
+                        "test host ipv6",
+                        "new host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.color",
+                    "data_type": "string",
+                    "example_values": [
+                        "black"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.uid",
+                    "data_type": "string",
+                    "example_values": [
+                        "41e821a0-3720-11e3-aa6e-0800200c9fde"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "SMC User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.domain.domain-type",
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ],
+                    "contains": [
+                        "domain"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.comments",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.lock",
+                    "data_type": "string",
+                    "example_values": [
+                        "unlocked"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creator",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creation-time.posix",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1635365349344,
+                        1635363435459,
+                        1635364300075
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.creation-time.iso-8601",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-27T13:09-0700",
+                        "2021-10-27T12:37-0700",
+                        "2021-10-27T12:51-0700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "admin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modify-time.posix",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1635365349344,
+                        1635363435459,
+                        1635364300075
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.last-modify-time.iso-8601",
+                    "data_type": "string",
+                    "example_values": [
+                        "2021-10-27T13:09-0700",
+                        "2021-10-27T12:37-0700",
+                        "2021-10-27T12:51-0700"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.meta-info.validation-state",
+                    "data_type": "string",
+                    "example_values": [
+                        "ok"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.read-only",
+                    "data_type": "numeric",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv6-address",
+                    "data_type": "string",
+                    "column_name": "IPv6",
+                    "column_order": 2,
+                    "example_values": [
+                        "2001:db8::ff00:42:7879"
+                    ],
+                    "contains": [
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.nat-settings.auto-rule",
+                    "data_type": "numeric",
+                    "example_values": [
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully added host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ipv6",
+                    "data_type": "string",
+                    "example_values": [
+                        "2001:0db8:0000:0000:0000:ff00:0042:7879"
+                    ],
+                    "contains": [
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "test host ipv6",
+                        "new host"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.ipv4-address",
+                    "data_type": "string",
+                    "column_name": "IPv4",
+                    "column_order": 1,
+                    "example_values": [
+                        "192.0.2.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ip",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.0.2.1"
+                    ],
+                    "contains": [
+                        "ip",
+                        "ipv6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.ipv4",
+                    "data_type": "string",
+                    "example_values": [
+                        "192.0.2.1"
+                    ],
+                    "contains": [
+                        "ip"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "delete host",
+            "description": "Delete host ",
+            "verbose": "To delete a host, either specify <b>uid</b> or <b>name</b>. If provided both, this action will prioritize the <b>uid</b> parameter.",
+            "type": "correct",
+            "identifier": "delete_host",
+            "undo": "delete host",
+            "read_only": false,
+            "parameters": {
+                "uid": {
+                    "description": "Host's unique indentifier",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": false,
+                    "order": 0
+                },
+                "name": {
+                    "description": "Object/host name (must be unique in the domain)",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": false,
+                    "order": 1
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Delete Host"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "OK"
+                    ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully deleted host"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.uid",
+                    "data_type": "string",
+                    "column_name": "Host UID",
+                    "column_order": 0,
+                    "example_values": [
+                        "7a20fab7-f411-4a1b-a541-58c6d7596934"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "column_name": "Host Name",
+                    "column_order": 1,
+                    "example_values": [
+                        "test host ipv6 ipv4"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "logout session",
+            "description": "Logout of an exisiting session",
+            "verbose": "This action logs out of an existing session. For all other actions, logging out occurs automatically.",
+            "type": "correct",
+            "identifier": "logout_session",
+            "read_only": false,
+            "parameters": {
+                "session_id": {
+                    "description": "Session id to log out from",
+                    "data_type": "string",
+                    "primary": true,
+                    "required": true,
+                    "order": 0
+                }
+            },
+            "render": {
+                "type": "table",
+                "width": 12,
+                "height": 5,
+                "title": "Logout Session"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 0,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully logged out of session",
+                        "Could not connect to Check Point:\nWrong session id. Session may be expired. Please check session id and resend the request."
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.session_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "Us2qnsKc5SGKglzjVqXGfUKIjNOOcZxl7HYINyq0Lz8",
+                        "TMRsvIBQFDIFwpWQRLskhHD7XCP5pbgHzkmvlHORoOY"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1,
+                        0
+                    ]
                 }
             ],
             "versions": "EQ(*)"

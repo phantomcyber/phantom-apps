@@ -15,7 +15,7 @@
     "utctime_updated": "2020-12-02T14:21:45.475883Z",
     "package_name": "phantom_bitglass",
     "main_module": "bitglass_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "configuration": {
         "auth_token": {
@@ -879,5 +879,81 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip_dependencies": {
+        "wheel": [
+            {
+                "module": "Flask",
+                "input_file": "wheels/Flask-2.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "Jinja2",
+                "input_file": "wheels/Jinja2-3.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "MarkupSafe",
+                "input_file": "wheels/MarkupSafe-2.0.1-cp36-cp36m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "Werkzeug",
+                "input_file": "wheels/Werkzeug-2.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "beautifulsoup4",
+                "input_file": "wheels/beautifulsoup4-4.10.0-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-4.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "click",
+                "input_file": "wheels/click-8.0.3-py3-none-any.whl"
+            },
+            {
+                "module": "dataclasses",
+                "input_file": "wheels/dataclasses-0.8-py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "importlib_metadata",
+                "input_file": "wheels/importlib_metadata-4.8.1-py3-none-any.whl"
+            },
+            {
+                "module": "itsdangerous",
+                "input_file": "wheels/itsdangerous-2.0.1-py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.15.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "soupsieve",
+                "input_file": "wheels/soupsieve-2.2.1-py3-none-any.whl"
+            },
+            {
+                "module": "typing_extensions",
+                "input_file": "wheels/typing_extensions-3.10.0.2-py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "zipp",
+                "input_file": "wheels/zipp-3.6.0-py3-none-any.whl"
+            }
+        ]
+    }
 }

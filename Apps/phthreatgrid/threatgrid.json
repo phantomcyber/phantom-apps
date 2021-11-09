@@ -4,7 +4,7 @@
     "description": "This app supports executing investigative actions to analyze executables and URLs on the Threat Grid sandbox",
     "type": "sandbox",
     "main_module": "threatgrid_connector.py",
-    "app_version": "2.1.9",
+    "app_version": "2.2.0",
     "utctime_updated": "2021-10-12T17:10:33.000000Z",
     "package_name": "phantom_threatgrid",
     "product_vendor": "Threat Grid",
@@ -129,6 +129,14 @@
                         "threatgrid playbook name"
                     ],
                     "primary": true
+                },
+                "sample_password": {
+                    "description": "Password used to open the submitted file",
+                    "data_type": "string",
+                    "order": 6,
+                    "contains": [
+                        "password"
+                    ]
                 }
             },
             "output": [
@@ -148,6 +156,13 @@
                     ],
                     "example_values": [
                         "Test_ThreatGrid_1.exe"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.sample_password",
+                    "data_type": "string",
+                    "contains": [
+                        "password"
                     ]
                 },
                 {

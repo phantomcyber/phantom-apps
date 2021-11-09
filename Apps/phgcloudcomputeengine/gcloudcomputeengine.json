@@ -15,12 +15,89 @@
     "utctime_updated": "2021-03-16T16:49:10.000000Z",
     "package_name": "phantom_gcloudcomputeengine",
     "main_module": "gcloudcomputeengine_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "app_wizard_version": "1.0.0",
     "pip_dependencies": {
-        "pypi": [
+        "wheel": [
             {
-                "module": "google-api-python-client"
+                "module": "cachetools",
+                "input_file": "wheels/cachetools-4.2.4-py3-none-any.whl"
+            },
+            {
+                "module": "certifi",
+                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "chardet",
+                "input_file": "wheels/chardet-4.0.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google_api_core",
+                "input_file": "wheels/google_api_core-2.2.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google_api_python_client",
+                "input_file": "wheels/google_api_python_client-2.28.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google_auth",
+                "input_file": "wheels/google_auth-2.3.2-py2.py3-none-any.whl"
+            },
+            {
+                "module": "google_auth_httplib2",
+                "input_file": "wheels/google_auth_httplib2-0.1.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "googleapis_common_protos",
+                "input_file": "wheels/googleapis_common_protos-1.53.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "httplib2",
+                "input_file": "wheels/httplib2-0.20.1-py3-none-any.whl"
+            },
+            {
+                "module": "idna",
+                "input_file": "wheels/idna-2.10-py2.py3-none-any.whl"
+            },
+            {
+                "module": "protobuf",
+                "input_file": "wheels/protobuf-3.19.0-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+            },
+            {
+                "module": "pyasn1",
+                "input_file": "wheels/pyasn1-0.4.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyasn1_modules",
+                "input_file": "wheels/pyasn1_modules-0.2.8-py2.py3-none-any.whl"
+            },
+            {
+                "module": "pyparsing",
+                "input_file": "wheels/pyparsing-2.4.7-py2.py3-none-any.whl"
+            },
+            {
+                "module": "requests",
+                "input_file": "wheels/requests-2.25.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "rsa",
+                "input_file": "wheels/rsa-4.7.2-py3-none-any.whl"
+            },
+            {
+                "module": "setuptools",
+                "input_file": "wheels/setuptools-58.3.0-py3-none-any.whl"
+            },
+            {
+                "module": "six",
+                "input_file": "wheels/six-1.16.0-py2.py3-none-any.whl"
+            },
+            {
+                "module": "uritemplate",
+                "input_file": "wheels/uritemplate-4.1.1-py2.py3-none-any.whl"
+            },
+            {
+                "module": "urllib3",
+                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
             }
         ]
     },
