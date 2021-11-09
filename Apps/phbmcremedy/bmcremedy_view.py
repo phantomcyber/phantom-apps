@@ -26,7 +26,7 @@ def _get_ctx_result(result, provides):
         ctx_result['data'] = {"work_details": data[0]['work_details']['entries'],
                               "incident_details": data[0]['entries']}
     else:
-        ctx_result['data'] = data[0].get('entries')
+        ctx_result['data'] = data
     ctx_result['action'] = provides
 
     return ctx_result

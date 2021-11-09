@@ -1,6 +1,10 @@
 {% extends 'widgets/widget_template.html' %}
 {% load custom_template %}
 
+{% block title_color %}{{ title_color|default:'white' }}{% endblock %}
+{% block title_text_color %}{{ title_text_color|default:'rgb(101, 71, 150)' }}{% endblock %}
+{% block body_color %}{{ body_color|default:'white' }}{% endblock %}
+{% block body_text_color %}{{ body_text_color|default:'black' }}{% endblock %}
 {% block custom_title_prop %}{% if title_logo %}style="background-size: auto 60%; background-position: 50%; background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo }}');"{% endif %}{% endblock %}
 {% block title1 %}{{ title1 }}{% endblock %}
 {% block title2 %}{{ title2 }}{% endblock %}
@@ -17,11 +21,9 @@
 
 <style>
 
-
     a:hover {
         text-decoration:underline;
     }
-
 
     .wf-table-vertical {
     width: initial;
@@ -30,7 +32,7 @@
 
     .wf-table-vertical td{
     padding: 8px 10px;
-    border: 1px solid;
+    border: 1px solid rgb(234, 234, 234);
     }
 
     .wf-table-vertical tr td:first-child {
@@ -39,20 +41,21 @@
 
     .wf-table-horizontal {
         width: initial;
-        border: 1px solid;
+        border: 1px solid rgb(234, 234, 234);
         font-size: 12px;
     }
 
     .wf-table-horizontal th {
         text-align: center;
-        border: 1px solid;
+        border: 1px solid rgb(234, 234, 234);
         text-transform: uppercase;
         font-weight: normal;
+        color: rgb(108, 129, 139);
         padding: 5px;
     }
 
     .wf-table-horizontal td {
-        border: 1px solid;
+        border: 1px solid rgb(234, 234, 234);
         padding: 5px;
         padding-left: 4px;
     }
@@ -66,7 +69,7 @@
     }
 
 </style>
-<div style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
+<div class="bmcremedy" style="overflow: auto; width: 100%; height: 100%; padding-left:10px; padding-right:10px"> <!-- Main Div -->
     {% for result in results %} <!-- loop for each result -->
     <br>
 
@@ -83,10 +86,16 @@
             <td>{{result.param.query}}</td>
         </tr>
         {% endif %}
-        {% if result.param.limit %}
+        {% if result.param.limit is not None%}
         <tr>
             <td>Limit</td>
             <td>{{result.param.limit}}</td>
+        </tr>
+        {% endif %}
+        {% if result.param.offset is not None %}
+        <tr>
+            <td>Offset</td>
+            <td>{{result.param.offset}}</td>
         </tr>
         {% endif %}
         <tr>
