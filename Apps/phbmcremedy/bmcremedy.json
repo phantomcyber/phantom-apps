@@ -7,8 +7,8 @@
     "license": "Copyright (c) 2017-2021 Splunk Inc.",
     "main_module": "bmcremedy_connector.py",
     "type": "ticketing",
-    "app_version": "2.0.0",
-    "utctime_updated": "2018-12-07T02:10:53.000000Z",
+    "app_version": "2.0.1",
+    "utctime_updated": "2021-11-09T05:02:56.000000Z",
     "product_vendor": "BMC Software",
     "product_name": "BMC Remedy",
     "product_version_regex": ".*",
@@ -23,25 +23,25 @@
         "url": {
             "description": "Complete URL (e.g. http://mybmc.contoso.com:8008)",
             "data_type": "string",
-			"required": true,
+            "required": true,
             "order": 0
         },
         "verify_server_cert": {
             "description": "Verify server certificate",
             "data_type": "boolean",
-			"default": false,
+            "default": false,
             "order": 1
         },
         "username": {
             "description": "Username",
             "data_type": "string",
-			"required": true,
+            "required": true,
             "order": 2
         },
         "password": {
             "description": "Password",
             "data_type": "password",
-			"required": true,
+            "required": true,
             "order": 3
         }
     },
@@ -1267,7 +1267,7 @@
                     "contains": [
                         "bmcremedy incident id"
                     ],
-					"required": true,
+                    "required": true,
                     "primary": true,
                     "order": 0
                 },
@@ -1287,7 +1287,7 @@
                     "contains": [
                         "vault id"
                     ],
-					"primary": true,
+                    "primary": true,
                     "order": 3
                 }
             },
@@ -1295,7 +1295,7 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-					"column_name": "Incident ID",
+                    "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
@@ -1335,7 +1335,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-					"column_name": "Status",
+                    "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
                         "success",
@@ -1345,7 +1345,7 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
-					"column_name": "Message",
+                    "column_name": "Message",
                     "column_order": 2,
                     "example_values": [
                         "Incident updated successfully"
@@ -1393,7 +1393,7 @@
                         "bmcremedy incident id"
                     ],
                     "primary": true,
-					"required": true
+                    "required": true
                 }
             },
             "output": [
@@ -3115,7 +3115,7 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-					"column_name": "Incident ID",
+                    "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
@@ -3184,7 +3184,7 @@
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
-					"column_name": "Status",
+                    "column_name": "Status",
                     "column_order": 1,
                     "example_values": [
                         "success",
@@ -3242,13 +3242,13 @@
                     "contains": [
                         "bmcremedy incident id"
                     ],
-					"required": true,
+                    "required": true,
                     "primary": true
                 },
                 "work_info_type": {
                     "description": "Work Info Type",
                     "data_type": "string",
-					"required": true,
+                    "required": true,
                     "order": 1
                 },
                 "comment": {
@@ -3271,7 +3271,7 @@
                 {
                     "data_path": "action_result.parameter.id",
                     "data_type": "string",
-					"column_name": "Incident ID",
+                    "column_name": "Incident ID",
                     "column_order": 0,
                     "contains": [
                         "bmcremedy incident id"
